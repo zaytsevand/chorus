@@ -218,13 +218,6 @@ not start until the previous phase's postcondition holds.**
   committed; if no addendum existed, an offer to write
   `CHORUS-PROJECT.md` is on record.
 
-### Phase 6 — Don't replace the work
-
-- **Pre:** Phase 5 post holds.
-- **Post:** highest-priority concrete fix is offered as a PR draft to the
-  user, with the explicit "or stop here?" branch. Naming-without-shipping
-  has been actively resisted.
-
 ## Invariants
 
 These are the audit points of the discipline cascade. They hold across the

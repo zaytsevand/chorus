@@ -417,17 +417,6 @@ If no project addendum exists, **also offer to write
 `docs/reviews/CHORUS-PROJECT.md`** distilling the answers the user gave at
 Phase 0 so the next round starts from a baseline, not from interview again.
 
-### Phase 6 — Don't replace the work
-
-The doc is the artifact, not the fix. Watch for the team's naming-without-
-shipping pattern (the chorus typically exposes it; the chorus output can
-replicate it).
-
-After sign-off, **immediately** offer to open the highest-priority concrete fix
-as a PR draft. Phrase it as a question: "Want me to draft the F[N] fix PR now,
-or stop here?" — don't auto-PR without confirmation, but make it the obvious
-next step.
-
 ## Security addendum (default-on)
 
 Security review is **in scope on legacy paths** — exfil risk doesn't care about
@@ -463,7 +452,6 @@ arrive — security 🔴 frequently re-orders the top.
 | Agent opined without reading (project-specific claims with no `file:line` and not principle-grounded) | Brief did not mandate artefact-chain following, OR persona reasoned purely from training | Re-dispatch once with explicit "Read these artefacts first: …" amendment. Existing principles the persona invokes MUST cite where established (constitution clause, prior chorus finding, doc); new principles tag `[principle:proposed]`. Pure unsupported claims about the project get demoted to `[unsupported]` and excluded from the matrix. |
 | Phase 2 takes longer than Phase 1 | Briefs too open-ended | Tighter numbered questions, finding-IDs listed explicitly |
 | Conflicts unresolved after Phase 2 | Lens-vs-lens disagreement won't self-resolve | Single `advisor()` call beats another round |
-| Doc shipped, no PR | Naming-without-shipping pattern | Phase 6 forces the offer |
 | All personas join every round | RSVP became performative; round context too vague | Tighten round-context paragraph; require concrete deltas, not "general project state" |
 | Project-fact interview every round | Missing project addendum | Phase 5 offers to write `CHORUS-PROJECT.md` |
 | Artifact references Fn/Cn that have no description | Findings register omitted; matrix-only artifact | Phase 2 requires findings register with Summary column before the matrix |

@@ -18,10 +18,9 @@ Two patterns this skill is built to resist:
   from the actively-developed surface. The skill's Phase-0 scope-exclusion
   gate prevents this by baking the project's "do not produce findings about
   these paths" list into every persona brief.
-- **Naming-without-shipping.** A review document is not a fix. Phase 6
-  forces the chorus to offer the highest-priority concrete fix as a PR draft
-  immediately after sign-off, so the artifact does not replace the work it
-  describes.
+- **Findings without scaffolding.** The artifact is a durable baseline; the
+  next round assumes its top-5 either closed or explicitly carried forward.
+  Without that discipline, every chorus re-derives the same blockers.
 
 Two design choices worth knowing about:
 
@@ -105,16 +104,10 @@ flowchart TD
     end
 
     P5 --> Artifact[(docs/reviews/&lt;date&gt;-chorus-review.md<br/>commit it)]
-    Artifact --> P6
-
-    subgraph P6[Phase 6 — Don&apos;t replace the work]
-        P6a[Offer the highest-priority fix as a PR draft<br/>&quot;want me to draft the Fn fix PR now?&quot;]
-    end
-
-    P6 --> End([Round complete])
+    Artifact --> End([Round complete])
 
     classDef phase fill:#f5f5f5,stroke:#333,stroke-width:1px;
-    class P0,P05,P1,P2,P3,P4,P5,P6 phase;
+    class P0,P05,P1,P2,P3,P4,P5 phase;
 ```
 
 The integration layer (the calling session) is a thin orchestrator. It routes
