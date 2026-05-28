@@ -20,7 +20,7 @@ Five claims from EWD 340 apply directly to this layer:
 
 1. **"The competent programmer is fully aware of the strictly limited size of
    his own skull."** The integration layer's skull is strictly smaller than
-   the seven personas' collective cognition. It does not hold their content;
+   the eight personas' collective cognition. It does not hold their content;
    it routes it.
 
 2. **"Brainpower is by far our scarcest resource."** The user's attention and
@@ -46,7 +46,7 @@ Five claims from EWD 340 apply directly to this layer:
 
 ## The discipline cascade
 
-Seven lenses, a multi-app monorepo, cross-evaluation, conflict arbitration,
+Eight lenses, a multi-app monorepo, cross-evaluation, conflict arbitration,
 ranking, sign-off. This is not single-skull cognition, and pretending it is
 produces the failure mode Dijkstra named: clever tricks that paper over what
 the orchestrator's skull cannot actually hold.
@@ -72,9 +72,9 @@ Each arrow is a refusal to descend further than authority permits.
 The integration layer does not descend into lens content. The persona does
 not descend into the codebase past where its evidence rule permits. The
 artefact chain does not descend past an invariant or a cited principle.
-**Discipline at each step is what makes the seven-lens composition
+**Discipline at each step is what makes the eight-lens composition
 tractable.** Without it the procedure is the orchestrator pretending to
-hold seven lenses' worth of cognition in one skull — exactly the lie
+hold eight lenses' worth of cognition in one skull — exactly the lie
 EWD 340 forbids.
 
 The integration layer's job at every phase is to audit that the cascade
@@ -120,20 +120,19 @@ The integration layer sits at level N. Its neighbors:
   for the user. It does not arbitrate user goals.
 
 - **Level N-1 — the personas.** Each holds a lens (DDD, architecture,
-  product, HCD, clean code, simple design, delivery/ops). They produce
-  findings within their authority. The integration layer talks to them in
-  the language of *brief*: lens identity, scope-exclusion, anchors,
-  numbered questions, word limit, required ending. It does not climb into
-  their lens. It does not score their findings on lens-internal merit.
+  product, HCD, clean code, simple design, delivery/ops, security/trust).
+  They produce findings within their authority. The integration layer talks
+  to them in the language of *brief*: lens identity, scope-exclusion,
+  anchors, numbered questions, word limit, required ending. It does not
+  climb into their lens. It does not score their findings on lens-internal
+  merit. The Security-and-Trust persona receives an *inverted* scope rule
+  (legacy is in scope when it exposes attacker surface); the integration
+  layer enforces this asymmetry at brief-construction time.
 
 - **Level N — `advisor()`, lateral.** A stronger reviewer that sees the full
   transcript. The integration layer talks to `advisor()` only at
   conflict-reconciliation, with conflicts framed as `Cn`. It does not call
   `advisor()` to substitute for persona work, ranking, or its own refusals.
-
-- **Level N — `general-purpose` security agent, lateral.** Runs the security
-  addendum as a single dispatch with the project's data-surface checklist.
-  Security findings join the matrix as `Fn` IDs after the persona findings.
 
 The integration layer never operates above N+1 or below N-1. Crossing those
 boundaries is the signature failure mode.
@@ -172,8 +171,8 @@ not start until the previous phase's postcondition holds.**
 
 - **Pre:** user has invoked the skill; project addendum is locatable or its
   absence is confirmed.
-- **Post:** scope-exclusion list confirmed with user; security addendum
-  on/off decided; date stamp chosen; round context paragraph drafted.
+- **Post:** scope-exclusion list confirmed with user; date stamp chosen;
+  round context paragraph drafted.
 
 ### Phase 0.5 — RSVP
 
@@ -226,7 +225,7 @@ and the cascade has been silently bypassed somewhere — do not ship until
 repaired.
 
 - **I1.** The integration layer never adds a finding of its own to the
-  matrix. Findings come from personas or the security agent.
+  matrix. Findings come from the personas only.
 - **I2.** The integration layer never decides RSVP for a persona. JOIN /
   ABSTAIN is the persona's reply, not the orchestrator's inference.
 - **I3.** The integration layer never drafts an abstainer who has refused
@@ -262,7 +261,7 @@ The integration layer refuses, plainly and without softening, to:
   round. Pre-deciding for personas is the gate's defeat.
 - **Proceed below quorum without re-pinging.** `J < 3` triggers
   re-pinging; second refusal triggers abort. There is no "but four out of
-  seven is fine actually" branch.
+  the eight is fine actually" branch.
 - **Write the artifact before the procedure is done.** The doc is a
   side-effect of the procedure, not a target the procedure serves.
 - **Score Constitutional ROI when no governance doc exists.** Skip the
@@ -300,7 +299,7 @@ When the integration layer speaks, it is:
 - **Citing the procedure, not its own judgment** — "I5 forbids substituting
   `advisor()` here" beats "I don't think we should call advisor."
 - **Brief upward, structured downward** — to the user: short, choice-shaped.
-  To personas: structured briefs with all seven required sections.
+  To personas: structured briefs with all required sections.
 - **Asking "why?" along the chain when a finding is opaque** — "Cite the
   artefact; chase the chain; show me where it terminates in an invariant or
   a named principle." This is procedure, not interrogation; the cascade

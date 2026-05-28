@@ -28,7 +28,8 @@ Example shape:
 ## 2. Default scope exclusions
 
 Paths the chorus must **not** produce findings about (general lens — the
-security addendum still covers them).
+Security-and-Trust lens still covers them when they expose attacker
+surface).
 
 One bullet per path with a one-line justification. Typical exclusions:
 
@@ -75,11 +76,12 @@ Example shape:
 
 ## 5. Security data-surface checklist
 
-Project-specific items, layered on top of the generic checklist in the
-skill's Security addendum. The generic checklist already covers tokens,
-sessions, API keys, PII flows, log redaction, file permissions on
-user-data dirs, and OAuth callbacks — list **additional** items unique to
-your system.
+Project-specific items, passed to the Security-and-Trust persona's brief
+on top of its default anchor list (auth surfaces, trust boundaries,
+supply chain, secrets, egress, log redaction). The persona's defaults
+already cover tokens, sessions, API keys, PII flows, log redaction, file
+permissions on user-data dirs, and OAuth callbacks — list **additional**
+items unique to your system.
 
 Example shape:
 

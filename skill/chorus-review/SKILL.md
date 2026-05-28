@@ -55,8 +55,9 @@ The addendum should contain:
    under "Constitutional ROI." If none exist, that ranking dimension is
    skipped.
 5. **Security data-surface checklist** — project-specific items (token storage,
-   PII flows, key exposure, log redaction, callback validation). Layered on
-   top of the generic checklist in the Security addendum below.
+   PII flows, key exposure, log redaction, callback validation). Passed
+   verbatim to the Security-and-Trust persona's brief on top of its default
+   anchor list.
 6. **Baseline references** — paths to prior chorus artifacts the next round
    should treat as already-accounted-for. The most recent artifact is the
    primary baseline.
@@ -123,9 +124,9 @@ The exclusion gate prevents this.
    > boundary (the boundary itself is in scope; the legacy module's internals
    > are not).
 
-4. The security review pass has different rules — see "Security addendum" below.
-   Security IS in scope on legacy paths because exfil risk doesn't care about
-   tech-debt labels.
+4. The Security-and-Trust persona has different scope rules — see
+   "Security-and-Trust lens" below. Security IS in scope on legacy paths
+   because exfil risk doesn't care about tech-debt labels.
 
 ## The procedure
 
@@ -133,13 +134,13 @@ The exclusion gate prevents this.
 
 - Load the project addendum (or interview the user inline if absent).
 - Confirm scope-exclusion list with the user (above).
-- Confirm any *additional* lenses to include or omit. Default chorus roster is seven:
+- Confirm any *additional* lenses to include or omit. Default chorus roster is eight:
   - Evans (DDD), Richards (architecture), Cooper (adversarial product),
     Norman (HCD), Uncle Bob (clean code/SOLID), Beck (TDD/simple design),
-    Delivery-and-Ops (CD discipline / operability / observability / cost).
+    Delivery-and-Ops (CD discipline / operability / observability / cost),
+    Security-and-Trust (trust boundaries / threat modeling / security poverty line).
   - Per-round participation is decided by the Phase 0.5 RSVP step;
-    the default *roster* is seven, the actual quorum each round may be smaller.
-- Confirm whether the security addendum runs (default: yes).
+    the default *roster* is eight, the actual quorum each round may be smaller.
 - Confirm date stamp for the artifact (`docs/reviews/YYYY-MM-DD-chorus-review.md`).
 
 ### Phase 0.5 — RSVP (per-round self-selection)
@@ -417,30 +418,32 @@ If no project addendum exists, **also offer to write
 `docs/reviews/CHORUS-PROJECT.md`** distilling the answers the user gave at
 Phase 0 so the next round starts from a baseline, not from interview again.
 
-## Security addendum (default-on)
+## Security-and-Trust lens (scope override)
 
-Security review is **in scope on legacy paths** — exfil risk doesn't care about
-tech-debt labels, so the general scope-exclusion list does not apply here. Run
-as a single `general-purpose` agent (not a persona) with an explicit
-data-surface checklist.
+The Security-and-Trust persona participates via RSVP like the other seven personas, but
+its scope rule is different: **the general scope-exclusion list does NOT
+apply to this lens**. Exfil risk does not care about tech-debt labels — a
+legacy module that touches credentials, runs in production, and is reachable
+from the network is in scope for Security-and-Trust regardless of whether the
+rest of the chorus excludes it.
 
-**Generic checklist (always applies):**
-- Token / credential storage, hash algorithm, transmission (URL, body, headers)
-- Session / cookie storage and permissions
-- API-key exposure (server-side vs reachable from client)
-- PII handling — what data flows to LLMs, third-party APIs, logs, telemetry
-- Log redaction — present and symmetric across server, client, tray
-- File permissions on directories holding user-supplied data
-- Open-redirect / callback / OAuth-state validation
-- Cross-context leakage where layer-boundary contracts (e.g., import-linter)
-  are not enforced
+This rule lives in the persona's brief (the agent file's "A note on legacy"
+section). The orchestrator's Phase 1 brief for Security-and-Trust must NOT
+include the scope-exclusion list verbatim the way it does for the other
+seven personas; instead, brief Security-and-Trust that **legacy paths are
+in scope when they expose attacker surface**, and that the general
+scope-exclusion list applies only to non-security concerns.
 
-**Project-specific items** come from the project addendum's "Security
-data-surface checklist" item. Layer those on top of the generic list.
+The project addendum's section 5 (Security data-surface checklist) carries
+project-specific items the Security-and-Trust persona should layer on top of
+its default anchor list (auth surfaces, trust boundaries, supply chain,
+secrets, egress, log redaction). Pass that checklist verbatim in the brief.
 
-Findings land in the matrix as the next available `Fn` IDs after the persona
-findings, with the same severity scheme. Re-rank top-5 after security findings
-arrive — security 🔴 frequently re-orders the top.
+When Security-and-Trust RSVPs JOIN, its findings land in the matrix as the
+next available `Fn` IDs alongside the other personas — same severity scheme,
+same evidence rule (I8). When it ABSTAINS, no separate security pass runs;
+the round proceeds without security findings, recorded honestly in the round
+roster like any other abstention.
 
 ## Failure modes (collected from prior runs)
 

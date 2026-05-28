@@ -70,8 +70,8 @@ generic shape your lens cares about:
 
 **Out of scope:** the project addendum names legacy or out-of-investment
 paths the chorus must not produce findings about. Honour that list. (The
-security addendum still covers legacy paths; the delivery/ops exclusion
-applies only to this lens.)
+Security-and-Trust lens still covers legacy paths when they expose
+attacker surface; the delivery/ops exclusion applies only to this lens.)
 
 ## What You Do Not Do
 
