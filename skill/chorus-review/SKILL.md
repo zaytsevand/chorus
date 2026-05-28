@@ -60,10 +60,31 @@ The addendum should contain:
 6. **Baseline references** — paths to prior chorus artifacts the next round
    should treat as already-accounted-for. The most recent artifact is the
    primary baseline.
+7. **Anchor-discovery procedure** — project-specific shape of the lightweight
+   procedure the orchestrator uses each round to build Phase 1's "existing
+   artefacts to re-examine first" list dynamically. Static anchor lists go
+   stale; a procedure stays current. Typical components:
+   - **Architecture doc** — the single index of truth-pointers (e.g.,
+     `docs/architecture.md`); the orchestrator reads it as the first anchor.
+   - **Spec head-scan** — instead of reading every spec fully, the orchestrator
+     does `head -n 20 specs/<NNN-slug>/spec.md` per relevant spec to know
+     what it covers. Specs are starting points; the head-scan is the cheapest
+     way to identify which spec(s) the round touches.
+   - **Memory recall** — `memsearch` or the project's memory recall surface,
+     for prior context on the round's deltas (what did the team learn last
+     time? what was deferred? what's a known fragile area?).
+   - **Spec-slug grep** — `rg "specs/0[0-9]+" --type <lang>` to find code
+     that references specs explicitly; each match is a pointer from code →
+     spec → invariant chain. Follow the chain; do not stop at the spec.
+   The output of the procedure IS the per-lens anchor list that Phase 1
+   section 4 of the brief consumes. Item 3 (Default anchor surface) gives
+   the static fallback when discovery yields nothing; item 7 is the dynamic
+   first move.
 
 When an addendum is missing, the orchestrator MUST ask the user for items
-(2), (3), and (5) at minimum before launching agents. Items (1), (4), (6) can
-be inferred from `CLAUDE.md` / `AGENTS.md` / repo layout if not provided.
+(2), (3), and (5) at minimum before launching agents. Items (1), (4), (6),
+(7) can be inferred from `CLAUDE.md` / `AGENTS.md` / repo layout if not
+provided.
 
 ## Required scope-exclusion gate (run BEFORE spawning agents)
 
@@ -200,13 +221,54 @@ Required brief sections per agent:
 2. **Project topology** — pulled from the project addendum's "Project summary"
    item; include constitution / governance doc location if any.
 3. **Scope-exclusion list** (verbatim, see above).
-4. **Specific files to read first** — pick 3–6 anchors per lens from the
-   addendum's "Default anchor surface" plus any lens-specific picks; do NOT
-   say "explore the codebase."
-5. **Numbered questions** — 4–7 questions through that lens.
-6. **Word limit** — 500–700 words.
-7. **Required ending** — "End with [specific call-to-action: a recommendation,
-   a finding, a persona name]."
+4. **Existing artefacts to re-examine first** — the load-bearing brief
+   section. Artefacts come in many forms: code, tests, configs, dashboards,
+   SQL, runbooks, ADRs, specs, BDD scenarios, AsyncAPI/OpenAPI contracts.
+   **Specs are starting points, not endpoints** — every `specs/<NNN-slug>`
+   reference in the codebase is a pointer; follow it. Apply the why-why-why
+   mantra: **do not stop at any single artefact unless it is an invariant**
+   — an executable assertion (BDD, fitness function, architectural test) or
+   a principle stated in the project's constitution/governance doc. A spec
+   that has no executable assertion is intermediate; chase it down to the
+   test or principle it implements, OR surface the gap as the finding.
+
+   Build the anchor list using the project addendum's item 7 (Anchor-
+   discovery procedure) — architecture doc, spec head-scan, memory recall,
+   spec-slug grep. Yields 4–8 specific paths per lens with `file:line`
+   targets where known. Mix artefact types where appropriate. The phrase
+   to ban is *"read whatever seems relevant"*; the phrase to bake in is
+   *"chase this artefact until you hit an invariant or run out of pointers."*
+
+   Section 4 closes with the mandate: **"Before you write a finding, you
+   MUST have either followed the artefact chain to an invariant or runs-
+   out-of-pointers, OR tagged your finding `[principle]` (existing,
+   cited) / `[principle:proposed]` (newly named)."**
+5. **Prior position to challenge** *(optional but high-leverage when
+   applicable)* — if a multi-turn design chat or a prior chorus has produced
+   a consensus, state it verbatim and direct the persona to attack it with
+   code-grounded behavioural evidence, not re-derive from principles.
+
+   Framing the persona must carry into Round 1: **principles (invariants)
+   ARE load-bearing** — they are the Platonic foundation the system is
+   built on; a lens-internal principle is not "just opinion." HOWEVER,
+   **declared intentions are not behaviour** — a documented invariant
+   that no executable assertion enforces is a claim, not a fact. Code is
+   the final truth on what the system actually does. The brief instructs:
+   *"Attack declared intentions with behavioural evidence; respect
+   invariants by citing where they are enforced (or surface the absence
+   of enforcement as the finding)."*
+6. **Numbered questions** — 4–7 questions through that lens.
+7. **Word limit** — 500–700 words.
+8. **Evidence rule** — every finding either cites `file:line` (claims
+   about THIS project's artefacts) OR carries an explicit `[principle]`
+   tag (existing principle — MUST cite where established: constitution
+   clause, prior chorus finding, project doc) OR `[principle:proposed]`
+   tag (genuinely new principle being named for the first time).
+   Findings making project-specific claims without `file:line` and not
+   principle-grounded are unsupported and demoted at the Phase-1 evidence-
+   check gate (see below).
+9. **Required ending** — "End with [specific call-to-action: a
+   recommendation, a finding, a persona name]."
 
 **Persona-agent failure mode (hung-on-enumeration pattern):** if an agent goes
 silent for >5 minutes with a substantial transcript already written, it has
@@ -220,6 +282,33 @@ report to `.claude/agent-memory/<persona-name>/` and return only a summary.
 After each agent completes, check that path and `Read` any new memory files —
 those ARE the report content.
 
+#### Phase 1 evidence check (gate before writing the register)
+
+Before writing the findings register, the integration layer scans each
+Round-1 report and verifies:
+
+1. **Tool-use count > 0** — the agent opened at least one artefact. Zero-
+   tool-use reports are re-dispatched ONCE with an explicit "Read these
+   artefacts first: …" amendment. A second zero-tool-use round → mark the
+   lens **substituted-without-evidence** in the artifact; do not register
+   findings from that lens.
+
+2. **Project-specific findings carry `file:line`.** Findings making claims
+   about THIS project without `file:line` and without a principle tag get
+   demoted to `[unsupported]` rows in the register — they appear with the
+   tag visible, do not enter the matrix, and do not contribute to
+   convergence counts. Pure `[principle]` findings (existing, cited) and
+   `[principle:proposed]` findings (newly named) are accepted as-is.
+
+3. **The register Summary column** preserves the `[principle]` /
+   `[principle:proposed]` / `[unsupported]` tag so future readers can
+   distinguish evidence-grounded findings from declarative or unsupported
+   ones at a glance.
+
+The gate is enforced by I8 in `INTEGRATION-LAYER.md`. The integration layer
+never accepts a report whose project-specific findings lack `file:line` or
+a principle tag.
+
 ### Phase 2 — Cross-evaluation (parallel reactions, one per joiner)
 
 Once all Round 1 reports are in, write a **findings register** followed by a
@@ -229,7 +318,7 @@ Once all Round 1 reports are in, write a **findings register** followed by a
 
 | ID | Advisor | Lens | Severity | Target | Summary |
 |----|---------|------|----------|--------|---------|
-| F1 | Evans | DDD | 🔴 | `src/orders/models.py` | Aggregate root has no invariant enforcement; Order can be saved in illegal state |
+| F1 | Evans | DDD | 🔴 | `webapp/data/models.py` | Aggregate root has no invariant enforcement; Order can be saved in illegal state |
 | … | | | | | |
 
 Every cell in the Summary column must be a complete sentence readable without
@@ -257,7 +346,15 @@ no original report to react with). Each gets:
    - Overreach (where another lens spoke outside its authority)
    - Retract or sharpen anything from your Round 1
    - Cross-cutting themes the matrix flagged
-4. **End with:** "which finding does YOUR-LENS want PRIORITIZED, and which
+4. **Evidence rule continues in Round 2.** Agreements, pushbacks, overreach
+   claims, and retractions that make project-specific assertions cite
+   `file:line`. "I read X.py:NN and confirm Bob's claim" is a citation.
+   "Bob is correct" with no file reference is `[principle]` at best
+   (existing, cited) or `[unsupported]` at worst. Genuinely new principles
+   introduced in Round 2 carry `[principle:proposed]`. The same
+   evidence-check gate that ran post-Round-1 runs post-Round-2: unsupported
+   project-specific assertions are demoted, not registered as findings.
+5. **End with:** "which finding does YOUR-LENS want PRIORITIZED, and which
    does YOUR-LENS think is over-rated?"
 
 Word limit: 500–600.
@@ -363,6 +460,7 @@ arrive — security 🔴 frequently re-orders the top.
 | Persona agent silent >5 min with large transcript | "Enumerate everything" mode | Kill, substitute with bounded `Explore` scan |
 | Findings dominated by legacy code | No exclusion gate | Phase 0 scope confirmation |
 | Reports return summaries only, no content | Agent wrote to its memory dir | Check `.claude/agent-memory/<persona>/`, `Read` any new files |
+| Agent opined without reading (project-specific claims with no `file:line` and not principle-grounded) | Brief did not mandate artefact-chain following, OR persona reasoned purely from training | Re-dispatch once with explicit "Read these artefacts first: …" amendment. Existing principles the persona invokes MUST cite where established (constitution clause, prior chorus finding, doc); new principles tag `[principle:proposed]`. Pure unsupported claims about the project get demoted to `[unsupported]` and excluded from the matrix. |
 | Phase 2 takes longer than Phase 1 | Briefs too open-ended | Tighter numbered questions, finding-IDs listed explicitly |
 | Conflicts unresolved after Phase 2 | Lens-vs-lens disagreement won't self-resolve | Single `advisor()` call beats another round |
 | Doc shipped, no PR | Naming-without-shipping pattern | Phase 6 forces the offer |

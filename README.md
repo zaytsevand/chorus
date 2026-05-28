@@ -35,6 +35,121 @@ Two design choices worth knowing about:
   its own, never substitutes `advisor()` for cognitive work. See
   `skill/chorus-review/INTEGRATION-LAYER.md`.
 
+## Lifecycle of a review
+
+```mermaid
+flowchart TD
+    Start([User: &quot;spawn the chorus&quot;]) --> P0
+
+    subgraph P0[Phase 0 — Brief]
+        direction TB
+        P0a[Load CHORUS-PROJECT.md addendum<br/>or interview the user inline]
+        P0b[Confirm scope-exclusion list]
+        P0c[Confirm roster &amp; security toggle]
+        P0a --> P0b --> P0c
+    end
+
+    P0 --> P05
+
+    subgraph P05[Phase 0.5 — RSVP]
+        direction TB
+        P05a[Draft round-context paragraph<br/>commits, specs, infra, incidents since last round]
+        P05b[Dispatch all roster personas in parallel<br/>each replies JOIN or ABSTAIN]
+        P05a --> P05b
+    end
+
+    P05 --> Quorum{Joiners?}
+    Quorum -- J &lt; 3 --> Abort([Abort honestly<br/>write -chorus-abstained.md])
+    Quorum -- J ≥ 3 --> P1
+
+    subgraph P1[Phase 1 — Round 1]
+        direction TB
+        P1a[Spawn joiners in parallel<br/>self-contained briefs]
+        P1b[Each persona: read artefacts,<br/>chase the why-why-why chain]
+        P1c[Evidence gate I8 — every finding<br/>cites file:line or principle tag]
+        P1a --> P1b --> P1c
+    end
+
+    P1 --> Register[Findings register + consolidation matrix]
+    Register --> P2
+
+    subgraph P2[Phase 2 — Cross-evaluation]
+        direction TB
+        P2a[One Round-2 agent per joiner]
+        P2b[Each reacts to others&apos; findings:<br/>sharpen, push back, overreach, retract]
+        P2a --> P2b
+    end
+
+    P2 --> P3
+
+    subgraph P3[Phase 3 — Conflict reconciliation]
+        P3a[Identify Cn conflicts<br/>single advisor call arbitrates]
+    end
+
+    P3 --> P4
+
+    subgraph P4[Phase 4 — Ranking]
+        P4a[Score on Cost / Value / Convergence<br/>+ Constitutional ROI if governance doc exists<br/>→ top-5]
+    end
+
+    P4 --> Sec{Security<br/>addendum?}
+    Sec -- yes --> SecPass[General-purpose agent<br/>with data-surface checklist] --> ReRank[Re-rank top-5 if security 🔴 lands]
+    Sec -- no --> P5
+    ReRank --> P5
+
+    subgraph P5[Phase 5 — Sign-off]
+        direction TB
+        P5a[TL;DR + pre-public-rollout gate<br/>+ next-chorus baseline]
+        P5b[advisor sanity pass]
+        P5a --> P5b
+    end
+
+    P5 --> Artifact[(docs/reviews/&lt;date&gt;-chorus-review.md<br/>commit it)]
+    Artifact --> P6
+
+    subgraph P6[Phase 6 — Don&apos;t replace the work]
+        P6a[Offer the highest-priority fix as a PR draft<br/>&quot;want me to draft the Fn fix PR now?&quot;]
+    end
+
+    P6 --> End([Round complete])
+
+    classDef phase fill:#f5f5f5,stroke:#333,stroke-width:1px;
+    class P0,P05,P1,P2,P3,P4,P5,P6 phase;
+```
+
+The integration layer (the calling session) is a thin orchestrator. It routes
+between personas, the user, and `advisor()`, but never holds a lens, never
+adds findings of its own, and never substitutes `advisor()` for cognitive
+work. The invariants enforcing that — including the **I8 evidence gate** the
+diagram references — live in
+[`skill/chorus-review/INTEGRATION-LAYER.md`](skill/chorus-review/INTEGRATION-LAYER.md).
+
+## Principles
+
+The chorus is a procedure for surfacing trade-offs. It is not a substitute
+for the engineering principles a project anchors trade-offs against. Three
+principles are baked in as **groundwork** — the floor every project inherits
+unless its own constitution names something stronger. The full text lives in
+[`docs/PRINCIPLES.md`](docs/PRINCIPLES.md); each one is implemented by
+specific phases of the procedure above.
+
+| Principle | What it says | How the chorus implements it |
+|---|---|---|
+| **P1 — API-First** | Every cross-component interaction is specified before it is implemented. The spec is the source of truth; generated artefacts are not hand-edited. | Phase 1 personas (especially Richards, Uncle Bob, Evans) check whether a spec exists for each new boundary they encounter. *Absence of a spec is itself a finding* — tagged `[principle:P1]` per the I8 evidence rule. The persona briefs name P1 explicitly in the "Existing artefacts to re-examine first" mandate. |
+| **P2 — No Side-Effects** | A function does exactly what its name says — no more. Hidden chaining is a smell. | Uncle Bob's review checklist item 5 ("hidden side effects?") references P2 directly. Evans flags the same pattern as anaemic-service-around-anaemic-model in DDD terms. The cross-evaluation phase surfaces side-effects two lenses caught independently as convergent 🔴 findings. |
+| **P3 — Test-First (TDD)** | A failing test exists in the same commit as the production code that makes it pass. | Beck's review treats missing tests as part of the finding, not a separate nit. Uncle Bob escalates missing tests to **blocker** severity. Phase 1's "chase the artefact chain to an invariant" mandate makes executable tests the cheapest stopping point — code without tests forces the persona to surface the missing assertion as the finding. |
+
+Projects with stronger or more-specific principles (layer rules, language
+mandates, infrastructure constraints) declare them in section 4 of
+[`templates/CHORUS-PROJECT.template.md`](templates/CHORUS-PROJECT.template.md)
+under "Constitutional / governance principles." Phase 4 ranking consumes that
+list under "Constitutional ROI."
+
+Persona agents reference principles by tag — `[principle:P1]`,
+`[principle:P2]`, `[principle:P3]`, or `[principle:<project-tag>]`. The
+tag identifies what is being invoked; the cite (file path, clause number,
+prior chorus finding) shows where it is grounded.
+
 ## Install
 
 ### Canonical (clone + script)
