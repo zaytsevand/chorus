@@ -128,27 +128,31 @@ diagram references — live in
 
 The chorus is a procedure for surfacing trade-offs. It is not a substitute
 for the engineering principles a project anchors trade-offs against. Three
-principles are baked in as **groundwork** — the floor every project inherits
-unless its own constitution names something stronger. The full text lives in
-[`docs/PRINCIPLES.md`](docs/PRINCIPLES.md); each one is implemented by
-specific phases of the procedure above.
+cross-cutting concerns recur across every lens — they aren't a separate
+doctrine layered on top of the personas, they're how each persona
+*already* reads code through their own vocabulary:
 
-| Principle | What it says | How the chorus implements it |
-|---|---|---|
-| **P1 — API-First** | Every cross-component interaction is specified before it is implemented. The spec is the source of truth; generated artefacts are not hand-edited. | Phase 1 personas (especially Richards, Uncle Bob, Evans) check whether a spec exists for each new boundary they encounter. *Absence of a spec is itself a finding* — tagged `[principle:P1]` per the I8 evidence rule. The persona briefs name P1 explicitly in the "Existing artefacts to re-examine first" mandate. |
-| **P2 — No Side-Effects** | A function does exactly what its name says — no more. Hidden chaining is a smell. | Uncle Bob's review checklist item 5 ("hidden side effects?") references P2 directly. Evans flags the same pattern as anaemic-service-around-anaemic-model in DDD terms. The cross-evaluation phase surfaces side-effects two lenses caught independently as convergent 🔴 findings. |
-| **P3 — Test-First (TDD)** | A failing test exists in the same commit as the production code that makes it pass. | Beck's review treats missing tests as part of the finding, not a separate nit. Uncle Bob escalates missing tests to **blocker** severity. Phase 1's "chase the artefact chain to an invariant" mandate makes executable tests the cheapest stopping point — code without tests forces the persona to surface the missing assertion as the finding. |
+| Concern | Cooper / Norman read it as | Evans reads it as | Richards reads it as | Beck reads it as | Uncle Bob reads it as | Delivery-and-Ops reads it as |
+|---|---|---|---|---|---|---|
+| **Interface contracts** | a promise the user can read | Published Language at a bounded-context boundary | the coupling-type decision at the seam | making the change easy before making the easy change | Dependency Inversion at the architectural seam | the surface a smoke test, canary, or rollback gate can assert against |
+| **Local purity / explicit effects** | hidden cost shifted onto the user | a Domain Event the model refuses to acknowledge | undocumented temporal or content coupling | a function that can't be cornered by a unit test | SRP and the principle of least astonishment, from two angles | three failure modes presented as one — blast radius compounds silently |
+| **Behavioural assertions** | a promise nobody is keeping | an aggregate invariant nobody enforces | the cheapest fitness function | the red of red-green-refactor | a blocker, not a nit | the cheapest signal — the CI gate you can afford |
+
+Each persona carries these as their own concerns in their own voice — see
+the agent files under [`agents/`](agents/). When two lenses converge on the
+same concern from different angles in a chorus round, the finding earns
+🔴 severity.
 
 Projects with stronger or more-specific principles (layer rules, language
 mandates, infrastructure constraints) declare them in section 4 of
 [`templates/CHORUS-PROJECT.template.md`](templates/CHORUS-PROJECT.template.md)
-under "Constitutional / governance principles." Phase 4 ranking consumes that
-list under "Constitutional ROI."
+under "Constitutional / governance principles." Phase 4 ranking consumes
+that list under "Constitutional ROI."
 
-Persona agents reference principles by tag — `[principle:P1]`,
-`[principle:P2]`, `[principle:P3]`, or `[principle:<project-tag>]`. The
-tag identifies what is being invoked; the cite (file path, clause number,
-prior chorus finding) shows where it is grounded.
+Findings cite either `file:line` (claims about the project's artefacts)
+or `[principle]` (claims grounded in a project-named principle the
+addendum carries). The I8 evidence gate refuses findings that do
+neither — see [`skill/chorus-review/INTEGRATION-LAYER.md`](skill/chorus-review/INTEGRATION-LAYER.md).
 
 ## Install
 
