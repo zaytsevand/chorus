@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # chorus-review uninstaller.
 #
-# Removes the chorus-review skill and the seven named persona agents from
+# Removes the chorus-review skill and the nine named persona agents from
 # your Claude Code config. Refuses to touch any other files.
 #
 # Usage:
@@ -23,6 +23,8 @@ AGENTS=(
   uncle-bob-architect.md
   kent-beck-persona.md
   delivery-and-ops-advisor.md
+  security-and-trust-advisor.md
+  constraint-and-flow-advisor.md
 )
 
 if [[ -d "$SKILL_DST" ]]; then

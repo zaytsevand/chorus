@@ -1,6 +1,6 @@
 ---
 name: chorus-review
-description: Multi-advisor project state review (Evans/Richards/Cooper/Norman/Uncle Bob/Beck/Delivery-and-Ops/security) with per-round RSVP self-selection, cross-evaluation, conflict reconciliation, and ranked recommendations. Use when the user asks for a chorus, a project-state review, or to "spawn the regular chorus." Produces a durable artifact at docs/reviews/YYYY-MM-DD-chorus-review.md.
+description: Multi-advisor project state review (Evans/Richards/Cooper/Norman/Uncle Bob/Beck/Delivery-and-Ops/security/constraint-and-flow) with per-round RSVP self-selection, cross-evaluation, conflict reconciliation, and ranked recommendations. Use when the user asks for a chorus, a project-state review, or to "spawn the regular chorus." Produces a durable artifact at docs/reviews/YYYY-MM-DD-chorus-review.md.
 ---
 
 # Chorus Review — repeatable procedure
@@ -134,13 +134,14 @@ The exclusion gate prevents this.
 
 - Load the project addendum (or interview the user inline if absent).
 - Confirm scope-exclusion list with the user (above).
-- Confirm any *additional* lenses to include or omit. Default chorus roster is eight:
+- Confirm any *additional* lenses to include or omit. Default chorus roster is nine:
   - Evans (DDD), Richards (architecture), Cooper (adversarial product),
     Norman (HCD), Uncle Bob (clean code/SOLID), Beck (TDD/simple design),
     Delivery-and-Ops (CD discipline / operability / observability / cost),
-    Security-and-Trust (trust boundaries / threat modeling / security poverty line).
+    Security-and-Trust (trust boundaries / threat modeling / security poverty line),
+    Constraint-and-Flow (deferral / opportunity cost / learning-loop throughput).
   - Per-round participation is decided by the Phase 0.5 RSVP step;
-    the default *roster* is eight, the actual quorum each round may be smaller.
+    the default *roster* is nine, the actual quorum each round may be smaller.
 - Confirm date stamp for the artifact (`docs/reviews/YYYY-MM-DD-chorus-review.md`).
 
 ### Phase 0.5 — RSVP (per-round self-selection)
@@ -420,7 +421,7 @@ Phase 0 so the next round starts from a baseline, not from interview again.
 
 ## Security-and-Trust lens (scope override)
 
-The Security-and-Trust persona participates via RSVP like the other seven personas, but
+The Security-and-Trust persona participates via RSVP like the other eight personas, but
 its scope rule is different: **the general scope-exclusion list does NOT
 apply to this lens**. Exfil risk does not care about tech-debt labels — a
 legacy module that touches credentials, runs in production, and is reachable
@@ -430,7 +431,7 @@ rest of the chorus excludes it.
 This rule lives in the persona's brief (the agent file's "A note on legacy"
 section). The orchestrator's Phase 1 brief for Security-and-Trust must NOT
 include the scope-exclusion list verbatim the way it does for the other
-seven personas; instead, brief Security-and-Trust that **legacy paths are
+eight personas; instead, brief Security-and-Trust that **legacy paths are
 in scope when they expose attacker surface**, and that the general
 scope-exclusion list applies only to non-security concerns.
 

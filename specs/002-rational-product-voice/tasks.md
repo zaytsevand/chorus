@@ -32,7 +32,7 @@ Docs-as-code single project. Real paths: `agents/`, `skill/chorus-review/`, `REA
 
 **Purpose**: Gather the inputs needed to author a coherent persona.
 
-- [ ] T001 Re-read `specs/002-rational-product-voice/research.md` (8 decisions) and the canonical persona anatomy in `agents/security-and-trust-advisor.md`; pick an unused frontmatter `color` (peers use yellow/etc.) for `agents/constraint-and-flow-advisor.md`.
+- [X] T001 Re-read `specs/002-rational-product-voice/research.md` (8 decisions) and the canonical persona anatomy in `agents/security-and-trust-advisor.md`; pick an unused frontmatter `color` (peers use yellow/etc.) for `agents/constraint-and-flow-advisor.md`.
 
 ---
 
@@ -42,9 +42,9 @@ Docs-as-code single project. Real paths: `agents/`, `skill/chorus-review/`, `REA
 
 **⚠️ CRITICAL**: The persona file and its RSVP registration block all three stories.
 
-- [ ] T002 Author the complete persona file `agents/constraint-and-flow-advisor.md` per `data-model.md` E1+E2: YAML frontmatter (`name: constraint-and-flow-advisor`, `description` with Goldratt+Reinertsen lineage / Ries-Duke-Cagan cited + 3 `<example>` contexts, `model: inherit`, `color`, `memory: user`) and all eight body sections — Your Central Thesis · Your Three Convictions · Accusations You Are Built To Make · Five Whys (worked trace + bedrock = "a 99%-defensible claim that work is off the learning constraint") · Scope and Anchor Files · What You Do Not Do · Relationship to Other Personas · Memory and Project Context (`~/.claude/agent-memory/constraint-and-flow-advisor/`). Absorb the three cross-cutting concerns natively (E2). **Additive-only: do not edit any existing persona file.**
-- [ ] T003 Register the persona in the RSVP roster so the chorus dispatches it: in `skill/chorus-review/SKILL.md`, add it to the `description` persona list AND change the Phase 0 Brief "Default chorus roster is **eight**:" → "**nine**:" with a new enumerated entry. (Behaviour-gating: without this, the persona is never RSVP'd.)
-- [ ] T004 Reinstall and confirm liveness: run `./install.sh --force`; verify `~/.claude/agents/constraint-and-flow-advisor.md` exists and the installer reports nine agents (quickstart.md §0).
+- [X] T002 Author the complete persona file `agents/constraint-and-flow-advisor.md` per `data-model.md` E1+E2: YAML frontmatter (`name: constraint-and-flow-advisor`, `description` with Goldratt+Reinertsen lineage / Ries-Duke-Cagan cited + 3 `<example>` contexts, `model: inherit`, `color`, `memory: user`) and all eight body sections — Your Central Thesis · Your Three Convictions · Accusations You Are Built To Make · Five Whys (worked trace + bedrock = "a 99%-defensible claim that work is off the learning constraint") · Scope and Anchor Files · What You Do Not Do · Relationship to Other Personas · Memory and Project Context (`~/.claude/agent-memory/constraint-and-flow-advisor/`). Absorb the three cross-cutting concerns natively (E2). **Additive-only: do not edit any existing persona file.**
+- [X] T003 Register the persona in the RSVP roster so the chorus dispatches it: in `skill/chorus-review/SKILL.md`, add it to the `description` persona list AND change the Phase 0 Brief "Default chorus roster is **eight**:" → "**nine**:" with a new enumerated entry. (Behaviour-gating: without this, the persona is never RSVP'd.)
+- [X] T004 Reinstall and confirm liveness: run `./install.sh --force`; verify `~/.claude/agents/constraint-and-flow-advisor.md` exists and the installer reports nine agents (quickstart.md §0).
 
 **Checkpoint**: Persona is authored, registered, and installed — a dispatchable ninth lens.
 
@@ -95,11 +95,11 @@ Docs-as-code single project. Real paths: `agents/`, `skill/chorus-review/`, `REA
 
 **Purpose**: Make every enumeration surface agree on "nine" and name the advisor (FR-013/SC-005). Required, not optional. See `contracts/roster-consistency.md`.
 
-- [ ] T013 Update `README.md` in three spots: headline "**Eight** persona advisors …" → "**Nine** …" + add the advisor name; Install section "the **eight** persona agents" → "the **nine**"; Principles matrix → add a **"Constraint-and-Flow reads it as"** column giving its read of each cross-cutting concern (Interface Contracts / Local Purity & Explicit Effects / Behavioural Assertions per `data-model.md` E2).
-- [ ] T014 [P] Update `skill/chorus-review/INTEGRATION-LAYER.md`: "**Eight** lenses" and "**eight-lens** composition" → "Nine" / "nine-lens" (both occurrences).
-- [ ] T015 [P] Update `install.sh` line 4 comment and line 38 echo: "**seven** persona agents" → "**nine** persona agents" (corrects pre-existing stale count).
-- [ ] T016 [P] Verify `templates/CHORUS-PROJECT.template.md` for any default-roster/count reference; update if present, else record "verified — no roster count to change."
-- [ ] T017 Run the roster-consistency grep (`quickstart.md` §1) across SKILL.md, INTEGRATION-LAYER.md, README.md, install.sh, CHORUS-PROJECT.template.md; confirm no surface states seven/eight for the default roster and every enumerating surface names `constraint-and-flow-advisor` (SC-005); confirm additive-only — every existing persona entry unchanged except the inserted ninth (SC-006).
+- [X] T013 Update `README.md` in three spots: headline "**Eight** persona advisors …" → "**Nine** …" + add the advisor name; Install section "the **eight** persona agents" → "the **nine**"; Principles matrix → add a **"Constraint-and-Flow reads it as"** column giving its read of each cross-cutting concern (Interface Contracts / Local Purity & Explicit Effects / Behavioural Assertions per `data-model.md` E2).
+- [X] T014 [P] Update `skill/chorus-review/INTEGRATION-LAYER.md`: "**Eight** lenses" and "**eight-lens** composition" → "Nine" / "nine-lens" (both occurrences).
+- [X] T015 [P] Update `install.sh` line 4 comment and line 38 echo: "**seven** persona agents" → "**nine** persona agents" (corrects pre-existing stale count). **Also fixed `uninstall.sh`**: its hardcoded `AGENTS` array was missing `security-and-trust-advisor.md` (a pre-existing bug from the 8th-persona addition) — added that plus `constraint-and-flow-advisor.md`, and the "seven"→"nine" comment.
+- [X] T016 [P] Verify `templates/CHORUS-PROJECT.template.md` for any default-roster/count reference; update if present, else record "verified — no roster count to change."
+- [X] T017 Run the roster-consistency grep (`quickstart.md` §1) across SKILL.md, INTEGRATION-LAYER.md, README.md, install.sh, CHORUS-PROJECT.template.md; confirm no surface states seven/eight for the default roster and every enumerating surface names `constraint-and-flow-advisor` (SC-005); confirm additive-only — every existing persona entry unchanged except the inserted ninth (SC-006).
 - [ ] T018 Final acceptance: `./install.sh --force` then run `quickstart.md` §0–§7 end-to-end; confirm the coverage map (`docs/reviews/2026-06-05-chorus-coverage-map.html`) now shows the prioritization/deferral axis owned at level 3 by the new voice.
 
 ---
@@ -171,3 +171,17 @@ in the persona file over editing shared machinery.
   inserting the ninth.
 - Commit after each phase (the speckit `after_*` hooks offer this).
 - Total: 18 tasks — Setup 1 · Foundational 3 · US1 3 · US2 3 · US3 2 · Polish/Consistency 6.
+
+## Implementation status (2026-06-05)
+
+**Done (build, deploy, consistency):** T001–T004 (persona authored + registered + installed live),
+T013–T017 (all roster surfaces updated 8→9, README matrix gains a Constraint-and-Flow column,
+install.sh/uninstall.sh corrected, consistency grep PASS). The persona is live in
+`~/.claude/agents/constraint-and-flow-advisor.md` and the skill roster now dispatches nine.
+
+**Pending — require a live chorus round:** T005–T012 (US1/US2/US3 behavioural validation) and the
+behavioural half of T018. These are dry-runs of an actual `/chorus-review` on a target repo, observed
+against SC-001…SC-007; they cannot be self-certified without running the chorus. T010/T012 (conditional
+skill-mechanic edits) stay open pending what those dry-runs reveal; default expectation is "reused
+unchanged" per the Mechanism-reuse assumption. The static half of T018 (install + roster-consistency
+grep) is already green.

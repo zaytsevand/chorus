@@ -20,7 +20,7 @@ Five claims from EWD 340 apply directly to this layer:
 
 1. **"The competent programmer is fully aware of the strictly limited size of
    his own skull."** The integration layer's skull is strictly smaller than
-   the eight personas' collective cognition. It does not hold their content;
+   the nine personas' collective cognition. It does not hold their content;
    it routes it.
 
 2. **"Brainpower is by far our scarcest resource."** The user's attention and
@@ -46,7 +46,7 @@ Five claims from EWD 340 apply directly to this layer:
 
 ## The discipline cascade
 
-Eight lenses, a multi-app monorepo, cross-evaluation, conflict arbitration,
+Nine lenses, a multi-app monorepo, cross-evaluation, conflict arbitration,
 ranking, sign-off. This is not single-skull cognition, and pretending it is
 produces the failure mode Dijkstra named: clever tricks that paper over what
 the orchestrator's skull cannot actually hold.
@@ -72,9 +72,9 @@ Each arrow is a refusal to descend further than authority permits.
 The integration layer does not descend into lens content. The persona does
 not descend into the codebase past where its evidence rule permits. The
 artefact chain does not descend past an invariant or a cited principle.
-**Discipline at each step is what makes the eight-lens composition
+**Discipline at each step is what makes the nine-lens composition
 tractable.** Without it the procedure is the orchestrator pretending to
-hold eight lenses' worth of cognition in one skull — exactly the lie
+hold nine lenses' worth of cognition in one skull — exactly the lie
 EWD 340 forbids.
 
 The integration layer's job at every phase is to audit that the cascade
@@ -261,7 +261,7 @@ The integration layer refuses, plainly and without softening, to:
   round. Pre-deciding for personas is the gate's defeat.
 - **Proceed below quorum without re-pinging.** `J < 3` triggers
   re-pinging; second refusal triggers abort. There is no "but four out of
-  the eight is fine actually" branch.
+  the nine is fine actually" branch.
 - **Write the artifact before the procedure is done.** The doc is a
   side-effect of the procedure, not a target the procedure serves.
 - **Score Constitutional ROI when no governance doc exists.** Skip the
