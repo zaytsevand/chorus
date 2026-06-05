@@ -18,6 +18,11 @@ edit tasks and the quickstart's consistency grep verifies.
 | 8 | `templates/CHORUS-PROJECT.template.md` | (verify) any default-roster/count reference | updated if present; else no-op (record "verified, none") |
 | 9 | `install.sh` — L4 comment | "the **seven** persona agents" *(already stale at 8)* | "the **nine** persona agents" |
 | 10 | `install.sh` — L38 echo | "Installing **seven** persona agents" | "Installing **nine** persona agents" |
+| 11 | `uninstall.sh` — `AGENTS` array + L4 comment | **7 files hard-coded** (already missing the 8th, `security-and-trust-advisor.md`) | all **9** files listed incl. `constraint-and-flow-advisor.md`; "seven"→"nine" |
+
+> ⚠️ **Gotcha for future persona additions**: `install.sh` globs `agents/*.md` (auto-discovers new
+> personas), but `uninstall.sh` keeps a **hard-coded `AGENTS` array** that must be edited by hand every
+> time. It silently drifted out of date once already (the 8th persona was never added). Always update it.
 
 ## Acceptance (SC-005 / SC-006)
 
