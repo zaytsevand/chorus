@@ -276,8 +276,9 @@ adopted by both the base round and the SDLC gates.
   work (I5).
 - **`spec-walkthrough` skill** reconciles a spec against the codebase, traces
   each user story to code, and runs headless as a review lens. It is wired in
-  as a **fixed viewpoint at Gate C** (and is available to Gate B): its
-  reconciliation is fed to the gate's seated personas as one structured input
+  as a **fixed viewpoint at Gate C** (Gate B only when substantial pre-existing
+  code is in scope to reconcile against): its reconciliation is fed to the gate's
+  seated personas as one structured input
   — effectively part of stage-1 Extract for the code review. **It is not
   gospel.** Agents are instructed to weigh it as evidence, not defer to it: a
   walkthrough claim is a `file:line`-anchored input subject to the same I8

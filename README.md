@@ -12,6 +12,26 @@ Conflicts go to `advisor()`. Output is a durable markdown artifact under
 `docs/reviews/` that you commit. The most recent artifact is the next
 round's baseline.
 
+## Two modes
+
+The skill runs in two modes, both built on the same four-stage gate primitive
+(`skill/chorus-review/GATE-PRIMITIVE.md`: extract → uncapped author → real
+adversarial vote → deterministic tally):
+
+- **Project-state round** (default) — the periodic multi-lens review described
+  below. Trigger: **"spawn the chorus."** Output:
+  `docs/reviews/YYYY-MM-DD-chorus-review.md`.
+- **Agent-SDLC** (lifecycle) — gates the speckit cycle for a single feature with
+  three scoped chorus gates (design review after `plan`, plan/tasks review after
+  `tasks`, implementation review after `implement`). Each gate is RSVP-scoped,
+  capped at five lenses, and blocks the pipeline only on an unresolved 🔴.
+  Trigger: **"run the agent-SDLC on feature 0NN."** Driven by
+  `skill/chorus-review/SDLC-LAYER.md`; output:
+  `specs/<feature>/agent-sdlc-log.md`.
+
+The gate primitive is shared so the two modes cannot drift. The rest of this
+README describes the project-state round.
+
 ## Why
 
 Two patterns this skill is built to resist:

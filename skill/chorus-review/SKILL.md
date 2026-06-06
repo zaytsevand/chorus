@@ -1,6 +1,6 @@
 ---
 name: chorus-review
-description: Multi-advisor project state review (Evans/Richards/Cooper/Norman/Uncle Bob/Beck/Delivery-and-Ops/security/constraint-and-flow) with per-round RSVP self-selection, cross-evaluation, conflict reconciliation, and ranked recommendations. Use when the user asks for a chorus, a project-state review, or to "spawn the regular chorus." Produces a durable artifact at docs/reviews/YYYY-MM-DD-chorus-review.md.
+description: Multi-advisor project state review (Evans/Richards/Cooper/Norman/Uncle Bob/Beck/Delivery-and-Ops/security/constraint-and-flow) with per-round RSVP self-selection, cross-evaluation, conflict reconciliation, and ranked recommendations. Use when the user asks for a chorus, a project-state review, or to "spawn the regular chorus." Produces a durable artifact at docs/reviews/YYYY-MM-DD-chorus-review.md. Also supports an agent-SDLC lifecycle mode ("run the agent-SDLC on feature 0NN") that interleaves scoped chorus gates with the speckit cycle — see SDLC-LAYER.md.
 ---
 
 # Chorus Review — repeatable procedure
@@ -18,6 +18,23 @@ layer (the calling session itself) — its position in the system, per-phase
 pre/post-conditions, invariants, and refusals. The procedure here describes
 *what* the chorus does; the integration-layer file describes *who runs it
 and what they are not allowed to do*. Both are load-bearing.
+
+The mechanic of a single review — the four stages **extract → author → vote →
+tally** — is defined once in `GATE-PRIMITIVE.md`; Phases 1/2/4 below run it
+(this file does not restate the mechanic). For the agent-SDLC lifecycle mode,
+read `SDLC-LAYER.md` as well.
+
+## Two modes
+
+Both modes are built on the same gate primitive (`GATE-PRIMITIVE.md`):
+
+- **Project-state round** (default) — the periodic multi-lens review described
+  below. Trigger: "spawn the chorus." Output:
+  `docs/reviews/YYYY-MM-DD-chorus-review.md`.
+- **Agent-SDLC** (lifecycle) — gates the speckit cycle for one feature with
+  design, plan/tasks, and implementation reviews. Trigger: "run the agent-SDLC
+  on feature 0NN." Driven by `SDLC-LAYER.md`; output:
+  `specs/<feature>/agent-sdlc-log.md`. Read `SDLC-LAYER.md` before running it.
 
 ## When to use
 
@@ -220,6 +237,12 @@ conversation). Abstainers are skipped entirely — do not brief them, do not
 include their findings as `[no comment]` rows; just record their RSVP reply
 in the round roster (see Phase 0.5).
 
+Round 1 is **stages 1–2 of the gate primitive** (`GATE-PRIMITIVE.md`): an
+optional read-only Extract pass (a bounded `Explore`) may pre-build structured
+`file:line`-anchored records the personas author from, then each persona
+authors findings **uncapped** (stage 2). The Extract pass is invisible to the
+operator and never assigns severity.
+
 Required brief sections per agent:
 
 1. **Lens identity** — "you are one of N advisors in a chorus review" (where
@@ -264,7 +287,10 @@ Required brief sections per agent:
    invariants by citing where they are enforced (or surface the absence
    of enforcement as the finding)."*
 6. **Numbered questions** — 4–7 questions through that lens.
-7. **Word limit** — 500–700 words.
+7. **Word limit** — 500–700 words. This bounds *prose density per finding*,
+   not the *number of findings*: authoring is **uncapped** (primitive stage 2).
+   Do not pad to a count, and do not trim findings to fit — let the count fall
+   where the evidence lands.
 8. **Evidence rule** — every finding either cites `file:line` (claims
    about THIS project's artefacts) OR carries an explicit `[principle]`
    tag (existing principle — MUST cite where established: constitution
@@ -345,7 +371,7 @@ no original report to react with). Each gets:
 
 1. **Pointer to the matrix** at the artifact path (they `Read` it).
 2. **Their Round 1 findings IDs** explicitly listed (so they don't react to
-   their own).
+   their own — S8: the author of a finding is never its grader).
 3. **Five questions through their lens:**
    - Agreements you'd sharpen (especially blind spots others caught)
    - Pushbacks (where the matrix mis-frames, in your lens)
@@ -364,6 +390,14 @@ no original report to react with). Each gets:
    does YOUR-LENS think is over-rated?"
 
 Word limit: 500–600.
+
+Phase 2 is **stage 3 (Vote)** of the gate primitive: PRIORITIZE / OVER-RATE are
+the votes. After the reactions arrive, finalize each finding's severity with the
+primitive's **deterministic stage-4 tally** (`GATE-PRIMITIVE.md`): among
+non-author voters, `net = P − O`; `net ≥ +2` escalates one level, `net ≤ −2`
+demotes one level, otherwise hold. The long-standing "two converging lenses earn
+🔴" rule *is* this tally (a convergent PRIORITIZE escalation). Severity is
+arithmetic over real votes — never the orchestrator's judgment (S9).
 
 After Round 2 reactions arrive, append a `### Round 2 brief` subsection to the
 artifact (2–4 sentences): which findings were sharpened, which were pushed back
