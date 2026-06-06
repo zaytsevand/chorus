@@ -5,8 +5,9 @@ description: Multi-advisor project state review (Evans/Richards/Cooper/Norman/Un
 
 # Chorus Review — repeatable procedure
 
-A periodic multi-lens review of project state. Each round produces a durable
-artifact future rounds baseline against, rather than re-derive.
+A multi-lens review of whatever you point it at — **most often a spec or a
+feature's design, occasionally a full-codebase sweep.** Each round produces a
+durable artifact future rounds baseline against, rather than re-derive.
 
 This skill is project-agnostic. Project-specific facts (exclusions, topology,
 security data-surface, baseline references) come from an optional per-project
@@ -28,8 +29,9 @@ read `SDLC-LAYER.md` as well.
 
 Both modes are built on the same gate primitive (`GATE-PRIMITIVE.md`):
 
-- **Project-state round** (default) — the periodic multi-lens review described
-  below. Trigger: "spawn the chorus." Output:
+- **Project-state round** — a multi-lens review of a scope you choose: most
+  often a spec or a feature's design, occasionally the whole codebase (the
+  periodic full sweep). Trigger: "spawn the chorus." Output:
   `docs/reviews/YYYY-MM-DD-chorus-review.md`.
 - **Agent-SDLC** (lifecycle) — gates the speckit cycle for one feature with
   design, plan/tasks, and implementation reviews. Trigger: "run the agent-SDLC
@@ -38,13 +40,16 @@ Both modes are built on the same gate primitive (`GATE-PRIMITIVE.md`):
 
 ## When to use
 
-- User says "spawn the chorus", "chorus review", "Evans/Richards/etc. round"
-- User asks for a project-state evaluation across multiple lenses
-- Quarterly cadence (or after a major release, before a quarter-end)
+- **Reviewing a spec or a feature's design** across multiple lenses — the common
+  case. Say "spawn the chorus" pointed at the spec, or "run the agent-SDLC on
+  feature 0NN" for the gated lifecycle (see `SDLC-LAYER.md`).
+- **A full-codebase sweep** for periodic project-state review — the occasional
+  case; quarterly or after a major release.
 
 Don't use for:
 - Single-lens questions (just spawn the relevant persona agent directly)
-- Code review of a specific PR (use `superpowers:code-reviewer` or `/ultrareview`)
+- Line-by-line review of a PR diff (use `superpowers:code-reviewer` or
+  `/ultrareview` — the chorus reviews specs and design, not diffs)
 - One-off architecture questions (use `mark-richards-architect` solo)
 
 ## Project addendum
