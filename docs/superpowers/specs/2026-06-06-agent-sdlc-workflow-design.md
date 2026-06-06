@@ -44,6 +44,14 @@ speckit hook extension.
   feature's surface, not a fixed nine-by-three. SDLC mode is a distinct,
   lighter procedure that *reuses* the round machinery; it does not contradict
   the README's "not for per-spec" rule about the heavyweight round.
+- **Back-test evidence (2026-06-06).** A parallel back-test of the
+  constraint-and-flow agent established that the review stages must be
+  *separated* and run by different agent types, and that stage 3 (a real
+  adversarial vote, never the author and never a synthetic grader) is
+  load-bearing — it is what flipped the new lens from last to mid-pack.
+  Captured in memory as `ref-chorus-backtest-pipeline`. This design adopts
+  the resulting four-stage gate primitive (see §4.1) and encodes its rule in
+  invariants S8/S9.
 
 ## 3. The pipeline
 
@@ -89,7 +97,29 @@ the cap fits).
 All three gates share one uniform semantic: **chorus review → findings →
 block on 🔴 → incorporation loop → re-review until clean.**
 
-### 4.1 RSVP per gate
+### 4.1 The gate is a four-stage pipeline
+
+Each gate runs as four **separable, specialized** stages, not one blended
+pass. The structure comes from a back-test of the constraint-and-flow agent
+(2026-06-06): when a single agent both **authored and graded** findings, it
+ranked the new lens dead last; when authoring was split from a **real
+adversarial vote**, the same lens came back mid-pack. Stage separation
+changed the answer. The stage you cheap out on is the stage that lies to you.
+
+| Stage | Agent | Must get right |
+|---|---|---|
+| **1 Extract** | Explore / general-purpose, parallel, read-only | coverage; structured per-finding records, with the `file:line` anchors that feed the I8 evidence gate |
+| **2 Author** | the seated persona itself, **uncapped** | no padding — let the finding count fall where it honestly lands; no "3–6" target (the cap manufactures padding that pollutes downstream stats) |
+| **3 Vote** | the real seated personas, in character | adversarial PRIORITIZE / OVER-RATE; **never the author of the finding, never a synthetic grader** |
+| **4 Tally** | the orchestrator, deterministic | keep judgment out of the arithmetic |
+
+Stage 3 is the load-bearing one: it is the difference between the orchestrator
+*predicting* how peers would react and *actually letting them react*. SDLC
+mode never substitutes a synthetic grade for a real vote (see S8/S9). The 🔴
+set that gates the pipeline is the output of the **deterministic tally
+(stage 4) over real votes (stage 3)** — not an orchestrator opinion.
+
+### 4.2 RSVP per gate
 
 - RSVP fires **independently at every gate**. A persona's JOIN/ABSTAIN at one
   gate never carries to another: constraint-and-flow may abstain on a code
@@ -98,7 +128,7 @@ block on 🔴 → incorporation loop → re-review until clean.**
 - Each RSVP reply carries a **self-declared relevance score (0–3)** for *this
   gate*, on the same scale as the coverage chart.
 
-### 4.2 Panel cap of five
+### 4.3 Panel cap of five
 
 - The panel seats at most **five** joiners (odd-quorum design, matching the
   existing chorus 3/5 quorum).
@@ -109,8 +139,12 @@ block on 🔴 → incorporation loop → re-review until clean.**
   to break.
 - If fewer than three JOIN, the gate follows the existing chorus quorum rule
   (re-ping once; abort honestly on second failure).
+- **Cap the panel, never the findings.** The five-joiner cap bounds *who
+  authors*; it never bounds *how many findings* each authors. Authoring is
+  uncapped (stage 2) — a finding cap manufactures padding that pollutes the
+  vote and the tally.
 
-### 4.3 Block on 🔴 only
+### 4.4 Block on 🔴 only
 
 - The orchestrator **halts** the pipeline only on an unresolved 🔴 (a violated
   hard invariant or a finding the panel rates red). 🟡/🟢 findings are recorded
@@ -118,7 +152,7 @@ block on 🔴 → incorporation loop → re-review until clean.**
 - The orchestrator refuses to pass a 🔴 **silently** (extends I7). It never
   overrides the user's call on ambers (the user holds sign-off, N+1).
 
-### 4.4 Incorporation model
+### 4.5 Incorporation model
 
 The **spec is the source of truth**; findings are incorporated by clarifying
 the spec and regenerating downstream artifacts, not by hand-patching them.
@@ -130,7 +164,7 @@ the spec and regenerating downstream artifacts, not by hand-patching them.
 
 After each incorporation pass the gate **re-reviews** (loop).
 
-### 4.5 Loop bound
+### 4.6 Loop bound
 
 Each gate loops until its 🔴 count reaches zero **or** the user explicitly
 waives a 🔴 with recorded rationale. After **N = 3** incorporation cycles
@@ -157,9 +191,10 @@ not "restore the missing gate."
 
 ## 6. SDLC-layer invariants
 
-These extend I1–I8 to the lifecycle level. They are the audit points that
-keep SDLC mode honest; if any breaks, the procedure's correctness argument
-breaks.
+These extend I1–I8. S1–S7 are lifecycle-level (the SDLC orchestrator); S8–S9
+are gate-primitive-level and therefore bind the base round too (see §8). They
+are the audit points that keep the procedure honest; if any breaks, the
+correctness argument breaks.
 
 - **S1.** The orchestrator never authors spec, plan, tasks, or code. It
   invokes the speckit phase-runner. (Extends I1: never adds findings →
@@ -178,6 +213,14 @@ breaks.
   principle tag). SDLC mode does not relax it.
 - **S7.** Each gate loop is bounded at N = 3 cycles, then escalates to the
   user. The orchestrator never loops indefinitely chasing a 🔴.
+- **S8.** The author of a finding is never its grader. Stage 3 votes are a
+  dispatch to *other* seated personas; a persona never votes on its own
+  findings. (The back-test failure mode: author-grades-self buried the new
+  lens dead last.)
+- **S9.** The orchestrator never synthesizes a vote or a grade. Stage 3 is a
+  real dispatch to seated personas — a *predicted* reaction is not a vote.
+  The deterministic tally (stage 4) aggregates real votes only. (Extends
+  I1/I6 to the voting and tally stages.)
 
 ## 7. Artifact
 
@@ -194,29 +237,55 @@ honestly — the Dijkstra "validate the procedure, not the artifact" property
 
 ## 8. Packaging — files touched
 
+Per the blast-radius decision, the four-stage primitive is defined **once** and
+adopted by both the base round and the SDLC gates.
+
+- **New:** `skill/chorus-review/GATE-PRIMITIVE.md` — the single canonical
+  definition of the four-stage round/gate mechanic (extract → uncapped author
+  → real vote → deterministic tally), including S8/S9 and the
+  author≠grader / no-synthetic-grade rule. Both the base round and the SDLC
+  gates reference it.
 - **New:** `skill/chorus-review/SDLC-LAYER.md` — the lifecycle-mode companion
-  to `INTEGRATION-LAYER.md`. Contains the pipeline, gate mechanics, S1–S7,
-  and the ledger format.
-- **Edit:** `skill/chorus-review/SKILL.md` — a new section describing SDLC
-  mode and its trigger (e.g., "run the agent-SDLC on feature 00X"), pointing
-  at `SDLC-LAYER.md`.
+  to `INTEGRATION-LAYER.md`. Contains the pipeline (§3), gate mechanics (§4),
+  S1–S9, and the per-feature ledger format (§7); defers stage internals to
+  `GATE-PRIMITIVE.md`.
+- **Edit:** `skill/chorus-review/INTEGRATION-LAYER.md` — refactor Phases 1/2/4
+  to the shared primitive: name the Extract stage explicitly, route findings
+  through it, and add S8/S9 to the invariant set so the base round adopts
+  author≠grader and the deterministic tally.
+- **Edit:** `skill/chorus-review/SKILL.md` — (a) update the Phase 1/2/4
+  descriptions to the four-stage primitive and **remove any per-author finding
+  cap / "3–6" target** (authoring is uncapped); (b) add the SDLC-mode section
+  and trigger ("run the agent-SDLC on feature 00X"), pointing at
+  `SDLC-LAYER.md`.
 - **Edit:** `README.md` — a short subsection introducing SDLC mode alongside
-  the existing project-state round, and stating when to use which.
-- **No** new skill, **no** speckit hook extension. SDLC mode is an operating
-  mode of the existing skill.
+  the project-state round, and stating when to use which.
+- **No** new skill, **no** speckit hook extension. Both modes are operating
+  modes of the existing `chorus-review` skill.
 
 ## 9. Relationship to existing components
 
-- **The project-state chorus round is unchanged.** SDLC mode is a sibling
-  procedure that reuses the round as a gate primitive. "Spawn the chorus"
-  still runs a periodic round; "run the agent-SDLC on feature X" runs this.
+- **The project-state chorus round keeps its user-facing flow but adopts the
+  shared primitive.** Its Phases 1/2/4 are refactored to the four-stage
+  mechanic in `GATE-PRIMITIVE.md` (explicit Extract, uncapped authoring,
+  S8/S9). "Spawn the chorus" still runs a periodic round; "run the agent-SDLC
+  on feature X" runs the lifecycle mode. Both share one gate primitive — that
+  is the point of the blast-radius decision.
 - **`advisor()`** keeps its lateral role: conflict arbitration within a gate
   and a final sanity pass, never a substitute for persona or orchestrator
   work (I5).
-- **`spec-walkthrough` skill** (reconciles a spec against the codebase,
-  traces user stories to code, runs headless as a review lens) is a natural
-  candidate lens for **Gate C** — it is the lens that checks the produced code
-  against the spec's intent. Wiring it in is in scope for the plan.
+- **`spec-walkthrough` skill** reconciles a spec against the codebase, traces
+  each user story to code, and runs headless as a review lens. It is wired in
+  as a **fixed viewpoint at Gate C** (and is available to Gate B): its
+  reconciliation is fed to the gate's seated personas as one structured input
+  — effectively part of stage-1 Extract for the code review. **It is not
+  gospel.** Agents are instructed to weigh it as evidence, not defer to it: a
+  walkthrough claim is a `file:line`-anchored input subject to the same I8
+  scrutiny and the same stage-3 vote as any other finding, and a persona may
+  contradict it. The fixed viewpoint guarantees coverage; the not-gospel
+  instruction keeps it from anchoring the panel. This pairs with S9 — a fixed
+  viewpoint is still an *input*, never a substitute for the personas' own
+  reading.
 
 ## 10. Out of scope / YAGNI
 
