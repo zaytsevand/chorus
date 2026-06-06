@@ -43,6 +43,10 @@
   tr.champ td{height:30px;background:#0d1422;font-size:16px}
   .legend{display:flex;gap:16px;align-items:center;flex-wrap:wrap;color:var(--muted);font-size:13px;margin:6px 0 0}
   .swatch{display:inline-block;width:16px;height:16px;border-radius:3px;vertical-align:middle;margin-right:5px;border:1px solid var(--line)}
+  /* radar */
+  .rlegend{display:flex;flex-wrap:wrap;gap:6px 16px;justify-content:center;margin-top:16px;font-size:12px}
+  .ritem{color:#cdd6e6;cursor:default;display:inline-flex;align-items:center}
+  .ritem:hover{color:#fff}
   /* bar chart */
   .bars{display:grid;grid-template-columns:230px 1fr 46px;gap:8px 12px;align-items:center}
   .bars .lab{color:var(--muted);font-size:13px;text-align:right}
@@ -86,6 +90,10 @@
       <span style="margin-left:auto">▦ dashed border = proposed (not yet seated)</span>
     </div>
   </div>
+
+  <h2>1b · Coverage radar — each voice's shape across the 12 axes</h2>
+  <p class="sub">Each polygon is one voice; its radius on a spoke = that voice's score (0–3) on that axis. A spike toward an axis = a champion there; a flat or absent side = a gap. The dashed cyan polygon is the proposed Constraint-and-Flow voice (marked <code>*</code>). Hover a name to isolate it.</p>
+  <div class="panel"><div id="radar"></div></div>
 
   <h2>2 · Per-axis coverage — weakest first</h2>
   <p class="sub">Sum of all nine voices on each axis. Red bars = no voice owns the axis at level 3 (structurally under-represented).</p>
@@ -148,6 +156,34 @@ html += "</tr><tr class='champ'><td class='lbl'>champion?</td>";
 maxes.forEach(m => html += `<td>${m>=3?"✓":"<span style='color:var(--warn)'>—</span>"}</td>`);
 html += "</tr>";
 heat.innerHTML = html;
+
+// ---- radar (voices overlaid on the 12 axes) ----
+(function(){
+  const N=AXES.length, cx=380, cy=275, R=190;
+  const SHORT=["Domain","Architecture","Craft","Testing","UX","Product","Prioritization","Delivery","Observability","Security","Performance","Data integrity"];
+  const COL=["#ff6b6b","#ffa94d","#ffd43b","#a9e34b","#38d9a9","#4dabf7","#9775fa","#f783ac","#5ad1c4"];
+  const pt=(i,rad)=>{const a=-Math.PI/2+i*2*Math.PI/N;return [cx+Math.cos(a)*rad, cy+Math.sin(a)*rad];};
+  const poly=(rad,fn)=>Array.from({length:N},(_,i)=>(fn?pt(i,fn(i)):pt(i,rad)).map(n=>n.toFixed(1)).join(',')).join(' ');
+  let s='<svg viewBox="0 0 760 560" width="100%" style="max-width:760px;display:block;margin:0 auto">';
+  for(let k=1;k<=3;k++) s+=`<polygon points="${poly(R*k/3)}" fill="none" stroke="#283145" stroke-width="1"/>`;
+  for(let i=0;i<N;i++){
+    const [x,y]=pt(i,R), a=-Math.PI/2+i*2*Math.PI/N, [lx,ly]=pt(i,R+16);
+    const anc=Math.cos(a)>0.3?'start':(Math.cos(a)<-0.3?'end':'middle');
+    const dy=Math.sin(a)>0.3?'0.9em':(Math.sin(a)<-0.3?'-0.2em':'0.32em');
+    s+=`<line x1="${cx}" y1="${cy}" x2="${x.toFixed(1)}" y2="${y.toFixed(1)}" stroke="#232b3d" stroke-width="1"/>`;
+    s+=`<text x="${lx.toFixed(1)}" y="${ly.toFixed(1)}" fill="#9aa7bd" font-size="11" text-anchor="${anc}" dy="${dy}">${SHORT[i]}</text>`;
+  }
+  for(let k=1;k<=3;k++){const [x,y]=pt(0,R*k/3); s+=`<text x="${(x+5).toFixed(1)}" y="${y.toFixed(1)}" fill="#55617a" font-size="9">${k}</text>`;}
+  VOICES.forEach((v,idx)=>{
+    s+=`<polygon id="rp${idx}" class="rpoly" points="${poly(0,i=>R*v.s[i]/3)}" fill="${COL[idx]}" fill-opacity="0.06" stroke="${COL[idx]}" stroke-width="1.6" stroke-opacity="0.9"${v.seated?'':' stroke-dasharray="5 3"'}/>`;
+  });
+  s+='</svg><div class="rlegend">';
+  VOICES.forEach((v,idx)=>{ s+=`<span class="ritem" onmouseenter="hiRadar(${idx})" onmouseleave="unhiRadar()"><span class="swatch" style="background:${COL[idx]}"></span>${v.name}${v.seated?'':' *'}</span>`; });
+  s+='</div>';
+  document.getElementById('radar').innerHTML=s;
+})();
+function hiRadar(i){document.querySelectorAll('.rpoly').forEach((p,j)=>{const on=j===i;p.setAttribute('stroke-opacity',on?'1':'0.07');p.setAttribute('fill-opacity',on?'0.22':'0');p.setAttribute('stroke-width',on?'2.6':'1.1');});}
+function unhiRadar(){document.querySelectorAll('.rpoly').forEach(p=>{p.setAttribute('stroke-opacity','0.9');p.setAttribute('fill-opacity','0.06');p.setAttribute('stroke-width','1.6');});}
 
 // ---- bar chart (weakest first) ----
 const order = AXES.map((a,i)=>({a,t:totals[i],owned:maxes[i]>=3}))
