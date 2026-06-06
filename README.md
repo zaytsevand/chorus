@@ -6,7 +6,8 @@ project state. Nine persona advisors — Eric Evans (DDD), Mark Richards
 Uncle Bob (clean code / SOLID), Kent Beck (TDD / simple design), a
 synthesized delivery-and-ops advisor, a synthesized security-and-trust
 advisor, and a synthesized constraint-and-flow advisor (deferral /
-opportunity cost) — each review your repo through their lens.
+opportunity cost) — each review your repo through their lens. An optional
+Guido (Python) language lens joins only on rounds that have Python in scope.
 Conflicts go to `advisor()`. Output is a durable markdown artifact under
 `docs/reviews/` that you commit. The most recent artifact is the next
 round's baseline.
@@ -131,7 +132,10 @@ doctrine layered on top of the personas, they're how each persona
 | **Behavioural assertions** | a promise nobody is keeping | an aggregate invariant nobody enforces | the cheapest fitness function | the red of red-green-refactor | a blocker, not a nit | the cheapest signal — the CI gate you can afford | a threat-model claim with no test = security theatre | a defer/cut claim with no settling experiment — an opinion, not a finding |
 
 Each persona carries these as their own concerns in their own voice — see
-the agent files under [`agents/`](agents/). When two lenses converge on the
+the agent files under [`agents/`](agents/). Optional language lenses carry the
+same three concerns in their language's grain — e.g. Guido (Python): an unsigned
+type-hint contract, a mutable-default side effect, an idiom claim no type or test
+can pin (`agents/guido-python-reviewer.md`). When two lenses converge on the
 same concern from different angles in a chorus round, the finding earns
 🔴 severity.
 
@@ -156,7 +160,7 @@ cd chorus-review
 ./install.sh
 ```
 
-This copies the skill into `~/.claude/skills/chorus-review/` and the nine
+This copies the skill into `~/.claude/skills/chorus-review/` and its
 persona agents into `~/.claude/agents/`. Existing same-named files are
 preserved unless you pass `--force`.
 
@@ -174,7 +178,7 @@ exact incantation; the manifest at the root is the canonical entry point.
 ./uninstall.sh
 ```
 
-Removes only the skill dir and the nine named agent files. Your per-project
+Removes only the skill dir and its persona agent files. Your per-project
 addenda and chorus artifacts under `docs/reviews/` are left untouched.
 
 ## Run a round

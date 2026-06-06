@@ -142,6 +142,10 @@ The exclusion gate prevents this.
     Constraint-and-Flow (deferral / opportunity cost / learning-loop throughput).
   - Per-round participation is decided by the Phase 0.5 RSVP step;
     the default *roster* is nine, the actual quorum each round may be smaller.
+- **Optional language lenses** — not part of the default nine; include one at Phase 0 when the
+  round's anchor surface is in its language, and let the Phase 0.5 RSVP drop it otherwise:
+  - Guido (Python — idiom, PEP 8/20, type-hint correctness, stdlib-first). Joins only when the
+    target has recently-changed Python; abstains on non-Python rounds.
 - Confirm date stamp for the artifact (`docs/reviews/YYYY-MM-DD-chorus-review.md`).
 
 ### Phase 0.5 — RSVP (per-round self-selection)
