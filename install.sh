@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # chorus-review installer.
 #
-# Copies the skill + the seven persona agents into your Claude Code config.
+# Copies the skill + its persona agents into your Claude Code config.
 # Idempotent. No sudo. Refuses to overwrite agent files you may have customized
 # unless you pass --force.
 #
@@ -35,7 +35,7 @@ mkdir -p "$SKILL_DST" "$AGENTS_DST"
 echo "Installing chorus-review skill -> $SKILL_DST"
 cp -f "$SKILL_SRC"/*.md "$SKILL_DST/"
 
-echo "Installing seven persona agents -> $AGENTS_DST"
+echo "Installing $(ls "$AGENTS_SRC"/*.md | wc -l) persona agents -> $AGENTS_DST"
 installed=0
 skipped=0
 for src in "$AGENTS_SRC"/*.md; do

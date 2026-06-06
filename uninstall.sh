@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # chorus-review uninstaller.
 #
-# Removes the chorus-review skill and the seven named persona agents from
+# Removes the chorus-review skill and its persona agents from
 # your Claude Code config. Refuses to touch any other files.
 #
 # Usage:
@@ -11,27 +11,22 @@
 set -euo pipefail
 
 CLAUDE_HOME="${CLAUDE_HOME:-$HOME/.claude}"
+REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+AGENTS_SRC="$REPO_DIR/agents"
 
 SKILL_DST="$CLAUDE_HOME/skills/chorus-review"
 AGENTS_DST="$CLAUDE_HOME/agents"
-
-AGENTS=(
-  eric-evans-advisor.md
-  mark-richards-architect.md
-  alan-cooper-advisor.md
-  don-norman-advisor.md
-  uncle-bob-architect.md
-  kent-beck-persona.md
-  delivery-and-ops-advisor.md
-)
 
 if [[ -d "$SKILL_DST" ]]; then
   echo "Removing $SKILL_DST"
   rm -rf "$SKILL_DST"
 fi
 
+# Derive the agent set from the repo's agents/ dir — the same source of truth
+# install.sh globs — so adding or removing a persona never needs editing a list here.
 removed=0
-for a in "${AGENTS[@]}"; do
+for src in "$AGENTS_SRC"/*.md; do
+  a="$(basename "$src")"
   if [[ -f "$AGENTS_DST/$a" ]]; then
     rm -f "$AGENTS_DST/$a"
     echo "  removed $a"

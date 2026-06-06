@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Chorus Coverage Map — 2026-06-05</title>
+<style>
+  :root{
+    --bg:#0f1420; --panel:#161d2e; --ink:#e8edf6; --muted:#9aa7bd;
+    --line:#283145; --accent:#5ad1c4; --warn:#ff7a7a; --good:#6ee7a8;
+    --c0:#141b2b; --c1:#1f3a55; --c2:#256f8e; --c3:#39c0b3;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font:15px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+  .wrap{max-width:1180px;margin:0 auto;padding:32px 24px 80px}
+  h1{font-size:26px;margin:0 0 4px}
+  h2{font-size:19px;margin:40px 0 12px;border-bottom:1px solid var(--line);padding-bottom:6px}
+  .sub{color:var(--muted);margin:0 0 6px}
+  .pill{display:inline-block;font-size:12px;padding:2px 9px;border-radius:20px;
+    border:1px solid var(--line);color:var(--muted);margin-right:6px}
+  .pill.warn{color:var(--warn);border-color:#5a2a2a}
+  .pill.good{color:var(--good);border-color:#2a5a3e}
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:18px 20px;margin-top:14px}
+  table{border-collapse:collapse;width:100%;font-size:13px}
+  th,td{text-align:center;padding:0;border:1px solid var(--line)}
+  th.axis{height:150px;vertical-align:bottom;font-weight:600;color:var(--muted);width:62px}
+  th.axis div{transform:rotate(-90deg);transform-origin:left bottom;white-space:nowrap;
+    width:18px;margin:0 auto 8px;text-align:left;font-size:12px}
+  th.voice,td.voice{text-align:left;padding:6px 10px;white-space:nowrap;width:212px}
+  td.voice b{font-weight:600}
+  td.voice .vt{display:block;color:var(--muted);font-size:11px}
+  .badge{font-size:9px;letter-spacing:.5px;padding:1px 6px;border-radius:10px;
+    border:1px dashed var(--accent);color:var(--accent);margin-left:6px;vertical-align:middle}
+  td.cell{height:40px;font-weight:700;color:#0a0f18}
+  td.cell.s0{background:var(--c0);color:#3a4458;font-weight:400}
+  td.cell.s1{background:var(--c1);color:#cfe0ee}
+  td.cell.s2{background:var(--c2)}
+  td.cell.s3{background:var(--c3)}
+  tr.proposed td.voice{border-left:3px solid var(--accent)}
+  tr.tot td{font-weight:700;color:var(--ink);background:#11192a;height:34px}
+  tr.tot td.lbl,tr.champ td.lbl{text-align:right;padding-right:10px;color:var(--muted);font-weight:600}
+  tr.champ td{height:30px;background:#0d1422;font-size:16px}
+  .legend{display:flex;gap:16px;align-items:center;flex-wrap:wrap;color:var(--muted);font-size:13px;margin:6px 0 0}
+  .swatch{display:inline-block;width:16px;height:16px;border-radius:3px;vertical-align:middle;margin-right:5px;border:1px solid var(--line)}
+  /* radar */
+  .rlegend{display:flex;flex-wrap:wrap;gap:6px 16px;justify-content:center;margin-top:16px;font-size:12px}
+  .ritem{color:#cdd6e6;cursor:default;display:inline-flex;align-items:center}
+  .ritem:hover{color:#fff}
+  /* bar chart */
+  .bars{display:grid;grid-template-columns:230px 1fr 46px;gap:8px 12px;align-items:center}
+  .bars .lab{color:var(--muted);font-size:13px;text-align:right}
+  .bars .track{background:#0d1422;border-radius:6px;height:22px;position:relative;overflow:hidden;border:1px solid var(--line)}
+  .bars .fill{height:100%;border-radius:6px 0 0 6px;background:linear-gradient(90deg,#256f8e,#39c0b3)}
+  .bars .fill.gap{background:linear-gradient(90deg,#7a2a2a,#ff7a7a)}
+  .bars .num{font-weight:700;font-size:13px}
+  .bars .num.gap{color:var(--warn)}
+  .find{margin:14px 0}
+  .find h3{margin:0 0 4px;font-size:16px}
+  .find h3 .tag{font-size:11px;font-weight:600;padding:2px 8px;border-radius:10px;margin-left:8px;vertical-align:middle}
+  .tag.red{background:#3a1717;color:var(--warn)}
+  .tag.amber{background:#3a2f14;color:#ffce6e}
+  .tag.green{background:#16301f;color:var(--good)}
+  .find p{margin:4px 0 0;color:#cdd6e6}
+  code{background:#0d1422;padding:1px 6px;border-radius:5px;color:var(--accent);font-size:13px}
+  .foot{color:var(--muted);font-size:12px;margin-top:34px;border-top:1px solid var(--line);padding-top:12px}
+  .scrollx{overflow-x:auto}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Chorus Coverage Map</h1>
+  <p class="sub">Where the review chorus is strong, thin, and concentrated — across 12 concern axes · generated 2026-06-05 · updated 2026-06-06 (constraint-and-flow now seated &amp; validated in a live round)</p>
+  <p>
+    <span class="pill">9 seated voices</span>
+    <span class="pill good">+1 opt-in language lens (Guido · Python)</span>
+    <span class="pill warn">2 axes have no champion</span>
+    <span class="pill warn">3 axes are single-owner</span>
+  </p>
+
+  <h2>1 · Coverage heatmap — voices × concerns</h2>
+  <p class="sub">Score per cell: 0 none · 1 incidental · 2 secondary strength · 3 primary remit. Bottom rows: column total (breadth of coverage) and whether any voice owns the axis at level 3 (a “champion”).</p>
+  <div class="panel scrollx">
+    <table id="heat"></table>
+    <div class="legend">
+      <span><span class="swatch" style="background:var(--c0)"></span>0</span>
+      <span><span class="swatch" style="background:var(--c1)"></span>1</span>
+      <span><span class="swatch" style="background:var(--c2)"></span>2</span>
+      <span><span class="swatch" style="background:var(--c3)"></span>3</span>
+      <span style="margin-left:auto">9 seated core voices · Guido (Python) is an opt-in language lens — joins only on Python rounds, so it's not part of this standing-coverage map</span>
+    </div>
+  </div>
+
+  <h2>1b · Coverage radar — each voice's shape across the 12 axes</h2>
+  <p class="sub">Each polygon is one voice; its radius on a spoke = that voice's score (0–3) on that axis. A spike toward an axis = a champion there; a flat or absent side = a gap. The dashed cyan polygon is the proposed Constraint-and-Flow voice (marked <code>*</code>). Hover a name to isolate it.</p>
+  <div class="panel"><div id="radar"></div></div>
+
+  <h2>2 · Per-axis coverage — weakest first</h2>
+  <p class="sub">Sum of all nine voices on each axis. Red bars = no voice owns the axis at level 3 (structurally under-represented).</p>
+  <div class="panel"><div class="bars" id="bars"></div></div>
+
+  <h2>3 · Findings — weak &amp; under-represented</h2>
+  <div class="panel" id="findings"></div>
+
+  <p class="foot">
+    Scoring is a deliberate judgement from each persona’s stated remit (agent definitions + the 002 spec), not a measurement —
+    treat it as a discussion artifact, not ground truth. Self-contained: no network calls. Source of voices:
+    <code>agents/*.md</code> + <code>specs/002-rational-product-voice/spec.md</code>.
+  </p>
+</div>
+
+<script>
+const AXES = [
+  "Domain modeling",
+  "Architecture & evolvability",
+  "Code craft & maintainability",
+  "Testing & correctness",
+  "Human / UX & usability",
+  "Product value & user goals",
+  "Prioritization, deferral & cost",
+  "Delivery & operability",
+  "Observability & prod feedback",
+  "Security & trust",
+  "Performance & efficiency",
+  "Data integrity & persistence",
+];
+const VOICES = [
+  {name:"Eric Evans",          tag:"DDD / domain model",        seated:true,  s:[3,2,2,1,0,1,0,0,0,0,0,2]},
+  {name:"Mark Richards",       tag:"Architecture / -ilities",   seated:true,  s:[1,3,1,2,0,0,1,1,1,1,2,1]},
+  {name:"Uncle Bob",           tag:"Clean Code / SOLID",        seated:true,  s:[1,2,3,2,0,0,0,0,0,0,0,0]},
+  {name:"Kent Beck",           tag:"TDD / simple design",       seated:true,  s:[1,1,3,3,0,1,1,1,0,0,0,0]},
+  {name:"Don Norman",          tag:"Human-centred UX",          seated:true,  s:[0,0,0,0,3,2,1,0,0,0,0,0]},
+  {name:"Alan Cooper",         tag:"Adversarial product",       seated:true,  s:[1,0,0,0,2,3,2,0,0,0,0,0]},
+  {name:"Delivery-and-Ops",    tag:"Farley · Hightower · Majors",seated:true, s:[0,1,0,2,0,0,2,3,3,0,1,0]},
+  {name:"Security-and-Trust",  tag:"Schneier · Shostack · Nather",seated:true,s:[0,1,0,1,0,0,2,1,1,3,0,2]},
+  {name:"Constraint-and-Flow", tag:"Goldratt · Reinertsen",     seated:true,  s:[0,1,1,1,0,2,3,2,1,0,1,0]},
+];
+
+// ---- heatmap ----
+const heat = document.getElementById("heat");
+let html = "<tr><th class='voice'>Voice</th>";
+AXES.forEach(a => html += `<th class='axis'><div>${a}</div></th>`);
+html += "</tr>";
+VOICES.forEach(v => {
+  html += `<tr class='${v.seated?'':'proposed'}'><td class='voice'><b>${v.name}</b>`
+        + `${v.seated?'':"<span class='badge'>PROPOSED</span>"}<span class='vt'>${v.tag}</span></td>`;
+  v.s.forEach(x => html += `<td class='cell s${x}'>${x||""}</td>`);
+  html += "</tr>";
+});
+// totals + champion
+const totals = AXES.map((_,c)=>VOICES.reduce((t,v)=>t+v.s[c],0));
+const maxes  = AXES.map((_,c)=>Math.max(...VOICES.map(v=>v.s[c])));
+html += "<tr class='tot'><td class='lbl'>Σ coverage</td>";
+totals.forEach(t => html += `<td>${t}</td>`);
+html += "</tr><tr class='champ'><td class='lbl'>champion?</td>";
+maxes.forEach(m => html += `<td>${m>=3?"✓":"<span style='color:var(--warn)'>—</span>"}</td>`);
+html += "</tr>";
+heat.innerHTML = html;
+
+// ---- radar (voices overlaid on the 12 axes) ----
+(function(){
+  const N=AXES.length, cx=380, cy=275, R=190;
+  const SHORT=["Domain","Architecture","Craft","Testing","UX","Product","Prioritization","Delivery","Observability","Security","Performance","Data integrity"];
+  const COL=["#ff6b6b","#ffa94d","#ffd43b","#a9e34b","#38d9a9","#4dabf7","#9775fa","#f783ac","#5ad1c4"];
+  const pt=(i,rad)=>{const a=-Math.PI/2+i*2*Math.PI/N;return [cx+Math.cos(a)*rad, cy+Math.sin(a)*rad];};
+  const poly=(rad,fn)=>Array.from({length:N},(_,i)=>(fn?pt(i,fn(i)):pt(i,rad)).map(n=>n.toFixed(1)).join(',')).join(' ');
+  let s='<svg viewBox="0 0 760 560" width="100%" style="max-width:760px;display:block;margin:0 auto">';
+  for(let k=1;k<=3;k++) s+=`<polygon points="${poly(R*k/3)}" fill="none" stroke="#283145" stroke-width="1"/>`;
+  for(let i=0;i<N;i++){
+    const [x,y]=pt(i,R), a=-Math.PI/2+i*2*Math.PI/N, [lx,ly]=pt(i,R+16);
+    const anc=Math.cos(a)>0.3?'start':(Math.cos(a)<-0.3?'end':'middle');
+    const dy=Math.sin(a)>0.3?'0.9em':(Math.sin(a)<-0.3?'-0.2em':'0.32em');
+    s+=`<line x1="${cx}" y1="${cy}" x2="${x.toFixed(1)}" y2="${y.toFixed(1)}" stroke="#232b3d" stroke-width="1"/>`;
+    s+=`<text x="${lx.toFixed(1)}" y="${ly.toFixed(1)}" fill="#9aa7bd" font-size="11" text-anchor="${anc}" dy="${dy}">${SHORT[i]}</text>`;
+  }
+  for(let k=1;k<=3;k++){const [x,y]=pt(0,R*k/3); s+=`<text x="${(x+5).toFixed(1)}" y="${y.toFixed(1)}" fill="#55617a" font-size="9">${k}</text>`;}
+  VOICES.forEach((v,idx)=>{
+    s+=`<polygon id="rp${idx}" class="rpoly" points="${poly(0,i=>R*v.s[i]/3)}" fill="${COL[idx]}" fill-opacity="0.06" stroke="${COL[idx]}" stroke-width="1.6" stroke-opacity="0.9"${v.seated?'':' stroke-dasharray="5 3"'}/>`;
+  });
+  s+='</svg><div class="rlegend">';
+  VOICES.forEach((v,idx)=>{ s+=`<span class="ritem" onmouseenter="hiRadar(${idx})" onmouseleave="unhiRadar()"><span class="swatch" style="background:${COL[idx]}"></span>${v.name}${v.seated?'':' *'}</span>`; });
+  s+='</div>';
+  document.getElementById('radar').innerHTML=s;
+})();
+function hiRadar(i){document.querySelectorAll('.rpoly').forEach((p,j)=>{const on=j===i;p.setAttribute('stroke-opacity',on?'1':'0.07');p.setAttribute('fill-opacity',on?'0.22':'0');p.setAttribute('stroke-width',on?'2.6':'1.1');});}
+function unhiRadar(){document.querySelectorAll('.rpoly').forEach(p=>{p.setAttribute('stroke-opacity','0.9');p.setAttribute('fill-opacity','0.06');p.setAttribute('stroke-width','1.6');});}
+
+// ---- bar chart (weakest first) ----
+const order = AXES.map((a,i)=>({a,t:totals[i],owned:maxes[i]>=3}))
+                  .sort((x,y)=>x.t-y.t);
+const max = Math.max(...totals);
+const bars = document.getElementById("bars");
+order.forEach(o => {
+  const pct = Math.round(o.t/max*100);
+  bars.insertAdjacentHTML("beforeend",
+    `<div class='lab'>${o.a}</div>`+
+    `<div class='track'><div class='fill ${o.owned?'':'gap'}' style='width:${pct}%'></div></div>`+
+    `<div class='num ${o.owned?'':'gap'}'>${o.t}${o.owned?'':' ⚠'}</div>`);
+});
+
+// ---- findings ----
+document.getElementById("findings").innerHTML = `
+<div class='find'><h3>No champion: Performance &amp; efficiency<span class='tag red'>GAP</span></h3>
+<p>Total coverage 4, and <b>no voice owns it</b> — Richards (architecture -ilities) tops out at 2, everyone else is incidental.
+The chorus can flag a scalability characteristic but has no one whose primary job is latency, throughput, or resource cost.
+Note: a <code>bjarne-stroustrup-persona</code> agent exists in the registry but is <b>not seated</b> in the chorus — the expertise is latent, just not in the room.</p></div>
+
+<div class='find'><h3>No champion: Data integrity &amp; persistence<span class='tag red'>GAP</span></h3>
+<p>Total coverage 5, again <b>no level-3 owner</b>. Evans (aggregates/invariants) and Security-and-Trust (data surfaces) each reach 2,
+so consistency/transaction/schema concerns are covered only as a side effect of two other remits. If neither RSVPs, the axis goes dark.</p></div>
+
+<div class='find'><h3>Single-owner concentration: Domain, Security, Observability<span class='tag amber'>BUS-FACTOR</span></h3>
+<p>Each of these axes has exactly one level-3 voice with the next-best stuck at level 1: <b>Domain</b> (Evans), <b>Security</b> (Security-and-Trust),
+<b>Observability</b> (Delivery-and-Ops). Because participation is per-round RSVP self-selection, a round where that single persona declines
+leaves the concern effectively unrepresented. Coverage exists but is fragile.</p></div>
+
+<div class='find'><h3>The 002 voice fills a real, previously-ownerless gap<span class='tag green'>CONFIRMED</span></h3>
+<p><b>Prioritization, deferral &amp; cost</b> is the axis the 002 spec diagnosed as missing. Before Constraint-and-Flow it summed to 9 spread thinly
+across Cooper/Delivery-and-Ops/Security (each 2) with <b>no champion</b> — the exact "twelve ways to add rigor, zero arguments to cut" disbalance.
+The ninth voice — now seated, and validated in the 2026-06-06 live round (it self-selected and produced defensible deferral findings) — takes it to total 12
+with a clear level-3 owner. The gap analysis independently validated the feature: it targets the one
+ownerless axis that isn't a cross-cutting quality concern.</p></div>
+
+<div class='find'><h3>The well-covered (arguably over-weighted) cluster<span class='tag green'>STRONG</span></h3>
+<p>Code craft (10), Architecture (11), and Testing (12) each carry multiple level-2/3 voices — the "craftsmanship and correctness" weighting
+the 002 spec called out. This isn't a problem to fix; it's the counterweight context. The chorus reasons deeply about <i>doing the thing well</i>
+and, until 002, had no one structurally responsible for <i>whether to do it now</i>.</p></div>
+
+<div class='find'><h3>Reading of the whole<span class='tag amber'>SUMMARY</span></h3>
+<p>After 002, the product/economics axis is healthy. The remaining thin band is <b>systemic-quality</b> concerns — performance and data integrity have
+no champion, and security/observability/domain are one-deep. If you want the next roster move, it's a <b>systemic-quality / runtime-correctness</b> voice
+(performance + data integrity + a second pair of eyes on the single-owner axes), not another product voice — adding a second product/deferral voice would
+re-introduce disbalance in the opposite direction, exactly the edge case 002 warns against. <b>But</b> per the
+2026-06-06 live round (finding F7), gate even a systemic-quality voice on an <i>observed</i> unmet need in a real
+round, not on an empty chart cell — a missing champion is a candidate to watch, not a mandate to staff.</p></div>
+`;
+</script>
+</body>
+</html>

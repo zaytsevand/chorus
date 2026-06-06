@@ -1,11 +1,13 @@
 # chorus-review
 
 A Claude Code skill that runs a structured multi-advisor review of your
-project state. Eight persona advisors — Eric Evans (DDD), Mark Richards
+project state. Nine persona advisors — Eric Evans (DDD), Mark Richards
 (architecture), Alan Cooper (adversarial product), Don Norman (HCD),
 Uncle Bob (clean code / SOLID), Kent Beck (TDD / simple design), a
-synthesized delivery-and-ops advisor, and a synthesized
-security-and-trust advisor — each review your repo through their lens.
+synthesized delivery-and-ops advisor, a synthesized security-and-trust
+advisor, and a synthesized constraint-and-flow advisor (deferral /
+opportunity cost) — each review your repo through their lens. An optional
+Guido (Python) language lens joins only on rounds that have Python in scope.
 Conflicts go to `advisor()`. Output is a durable markdown artifact under
 `docs/reviews/` that you commit. The most recent artifact is the next
 round's baseline.
@@ -123,14 +125,17 @@ cross-cutting concerns recur across every lens — they aren't a separate
 doctrine layered on top of the personas, they're how each persona
 *already* reads code through their own vocabulary:
 
-| Concern | Cooper / Norman read it as | Evans reads it as | Richards reads it as | Beck reads it as | Uncle Bob reads it as | Delivery-and-Ops reads it as | Security-and-Trust reads it as |
-|---|---|---|---|---|---|---|---|
-| **Interface contracts** | a promise the user can read | Published Language at a bounded-context boundary | the coupling-type decision at the seam | making the change easy before making the easy change | Dependency Inversion at the architectural seam | the surface a smoke test, canary, or rollback gate can assert against | the trust boundary — what crosses it, who's authoritative, what's enforced |
-| **Local purity / explicit effects** | hidden cost shifted onto the user | a Domain Event the model refuses to acknowledge | undocumented temporal or content coupling | a function that can't be cornered by a unit test | SRP and the principle of least astonishment, from two angles | three failure modes presented as one — blast radius compounds silently | a hidden grant of capability the threat model never accounted for |
-| **Behavioural assertions** | a promise nobody is keeping | an aggregate invariant nobody enforces | the cheapest fitness function | the red of red-green-refactor | a blocker, not a nit | the cheapest signal — the CI gate you can afford | a threat-model claim with no test = security theatre |
+| Concern | Cooper / Norman read it as | Evans reads it as | Richards reads it as | Beck reads it as | Uncle Bob reads it as | Delivery-and-Ops reads it as | Security-and-Trust reads it as | Constraint-and-Flow reads it as |
+|---|---|---|---|---|---|---|---|---|
+| **Interface contracts** | a promise the user can read | Published Language at a bounded-context boundary | the coupling-type decision at the seam | making the change easy before making the easy change | Dependency Inversion at the architectural seam | the surface a smoke test, canary, or rollback gate can assert against | the trust boundary — what crosses it, who's authoritative, what's enforced | the hypothesis the work is betting on — the boundary past which a non-constraint may be subordinated |
+| **Local purity / explicit effects** | hidden cost shifted onto the user | a Domain Event the model refuses to acknowledge | undocumented temporal or content coupling | a function that can't be cornered by a unit test | SRP and the principle of least astonishment, from two angles | three failure modes presented as one — blast radius compounds silently | a hidden grant of capability the threat model never accounted for | a deferral whose downstream cost is hidden — opportunity cost that must be priced, not buried |
+| **Behavioural assertions** | a promise nobody is keeping | an aggregate invariant nobody enforces | the cheapest fitness function | the red of red-green-refactor | a blocker, not a nit | the cheapest signal — the CI gate you can afford | a threat-model claim with no test = security theatre | a defer/cut claim with no settling experiment — an opinion, not a finding |
 
 Each persona carries these as their own concerns in their own voice — see
-the agent files under [`agents/`](agents/). When two lenses converge on the
+the agent files under [`agents/`](agents/). Optional language lenses carry the
+same three concerns in their language's grain — e.g. Guido (Python): an unsigned
+type-hint contract, a mutable-default side effect, an idiom claim no type or test
+can pin (`agents/guido-python-reviewer.md`). When two lenses converge on the
 same concern from different angles in a chorus round, the finding earns
 🔴 severity.
 
@@ -155,7 +160,7 @@ cd chorus-review
 ./install.sh
 ```
 
-This copies the skill into `~/.claude/skills/chorus-review/` and the eight
+This copies the skill into `~/.claude/skills/chorus-review/` and its
 persona agents into `~/.claude/agents/`. Existing same-named files are
 preserved unless you pass `--force`.
 
@@ -173,7 +178,7 @@ exact incantation; the manifest at the root is the canonical entry point.
 ./uninstall.sh
 ```
 
-Removes only the skill dir and the eight named agent files. Your per-project
+Removes only the skill dir and its persona agent files. Your per-project
 addenda and chorus artifacts under `docs/reviews/` are left untouched.
 
 ## Run a round
