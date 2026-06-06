@@ -167,15 +167,10 @@ When tempted to rule on something it does not see, refuse and surface.
 Each phase has gates. The integration layer enforces them. **A phase does
 not start until the previous phase's postcondition holds.**
 
-Phases 1, 2, and 4 run the four-stage review **mechanic** defined once in
-`GATE-PRIMITIVE.md` (extract → author → vote → tally) — this file does not
-restate it. The gates below are the discipline *around* the mechanic; the
-mechanic *inside* lives in the primitive. The mapping: **Phase 1** = stage 1
-(Extract, optional read-only pass) + stage 2 (Author, uncapped); **Phase 2** =
-stage 3 (Vote — PRIORITIZE / OVER-RATE), after which severities are finalized by
-stage 4 (the deterministic symmetric tally); **Phase 4** ranks using those
-tallied severities. The SDLC gates (`SDLC-LAYER.md`) run the same primitive, so
-the two modes cannot drift.
+Phases 1, 2, and 4 run the four-stage review mechanic — see `GATE-PRIMITIVE.md`
+for the stages and invariants S8/S9. The gates below are the discipline around
+it; the SDLC gates (`SDLC-LAYER.md`) run the same primitive, so the two modes
+cannot drift.
 
 ### Phase 0 — Brief
 

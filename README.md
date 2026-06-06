@@ -2,16 +2,22 @@
 
 A Claude Code skill that runs a structured multi-advisor review of **whatever
 you point it at** — most often a spec or a feature's design, occasionally a
-full-codebase sweep. Nine persona advisors — Eric Evans (DDD), Mark Richards
-(architecture), Alan Cooper (adversarial product), Don Norman (HCD),
-Uncle Bob (clean code / SOLID), Kent Beck (TDD / simple design), a
-synthesized delivery-and-ops advisor, a synthesized security-and-trust
-advisor, and a synthesized constraint-and-flow advisor (deferral /
-opportunity cost) — each review your repo through their lens. An optional
-Guido (Python) language lens joins only on rounds that have Python in scope.
-Each advisor reviews the target through their lens; conflicts go to `advisor()`.
-Output is a durable markdown artifact you commit. The most recent artifact is
-the next round's baseline.
+full-codebase sweep. Nine persona advisors, each reviewing the target through
+their lens:
+
+- **Eric Evans** — DDD / domain model
+- **Mark Richards** — architecture & evolvability
+- **Alan Cooper** — adversarial product
+- **Don Norman** — human-centred design
+- **Uncle Bob** — clean code / SOLID
+- **Kent Beck** — TDD / simple design
+- **Delivery-and-Ops** — synthesized (Farley · Hightower · Majors)
+- **Security-and-Trust** — synthesized (Schneier · Shostack · Nather)
+- **Constraint-and-Flow** — synthesized (Goldratt · Reinertsen; deferral / opportunity cost)
+
+An optional **Guido** (Python) language lens joins only on rounds with Python in
+scope. Conflicts go to `advisor()`. Output is a durable markdown artifact you
+commit; the most recent artifact is the next round's baseline.
 
 ## Two modes
 
@@ -23,9 +29,11 @@ adversarial vote → deterministic tally):
   often a spec or a feature's design, occasionally the whole codebase (the
   periodic full sweep). Trigger: **"spawn the chorus."** Output:
   `docs/reviews/YYYY-MM-DD-chorus-review.md`.
-- **Agent-SDLC** (lifecycle) — gates the speckit cycle for a single feature with
-  three scoped chorus gates (design review after `plan`, plan/tasks review after
-  `tasks`, implementation review after `implement`). Each gate is RSVP-scoped,
+- **Agent-SDLC** (lifecycle) — runs three scoped chorus gates over a single
+  feature as it moves through plan → tasks → implement (design review after
+  `plan`, plan/tasks review after `tasks`, implementation review after
+  `implement`). It reviews an existing spec; it does not require you to author
+  one first. Each gate is RSVP-scoped,
   capped at five lenses, and blocks the pipeline only on an unresolved 🔴.
   Trigger: **"run the agent-SDLC on feature 0NN."** Driven by
   `skill/chorus-review/SDLC-LAYER.md`; output:

@@ -29,22 +29,22 @@ The SDLC orchestrator sits one level above the round orchestrator.
 A single SDLC run drives one feature, in this order. The orchestrator never
 merges or skips a step (S-ordering / FR-002).
 
+```mermaid
+flowchart TD
+    plan["/speckit-plan → plan.md"] --> A{"Gate A · design review"}
+    A -->|"🔴 incorporate: /speckit-clarify → /speckit-plan"| A
+    A -->|clear| tasks["/speckit-tasks → tasks.md"]
+    tasks --> B{"Gate B · plan/tasks review"}
+    B -->|"🔴 incorporate: clarify → plan → tasks"| B
+    B -->|clear| impl["/speckit-implement → code + tests"]
+    impl --> C{"Gate C · implementation review"}
+    C -->|"🔴 fix code, or clarify → re-implement"| C
+    C -->|clear| done([feature reviewed])
 ```
-1  /speckit-specify           → spec.md
-2  /speckit-clarify           (optional, operator-driven)
-3  /speckit-plan              → plan.md
-─────────────────────────────────────────────────────────────
-4  GATE A — design review               block on 🔴
-5  incorporation loop  (/speckit-clarify → /speckit-plan)   ↺ until no 🔴
-─────────────────────────────────────────────────────────────
-6  /speckit-tasks             → tasks.md
-7  GATE B — plan/tasks review            block on 🔴
-8  incorporation loop  (/speckit-clarify → /speckit-plan → /speckit-tasks)  ↺
-─────────────────────────────────────────────────────────────
-9  /speckit-implement         → code + tests
-10 GATE C — implementation review        block on 🔴
-   incorporation loop  (code fix, or /speckit-clarify → re-implement)  ↺
-```
+
+The feature's spec is the entry point, not a step the orchestrator must author:
+a prior `/speckit-specify` (and optional `/speckit-clarify`) may have produced
+it, or it may already exist. The gates begin at `/speckit-plan`.
 
 There is **no acceptance gate**. Because the implementation hews to a plan and
 tasks that were themselves reviewed (Gates A, B), the deviation surface is small;

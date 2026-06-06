@@ -13,20 +13,12 @@ new lens dead last; when authoring was split from a **real adversarial vote** th
 same lens came back mid-pack. Stage separation changed the answer. The stage you
 cheap out on is the stage that lies to you — and stage 3 is load-bearing.
 
-```
-corpus
-   │  Stage 1 — Extract     read-only agents → structured records (file:line)
-   ▼
-records
-   │  Stage 2 — Author      seated personas → findings (uncapped)
-   ▼
-findings
-   │  Stage 3 — Vote        OTHER seated personas → PRIORITIZE / OVER-RATE
-   ▼
-votes
-   │  Stage 4 — Tally       orchestrator → deterministic severity + gating flag
-   ▼
-verdict
+```mermaid
+flowchart TD
+    corpus([corpus]) -->|"Stage 1 · Extract — read-only agents → file:line records"| records([records])
+    records -->|"Stage 2 · Author — seated personas → findings, uncapped"| findings([findings])
+    findings -->|"Stage 3 · Vote — OTHER personas → PRIORITIZE / OVER-RATE"| votes([votes])
+    votes -->|"Stage 4 · Tally — orchestrator → deterministic severity + gating"| verdict([verdict])
 ```
 
 ## Stage 1 — Extract
