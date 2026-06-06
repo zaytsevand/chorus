@@ -167,6 +167,11 @@ When tempted to rule on something it does not see, refuse and surface.
 Each phase has gates. The integration layer enforces them. **A phase does
 not start until the previous phase's postcondition holds.**
 
+Phases 1, 2, and 4 run the four-stage review mechanic — see `GATE-PRIMITIVE.md`
+for the stages and invariants S8/S9. The gates below are the discipline around
+it; the SDLC gates (`SDLC-LAYER.md`) run the same primitive, so the two modes
+cannot drift.
+
 ### Phase 0 — Brief
 
 - **Pre:** user has invoked the skill; project addendum is locatable or its
@@ -250,6 +255,15 @@ repaired.
   marks the lens substituted-without-evidence. The gate is enforced
   post-Round-1 and post-Round-2; SKILL.md's "Phase 1 evidence check"
   section describes the mechanism.
+
+- **S8 / S9 (gate-primitive invariants — defined in `GATE-PRIMITIVE.md`).**
+  A review's stages are separated. **S8:** the author of a finding is never its
+  grader — the Phase-2 vote is dispatched to *other* lenses (an author never
+  votes on its own finding). **S9:** the integration layer never synthesizes a
+  vote or a grade; the stage-4 tally aggregates real votes only, and a
+  *predicted* reaction is not a vote. These bind Phases 1/2/4 here exactly as
+  they bind the SDLC gates — the back-test that produced them showed
+  author-grades-self buries a lens.
 
 ## Refusals (system boundaries, not modesty)
 

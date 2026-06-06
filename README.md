@@ -1,16 +1,46 @@
 # chorus-review
 
-A Claude Code skill that runs a structured multi-advisor review of your
-project state. Nine persona advisors — Eric Evans (DDD), Mark Richards
-(architecture), Alan Cooper (adversarial product), Don Norman (HCD),
-Uncle Bob (clean code / SOLID), Kent Beck (TDD / simple design), a
-synthesized delivery-and-ops advisor, a synthesized security-and-trust
-advisor, and a synthesized constraint-and-flow advisor (deferral /
-opportunity cost) — each review your repo through their lens. An optional
-Guido (Python) language lens joins only on rounds that have Python in scope.
-Conflicts go to `advisor()`. Output is a durable markdown artifact under
-`docs/reviews/` that you commit. The most recent artifact is the next
-round's baseline.
+A Claude Code skill that runs a structured multi-advisor review of **whatever
+you point it at** — most often a spec or a feature's design, occasionally a
+full-codebase sweep. Nine persona advisors, each reviewing the target through
+their lens:
+
+- **Eric Evans** — DDD / domain model
+- **Mark Richards** — architecture & evolvability
+- **Alan Cooper** — adversarial product
+- **Don Norman** — human-centred design
+- **Uncle Bob** — clean code / SOLID
+- **Kent Beck** — TDD / simple design
+- **Delivery-and-Ops** — synthesized (Farley · Hightower · Majors)
+- **Security-and-Trust** — synthesized (Schneier · Shostack · Nather)
+- **Constraint-and-Flow** — synthesized (Goldratt · Reinertsen; deferral / opportunity cost)
+
+An optional **Guido** (Python) language lens joins only on rounds with Python in
+scope. Conflicts go to `advisor()`. Output is a durable markdown artifact you
+commit; the most recent artifact is the next round's baseline.
+
+## Two modes
+
+The skill runs in two modes, both built on the same four-stage gate primitive
+(`skill/chorus-review/GATE-PRIMITIVE.md`: extract → uncapped author → real
+adversarial vote → deterministic tally):
+
+- **Project-state round** — a multi-lens review of a scope you choose: most
+  often a spec or a feature's design, occasionally the whole codebase (the
+  periodic full sweep). Trigger: **"spawn the chorus."** Output:
+  `docs/reviews/YYYY-MM-DD-chorus-review.md`.
+- **Agent-SDLC** (lifecycle) — runs three scoped chorus gates over a single
+  feature as it moves through plan → tasks → implement (design review after
+  `plan`, plan/tasks review after `tasks`, implementation review after
+  `implement`). It reviews an existing spec; it does not require you to author
+  one first. Each gate is RSVP-scoped,
+  capped at five lenses, and blocks the pipeline only on an unresolved 🔴.
+  Trigger: **"run the agent-SDLC on feature 0NN."** Driven by
+  `skill/chorus-review/SDLC-LAYER.md`; output:
+  `specs/<feature>/agent-sdlc-log.md`.
+
+The gate primitive is shared so the two modes cannot drift. The rest of this
+README describes the project-state round.
 
 ## Why
 
@@ -150,6 +180,41 @@ or `[principle]` (claims grounded in a project-named principle the
 addendum carries). The I8 evidence gate refuses findings that do
 neither — see [`skill/chorus-review/INTEGRATION-LAYER.md`](skill/chorus-review/INTEGRATION-LAYER.md).
 
+## Lens coverage
+
+Which agent owns which axis. Score per cell: **3** primary remit · **2**
+secondary strength · **1** incidental · `·` none. A column with no `3` is an
+axis no single lens owns — structurally under-represented.
+
+| Agent (lens) | Dom | Arch | Craft | Test | UX | Prod | Prio | Deliv | Obs | Sec | Perf | Data |
+|---|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|
+| **Evans** — DDD / domain | **3** | 2 | 2 | 1 | · | 1 | · | · | · | · | · | 2 |
+| **Richards** — architecture / -ilities | 1 | **3** | 1 | 2 | · | · | 1 | 1 | 1 | 1 | 2 | 1 |
+| **Uncle Bob** — clean code / SOLID | 1 | 2 | **3** | 2 | · | · | · | · | · | · | · | · |
+| **Kent Beck** — TDD / simple design | 1 | 1 | **3** | **3** | · | 1 | 1 | 1 | · | · | · | · |
+| **Norman** — human-centred UX | · | · | · | · | **3** | 2 | 1 | · | · | · | · | · |
+| **Cooper** — adversarial product | 1 | · | · | · | 2 | **3** | 2 | · | · | · | · | · |
+| **Delivery-and-Ops** — Farley/Hightower/Majors | · | 1 | · | 2 | · | · | 2 | **3** | **3** | · | 1 | · |
+| **Security-and-Trust** — Schneier/Shostack/Nather | · | 1 | · | 1 | · | · | 2 | 1 | 1 | **3** | · | 2 |
+| **Constraint-and-Flow** — Goldratt/Reinertsen | · | 1 | 1 | 1 | · | 2 | **3** | 2 | 1 | · | 1 | · |
+| **Breadth (Σ)** | 7 | 11 | 10 | 12 | 5 | 9 | 12 | 8 | 6 | 4 | 4 | 5 |
+| **Champion? (any 3)** | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | — | — |
+
+**Axis key:** **Dom** Domain modeling · **Arch** Architecture & evolvability ·
+**Craft** Code craft & maintainability · **Test** Testing & correctness ·
+**UX** Human / UX & usability · **Prod** Product value & user goals ·
+**Prio** Prioritization, deferral & cost · **Deliv** Delivery & operability ·
+**Obs** Observability & prod feedback · **Sec** Security & trust ·
+**Perf** Performance & efficiency · **Data** Data integrity & persistence.
+
+Two axes — **Performance** and **Data integrity** — have no champion: they are
+covered only as a side effect of other remits (Richards on performance; Evans
+and Security-and-Trust on data). If neither of those lenses RSVPs into a round,
+the axis goes dark. Optional language lenses (e.g. Guido for Python) layer their
+own grain on top per language and aren't scored here. The live, interactive
+version of this matrix — heatmap, radar, and per-axis breakdown — is at
+[`docs/reviews/2026-06-05-chorus-coverage-map.html`](docs/reviews/2026-06-05-chorus-coverage-map.html).
+
 ## Install
 
 ### Canonical (clone + script)
@@ -226,11 +291,13 @@ A markdown artifact structured as:
 ## When NOT to use this
 
 - Single-lens questions — just spawn the relevant persona agent directly.
-- Code review of a specific PR — use a dedicated review tool, not this.
+- Line-by-line review of a PR diff — use a dedicated code-review tool; the
+  chorus reviews specs and design, not diffs.
 - One-off architecture questions — invoke `mark-richards-architect` solo.
 
-The chorus is for periodic project-state review. Cadence depends on your
-project; quarterly or after-each-major-release is typical.
+The chorus is usually pointed at a spec or a feature's design; a full-codebase
+sweep is the occasional periodic case, not the default. For the full sweep,
+cadence is typically quarterly or after a major release.
 
 ## License
 
