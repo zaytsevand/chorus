@@ -92,7 +92,16 @@ flowchart TD
 
     P05 --> Quorum{Joiners?}
     Quorum -- J &lt; 3 --> Abort([Abort honestly<br/>write -chorus-abstained.md])
-    Quorum -- J ≥ 3 --> P1
+    Quorum -- J ≥ 3 --> P07
+
+    subgraph P07[Phase 0.7 — Exploratory phase]
+        direction TB
+        P07a[Each joiner builds a persisted,<br/>lens-specific understanding — reference-first]
+        P07b[Orchestrator: one batched, sessioned<br/>operator interview ≤5 Q/session]
+        P07a --> P07b
+    end
+
+    P07 --> P1
 
     subgraph P1[Phase 1 — Round 1]
         direction TB
@@ -137,7 +146,7 @@ flowchart TD
     Artifact --> End([Round complete])
 
     classDef phase fill:#f5f5f5,stroke:#333,stroke-width:1px;
-    class P0,P05,P1,P2,P3,P4,P5 phase;
+    class P0,P05,P07,P1,P2,P3,P4,P5 phase;
 ```
 
 The integration layer (the calling session) is a thin orchestrator. It routes
@@ -146,6 +155,15 @@ adds findings of its own, and never substitutes `advisor()` for cognitive
 work. The invariants enforcing that — including the **I8 evidence gate** the
 diagram references — live in
 [`skill/chorus-review/INTEGRATION-LAYER.md`](skill/chorus-review/INTEGRATION-LAYER.md).
+
+Before Round 1, participating advisors run the **exploratory phase**: each builds
+and persists a lens-specific understanding of the target, harvested
+reference-first over a **two-tier memory** — the operator-owned
+`CHORUS-PROJECT.md` addendum as the authoritative project base, plus thin
+per-advisor records that may cache from it. Persisted memory is an index of
+locators, never a finding's evidentiary endpoint — findings re-ground in the live
+material. The mechanic lives in
+[`skill/chorus-review/EXPLORATORY-PHASE.md`](skill/chorus-review/EXPLORATORY-PHASE.md).
 
 ## Principles
 

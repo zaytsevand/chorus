@@ -3,7 +3,7 @@
 - **Feature**: specs/004-advisor-exploratory-phase/
 - **Run started**: 2026-06-07
 - **Mode**: agent-SDLC (lifecycle)
-- **Status**: in-progress (Gate A PASSED at cycle 2; ready for Gate B / `/speckit-tasks`)
+- **Status**: in-progress (Gate A PASSED cycle 2; tasks generated; **Gate B skipped by operator**; `/speckit-implement` done — T001–T028 + T030; Gate C / impl review + live dogfood T029/T031 owed)
 
 > Gate A (design review) opened. Corpus is the design set produced through
 > `/speckit-plan`. No project addendum (`docs/reviews/CHORUS-PROJECT.md`) exists

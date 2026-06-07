@@ -25,6 +25,11 @@ tally** — is defined once in `GATE-PRIMITIVE.md`; Phases 1/2/4 below run it
 (this file does not restate the mechanic). For the agent-SDLC lifecycle mode,
 read `SDLC-LAYER.md` as well.
 
+Before findings are authored, participating advisors build a persisted,
+lens-specific understanding of the target — the **exploratory phase**, defined
+once in `EXPLORATORY-PHASE.md` (Phase 0.7 below). Both modes run it; this file
+does not restate it.
+
 ## Two modes
 
 Both modes are built on the same gate primitive (`GATE-PRIMITIVE.md`):
@@ -233,6 +238,28 @@ Append the joiners/abstainers list (with one-line reasons) to the artifact
 under a `## Roster (this round)` heading. Future chorus rounds use this to
 detect drift — if a persona has abstained four rounds running, the round-
 context paragraph may not be surfacing relevant deltas honestly.
+
+### Phase 0.7 — Exploratory phase (joiners build understanding)
+
+Between RSVP and Round 1, each joiner runs the **exploratory phase** — defined
+once in `EXPLORATORY-PHASE.md`, run cheapest-subset-first. In brief: load the
+lens's `Information needs (exploratory phase)` profile → reuse the prior record +
+compute deltas / stale refs → harvest **reference-first, addendum-first** (record
+locators, not copies) → bounded, operator-budget-controlled analysis for what's
+undocumented → emit gap-questions. The orchestrator then runs **one batched
+operator interview**, delivered in **resumable, operator-paced sessions of ≤ 5
+questions** (deferring a session leaves open gaps plus a verdict **degradation
+summary**); project-wide answers are written back to the addendum
+(operator-accepted), lens-specific answers to the asking advisor's record. A
+**profile-coverage fitness function** confirms every profile need resolved before
+findings are authored.
+
+This **supersedes the per-round cold read**: Round 1 (the Author stage below) is
+produced *from* the persisted understanding. Persisted memory is an **index of
+locators, never a finding's evidentiary endpoint** — findings re-ground in the
+live material. Abstainers do not run the phase. See `EXPLORATORY-PHASE.md` for the
+full mechanic, the two-tier memory (the addendum is the authoritative base; records
+may cache it), and staleness/reconciliation rules.
 
 ### Phase 1 — Round 1 (parallel persona agents — joiners only)
 
