@@ -34,6 +34,13 @@ the success criteria.
 
 ## Dogfood validation (the feature's test)
 
+**Cheapest first probe (do this before any full round):** run **one** lens,
+**zero-question**, on this (well-documented) repo — the SC-007 path. It produces a
+real understanding record, makes the coverage fitness function runnable, and
+exercises SC-001 / SC-005 / SC-007 / SC-010 **without** needing the operator. Only
+then scale to a full multi-lens round for the delta/interview criteria (SC-004 /
+SC-009).
+
 Run the exploratory phase on this repo (chorus-review itself) and assert:
 
 - **SC-001**: every lens-critical assumption in the ensuing findings traces to a
@@ -64,9 +71,10 @@ Run the exploratory phase on this repo (chorus-review itself) and assert:
 for f in agents/*.md; do grep -q "Information needs (exploratory phase)" "$f" \
   || echo "MISSING profile: $f"; done
 
-# the phase mechanic exists and both modes reference it
+# the phase mechanic exists and all three layer docs reference it
 test -f skill/chorus-review/EXPLORATORY-PHASE.md
-grep -l EXPLORATORY-PHASE skill/chorus-review/SKILL.md skill/chorus-review/SDLC-LAYER.md
+grep -l EXPLORATORY-PHASE skill/chorus-review/SKILL.md \
+  skill/chorus-review/SDLC-LAYER.md skill/chorus-review/INTEGRATION-LAYER.md
 
 # the addendum template has the new section
 grep -q "Project understanding" templates/CHORUS-PROJECT.template.md

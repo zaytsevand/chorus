@@ -126,7 +126,15 @@ commit hash:
   the property staleness detection actually needs. For a whole-file reference the
   span is the file; for a cached addendum fact the span is the fact's line(s).
 
-The digest is a cheap compare, not a re-exploration.
+**Executor (this skill has no runtime).** There is no build step computing hashes:
+the freshness check is performed by **the advisor re-reading the cited span** and
+comparing it to what the record captured — the "digest" is that **content
+comparison at re-read**, not a stored cryptographic hash. Where a real hash *is*
+cheaply available (e.g. a git blob hash for a committed file) it MAY be recorded as
+a fast pre-filter, but the advisor's re-read of the span is the authority. Either
+way it is a cheap, bounded compare, not a re-exploration — and because re-grounding
+already re-reads the source (memory is an index, never the endpoint), the freshness
+check rides on a read the advisor was going to do anyway.
 
 ## Incremental deltas
 
@@ -163,8 +171,10 @@ open-ended interview.
 
 ## Profile-coverage fitness function
 
-The phase's executable conformance check (FR-022 / SC-010), run per advisor
-after the interview and before findings are authored:
+The phase's conformance check (FR-022 / SC-010). It is **runnable once the
+exploratory phase has produced understanding records** — it checks the records the
+phase emits, not an empty tree — run per advisor after the interview and before
+findings are authored:
 
 1. **Coverage** — every item in the lens's information-needs profile resolves to
    an entry in its understanding record, tagged `referenced` / `inferred` /
@@ -173,8 +183,14 @@ after the interview and before findings are authored:
 2. **Reconciliation** — every cached `project-wide` fact carries a reconciliation
    locator to the addendum.
 
-This replaces prose-only conformance for SC-001 / SC-003 / SC-005 / SC-007 /
-SC-008 with a grep-able check (see `quickstart.md`).
+Two tiers of check (see `quickstart.md`): the **structural smoke checks**
+(profile-section present, both modes reference this doc, template carries the
+section) run **always**, against the repo as-is, with no records needed; the
+**coverage** check above is the per-advisor part that runs against the records a
+round produces. Calling the whole thing "executable" only means *coverage is
+mechanically decidable once records exist* — not that it runs on an empty tree.
+Together they replace prose-only conformance for SC-001 / SC-003 / SC-005 /
+SC-007 / SC-008.
 
 ## Invariants this phase carries
 

@@ -12,38 +12,19 @@ phase shows value before more budget is spent.
 into live material; a finding re-grounds in the source, never in persisted memory
 alone. A stored quote is a navigational hint, never evidence.
 
-## Steps (per advisor)
+## Steps
 
-1. **Load profile** — the lens's information-needs profile from its agent file
-   (`contracts/information-needs-profile.md`).
-2. **Reuse** — load the advisor's prior understanding record; determine the
-   round deltas (D6) and stale references (D5). Needs already satisfied and
-   unaffected are carried forward untouched.
-3. **Harvest (reference-first)** — for each unmet/affected need, search existing
-   written knowledge **addendum first** (`docs/reviews/CHORUS-PROJECT.md`), then
-   docs/ADRs/READMEs/specs/diagrams/comments. Record a **reference**, not a copy
-   (`contracts/understanding-record.md`).
-4. **Analyse** — for needs the repo doesn't answer, run a **bounded**,
-   **operator-budget-controlled** analysis (sampling discipline; no
-   enumerate-everything). Record findings as **inferred** (provisional).
-5. **Raise gap-questions** — for needs neither reference nor analysis settled,
-   emit gap-questions tagged project-wide or lens-specific
-   (`contracts/gap-interview.md`). Do **not** interview the operator directly.
-6. **Emit record** — write/update the per-advisor understanding record (referenced
-   / inferred / operator-confirmed entries + open gaps + dates).
+The procedure — 8 steps (load profile → reuse + deltas → reference-first harvest,
+addendum-first → bounded, operator-budget-controlled analysis → gap-questions →
+emit record → orchestrator's sessioned operator interview → coverage check) — is
+defined **canonically in `skill/chorus-review/EXPLORATORY-PHASE.md`** and is
+**not restated here** (single source of truth; this contract would otherwise drift
+from the mechanic). This contract pins only the schema, pre/postconditions, and
+must-nots below.
 
-## Orchestrator steps (once per round)
-
-7. **Batch interview** — collect gap-questions across all joiners, dedupe, run a
-   single operator interview delivered in **resumable, operator-paced sessions of
-   ≤ 5 questions** (each opening with a plain-language preamble; FR-019), route
-   answers (project-wide → addendum write-back per
-   `contracts/addendum-project-understanding.md`; lens-specific → asking advisor's
-   record). A deferred/skipped session leaves open gaps and the verdict carries a
-   **degradation summary** (gaps remaining, findings affected).
-8. **Coverage check** — run the profile-coverage fitness function (FR-022): every
-   profile item resolves to a record entry; every cached project-wide fact carries
-   a reconciliation locator. Report pass/fail per advisor.
+Locator note: a lens's profile loads from its **agent file**
+(`agents/<persona>.md`) — the schema for that section is
+`contracts/information-needs-profile.md`, which is *not* where the profile lives.
 
 ## Preconditions
 

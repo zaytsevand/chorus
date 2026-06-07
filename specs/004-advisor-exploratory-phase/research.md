@@ -79,8 +79,10 @@ confirmed/provisional distinction).
 
 **Decision**: A **source reference** records a locator (path, and section/anchor
 or `file:line` where applicable) plus a **freshness marker** — the date recorded
-and a cheap fingerprint (e.g. the source's last-modified/commit marker or a short
-content digest). A short quote (≈ two sentences) is allowed; more is duplication.
+and a cheap fingerprint. **Granularity (resolved, R2 / see EXPLORATORY-PHASE.md):**
+the fingerprint is a **content comparison of the cited span** performed by the
+advisor at re-read — *not* mtime (false-fresh risk) and *not* a whole-file commit
+marker (false-stale). A short quote (≈ two sentences) is allowed; more is duplication.
 On reuse, if the fingerprint differs, the reference is **flagged stale and
 re-validated** (re-read) before it's trusted (FR-004/FR-012).
 

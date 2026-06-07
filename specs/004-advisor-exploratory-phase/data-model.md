@@ -62,9 +62,10 @@ Per lens; lives in the agent file.
 ## Source reference
 
 - **Fields**: `locator` (path + section/anchor or `file:line`), `recorded_date`,
-  `freshness` (fingerprint: last-modified/commit marker or short digest),
-  optional short quote (≤ ~2 sentences) — a **navigational hint, never evidence**
-  (FR-021).
+  `freshness` (fingerprint = a **content comparison of the cited span** at
+  advisor re-read; not mtime, not a whole-file commit marker — R2, see
+  `EXPLORATORY-PHASE.md`), optional short quote (≤ ~2 sentences) — a **navigational
+  hint, never evidence** (FR-021).
 - **Transitions**: `fresh → stale (fingerprint changed) → revalidated`. For a
   cached project-wide fact, revalidation reconciles against the authoritative
   addendum (FR-023).
