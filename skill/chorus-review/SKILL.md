@@ -30,6 +30,14 @@ lens-specific understanding of the target — the **exploratory phase**, defined
 once in `EXPLORATORY-PHASE.md` (Phase 0.7 below). Both modes run it; this file
 does not restate it.
 
+When the chorus must involve the operator — seating a capped panel, blocking on a
+🔴, confirming scope — the decision is banded by the **decision primitive**, defined
+once in `DECISION-PRIMITIVE.md`: 🟢 auto-resolve, 🟡 proceed-with-recorded-default +
+async override, 🔴 hard-block + instant ask, by declared catalog predicate (never
+orchestrator inference). It makes the workflow **self-unblocking yet balanced** — it
+runs forward, stopping the operator only for 🔴. Both modes reference it; this file
+does not restate it.
+
 ## Two modes
 
 Both modes are built on the same gate primitive (`GATE-PRIMITIVE.md`):
@@ -203,8 +211,12 @@ agent receives a short, self-contained brief:
 1. Their lens identity
 2. The round-context paragraph
 3. The scope-exclusion list (verbatim, as in Phase 1 below)
-4. RSVP instructions: reply in ≤80 words with `JOIN` or `ABSTAIN`, plus a
-   one-sentence reason.
+4. RSVP instructions: reply in ≤80 words with `JOIN` or `ABSTAIN`, plus the
+   **two-axis signal** (`DECISION-PRIMITIVE.md` §RSVP signal) — **applicability**
+   (cite ≥1 concrete round-context delta your lens touches; no citable delta →
+   ABSTAIN) and **expected stakes** (🟢/🟡/🔴-potential + a one-line hook) — and a
+   one-sentence reason. (This replaces the old relevance 0–3 score, which degenerated
+   to all-3s; seating ties on it are now a self-unblocking 🟡, not an operator ask.)
 
 Cost: ~7 small parallel calls, ~30s wall time, ~3K tokens total. Cheap
 relative to a saved Phase 1 round.
