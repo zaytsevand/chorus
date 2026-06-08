@@ -186,9 +186,30 @@ cannot drift.
   one-line reason. Joiner count `J` is determined. Quorum branch
   (`J ≥ 5` / `J ∈ {3,4}` / `J < 3`) is selected.
 
+### Phase 0.7 — Exploratory phase
+
+- **Pre:** Phase 0.5 post holds; quorum branch is "proceed". The mechanic is
+  `EXPLORATORY-PHASE.md`.
+- **Post:** every joiner has a persisted understanding record whose profile
+  needs are each referenced / inferred / operator-confirmed / open-gap; the
+  **one batched, sessioned operator interview** has run (or been deferred with a
+  recorded degradation summary); operator-confirmed **project-wide** facts were
+  written to the addendum **only with operator acceptance**; and the
+  **profile-coverage fitness function** passes (or its failures are recorded).
+
+The integration layer owns the operator interview here exactly as elsewhere
+(N+1): it collects and dedupes joiners' gap-questions, runs them in **resumable,
+operator-paced sessions of ≤ 5 questions** with an educational preamble, and
+routes answers (project-wide → addendum write-back, operator-accepted;
+lens-specific → the asking advisor's record). Advisors never interview directly.
+Findings authored afterward must **re-ground in the live source** — persisted
+memory is an index of locators, never a finding's evidentiary endpoint, which
+extends the I8 evidence discipline upstream of Round 1.
+
 ### Phase 1 — Round 1
 
-- **Pre:** Phase 0.5 post holds; quorum branch is "proceed" (not "abort").
+- **Pre:** Phase 0.7 post holds (exploratory understanding built); quorum branch
+  is "proceed" (not "abort").
 - **Post:** every joiner has produced a report (or been substituted with a
   bounded `Explore` and marked as substituted). Reports are referenceable
   by file path or memory-dir path.

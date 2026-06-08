@@ -103,6 +103,38 @@ the next round knows which findings to assume closed (or re-evaluated):
 When a new chorus artifact is added under `docs/reviews/`, update this list
 so the next round knows which baseline to load.
 
+## 7. Project understanding
+
+> Operator-confirmed, project-wide facts gathered by the advisor **exploratory
+> phase** (`skill/chorus-review/EXPLORATORY-PHASE.md`). This section is the
+> **authoritative system of record** for these facts — advisors reference it (and
+> may cache from it, reconciling on change) rather than re-asking. Each entry was
+> **accepted by you**: advisors propose additions, you accept or edit them.
+> Nothing lands here without your acceptance.
+
+Start empty; it fills as advisors confirm facts with you. One line per fact;
+reference longer material elsewhere rather than pasting it. A changed fact
+**supersedes** the prior line (with the new accepted date). Absence of a topic
+group = not yet gathered (an open gap, surfaced — not silently "n/a").
+
+### Architecture
+- Ranked architectural characteristics: `<…>`  [accepted <date>]
+- Architecture style (as built): `<…>`
+
+### Product
+- Real users yet?: `<yes / no / …>` · Primary user & goal: `<…>`
+
+### Security
+- Trust boundaries: `<…>`
+
+### Delivery
+- Release path (commit → prod): `<…>` · Rollback: `<…>`
+
+### Domain
+- Core domain / ubiquitous-language pointers: `<… or → reference>`
+
+<!-- add topic groups as lenses confirm facts; one line per fact -->
+
 ## Maintenance
 
 When project facts change (a layer is absorbed, a directory moves, a new

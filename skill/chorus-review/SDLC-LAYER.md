@@ -77,6 +77,20 @@ delivery-and-ops, security, + constraint-and-flow (scope/defer); **Gates B/C** �
 architecture, domain, language lens (if code in scope), delivery-and-ops,
 security.
 
+### Exploratory phase (per gate)
+
+After seating and **before the gate's Author stage** (`GATE-PRIMITIVE.md` stage 2),
+each seated lens runs the **exploratory phase** (`EXPLORATORY-PHASE.md`): it builds
+a persisted, lens-specific understanding of the gate's corpus, harvesting
+**reference-first** (addendum first) and re-grounding findings in live material
+(persisted memory is an index, never the evidentiary endpoint). The **project base
+is reused across gates** — built once, each gate adds only feature/spec deltas — so
+Gates B and C do not re-derive the project context Gate A established. Gap-questions
+feed the orchestrator's **one batched, sessioned operator interview** (≤ 5 Q/session,
+re-entrant, operator-paced; a deferred session yields a verdict degradation
+summary); project-wide answers are written back to the addendum (operator-accepted).
+The phase feeds Stage 1 Extract; it does not replace it.
+
 ### Block on 🔴 only
 
 - A gate **halts** the pipeline on an unresolved 🔴 (post-tally per the
