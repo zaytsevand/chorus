@@ -29,6 +29,9 @@ and stops dead **only for 🔴**. That is the whole of "self-unblocking yet bala
 > **Band ≠ finding severity.** A finding whose *severity* is 🔴 produces, at first, a 🟡
 > *decision* — "auto-incorporate and re-verify" (see The self-heal loop). The *decision*
 > becomes 🔴 only at the loop bound or on a waiver. Keep the two senses distinct.
+> Note the scales differ: **finding severity** is four-level (🔴🟠🟡🟢, the gate tally's
+> output); a **decision band** is three-level (🔴🟡🟢). The shared glyphs are intentional
+> but the domains are separate — a decision is never 🟠.
 
 ## The sensor
 
@@ -96,7 +99,11 @@ a live decision is representable, not only its rest-states).
 - **In-flight signifier** (self-heal): each cycle's DecisionRecord (`resolution:
   in-progress`, "cycle N of 3 + gate verdict") is emitted **before the next cycle starts**,
   so an in-flight self-heal reads as *progress*, not runaway or silence. Pass-bar: visible
-  before cycle 2.
+  before cycle 2. **Rendering surface**: the record is appended to the ledger's
+  `## Provisional decisions (review & override)` section as it happens (not batched at loop
+  end), and the orchestrator emits a one-line narrator update to the operator's live
+  surface ("self-heal cycle N/3 — <verdict>") — so the operator perceives it mid-run, not
+  only on later inspection.
 
 ## The self-heal loop (gating 🔴 findings)
 

@@ -90,3 +90,91 @@ re-tasks.md now corners each behavior the panel flagged.
 - **S7** pass — cycle 2 of 3.
 - **S8** pass — no author voted on its own finding; severity by independent convergence.
 - **S9** pass — severity from real authored proposals + convergence rule; no synthesized vote.
+
+---
+
+## Gate C — Implementation review
+
+**Corpus**: NEW `skill/chorus-review/DECISION-PRIMITIVE.md` + edited `SDLC-LAYER.md`,
+`SKILL.md`, `INTEGRATION-LAYER.md`, against spec/tasks/contracts. (`spec-walkthrough`
+N/A — the implementation is prose; no spec↔code drift to reconcile.)
+
+### RSVP & seating
+
+8 of 9 JOINed (Security ABSTAIN, while naming a 🔴 and handing it off). The **two-axis
+signal discriminated cleanly** this time (Beck 🔴-potential > the 🟡s > Bob/Richards 🟢
+"clean, confirm") — the sharpening working, unlike Gate B's degenerate all-3s. The 🟡-tier
+tie was handled as a 🟡 seating decision (dogfood):
+
+```
+DecisionRecord gateC-seating-1 [🟡]
+  point: RSVP seating (8 join, cap 5); strict for Beck(🔴), tie among 🟡-tier
+  resolution: default-applied
+  chosen: {Beck, Delivery-and-Ops, Norman, Evans, Cooper} (concern-coverage)
+  alternatives: {Uncle Bob, Richards (🟢 affirmers), Constraint-and-Flow} — recorded
+  override: "re-seat from any evicted lens → cost: re-run Gate C authoring"
+```
+
+### Findings register
+
+| ID | Author(s) | Proposed | Evidence | Summary |
+|----|-----------|:---:|----------|---------|
+| GC1 | Security, Delivery, Cooper | 🔴 | sdlc-ledger.md:26-28 (old 0–3 table; no Provisional-decisions) | The contract the ledger is written from never rendered the 🟡 override surface — the operator's recourse is hollow in the shipping artifact. **[orchestrator-verified]** |
+| GC2 | Beck, Delivery | 🟡 | T018/a/b unrun; DECISION-PRIMITIVE self-heal §; D2 | Bound-branch / unclassified→🔴 cornered in prose, not yet proven by replay. |
+| GC3 | Evans | 🟡 | SKILL.md:404 (🔴🟠🟡🟢) vs bands 🔴🟡🟢 | Severity-vs-band glyph collision; disambiguate. |
+| GC4 | Norman | 🟡 | DECISION-PRIMITIVE §review-surfaces | In-flight signifier content specified, rendering surface unstated. |
+| GC5 | Constraint-and-Flow | 🟡 | DECISION-PRIMITIVE (176 lines) vs 19 FRs | Possible gold-plating ahead of the first measured run. |
+| GC6 | Bob, Richards, Norman, Delivery, Cooper | 🟢 | catalog rows 5/8/11; ref-resolution; loop diagram | Affirmations: catalog-correctness holds; references resolve; one-definition held; self-heal terminates; in-flight signifier + 🔴 affordance + 🟡 override specified. |
+
+**Tally**: GC1 confirmed 🔴 by 3-way convergence + orchestrator verification → **GATING**.
+GC2–GC5 held 🟡; GC6 affirmations. (Gate C compressed authoring into RSVP — the panel
+front-loaded substantive, file-anchored findings; the keystone GC1 was verified by the
+orchestrator, not taken on assertion.)
+
+### 🔴 resolution (cycle 1 → cleared, cycle 2)
+
+- **GC1 (🔴) RESOLVED** — updated `specs/003-agent-sdlc-workflow/contracts/sdlc-ledger.md`:
+  RSVP table → two-axis signal; added a `### Provisional decisions (review & override)`
+  section + DecisionRecord schema (incl. the in-flight signifier). The override surface
+  the design promises now ships in the contract the ledger is written from. (Re-verified
+  by grep: the contract now renders the Provisional-decisions section + two-axis RSVP.)
+- **GC3 / GC4** folded into DECISION-PRIMITIVE.md (glyph disambiguation; the in-flight
+  rendering surface = ledger Provisional-decisions section + a live narrator line).
+
+### GC2 discharge — hand-replay of the bound branch (D2)
+
+Walking catalog row 5's escalation by hand (the live multi-agent dogfood remains a tracked
+residual — see below):
+
+- A gating 🔴 enters at cycle 1 → 🟡 decision; auto-incorporate; re-run; still 🔴.
+- cycle 2 → 🟡; in-progress DecisionRecord emitted before cycle 3; auto-incorporate; re-run; still 🔴.
+- cycle 3 == bound → **escalate to 🔴 operator ask {escalate | waive}**; **no auto-default
+  applied** (D2 holds); the loop terminates. ✔ The fail-safe fires; the counter is
+  per-gate-invocation so a mutating finding still hits the bound.
+
+This discharges the *prose-fidelity* of D2/S7 (the loop provably terminates as written).
+
+### Residuals (tracked, non-gating)
+
+- **R1 — live multi-agent dogfood (T018/a/b) unrun.** SC-001/002/004/006/009 are validated
+  on first real use (the honest live-acceptance residual, as in 003 T025 / 004 T029/T031).
+  Note: this Gate B+C run *itself* dogfooded the discipline by hand — two 🟡 seating-tie
+  defaults (Gate B 8-way, Gate C) and two 🔴 self-heals (Gate B's 3 findings, Gate C's GC1)
+  — exercising the bands live, though not via the not-yet-installed automated sensor.
+- **R2 — gold-plating (GC5).** Re-evaluate catalog/in-flight richness against the measured
+  interrupt-reduction after the first real run; trim if unearned.
+
+### S1–S9 self-audit (Gate C)
+
+- **S1** pass — review authored no code; incorporation edits trace to the gate's verified findings.
+- **S2** pass — RSVP fired independently at this gate.
+- **S3** — seating tie handled as 🟡 dogfood (recorded default + override); two-axis signal discriminated; no lens-merit judgment.
+- **S4** pass — GC1 🔴 blocked the gate; resolved by incorporation, not passed silently; re-verified.
+- **S5** pass — incorporation revised the ledger contract + primitive (the gate's artefacts); no unrelated hand-patch.
+- **S6** pass — every finding carries a file:line/contract anchor; GC1 orchestrator-verified.
+- **S7** pass — cycle 2 of 3.
+- **S8** pass — no author graded its own finding; GC1 by independent convergence + verification.
+- **S9** pass — severity from authored proposals + convergence; GC1 is verified fact, not synthesized.
+
+**Gate C ✅ cleared cycle 2.** Feature 006 implementation reviewed and faithful;
+2 residuals tracked (live dogfood, gold-plating re-eval).
