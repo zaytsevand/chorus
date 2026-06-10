@@ -1,143 +1,199 @@
 # Research: `chorus learn` — Interactive Staged Onboarding
 
-**Feature**: 007-chorus-learn-onboarding | **Date**: 2026-06-10
+**Feature**: 007-chorus-learn-onboarding | **Date**: 2026-06-10 (cycle-2 regen)
 
-No `NEEDS CLARIFICATION` markers existed in Technical Context; the research tasks below
-resolve the design forks the spec left as planning details, each grounded in the repo
-as it stands.
+R1–R8 are the original plan decisions, revised where Gate A cycle 1 falsified them;
+R9–R10 are new, sourced from the gate's defect families (ledger:
+`agent-sdlc-log.md`, families A–N).
 
-## R1 — Where the mode lives: `LEARN.md` companion, not inline
+## R1 — Where the mode lives: `LEARN.md` companion, not inline *(unchanged)*
 
-- **Decision**: Author the tutorial as a new companion doc
-  `skill/chorus-review/LEARN.md` — the single canonical definition of the learn mode.
-  `SKILL.md` registers the mode in its mode list (trigger: "chorus learn" /
-  `/chorus learn`) with a one-paragraph summary and a pointer, exactly the shape used
-  for `SDLC-LAYER.md` (lifecycle mode).
-- **Rationale**: `SKILL.md` is already ~15 KB and is read in full by the orchestrator
-  every round; a ~10 KB tutorial inlined there taxes every non-learn invocation. The
-  companion-doc pattern is the repo's established mechanism for a mode
-  (`SDLC-LAYER.md`), and the spec's Assumption 1 anticipated it ("or a referenced
-  `LEARN.md` companion if it grows" — it grows: 5 stages × explanation + navigation +
-  edge-case routing).
-- **Alternatives considered**: (a) inline `SKILL.md` section — rejected, bloats the
-  hot path and mixes onboarding altitude with operating procedure; (b) a new skill —
-  rejected by the spec itself (mode-of-one-skill shape).
+- **Decision**: Author the tutorial as `skill/chorus-review/LEARN.md` — the single
+  canonical definition of the learn mode. `SKILL.md` registers it (see R9 for the full
+  registration surface).
+- **Rationale**: `SKILL.md` is read in full every round; a ~12 KB tutorial inlined there
+  taxes every non-learn invocation. The companion-doc pattern is the repo's established
+  mode mechanism (`SDLC-LAYER.md`).
+- **Alternatives considered**: inline `SKILL.md` section (bloats the hot path); a new
+  skill (rejected by the spec's mode-of-one-skill shape).
 
-## R2 — Stage set: the spec's five, with sub-steps inside stages
+## R2 — Step set: the spec's five, with declared sub-steps *(revised: vocabulary + sub-step entity)*
 
-- **Decision**: Exactly the five stages of FR-002 — **(1) orient, (2) set up,
-  (3) run a round, (4) agent-SDLC, (5) work with results** — with conditional
-  sub-steps *inside* stages rather than extra stages: the install check is a sub-step
-  of *orient* (FR-006 routes to an install sub-step only when the skill is missing);
-  the scaffold offer is a sub-step of *set up* (FR-007).
-- **Rationale**: SC-002 caps the count ("small, fixed, ≈5"); sub-steps keep the
-  conditional paths (already installed / addendum exists / outside a repo) from
-  multiplying stages. Each stage maps to one teachable claim:
-  | Stage | Teaches | Cites |
+- **Decision**: Five **steps** (FR-002) — orient / set up / run a round / agent-SDLC /
+  work with results — with **declared sub-steps** inside steps: the **install sub-step**
+  (S1, instruct-only) and the **scaffold offer** (S2, dedicated confirm; the sole
+  write). "Stage" is reserved for the canon's four-stage review flow; S3 carries the
+  one-line disambiguation (FR-012).
+  | Step | Teaches | Cites |
   |---|---|---|
-  | 1 orient | what the chorus is; the three modes; what's installed | `SKILL.md` |
-  | 2 set up | install; the addendum (sections 2/3/5); the roster | `install.sh` next-steps, `templates/CHORUS-PROJECT.template.md`, `SKILL.md` §addendum |
-  | 3 run a round | "spawn the chorus": RSVP → four-stage primitive → artifact | `GATE-PRIMITIVE.md`, `SKILL.md` §procedure |
-  | 4 agent-SDLC | gating a speckit feature; block-on-🔴; self-heal | `SDLC-LAYER.md`, `DECISION-PRIMITIVE.md` |
-  | 5 work with results | the artifact, baselines, overriding 🟡 defaults, next round | `SKILL.md` §artifact, `DECISION-PRIMITIVE.md` §review surfaces |
-- **Alternatives considered**: a 6th "expert fast-exit" stage — rejected; the fast exit
-  is an *option on stage 1's question* (edge case "user already expert"), not a stage.
+  | S1 orient | what the chorus is; the three modes; what's reachable | `skill/chorus-review/SKILL.md` |
+  | S2 set up | install; the addendum (sections 2/3/5); the roster | `templates/CHORUS-PROJECT.template.md`, `skill/chorus-review/SKILL.md` (addendum + roster sections), `install.sh` |
+  | S3 run a round | "spawn the chorus": RSVP → the four review stages → artifact | `skill/chorus-review/GATE-PRIMITIVE.md`, `skill/chorus-review/SKILL.md` (procedure) |
+  | S4 agent-SDLC | gating a speckit feature; block-on-🔴; self-heal | `skill/chorus-review/SDLC-LAYER.md`, `skill/chorus-review/DECISION-PRIMITIVE.md` |
+  | S5 work with results | the artifact, baselines, 🟡 override surfaces, next round | `skill/chorus-review/SKILL.md` (artifact), `skill/chorus-review/DECISION-PRIMITIVE.md` (review surfaces) |
+- **Rationale**: SC-002 caps the count; declared sub-steps keep conditional paths from
+  multiplying steps while making their effects auditable (gate finding F5: an
+  undeclared sub-step is an undeclared write surface).
+- **Alternatives considered**: a 6th expert step — rejected; the fast exit rides S1's
+  exit affordance (R3).
 
-## R3 — Navigation contract within the AskUserQuestion budget
+## R3 — Navigation within the AskUserQuestion budget *(revised: families A, B, L)*
 
-- **Decision**: Each stage ends with **one AskUserQuestion call, one question, exactly
-  4 options**: **(a)** advance to the next stage (recommended, listed first), **(b)** go
-  deeper on the current topic, **(c)** jump to another stage, **(d)** exit (with the
-  "you can now do X" wrap-up of FR-011). Selecting **(c)** triggers one follow-up
-  question listing the remaining stages by name (≤4 fit: 5 stages minus current minus
-  next-already-offered ≤ 3, plus "back to where I was"). The tool's built-in "Other"
-  free-text covers arbitrary asks without costing an option slot.
-- **Rationale**: FR-004 names exactly four affordances; the AskUserQuestion tool
-  presents up to 4 options per question — the contract fits the primitive with zero
-  compression. The two-step jump keeps every question scannable (FR-003: never a wall
-  of text) while still reaching any stage in ≤2 interactions (SC-003's "one navigation
-  choice" is satisfied by stage 1's question offering the jump directly).
-- **Alternatives considered**: (a) flattening all stage names into the per-stage
-  question — rejected, would need >4 options; (b) multiSelect — rejected, navigation is
-  mutually exclusive; (c) free-text-only navigation — rejected, undiscoverable for the
-  newcomer the feature exists for.
+- **Decision**: Each step ends with **one navigation question, exactly 4 options**:
+  **(a)** advance (recommended, first), **(b)** go deeper — after one deeper pass this
+  slot re-presents as **"recap this step"** (depth bounded at one level, no dead
+  option), **(c)** jump — fires one follow-up listing the other steps (**at S5: S1–S4,
+  no "back" slot**; returning rides the built-in Other), **(d)** exit — delivering the
+  FR-011 wrap-up. **At S1 the exit wrap-up IS the expert cheat-sheet** (addendum
+  checklist + command list + "any step is one jump away"), so the fast exit costs no
+  slot and FR-004 holds universally.
+- **Unit definition (SC-003)**: one **navigation action** = one selection on the
+  navigation question plus its follow-up if any — **≤2 AskUserQuestion interactions**.
+  Any step is reachable from any other in one navigation action.
+- **Rationale**: Gate A families A/B (5/5-lens convergence each): the prior design's N5
+  substitution violated FR-004's MUST, and "one navigation choice" was satisfied only
+  by redefinition. Riding the exit affordance satisfies both MUSTs inside four slots
+  (finding F51's resolution); defining the unit makes SC-003 certifiable (F2).
+- **Alternatives considered**: an FR-004 exception clause at S1 — workable but weaker
+  (an unrecorded exception was the defect; a recorded one still splits the system's
+  voice — F1); >4 options (tool budget); multiSelect (navigation is exclusive).
 
-## R4 — Resume state: in-conversation, zero writes
+## R4 — Resume: conversation-scoped, transition-updated, disclosed *(revised: families C + F10)*
 
-- **Decision**: The orchestrator tracks the last stage reached **in conversation
-  state only**. Re-invoking "chorus learn" in a session where a tutorial was exited
-  offers resume-or-restart (FR-010). Across sessions there is no persisted marker; a
-  fresh session starts at orientation, which is itself skippable in one choice.
-- **Rationale**: The spec's assumption says lightweight, best-effort-within-conversation
-  suffices; any persisted marker (a state file) would violate the non-mutating default
-  (FR-005) for a convenience the navigation already provides (any stage reachable in
-  ≤2 choices).
-- **Alternatives considered**: a `.claude/`-side state file — rejected (a write the
-  user never asked for, and cross-machine persistence is explicitly out of scope).
+- **Decision**: ResumeState (last step reached) updates at **every step transition**,
+  not only at explicit exit — silent abandonment resumes correctly. Scope is the
+  conversation; **the wrap-up discloses it** (step reached + "in a new session, say
+  'chorus learn' and jump straight to any step"). SC-007/US2-sc3/FR-010 are qualified
+  to the conversation.
+- **Rationale**: The scoping was deliberate (no writes for a convenience navigation
+  already covers); the gate's finding was **non-disclosure** (F3/F52) and the
+  exit-only update (F10). Both fixed at the contract level; zero writes preserved.
+- **Alternatives considered**: a state file (violates FR-005 for marginal benefit —
+  unchanged from cycle 1).
 
-## R5 — Detection mechanics (orientation routing), all read-only
+## R5 — Detection: dual-channel, artefact-grounded, read-only *(revised: family F)*
 
-- **Decision**: Stage 1 performs three read-only checks and routes on them (FR-006):
-  1. **Skill installed** — `$CLAUDE_HOME/skills/chorus-review/SKILL.md` exists (default
-     `~/.claude`), else route to the install sub-step (clone + `./install.sh`).
-  2. **Project addendum** — `docs/reviews/CHORUS-PROJECT.md` exists in the cwd repo →
-     setup stage offers review/extend instead of scaffold (US3 scenario 3).
-  3. **Repo context** — `git rev-parse --is-inside-work-tree` succeeds; outside a repo
-     the scaffold offer is suppressed and the tutorial stays explanatory (edge case).
-- **Rationale**: All three are one-command, side-effect-free probes; they make the
-  tutorial truthful about the user's actual state instead of assuming a fresh machine.
-- **Alternatives considered**: asking the user "is the skill installed?" — rejected;
-  the newcomer often doesn't know, and the probe is free.
+- **Decision**: S1 probes are read-only and **artefact-grounded**: the mode running is
+  itself evidence the skill is reachable, so probes verify what routing actually needs —
+  **(1) template availability** at either documented channel (file-path
+  `$CLAUDE_HOME/skills/chorus-review/templates/` or the plugin's skill directory,
+  resolved from the running skill's own base path), **(2) persona agents present**,
+  **(3) project addendum** (`docs/reviews/CHORUS-PROJECT.md`, including its SCAFFOLDED
+  marker state — R9), **(4) repo context** (`git rev-parse --is-inside-work-tree`).
+  Only a user whose installation genuinely lacks a needed artefact routes to the
+  install sub-step, whose cohort is named: someone exploring from a checkout or with a
+  partial install. The sub-step **instructs** (clone + `./install.sh`); it never
+  executes.
+- **Rationale**: Family F (3 lenses): probing only `~/.claude/skills/` false-negatives
+  the README's plugin channel — the tutorial would tell working users their setup is
+  broken. Execute-vs-recite ambiguity (F5/F21) resolved to instruct-only, keeping the
+  write surface at exactly one.
+- **Alternatives considered**: asking the user (newcomers don't know); executing
+  install.sh on confirm (a second write surface — rejected to keep FR-005's "exactly
+  one" simple and auditable).
 
-## R6 — Scaffold source: deploy the template with the skill
+## R6 — Scaffold source & deployment *(revised: family G mechanics + F47)*
 
-- **Decision**: Extend `install.sh` to copy `templates/` into the installed skill dir
-  (`$SKILL_DST/templates/CHORUS-PROJECT.template.md`). The scaffold action (FR-007)
-  copies **from the installed skill location** into the user project's
-  `docs/reviews/CHORUS-PROJECT.md`, flagging sections 2/3/5 as to-fill. Existing
-  addendum → review/extend offer, never overwrite (US3); outside a repo → suppressed
-  (R5.3).
-- **Rationale**: Today `install.sh:36` deploys only `skill/chorus-review/*.md`; the
-  template exists **only in the source repo** (`templates/CHORUS-PROJECT.template.md`),
-  which an installed skill running in an arbitrary user project cannot reach. Without
-  this edit, FR-007 is unimplementable everywhere except this repo. The installer's own
-  "Next:" text (install.sh:57-60) already tells humans to copy this template — the
-  scaffold automates exactly that documented step.
-- **Alternatives considered**: (a) embedding the template's content inside `LEARN.md` —
-  rejected, duplicates a canonical artefact (violates the cite-not-restate discipline
-  the feature itself enforces, FR-008); (b) fetching from GitHub at scaffold time —
-  rejected, network dependency + supply-chain surface for a local file we can ship.
+- **Decision**: `install.sh` deploys `templates/` into the installed skill dir
+  (`$SKILL_DST/templates/CHORUS-PROJECT.template.md`). Scaffold source resolution:
+  **inside this repo, the repo checkout's `templates/` is authoritative** (source of
+  truth); otherwise the running skill's own `templates/` copy (whichever channel
+  installed it). The scaffold copies the template with sections 2/3/5 flagged
+  `<!-- TO FILL -->`, prepends the **SCAFFOLDED marker** (R9), and the template's
+  copy-instructions preamble is **comment-wrapped in the template itself** so the
+  scaffolded file reads correctly post-copy (F7).
+- **Rationale**: install.sh:36 ships only `skill/chorus-review/*.md` today — FR-007 is
+  unimplementable outside this repo without the edit (verified by 3 lenses, F49
+  "verifies true"). Repo-first ordering inside this repo fixes the ownership inversion
+  (F47). The installer's "Next:" text already documents the manual copy this automates.
+- **Alternatives considered**: embedding template content in `LEARN.md` (restatement
+  that drifts — the exact FR-008 violation); fetching from GitHub (network +
+  supply-chain surface).
 
-## R7 — Cite-not-restate enforcement: structural checks in quickstart
+## R7 — Conformance checks C1–C7 *(revised: families H, I, K + F23/F37/F45/F46)*
 
-- **Decision**: `quickstart.md` carries the feature's conformance checks, runnable
-  against the repo as-is: **(1) mode registered** — `SKILL.md` mode list and README name
-  "chorus learn"; **(2) stages present** — `LEARN.md` contains the five stage headings;
-  **(3) cite-resolution** — every canonical doc `LEARN.md` references exists at the
-  cited path (a rename surfaces as a broken pointer, SC-005); **(4) no-restatement
-  scan** — `LEARN.md` contains none of the canon's load-bearing definition blocks (the
-  tally table, the band table, the catalog, the four-stage list verbatim); **(5)
-  scaffold safety** — the scaffold contract names its three preconditions (opt-in
-  confirm, no-overwrite, in-repo).
-- **Rationale**: This mirrors how 004/006 made prose specs checkable (structural smoke
-  checks that run with no runtime); SC-005's "inspection finds no restated mechanic"
-  becomes mechanically scannable instead of a judgment call.
-- **Alternatives considered**: prose-only review — rejected; drift is exactly the
-  failure the spec calls out (US4).
+- **Decision**: `quickstart.md` carries seven checks, each pinned to what it actually
+  defends:
+  - **C1 registration** — "chorus learn" present in `SKILL.md` mode list **and YAML
+    frontmatter description**, README, `install.sh` "Next:"; **staleness assert**: the
+    bare "Two modes" framing is gone from SKILL.md/README.
+  - **C2 steps** — the five step headings exist in `LEARN.md`, each with a
+    navigation-question block.
+  - **C3 cite-resolution** — every path in every structured **`Cites:`** line resolves
+    against the repo; scoped to the Cites: notation (no bare-filename regex), so
+    non-canon names in prose (e.g. the scaffold target `CHORUS-PROJECT.md`) cannot
+    false-positive. Limitation recorded honestly: resolution is at **doc granularity**;
+    section renames surface at re-read, not in C3 (F23/F37/F45).
+  - **C4 no-restatement** — pinned **distinctive delimiters** of the canon's
+    load-bearing tables: the tally rule (`net ≥ +2`), the band table
+    (`auto-resolve · audit-log`), the decision catalog (`| 1 | RSVP seating`), **and
+    the RSVP quorum table (`J ∈ {3, 4}`)** — none may appear in `LEARN.md`.
+  - **C5 scaffold deployment** — template present in repo; `install.sh` deploys
+    `templates/`; **installed-side assertion**: after `./install.sh` into a temp
+    `CLAUDE_HOME`, the template exists at `$SKILL_DST/templates/` (F46).
+  - **C6 write surface** — mechanical **write-idiom scan** over `LEARN.md` (Write/Edit/
+    `cp`/`mkdir`/`tee`/redirection idioms appear only inside the scaffold sub-step's
+    accept branch); manual inspection demoted to backstop.
+  - **C7 scaffold matrix** — the four paths (accept / decline / existing-target /
+    outside-repo) each dogfooded with a recorded expected outcome (write with marker /
+    zero writes / review-extend offer, no overwrite / stated unavailability, zero
+    writes).
+- **Rationale**: Family K: the design's strongest invariants had the weakest checks;
+  family H: C3's regex was guaranteed to false-positive on conformant content (F17/F30
+  — both proposed 🔴 by their authors and confirmed 4–0). Checks now assert behavior,
+  not presence.
+- **Alternatives considered**: prose-only review (the drift the spec exists to prevent);
+  hash-pinning canon tables (over-brittle; delimiter pinning catches restatement
+  without freezing the canon).
 
-## R8 — Sequencing on feature 006 (PR #5, open)
+## R8 — Sequencing on feature 006 (PR #5, open) *(corrected per F25)*
 
-- **Decision**: 007 **lands after 006 merges**. Before `/speckit-implement`, merge
-  `main` (containing 006) into this branch — or rebase — and author `LEARN.md` against
-  the 006-era canon (three-band decision discipline, two-axis RSVP signal,
-  `DECISION-PRIMITIVE.md` present). Tutorial stages 3–5 cite `DECISION-PRIMITIVE.md`,
-  which exists only post-006.
-- **Rationale**: This branch was cut from main before PR #5; its
-  `skill/chorus-review/` lacks `DECISION-PRIMITIVE.md` and its `SKILL.md` predates the
-  decision-discipline edits. The spec's own Context paragraph lists
-  `DECISION-PRIMITIVE.md` among the docs the tutorial mediates — the dependency is in
-  the spec, not optional. Both branches edit `SKILL.md`'s mode-area text, so merging
-  006 first also localizes the conflict to one known edit site.
-- **Alternatives considered**: authoring against pre-006 canon and patching later —
-  rejected; it guarantees the tutorial teaches a roster of mechanics that is stale on
-  arrival (the exact drift FR-008 exists to prevent).
+- **Decision**: 007 lands after 006 merges; merge `main` (with 006) into this branch
+  before `/speckit-implement`; author `LEARN.md` against the 006-era canon.
+  **Correction**: 006 does *not* deliver a three-mode SKILL.md — its SKILL.md still
+  frames two modes (+ the decision primitive). **007 itself performs the two→three
+  reframe** (R9), which is why both branches edit the same SKILL.md region and the
+  merge order matters.
+- **Rationale**: Tutorial steps S3–S5 cite `DECISION-PRIMITIVE.md`, which exists only
+  post-006; the conflict surface is the known mode-list region.
+- **Alternatives considered**: authoring against pre-006 canon (teaches a stale
+  roster of mechanics on arrival — the drift FR-008 prevents).
+
+## R9 — The scaffolded-addendum third state *(new: family G)*
+
+- **Decision**: The scaffold emits a machine-readable marker as the file's first line
+  after the title — `<!-- SCAFFOLDED by chorus learn YYYY-MM-DD — sections 2/3/5
+  unfilled; a chorus round treats this file as structure, not facts, until the marker
+  is removed -->` — and the **registration edit adds a Phase-0 note to SKILL.md**: an
+  addendum bearing the SCAFFOLDED marker is **present-but-unfilled** — the orchestrator
+  confirms the flagged sections with the operator (one question, as if the addendum
+  were absent but pre-structured) instead of consuming placeholder text as project
+  facts. The user removes the marker when they fill sections 2/3/5; the tutorial
+  wrap-up says exactly that. The **dogfood walkthrough in this repo declines the
+  scaffold by default** (accepting changes this repo's Phase-0 behavior — a separate
+  operator decision, F61).
+- **Rationale**: Family G (Evans F33, 4–0): the round's consumer contract was binary
+  (present = read-and-use; absent = ask); the scaffold manufactured an undefined third
+  state in which TO-FILL placeholders would enter persona briefs as project facts. The
+  marker makes the state explicit and its consumer behavior declared; the two
+  addendum-creation paths (S2 scaffold = pre-round structural form; SKILL.md Phase-5
+  offer = post-interview distillation) are cross-referenced with the template as the
+  single source of structure (F22).
+- **Alternatives considered**: scaffolding into a draft path then renaming (two-step
+  state the user must remember); teaching "fill before any round" with no mechanical
+  signal (vigilance-only — the exact failure family K removes).
+
+## R10 — Runtime cite-failure behavior *(new: family H)*
+
+- **Decision**: `LEARN.md` carries a **cite-failure clause** mirroring the scaffold's
+  failure honesty: if a cited canon doc is missing/unreadable at runtime (stale or
+  partial installation), the tutorial **states that plainly, continues at summary
+  altitude, and points to the repo path** — it never reconstructs canon from memory.
+  This clause covers every CanonicalPointer, not only the template.
+- **Rationale**: F8/F56: authoring-time C3 cannot protect a user whose *installed* copy
+  is stale; the natural LLM fallback (reconstruct from memory) is precisely the silent
+  drift FR-008 exists to prevent. Declaring the degraded mode keeps the failure honest
+  and visible.
+- **Alternatives considered**: hard-stopping the tutorial on a broken cite (punishes
+  the user for a packaging defect); silently skipping the mechanic (silent quality
+  drop).

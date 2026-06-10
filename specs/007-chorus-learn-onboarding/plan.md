@@ -1,23 +1,26 @@
 # Implementation Plan: `chorus learn` — Interactive Staged Onboarding
 
-**Branch**: `007-chorus-learn-onboarding` | **Date**: 2026-06-10 | **Spec**: [spec.md](spec.md)
+**Branch**: `007-chorus-learn-onboarding` | **Date**: 2026-06-10 (cycle-2 regen) | **Spec**: [spec.md](spec.md)
 
 **Input**: Feature specification from `/specs/007-chorus-learn-onboarding/spec.md`
+(Gate A cycle-1-revised: 14 gate-sourced clarifications, FR-014/SC-008 added)
 
 ## Summary
 
 Add a third operating mode to the chorus-review skill — **`chorus learn`** — an
-interactive, staged onboarding tutorial driven by the AskUserQuestion tool. Five stages
-(orient / set up / run a round / agent-SDLC / work with results) teach a newcomer how to
-set up the chorus and work with it, with choose-your-path navigation, one opt-in write
-(the addendum scaffold), and cite-not-restate pointers into the canonical docs.
+interactive onboarding tutorial of five **steps** (orient / set up / run a round /
+agent-SDLC / work with results) driven by the AskUserQuestion tool: four navigation
+affordances at every step (advance / jump / deeper / exit, with declared S1/S5/
+post-deeper rules), one opt-in write (the addendum scaffold, behind a dedicated
+confirm, emitting a SCAFFOLDED marker), structured per-step `Cites:` lists with a
+declared runtime cite-failure behavior, and dual-channel install detection.
 
-Technical approach: author a new companion doc `skill/chorus-review/LEARN.md` holding the
-staged tutorial procedure (the single canonical definition of the mode), register the
-mode in `SKILL.md`'s mode list and the README (FR-013), and extend `install.sh` to deploy
-the addendum template with the skill so the scaffold action (FR-007) works in any
-installed project. No runtime code; the "implementation" is skill/prompt authoring, the
-same shape as features 003–006.
+Technical approach: author a new companion doc `skill/chorus-review/LEARN.md` (the
+single canonical definition of the mode); register the mode across **all** cold-start
+surfaces — `SKILL.md` mode list **and YAML frontmatter**, the three-mode reframe of the
+"Two modes" heading, a Phase-0 note defining the scaffolded-addendum state (FR-014),
+README quick-start, `install.sh` "Next:" text; extend `install.sh` to deploy the
+template. No runtime code; same authoring shape as features 003–006.
 
 ## Technical Context
 
@@ -27,57 +30,68 @@ same shape as features 003–006.
 **Primary Dependencies**:
 - The chorus canon the tutorial cites: `SKILL.md`, `INTEGRATION-LAYER.md`,
   `SDLC-LAYER.md`, `GATE-PRIMITIVE.md`, `EXPLORATORY-PHASE.md`, `DECISION-PRIMITIVE.md`
-- **Feature 006 (PR #5, open)** — `DECISION-PRIMITIVE.md` and the three-mode-aware
-  `SKILL.md` exist only on that branch; 007 must land after it (see research.md R8)
-- The AskUserQuestion tool (Claude Code harness primitive; ≤4 options per question plus a
-  built-in "Other") — the navigation contract is designed to fit it
+- **Feature 006 (PR #5, open)** — `DECISION-PRIMITIVE.md` exists only on that branch;
+  007 lands after it (research.md R8). Note: 006 does **not** deliver a three-mode
+  SKILL.md — its SKILL.md still lists two modes; **007 itself performs the
+  two→three-modes reframe** (R8 corrected per finding F25)
+- The AskUserQuestion tool (≤4 options per question plus built-in "Other") — the
+  navigation rules in FR-004 are designed against this hard budget
 - `templates/CHORUS-PROJECT.template.md` (scaffold source) and `install.sh` (deployment)
+- **Both documented install channels**: file-path (`./install.sh` → `~/.claude`) and
+  plugin — detection and scaffold-source resolution must work on each (R5/R6)
 
-**Storage**: none — resume state is lightweight, in-conversation only (FR-010 assumption);
-the sole write surface is the opt-in scaffold `docs/reviews/CHORUS-PROJECT.md` (FR-005/007)
+**Storage**: none — resume state is conversation-scoped, updated at every step
+transition (FR-010); the sole write surface is the opt-in scaffold
+`docs/reviews/CHORUS-PROJECT.md` (FR-005/007)
 
-**Testing**: structural checks in `quickstart.md` (mode registered, stages present,
-cite-resolution, no-restatement scan, scaffold preconditions) + a dogfood walkthrough of
-the tutorial in this repo
+**Testing**: structural checks **C1–C7** in `quickstart.md` (mode + frontmatter
+registered, steps present, structured-cites resolution, no-restatement with pinned
+table delimiters, scaffold deployment incl. installed-side assertion, write-idiom scan,
+four-path scaffold matrix) + a dogfood walkthrough (scaffold declined by default —
+spec Assumptions)
 
 **Target Platform**: a Claude Code session in any user project (the skill is
 project-agnostic; project facts come from the addendum or are absent)
 
 **Project Type**: skill/prompt repository — documentation-mode addition (no app, no
-runtime code, no test harness beyond structural checks)
+runtime code)
 
-**Performance Goals**: N/A — interaction-bounded; ≈5 stages, one AskUserQuestion
-interaction's worth of content per stage (SC-002)
+**Performance Goals**: N/A — interaction-bounded; ≈5 steps, one AskUserQuestion
+interaction's worth of content per step (SC-002)
 
 **Constraints**:
-- Non-mutating by default; exactly one opt-in write (FR-005/FR-007, SC-004)
-- Cite-not-restate for every canon-defined mechanic (FR-008, SC-005)
-- Navigation must offer advance / jump / deeper / exit within the AskUserQuestion
-  4-option budget (FR-004, SC-003)
-- Usable by a non-expert; terms introduced before use (FR-012)
+- Non-mutating by default; exactly one opt-in write behind a dedicated confirm
+  (FR-005/FR-007, SC-004); install sub-step instruct-only (FR-006)
+- Cite-not-restate via structured `Cites:` lists + runtime failure clause (FR-008, SC-005)
+- All four affordances at every step within the 4-option budget — S1 fast-exit rides
+  the exit wrap-up; S5 jump lists S1–S4 without "back"; post-deeper slot becomes
+  "recap this step" (FR-004, SC-003: one navigation action = ≤2 interactions)
+- Non-expert floor + step/stage vocabulary disambiguation (FR-012)
 
-**Scale/Scope**: 1 new companion doc (`LEARN.md`, est. 8–12 KB), a mode-list edit in
-`SKILL.md`, a README discoverability edit, an `install.sh` edit (template deployment);
-5 stages, ~6 canonical pointers
+**Scale/Scope**: 1 new companion doc (`LEARN.md`, est. 10–14 KB); `SKILL.md` edits
+(mode list, frontmatter description, "Two modes"→three-mode heading, Phase-0
+scaffolded-state note); README quick-start edit; `install.sh` edits (template
+deployment + "Next:" text); template preamble made copy-safe; 5 steps, ~7 canonical
+pointers; checks C1–C7
 
 ## Constitution Check
 
 *GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
 
-`.specify/memory/constitution.md` is the unfilled speckit template — **no ratified
-project constitution exists** (same finding as features 003–006). The operative
-governance is the chorus invariant set, and this feature touches it directly:
+`.specify/memory/constitution.md` remains the unfilled speckit template — **no ratified
+project constitution** (standing fact since feature 003). Operative governance is the
+chorus invariant set:
 
 | De-facto principle | How this plan honors it | Status |
 |---|---|---|
-| One canonical definition; layers reference, never restate (GATE-PRIMITIVE/DECISION-PRIMITIVE adoption notes) | The tutorial **cites** the canon for every mechanic (FR-008); `LEARN.md` is itself the single definition of the learn mode, referenced from `SKILL.md` | ✅ |
-| Mode-of-one-skill shape (SDLC-LAYER: "an operating mode … not a new skill") | `chorus learn` is registered as a third mode, not a new skill (spec Assumption 1) | ✅ |
-| Operator decisions banded, never inferred (D1–D5) | The tutorial's one mutating action is an explicit opt-in confirmation (a 🔴-style ask by design: a write to the user's repo); everything else proceeds without writes | ✅ |
-| Orchestrator authors nothing it shouldn't (S1) | Plan artefacts produced via speckit phase-runners; tutorial content authored at implement, gated A/B/C | ✅ |
+| One canonical definition; layers reference, never restate | `LEARN.md` cites via structured `Cites:` lists (FR-008); C3/C4 mechanically enforce; the template stays the single source of addendum structure for both creation paths (FR-007) | ✅ |
+| Mode-of-one-skill shape | third mode registered, not a new skill; all registry surfaces named as edit targets (FR-013) | ✅ |
+| Operator decisions banded, never inferred (D1–D5) | the sole write sits behind a dedicated explicit confirm (consent isolated from navigation); everything else read-only; scaffolded-state consumer behavior declared (FR-014) | ✅ |
+| Orchestrator authors nothing it shouldn't (S1) | artefacts produced via speckit phase-runners; tutorial content authored at implement, gated A/B/C | ✅ |
 
-No violations → Complexity Tracking is empty. **Re-checked after Phase 1 design: still
-passing** — the contracts introduce no new canonical definitions (they bind the tutorial
-to existing ones) and no new write surfaces beyond the scaffold.
+No violations → Complexity Tracking empty. **Re-checked after Phase 1 regen: passing** —
+the contracts bind the tutorial to existing canonical definitions and declare every
+write/probe surface.
 
 ## Project Structure
 
@@ -85,17 +99,17 @@ to existing ones) and no new write surfaces beyond the scaffold.
 
 ```text
 specs/007-chorus-learn-onboarding/
-├── spec.md              # Feature specification (committed 55f3fff)
+├── spec.md              # Cycle-2 revision (Gate A clarifications encoded)
 ├── plan.md              # This file
-├── research.md          # Phase 0 output
+├── research.md          # Phase 0 output (R1–R10)
 ├── data-model.md        # Phase 1 output
-├── quickstart.md        # Phase 1 output
-├── contracts/           # Phase 1 output
-│   ├── learn-mode.md    #   mode trigger + stage map + per-stage contract
-│   ├── navigation.md    #   the AskUserQuestion navigation contract
-│   └── scaffold.md      #   the opt-in addendum-scaffold contract
-├── checklists/
-│   └── requirements.md  # Spec quality checklist (committed)
+├── quickstart.md        # Phase 1 output (checks C1–C7 + walkthrough)
+├── contracts/
+│   ├── learn-mode.md    #   mode trigger + registration surfaces + step contract
+│   ├── navigation.md    #   the AskUserQuestion navigation contract (incl. S1/S5/recap rules)
+│   └── scaffold.md      #   the opt-in addendum-scaffold contract (confirm, marker, matrix)
+├── checklists/requirements.md
+├── agent-sdlc-log.md    # Gate ledger (cycle 1 BLOCKED → self-heal → cycle 2)
 └── tasks.md             # Phase 2 output (/speckit-tasks — NOT created by /speckit-plan)
 ```
 
@@ -103,7 +117,8 @@ specs/007-chorus-learn-onboarding/
 
 ```text
 skill/chorus-review/
-├── SKILL.md             # EDIT: mode list gains "chorus learn" trigger → points to LEARN.md
+├── SKILL.md             # EDIT: mode list + YAML frontmatter description + "Two modes"→
+│                        #   three-mode heading + Phase-0 scaffolded-addendum note (FR-014)
 ├── LEARN.md             # NEW: the staged tutorial — single canonical definition of the mode
 ├── INTEGRATION-LAYER.md # cited (unchanged)
 ├── SDLC-LAYER.md        # cited (unchanged)
@@ -112,18 +127,20 @@ skill/chorus-review/
 └── DECISION-PRIMITIVE.md# cited (unchanged; arrives via 006 / PR #5)
 
 templates/
-└── CHORUS-PROJECT.template.md  # unchanged; becomes deployed by install.sh
+└── CHORUS-PROJECT.template.md  # EDIT: copy-safe preamble (comment-wrapped copy instructions)
 
-install.sh               # EDIT: also deploy templates/ → $SKILL_DST/templates/
-README.md                # EDIT: name the third mode (FR-013)
+install.sh               # EDIT: deploy templates/ → $SKILL_DST/templates/ + "Next:" leads
+                         #   with `chorus learn`
+README.md                # EDIT: three modes named; quick-start leads with `chorus learn`;
+                         #   manual copy remains as cited fallback
 ```
 
-**Structure Decision**: single-repo skill layout, unchanged from features 003–006. The
-learn mode follows the established companion-doc pattern: `SKILL.md` lists the mode and
-points to `LEARN.md`, which holds the whole procedure once. The only structural addition
-outside `skill/` is the install.sh deployment of the existing template (research.md R6).
-There is no repo `CLAUDE.md`, so the speckit agent-context update step is a recorded
-no-op for this repo.
+**Structure Decision**: single-repo skill layout, unchanged from 003–006. `LEARN.md`
+holds the whole mode once; `SKILL.md` carries registration only (mode list +
+frontmatter + the FR-014 Phase-0 note — a consumer-contract addition, not tutorial
+content). The template edit (copy-safe preamble) is part of this feature because the
+scaffold copies it verbatim. No repo `CLAUDE.md` exists; the speckit agent-context
+update step is a recorded no-op.
 
 ## Complexity Tracking
 
