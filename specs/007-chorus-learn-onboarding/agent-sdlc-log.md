@@ -12,7 +12,7 @@ Audit trail for the gated lifecycle of `specs/007-chorus-learn-onboarding`. Sche
 | gateA-roster-1 | Optional language lens (Guido) at Phase 0 | 🟢 | mechanical: round corpus contains no Python (markdown + bash only) | not invited | invite and let RSVP drop him | say "include Guido"; cost = one extra RSVP dispatch |
 | gateA-seating-1 | RSVP seating — tie at the cap (J=9) | 🟡 | catalog row 2: seven lenses tied at (applies=3, stakes=🟡) spanning the 5th seat → non-strict order at the boundary | default panel **norman, unclebob, evans, richards, cooper** by declared sort (applies ↓, stakes ↓, roster-order tiebreak); resolution: default-applied | runner-ups in order: beck, dno, sec, cnf (each tied with the 3 seated tail lenses) | name a lens to swap in (async, any time before sign-off); cost = author+vote dispatch for that lens + tally recompute (~1 lens-cycle) |
 | gateA-gaps-1 | Exploratory gaps — operator interview | 🟡 | catalog rows 6/7: 13 gap-questions raised, **0 flagged blocking** (row 8 not triggered) → recorded-assumption defaults, interview deferred | each advisor proceeds on the safest repo-documented assumption, stated inside any finding that rests on it; resolution: default-applied | run a ≤5-question interview session before Author (rejected: no blocking gap; rows 6/7 declare the default) | answer any gap-question async (they are listed below); cost = affected lens re-grounds, possibly 1 re-vote |
-| gateA-selfheal-1 | Gating 🔴 set after cycle-1 tally (38 findings) | 🟡 | catalog row 5: `cycle 1 < 3` → auto-run incorporation cascade (`/speckit-clarify` → `/speckit-plan`) + re-run gate; **resolution: in-progress** — cycle 1 verdict BLOCKED, cycle 2 of 3 starting | spec-sourced incorporation of the 14 defect families below, then fresh RSVP + primitive cycle | escalate to operator now (rejected: row 5 declares the 🟡 default while cycle < 3) | say "stop the self-heal" to escalate immediately; cost = the gate halts open and Gate A waits on an operator session |
+| gateA-selfheal-1 | Gating 🔴 set after cycle-1 tally (38 findings) | 🟡 | catalog row 5: `cycle 1 < 3` → auto-run incorporation cascade (`/speckit-clarify` → `/speckit-plan`) + re-run gate; **resolution: in-progress** — cycle 1 BLOCKED (38 🔴 / 14 families) → cycle 2 BLOCKED (14 🔴 / 6 clusters, all narrower), **cycle 3 of 3 starting — final cycle; S7 escalates to the operator if it does not clear** | spec-sourced incorporation of the 6 cycle-2 clusters (+ one-line-cheap 🟡s), then fresh RSVP + primitive cycle | escalate to operator now (rejected: row 5 declares the 🟡 default while cycle < 3) | say "stop the self-heal" to escalate immediately; cost = the gate halts open and Gate A waits on an operator session |
 
 ---
 
@@ -165,3 +165,92 @@ for a future canon round, not patched mid-gate (I7).
 
 **Self-heal cycle 2 of 3 starting** (gateA-selfheal-1, in-progress): incorporation
 cascade `/speckit-clarify` → `/speckit-plan`, then a fresh RSVP + primitive cycle.
+
+---
+
+## Gate A — design review (cycle 2) — 2026-06-10
+
+**Corpus**: the cycle-1-revised artefacts (spec +14 clarifications/FR-014/SC-008,
+plan/research R1–R10, contracts regen, quickstart C1–C7; commits `5e15677` → `33ccdcb`).
+
+### RSVP (fresh, S2)
+
+All nine JOINed again, each citing the **revisions** (fix-verification, not
+performance): Evans 4 deltas / Richards 5 / Cooper 8 / Norman 5 / Uncle Bob 5 / Beck 4 /
+D&O 6 (**red-potential** — pre-verified C6's grep is dead before seating) / Security 4 /
+C&F 3.
+
+**Seating: 🟢 (strict two-axis order at the cap)** — applies-count sort:
+**Cooper (8), D&O (6), Richards (5), Norman (5), Uncle Bob (5)**; Evans/Beck/Security
+(4) and C&F (3) out on a strict boundary — no tie, no 🟡 card needed. The panel rotated
+on evidence: D&O in (release-path findings), Evans out (his cycle-1 families verified
+by others' verdicts).
+
+### Exploratory (incremental)
+
+5 records updated (delta sections); 9 new gap-questions, **0 blocking** → recorded
+assumptions again (rows 6/7).
+
+### Family verdicts (the cycle-1 🔴 set, verified per lens against the revised corpus)
+
+**12 of 14 families RESOLVED** — A, B, C, D, E, G, H, I, J, L, M, N each confirmed
+unanimously by the seated lenses with `file:line`-cited notes. Residues:
+
+- **Family F (partial)** — detection identity healed (R5), but the **delivery half is
+  unbacked on the plugin channel**: `install.sh` never runs there, and
+  `<skill-base>/templates/` does not exist in the plugin layout (plugin.json roots the
+  skill at `skill/chorus-review/`; `templates/` lives at repo root).
+- **Family K (partial)** — C4/C7 verified real (the quorum pin checked non-vacuous
+  against installed canon), but **C6's write-idiom scan is empirically dead** for
+  cp/tee/mkdir (`\|` in ERE = literal pipe; verified by three lenses with test lines).
+
+### Findings register & tally (cycle 2 — new findings only; resolved cycle-1 findings not re-filed)
+
+I8: **0 demoted**. Votes real, authors excluded (S8); severities post-tally.
+
+| ID | Lens | Proposed | Votes P–O | Post | Summary |
+|---|---|:--:|:--:|:--:|---|
+| G1 | Cooper | 🟡 | 4–0 | 🔴 | The cite-failure recovery pointer is repo-relative, but the user who hits it has no repo. |
+| G2 | Cooper | 🟡 | 4–0 | 🔴 | Check C5 ships a dead first line that installs into a discarded temp dir and asserts nothing. |
+| G3 | Cooper | 🟢 | 4–0 | 🟡 | S5 presents two terminal verbs, Finish and Exit, with identical consequence — a fake choice. |
+| G4 | Cooper | 🟢 | 4–0 | 🟡 | Same-conversation re-entry to a different step costs three interactions; SC-003's unit honestly excludes the resume question. |
+| G5 | Cooper | 🟢 | 4–0 | 🟡 | The README's manual-fallback path is contract-unpinned; the author's home directory could survive implementation. |
+| G6 | D&O | 🔴 | 4–0 | 🔴 | Plugin-channel template delivery is unbacked: install.sh never runs there; pick one of three named designs. |
+| G7 | D&O | 🔴 | 3–1 | 🔴 | C6's write-idiom scan is mechanically dead for cp, tee, and mkdir; SC-008 would certify on a decorative gate. |
+| G8 | D&O | 🟡 | 4–0 | 🔴 | C5's first half is vestigial dead code, and its repo-side grep false-positives on installer prose. |
+| G9 | D&O | 🟡 | 3–1 | 🔴 | No artifact names who runs C1–C7 or when; an unowned check is decorative by default. |
+| G10 | D&O | 🟢 | 4–0 | 🟡 | The additive-only installer leaves stale-present canon that R10's missing-doc clause cannot detect. |
+| G11 | D&O | 🟢 | 4–0 | 🟡 | C1's frontmatter assertion pins a six-line sed window and false-negatives if frontmatter grows. |
+| G12 | Richards | 🔴 | 4–0 | 🔴 | Scaffold's plugin-channel template path does not exist; the "both install channels work" claim is unsubstantiated. |
+| G13 | Richards | 🟡 | 4–0 | 🔴 | C6's dead cp/tee/mkdir branches: the sole-write invariant's mechanical guard partly cannot fire. |
+| G14 | Richards | 🟢 | 4–0 | 🟡 | C1's staleness grep misses SKILL.md:30 "Both modes run it", which goes ambiguous post-reframe. |
+| G15 | Richards | 🟢 | 4–0 | 🟡 | C5 contains a half-finished draft: an undefined variable and a duplicate, leaked install run. |
+| G16 | Richards | 🟢 | 4–0 | 🟡 | plugin.json packages 7 of 10 persona agents; 007's S1 probe makes that gap user-visible. |
+| G17 | Richards | 🟢 | 4–0 | 🟡 | FR-014 names only the Phase-0 orchestrator; the per-advisor exploratory cache is a second addendum consumer. |
+| G18 | Norman | 🟡 | 4–0 | 🔴 | The install remedy is single-channel while detection is dual-channel, mismatching the plugin user's mental model. |
+| G19 | Norman | 🟡 | 4–0 | 🔴 | The S1 exit signifier is unpinned, so family A's fast-exit resolution is invisible before selection. |
+| G20 | Norman | 🟢 | 4–0 | 🟡 | The S2 confirm-before-navigation ordering is pinned only by the non-normative walkthrough. |
+| G21 | Norman | 🟢 | 4–0 | 🟡 | At S5 the jump follow-up's stay-here escape depends on knowing the tool's built-in Other. |
+| G22 | Norman | 🟢 | 4–0 | 🟡 | Check C5's dead script lines blur which assertions in the new check layer are load-bearing. |
+| G23 | Uncle Bob | 🔴 | 3–1 | 🔴 | C6's write-idiom regex can never match its cp, tee, or mkdir branches. |
+| G24 | Uncle Bob | 🟡 | 4–0 | 🔴 | Walkthrough S5 shows "Recap this step" though no deeper pass happened at S5 (depth state is per-step). |
+| G25 | Uncle Bob | 🟡 | 4–0 | 🔴 | C5's first stanza is dead code: undefined variable, redundant install, leaked tempdir. |
+| G26 | Uncle Bob | 🟡 | 4–0 | 🔴 | C2 and C3 both pass vacuously if LEARN.md ships zero Cites: lines. |
+| G27 | Uncle Bob | 🟢 | 4–0 | 🟡 | S5's advance label is uncontracted; the walkthrough invents "Finish". |
+
+### Cycle-2 verdict: **BLOCKED** — 14 gating 🔴 in 6 clusters (all narrower than cycle 1's)
+
+| Cluster | Findings | Defect | Resolution direction |
+|---|---|---|---|
+| F′ plugin delivery | G6 G12 G18 (+G16) | template + remedy text don't exist/branch on the plugin channel | resolution order `<skill-base>/templates/` → plugin root; templates + missing agents into plugin packaging (named edit surface); channel-branched instruct text; C5b plugin-side assertion |
+| K′ C6 dead regex | G7 G13 G23 | `\|` in ERE is a literal pipe — cp/tee/mkdir branches can't fire | corrected alternation + a self-test of the scan against known-bad fixture lines |
+| C5 dead draft | G2 G8 G25 (+G15 G22) | undefined `$CLAUDE_HOME_TMP_CHECK`, leaked tempdir, prose-matching grep | delete the dead stanza; tighten to `^cp .*templates`; keep the clean mktemp assertion |
+| Check ownership | G9 | nobody named to run C1–C7 | bind: "C1–C7 execute at Gate C dogfood and before merge; results recorded in the gate ledger" |
+| Runtime coordinates | G1 | cite-failure recovery pointer is repo-relative; the user who hits it has no repo | runtime pointers resolve via the running skill's base path (same rule as R6) |
+| Rendering/normativity | G19 G24 G26 | S1 exit label doesn't signify the cheat-sheet; S5 walkthrough/contract drift; vacuous-pass C2/C3 | pin the S1 exit label + S5 "Finish → wrap-up" (declared convergence with Exit) in navigation.md; per-step depth state; Cites: cardinality assert |
+
+**Self-heal cycle 3 of 3 starting** (gateA-selfheal-1, in-progress — **last cycle
+before the S7 bound escalates to the operator**): incorporation cascade, then a fresh
+RSVP + primitive cycle. Non-gating 🟡s (G3/G4/G5/G10/G11/G14/G16/G17/G20/G21/G27) are
+folded into the same incorporation where one-line-cheap; G10 (stale-present installed
+canon) is recorded as a future-round candidate, out of 007's scope.
