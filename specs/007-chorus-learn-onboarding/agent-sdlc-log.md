@@ -12,7 +12,8 @@ Audit trail for the gated lifecycle of `specs/007-chorus-learn-onboarding`. Sche
 | gateA-roster-1 | Optional language lens (Guido) at Phase 0 | 🟢 | mechanical: round corpus contains no Python (markdown + bash only) | not invited | invite and let RSVP drop him | say "include Guido"; cost = one extra RSVP dispatch |
 | gateA-seating-1 | RSVP seating — tie at the cap (J=9) | 🟡 | catalog row 2: seven lenses tied at (applies=3, stakes=🟡) spanning the 5th seat → non-strict order at the boundary | default panel **norman, unclebob, evans, richards, cooper** by declared sort (applies ↓, stakes ↓, roster-order tiebreak); resolution: default-applied | runner-ups in order: beck, dno, sec, cnf (each tied with the 3 seated tail lenses) | name a lens to swap in (async, any time before sign-off); cost = author+vote dispatch for that lens + tally recompute (~1 lens-cycle) |
 | gateA-gaps-1 | Exploratory gaps — operator interview | 🟡 | catalog rows 6/7: 13 gap-questions raised, **0 flagged blocking** (row 8 not triggered) → recorded-assumption defaults, interview deferred | each advisor proceeds on the safest repo-documented assumption, stated inside any finding that rests on it; resolution: default-applied | run a ≤5-question interview session before Author (rejected: no blocking gap; rows 6/7 declare the default) | answer any gap-question async (they are listed below); cost = affected lens re-grounds, possibly 1 re-vote |
-| gateA-selfheal-1 | Gating 🔴 set after cycle-1 tally (38 findings) | 🟡 | catalog row 5: `cycle 1 < 3` → auto-run incorporation cascade (`/speckit-clarify` → `/speckit-plan`) + re-run gate; **resolution: in-progress** — cycle 1 BLOCKED (38 🔴 / 14 families) → cycle 2 BLOCKED (14 🔴 / 6 clusters, all narrower), **cycle 3 of 3 starting — final cycle; S7 escalates to the operator if it does not clear** | spec-sourced incorporation of the 6 cycle-2 clusters (+ one-line-cheap 🟡s), then fresh RSVP + primitive cycle | escalate to operator now (rejected: row 5 declares the 🟡 default while cycle < 3) | say "stop the self-heal" to escalate immediately; cost = the gate halts open and Gate A waits on an operator session |
+| gateA-selfheal-1 | Gating 🔴 set after cycle-1 tally (38 findings) | 🟡→🔴 | catalog row 5: `cycle 1 < 3` → auto-run incorporation cascade + re-run gate; **resolution: ESCALATED** — cycle 1 BLOCKED (38 🔴 / 14 families) → cycle 2 BLOCKED (14 🔴 / 6 clusters) → cycle 3 BLOCKED (6 🔴 / 3 clusters); **`cycle == 3` reached without clearing → row 5 flips to 🔴, hand to operator (D2: no auto-default)** | three self-heal cycles run; convergence monotonic (38→14→6) but not zero | superseded by **gateA-escalation-1** below | — |
+| gateA-escalation-1 | Self-heal bound reached: 6 gating 🔴 after cycle-3 tally | 🔴 | catalog row 5 (`cycle == 3`) + S7: hard-block, instant framed ask, **no auto-default** (D2) | **WAIT for operator** — options framed in the cycle-3 verdict below | A waive (per-🔴 rationale, S4) · B one more incorporation cycle (operator-authorized 4th, past the S7 bound) · C amend scope (defer a cluster) | operator selects A/B/C/other; nothing proceeds until then |
 
 ---
 
@@ -254,3 +255,103 @@ before the S7 bound escalates to the operator**): incorporation cascade, then a 
 RSVP + primitive cycle. Non-gating 🟡s (G3/G4/G5/G10/G11/G14/G16/G17/G20/G21/G27) are
 folded into the same incorporation where one-line-cheap; G10 (stale-present installed
 canon) is recorded as a future-round candidate, out of 007's scope.
+
+---
+
+## Gate A — design review (cycle 3, final self-heal) — 2026-06-10
+
+**Corpus**: the cycle-2-revised artefacts (spec +10 clarifications/FR-015/SC-009,
+plan/research R1–R12, contracts regen incl. navigation.md as the normative surface,
+quickstart C1–C7+C5b with C6 fixture self-test; commits `57e5008` → `045f540`).
+
+### RSVP (fresh, S2) — all 9 JOIN
+
+Every lens JOINed citing the **cycle-3 fix deltas** (fix-verification, not performance):
+the five whose own cycle-2 🔴s were under verification cited their authored findings
+(D&O G6/G9, Richards G12–G17, Cooper G1–G5, Uncle Bob G23–G26, Norman G19/G20/G21);
+Beck cited the check-suite overhaul (C6 fixture self-test, C3 cardinality), Security the
+FR-015-widened plugin artefact set (resolution-order shadowing of the SCAFFOLDED trust
+surface), C&F the heal-cycle scope growth (13→15 FRs, C1–C6→C1–C7+C5b on an unshipped
+feature), Evans the "one resolution rule" Published-Language seam.
+
+**Seating: 🟢 (strict two-axis order at the cap)** — applicability-count sort seats the
+five fix-verifiers whose own reds are under test: **D&O, Richards, Cooper, Uncle Bob,
+Norman** — which exactly covers all six cycle-2 clusters. Beck/Evans/Security/C&F out on
+a strict boundary (they cite general deltas, not authored cycle-2 reds); their hooks are
+recorded and available to vote-stage override. **Recorded runner-up concerns** (not
+authored this cycle, available async): Security — resolution-order shadowing could let a
+repo-local template displace the packaged one seeding an operator-trusted addendum;
+C&F — three heal cycles on a feature that has served zero newcomers is correctness bought
+before the learning loop is tested (🔴-potential on the *escalation* decision itself,
+which is now live below).
+
+### Exploratory (incremental; EXPLORATORY-PHASE.md)
+
+5 seated records refreshed against the live corpus (4 incremental delta sections; C&F a
+fresh build, first seating). Each lens **re-ran its own checks live** (re-grounding, not
+replay): D&O + Uncle Bob executed the corrected C6 fixture block (fires 6/6; old `\|`
+regex demonstrated dead 0/2 on cp/tee), Richards verified `plugin.json` is still 7/10
+agents with no `templates` key (the expected pre-implementation state C5b is meant to
+gate). Gap-questions: 5 raised across joiners, **0 blocking** (rows 6/7) → recorded
+assumptions; interview deferred.
+
+### Findings register & tally (cycle 3)
+
+Author stage uncapped; I8 evidence gate: **0 demoted** (every finding cites `file:line`
+or a tagged principle). Votes are real dispatches, each finding's author excluded (S8);
+tally is the symmetric stage-4 rule; severity below is **post-tally**.
+
+**Cluster A — the six cycle-2 🔴 clusters: all VERIFIED-HEALED.** Each original author
+re-grounded against the revised corpus and confirmed closure with `file:line`: F′ plugin
+*detection* + agent-set + channel-branched remedy (FR-015/SC-009/C5b agent-loop fires
+live on 7/10), K′ C6 corrected + fixture-self-tested (6/6), C5 dead stanza deleted,
+check ownership named (Gate C dogfood + pre-merge, quickstart.md:86), G1 runtime pointers
+via base path, navigation.md normative (S1 exit label, S5 Finish convergence, per-step
+depth, S2 ordering, S5 free-text disclosure). These are recorded 🟢 (heal-confirmations:
+DNO-3/4/5, RICH-1–6, COOP-2/3, BOB-1/2/3/6/8, NORM-1/2/3/4/6) and do not re-gate.
+
+**Cluster B — six NEW gating 🔴 the heal introduced/left** (mostly: the conformance
+checks do not assert what they claim):
+
+| ID | Lens | Proposed | Votes P–O–A | Post | Summary |
+|---|---|:--:|:--:|:--:|---|
+| DNO-1 | D&O | 🔴 | 4–0–0 | 🔴 | C5b greps `"templates` in plugin.json, but the plugin schema defines no such asset key — the headline plugin-delivery gate is inert. |
+| DNO-2 | D&O | 🟡 | 2–0–2 | 🔴 | R11 hedges "or the packaging mechanism demonstrably carries it" — the plugin-delivery mechanism is named nowhere (root of DNO-1). |
+| COOP-1 | Cooper | 🟡 | 2–0–2 | 🔴 | Cite-failure recovery sends the newcomer to read the raw canon SC-001 promised they'd never need — no "install broken, not your fault" framing. |
+| BOB-4 | Uncle Bob | 🟡 | 4–0–0 | 🔴 | C3 asserts TOTAL `Cites:` ≥5, not ≥1 PER step (FR-008/data-model.md:21) — clustered cites pass while a step ships uncited. |
+| BOB-7 | Uncle Bob | 🟡 | 2–0–2 | 🔴 | C6's fixture self-test proves green-on-presence but never asserts RED-on-absence outside the S2 accept branch — SC-008's real claim stays human-inspected. |
+| NORM-5 | Norman | 🔴 | 4–0–0 | 🔴 | navigation.md is normative for nav labels but no check C1–C7+C5b binds LEARN.md to them — the normative contract is unenforced against its artifact. |
+
+Non-gating this cycle: **RICH-7** 🟡 (held, 2–1–1 — failure/detection clauses paraphrase
+the 3-tier resolution order down to tier-2 only; DRY/restatement, fold with a
+no-restatement assert); **BOB-5** 🟢 (demoted 1–3 — same defect as BOB-4 from the other
+direction; merge).
+
+**Vote-pattern note (honest):** convergence again — DNO-1, BOB-4, NORM-5 drew 4–0; the
+three 🟡→🔴 escalations (DNO-2/COOP-1/BOB-7) each rode a clean +2 with two abstentions,
+the abstainers ceding to the owning lens's authority (architecture/UX/test-rigor) rather
+than dissenting. No OVER-RATE on any gating finding. BOB-5's 1–3 demotion shows the panel
+discriminated (it folded a duplicate rather than rubber-stamping). Five of six 🔴s are
+about **check rigor** — the same defect class as cycle-1 family K and cycle-2 K′
+(strongest invariants, weakest checks), now one level deeper: the checks added to fix K
+are themselves decorative. Three (DNO-1, BOB-4, NORM-5) trace partly to **this
+orchestrator's own incorporation** (C5b's non-schema grep, C3's total-vs-per-step
+contradiction against data-model.md:21, the un-checked normative labels) — recorded as an
+incorporation-quality watch signal (I7), not patched mid-gate.
+
+### Cycle-3 verdict: **BLOCKED — 6 gating 🔴 in 3 clusters** (narrower again than cycle 2's 6)
+
+| Cluster | Findings | Defect | Resolution direction (spec-sourced, for a 4th cycle if authorized) |
+|---|---|---|---|
+| α plugin delivery still hollow | DNO-1 DNO-2 | C5b checks a non-schema manifest key; the actual plugin→`templates/` delivery mechanism is unnamed | name the real plugin packaging/delivery mechanism in R11; C5b asserts the template's *delivered presence* under the plugin root post-install, not a manifest substring |
+| β checks don't assert their invariant | BOB-4 BOB-7 NORM-5 | C3 asserts a total not a per-step floor; C6 self-test is one-directional; no check binds LEARN.md to navigation.md's normative labels | C3 iterates per step heading (collapses BOB-4/5/6/8); C6 adds a negative fixture (idiom outside accept branch ⇒ RED); new C8 greps LEARN.md for each pinned nav label |
+| γ cite-failure UX | COOP-1 | the broken-install recovery re-imposes SC-001's abolished cost and reads as the user's fault | the cite-failure clause adds "your installation is incomplete — not an error you caused" framing before pointing to canon |
+
+**S7 BOUND REACHED — escalating to the operator (gateA-escalation-1, 🔴).** Three
+self-heal cycles have run (catalog row 5; D2: 🔴 never auto-proceeds, no auto-default).
+Convergence is monotonic — 38 → 14 → 6 gating 🔴, clusters narrowing each cycle (14
+families → 6 clusters → 3 clusters) — and every cycle's 🔴s genuinely closed; but the
+gate has not reached zero, and the loop bound forbids a self-authorized 4th cycle. The
+operator decides; options framed in the response. C&F's runner-up concern is now live: a
+4th correctness cycle on a feature that has served **zero** newcomers is itself a
+cost-of-delay bet against the learning loop the feature exists to shorten.
