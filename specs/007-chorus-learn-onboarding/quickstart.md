@@ -1,10 +1,16 @@
 # Quickstart: `chorus learn` — Interactive Staged Onboarding
 
-**Feature**: 007-chorus-learn-onboarding | **Date**: 2026-06-10 (cycle-2 regen)
+**Feature**: 007-chorus-learn-onboarding | **Date**: 2026-06-10 (cycle-3 regen)
 
-Two parts: a worked walkthrough (what the feature feels like when done) and the
-structural conformance checks **C1–C7** (research.md R7) that make
-SC-005/SC-006/SC-008 mechanically scannable.
+Two parts: a worked walkthrough (what the feature feels like when done —
+**illustrative**; the normative labels/ordering live in `contracts/navigation.md`,
+R12) and the structural conformance checks **C1–C7 + C5b** (research.md R7) that make
+SC-005/SC-006/SC-008/SC-009 mechanically scannable.
+
+**Ownership (SC-008, G9)**: C1–C7 execute at the **Gate C dogfood and before merge**;
+results are recorded in the gate ledger (`agent-sdlc-log.md`). Suite-wide rules: no
+dead or vestigial assertions (every line can fail), and checks parse **structural
+units** (frontmatter block, tables), never fixed line windows.
 
 ## Worked walkthrough — the newcomer path (US1)
 
@@ -18,7 +24,7 @@ S1 orient   "The chorus is a multi-lens review… It has three modes: two review
             [probes: template reachable ✓ (file-path channel) · agents ✓ ·
              addendum ✗ · in a repo ✓]
             Q: Continue → set up | Go deeper on the modes |
-               Jump to another step | Exit (wrap-up = cheat-sheet)
+               Jump to another step | Exit — get the cheat-sheet
 
 user: Continue
 
@@ -57,7 +63,11 @@ S5 results  "Each round leaves docs/reviews/YYYY-MM-DD-chorus-review.md —
             commit it; it is the next round's baseline. 🟡 decisions queue in
             the ledger's Provisional-decisions section for async override…"
             Cites: skill/chorus-review/SKILL.md, skill/chorus-review/DECISION-PRIMITIVE.md
-            Q: Finish | Recap this step | Jump (→ S1–S4, no "back") | Exit
+            Q: Finish the tutorial | Go deeper on results |
+               Jump (→ S1–S4, no "back"; free-text stays here) | Exit
+            [depth state is per-step (G24): S4's deeper pass flipped only S4's
+             slot — S5 shows "Go deeper", not "Recap". Finish and Exit converge
+             on the wrap-up by declaration (G3): Finish marks completion.]
 
 user: Finish → "You reached the end of the tutorial. You can now: create your
             addendum (say 'chorus learn' and jump to set up, or copy the
@@ -70,18 +80,22 @@ The expert path (US2): at S1, one navigation action — Jump → "run a round" (
 AskUserQuestion interactions) — lands in S3; setup is not replayed. The expert fast
 exit: S1 → Exit, whose wrap-up is the cheat-sheet.
 
-## Structural conformance checks (C1–C7)
+## Structural conformance checks (C1–C7 + C5b)
 
 Run from the repo root. All are read-only except C5's temp-dir install and C7's
-matrix (which exercises the scaffold in a scratch repo).
+matrix (which exercises the scaffold in a scratch repo). **Owner & trigger**: the
+Gate C dogfood and the pre-merge pass; results land in the gate ledger (G9).
 
-### C1 — registration & staleness (FR-001/FR-013, families I/J)
+### C1 — registration & staleness (FR-001/FR-013, families I/J; structural parse per G11)
 
 ```bash
 grep -n "chorus learn" README.md install.sh                       # both surfaces name the mode
-sed -n '1,6p' skill/chorus-review/SKILL.md | grep "chorus learn"  # YAML frontmatter description (the routing surface)
+# frontmatter parsed as the whole ----delimited block, not a fixed line window (G11):
+awk '/^---$/{n++; next} n==1' skill/chorus-review/SKILL.md | grep "chorus learn" \
+  || echo "FAIL: frontmatter description missing the trigger"
 grep -n "chorus learn" skill/chorus-review/SKILL.md               # mode-list entry → LEARN.md
-grep -n "^## Two modes\|Both modes are built" skill/chorus-review/SKILL.md README.md
+# staleness: ANY residual two-mode phrasing on the named surfaces (G14), not one literal:
+grep -nE "Two modes|[Bb]oth modes" skill/chorus-review/SKILL.md README.md
 # expect: first three hit; the staleness grep returns NOTHING (three-mode reframe done)
 ```
 
@@ -93,17 +107,20 @@ grep -nE "^#{2,3} .*(orient|set up|run a round|agent-SDLC|work with results)" \
 # expect: 5 step headings, each followed by a Cites: line and a navigation-question block
 ```
 
-### C3 — structured cite-resolution (FR-008, SC-005, family H)
+### C3 — structured cite-resolution + cardinality (FR-008, SC-005, family H + G26)
 
 Scoped to the structured notation — never a bare-filename regex (the scaffold target
 `CHORUS-PROJECT.md` in prose must NOT trip it):
 
 ```bash
+# cardinality floor first (G26): zero Cites: lines must FAIL, never pass vacuously
+n=$(grep -c "^Cites:" skill/chorus-review/LEARN.md)
+[ "$n" -ge 5 ] || echo "FAIL: only $n Cites: lines (expect ≥5 — one per step)"
 grep -n "^Cites:" skill/chorus-review/LEARN.md | sed 's/^[0-9]*:Cites: *//' | tr ',' '\n' \
   | sed 's/^ *//; s/ *$//; s/ (.*)//' | sort -u | while read p; do
   test -e "$p" || echo "BROKEN POINTER: $p"
 done
-# expect: no output (every Cites: path resolves repo-relative)
+# expect: no output (every Cites: path resolves repo-relative; count ≥5)
 # recorded limitation: doc granularity — section renames surface at re-read, not here
 ```
 
@@ -118,25 +135,42 @@ grep -n "| 1 | RSVP seating"            skill/chorus-review/LEARN.md  # decision
 grep -n "J ∈ {3, 4}\|J ≥ 5.*full chorus" skill/chorus-review/LEARN.md # quorum table     — expect none
 ```
 
-### C5 — scaffold deployment, both sides (FR-007, R6, F46)
+### C5 — scaffold deployment, repo + installed side (FR-007, R6, F46; dead stanza removed per G2/G8/G25)
 
 ```bash
 test -f templates/CHORUS-PROJECT.template.md && echo "template present (repo)"
-grep -n "templates" install.sh        # deployment line copying templates/ → $SKILL_DST
-# installed-side assertion:
-CLAUDE_HOME=$(mktemp -d) ./install.sh >/dev/null \
-  && test -f "$CLAUDE_HOME_TMP_CHECK" 2>/dev/null \
-  ; CH=$(mktemp -d); CLAUDE_HOME="$CH" ./install.sh >/dev/null \
+grep -nE "^cp .*templates" install.sh   # the actual deploy idiom — prose mentions cannot match (G8)
+# installed-side assertion (one clean stanza; no leaked tempdir):
+CH=$(mktemp -d); CLAUDE_HOME="$CH" ./install.sh >/dev/null \
   && test -f "$CH/skills/chorus-review/templates/CHORUS-PROJECT.template.md" \
   && echo "template deployed (installed side)"; rm -rf "$CH"
 ```
 
-### C6 — write surface, mechanical (FR-005, SC-008, family K)
+### C5b — plugin-side packaging (FR-015/SC-009, R11, G6/G12/G16)
 
 ```bash
-# write idioms may appear ONLY inside the scaffold sub-step's accept branch:
-grep -nE "Write tool|Edit tool|\bcp \|\btee \|mkdir |> docs/|>> " skill/chorus-review/LEARN.md
-# expect: hits only within the S2 scaffold accept-branch section; manual review is backstop
+# the plugin channel must DELIVER, not merely probe:
+grep -n '"templates' plugin.json || echo "FAIL: plugin.json does not package templates/"
+# full persona-agent set — packaged list vs the agents/ directory (10/10, not 7/10):
+for a in agents/*.md; do
+  grep -q "\"$a\"" plugin.json || echo "MISSING FROM PLUGIN: $a"
+done
+# expect: no FAIL/MISSING output
+```
+
+### C6 — write surface, mechanical + self-tested (FR-005, SC-008, family K; alternation fixed per G7/G13/G23)
+
+```bash
+# corrected ERE — one alternation, no escaped pipes (the cycle-2 scan's \| matched a
+# literal pipe and its cp/tee/mkdir branches could never fire):
+SCAN='Write tool|Edit tool|\bcp |\btee |\bmkdir |> docs/|>> '
+# fixture self-test FIRST — the scan must fire on every known-bad line or the suite fails:
+printf '%s\n' 'use the Write tool here' 'cp templates/x docs/' 'tee docs/out.md' \
+  'mkdir docs/reviews' 'echo hi > docs/x.md' 'cat <<EOF >> docs/x.md' \
+  | grep -cE "$SCAN" | grep -qx 6 || echo "FAIL: write-idiom scan is dead on a fixture"
+# the real scan — hits may appear ONLY inside the scaffold sub-step's accept branch:
+grep -nE "$SCAN" skill/chorus-review/LEARN.md
+# expect: fixture test silent; scan hits only within the S2 accept-branch section
 ```
 
 ### C7 — four-path scaffold matrix (SC-004/SC-008, family K)
@@ -154,12 +188,14 @@ Dogfood in a scratch repo; each path's outcome recorded:
 
 | Check | Verifies |
 |---|---|
-| walkthrough | US1, US2, FR-003/004/011, SC-001/002/003 |
-| C1 | FR-001, FR-013 (frontmatter + staleness) |
+| walkthrough | US1, US2, FR-003/004/011, SC-001/002/003 (illustrative; navigation.md is normative — R12) |
+| C1 | FR-001, FR-013 (frontmatter as structural block + any-two-mode-phrasing staleness) |
 | C2 | FR-002, SC-006 |
-| C3, C4 | FR-008, US4, SC-005 (+ quorum-table pin) |
-| C5 | FR-007 deployment, both sides |
-| C6 | FR-005, SC-008 |
+| C3, C4 | FR-008, US4, SC-005 (+ cardinality floor ≥5 + quorum-table pin) |
+| C5 | FR-007 deployment, repo + installed side (single clean stanza) |
+| C5b | FR-015, SC-009 — plugin packaging: templates/ + 10/10 agents |
+| C6 | FR-005, SC-008 (fixture-self-tested scan) |
 | C7 | FR-005/006/007/014, US3, SC-004, SC-008 |
-| resume question (navigation.md §Resume) | FR-010, SC-007 (incl. silent abandonment) |
-| S1 exit wrap-up | FR-004's fast-exit-rides-exit + FR-011 disclosure |
+| resume question (navigation.md §Resume) | FR-010, SC-007 (incl. silent abandonment; outside SC-003's unit — G4) |
+| S1 exit wrap-up | FR-004's fast-exit-rides-exit + FR-011 disclosure (label pinned — G19) |
+| ownership binding (header) | SC-008's named owner + trigger: Gate C dogfood + pre-merge, ledger-recorded (G9) |

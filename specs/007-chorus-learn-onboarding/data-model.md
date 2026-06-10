@@ -1,6 +1,6 @@
 # Data Model: `chorus learn` — Interactive Staged Onboarding
 
-**Feature**: 007-chorus-learn-onboarding | **Date**: 2026-06-10 (cycle-2 regen)
+**Feature**: 007-chorus-learn-onboarding | **Date**: 2026-06-10 (cycle-3 regen)
 
 The feature is a documented interactive procedure; its "data model" is the set of
 conceptual entities the procedure manipulates. No runtime schema exists — these shapes
@@ -18,7 +18,7 @@ One unit of the tutorial.
 | `name` | string | orient · set up · run a round · agent-SDLC · work with results |
 | `teaches` | string | the step's single teachable claim (research.md R2 table) |
 | `explanation` | prose | concise; ≤ one AskUserQuestion interaction's worth (FR-003) |
-| `cites` | CanonicalPointer[] | a structured `Cites:` list; ≥1 per canon-defined mechanic mentioned (FR-008) |
+| `cites` | CanonicalPointer[] | a structured `Cites:` list; **≥1 per step** (cardinality asserted by C3 — G26) and ≥1 per canon-defined mechanic mentioned (FR-008) |
 | `sub_steps` | SubStep[] | declared conditional paths (see SubStep) |
 | `question` | NavigationChoice | exactly one navigation question per step (FR-003/004) |
 
@@ -55,9 +55,10 @@ The per-step question (contracts/navigation.md).
 | Field | Type | Notes |
 |---|---|---|
 | `step` | Step.id | owner |
-| `options` | exactly 4 | advance (first, recommended) · deeper/recap · jump · exit — all four at every step incl. S1 (FR-004) |
-| `deeper_rule` | rule | after one deeper pass, slot 2 re-presents as **"recap this step"** (depth bounded at one level; no dead option) |
-| `jump_followup` | question | fires only when `jump` chosen; lists the other steps; **at S5: S1–S4, no "back" slot** (return rides the built-in Other) |
+| `options` | exactly 4 | advance (first, recommended; **at S5 labeled "Finish"**, declared-convergent with exit — both reach the wrap-up, Finish marks completion) · deeper/recap · jump · exit (**S1's exit label signifies the cheat-sheet** before selection) — all four at every step incl. S1 (FR-004). **Labels and ordering are pinned by contracts/navigation.md (normative — R12)** |
+| `depth_state` | per-step flag | **scoped to its step**: a deeper pass on Sn flips only Sn's slot 2 to **"recap this step"**; no other step's slot changes (G24) |
+| `deeper_rule` | rule | after one deeper pass **on this step**, slot 2 re-presents as "recap this step" (depth bounded at one level; no dead option) |
+| `jump_followup` | question | fires only when `jump` chosen; lists the other steps; **at S5: S1–S4, no "back" slot**, and the question text **discloses** that free-text input stays at S5 (G21) |
 | `exit_wrapup` | prose | the FR-011 wrap-up: next command + step reached + resume scope + canon pointers; **at S1 it IS the expert cheat-sheet** |
 
 **State transitions**: `advance: Sn → Sn+1` (S5 advances to exit_wrapup) ·
@@ -80,8 +81,8 @@ The tutorial's only write (contracts/scaffold.md).
 
 | Field | Type | Notes |
 |---|---|---|
-| `consent` | dedicated confirm | its own question — never an option on the navigation question (FR-007, family D) |
-| `source` | path | inside this repo: the checkout's `templates/CHORUS-PROJECT.template.md` (authoritative); else the running skill's own `templates/` copy, either install channel (R6) |
+| `consent` | dedicated confirm | its own question, **presented before S2's navigation question** (ordering pinned by navigation.md — G20) — never an option on the navigation question (FR-007, family D) |
+| `source` | path | resolution order (R6): **(1)** inside this repo, the checkout's `templates/CHORUS-PROJECT.template.md` (authoritative); **(2)** `<skill-base>/templates/` — the running skill's own copy; **(3)** the plugin root's `templates/` (FR-015/R11) |
 | `target` | path | `docs/reviews/CHORUS-PROJECT.md` in the user's repo |
 | `marker` | first line after title | `<!-- SCAFFOLDED by chorus learn YYYY-MM-DD … -->` — signals structure-without-facts to the Phase-0 consumer (FR-014, R9) |
 | `flagged_sections` | {2, 3, 5} | exclusions · anchors · security checklist, marked `<!-- TO FILL -->` |
@@ -97,8 +98,8 @@ overwrite; outside a repo ⇒ offer replaced by a stated one-line unavailability
 |---|---|---|
 | `mechanic` | string | what is being referenced (e.g. "the four-stage review") |
 | `summary` | prose | onboarding-altitude paraphrase, **not** the definition |
-| `doc` | repo-relative path | listed on the owning step's structured `Cites:` line — the unit check C3 resolves |
-| `runtime_failure` | declared behavior | doc missing at runtime → state plainly + continue at summary altitude + point to the repo path; never reconstruct from memory (R10) |
+| `doc` | repo-relative path | listed on the owning step's structured `Cites:` line — the unit check C3 resolves (≥1 per step, G26) |
+| `runtime_failure` | declared behavior | doc missing at runtime → state plainly + continue at summary altitude + point to the canonical source **resolved via the running skill's base path** (G1/R10); never reconstruct from memory |
 
 **Validation**: every `Cites:` path resolves (C3); the canon's load-bearing definition
 blocks (tally rule, band table, decision catalog, quorum table) appear **only** in
@@ -118,8 +119,11 @@ LEARN.md ──defines──> Step (×5) ──ends with──> NavigationChoice
    └──tracked by──> ResumeState (per-transition, conversation-scoped, disclosed)
 
 SKILL.md ──registers mode──> LEARN.md   (mode list + YAML frontmatter + three-mode heading)
-SKILL.md ──Phase-0 note──> scaffolded-addendum consumer behavior (FR-014)
+SKILL.md ──Phase-0 note──> scaffolded-addendum consumer behavior, BOTH consumers:
+                           Phase-0 orchestrator + per-advisor exploratory cache (FR-014)
 README.md / install.sh "Next:" ──lead with──> `chorus learn` (FR-013)
 install.sh ──deploys──> templates/ → installed skill (R6; asserted installed-side by C5)
+plugin.json ──packages──> templates/ + full persona-agent set (FR-015/R11; asserted by C5b)
 templates/CHORUS-PROJECT.template.md ──single source of structure for──> S2 scaffold AND the round's Phase-5 offer (FR-007)
+contracts/navigation.md ──normatively pins──> labels · ordering · per-step depth state (R12)
 ```
