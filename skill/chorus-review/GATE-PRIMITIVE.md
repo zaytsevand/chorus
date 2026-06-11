@@ -8,6 +8,7 @@ There is exactly one copy; neither layer restates it.
 A review is four **separable, specialized stages**, each with a distinct actor
 and a distinct success criterion. Running them blended is the failure mode this
 file exists to prevent: a 2026-06-06 back-test of the constraint-and-flow lens
+(today's Goldratt advisor)
 showed that when one agent both **authored and graded** findings it ranked the
 new lens dead last; when authoring was split from a **real adversarial vote** the
 same lens came back mid-pack. Stage separation changed the answer. The stage you
@@ -53,7 +54,11 @@ flowchart TD
 
 - **Actor**: the seated persona itself, one per lens (in the base round, the
   Round-1 agent; in an SDLC gate, the gate's seated panel).
-- **Input**: the extract records plus the persona's own reading of the corpus.
+- **Input**: the extract records plus the persona's own reading of the corpus —
+  with the persona's own **gates** satisfied (`EXPLORATORY-PHASE.md`): the
+  answers it has declared it cannot honestly review without (who the user is and
+  how many, the grading bar, the characteristic ranking, …), each resolved by
+  reference or operator confirmation, never invented.
 - **Output**: **findings**, each:
   `{id, lens, evidence (file:line | [principle] | [principle:proposed]),
   proposed_severity (🔴/🟡/🟢), summary (≤ 20 words)}`.
@@ -63,7 +68,11 @@ flowchart TD
   finding*, never the *number of findings*.
 - **Must not**: pad to hit a number; file a project-specific claim with no
   `file:line` and no principle tag (such a finding is demoted to
-  `[unsupported]` per I8 and excluded from the tally).
+  `[unsupported]` per I8 and excluded from the tally); **author past an unmet
+  gate** — when one of the persona's declared gates is unanswered, the honest
+  output is the question itself, with any dependent findings marked
+  **conditional on the stated assumption** rather than graded as if the answer
+  were known (S10).
 
 ## Stage 3 — Vote
 
@@ -114,7 +123,7 @@ author-under-rated finding through.
 ## Invariants this primitive carries
 
 These bind every review — the base round and every SDLC gate. They extend the
-integration layer's I1–I8.
+integration layer’s I1–I9.
 
 - **S8.** The author of a finding is never its grader. Stage 3 dispatches to
   personas *other than* the author; a persona never votes on its own finding.
@@ -122,6 +131,18 @@ integration layer's I1–I8.
 - **S9.** The orchestrator never synthesizes a vote or a grade. Stage 3 is a real
   dispatch to seated personas; stage 4 aggregates real votes only. A predicted
   reaction is not a vote. (Extends I1/I6 to the voting and tally stages.)
+- **S10.** Every persona **names its gates explicitly** — the information needs
+  it cannot honestly review without (`[gate]` entries in its profile,
+  `EXPLORATORY-PHASE.md`) — and **prompts for an unmet gate instead of inferring
+  past it**. A gate resolves only as *referenced* or *operator-confirmed*; while
+  it is open, the persona leads with the question and marks dependent findings
+  conditional on the stated assumption. The later stages cannot catch a
+  wrong-bar review — every vote asks "is this severe *within the frame*," so
+  convergent PRIORITIZE amplifies an altitude error rather than correcting it.
+  Honesty about the frame lives in each persona's own chain of thought, before
+  authoring. (Provenance: a 2026-06-11 gate reviewed single-operator dev tooling
+  against an inferred production bar; 13 manufactured gating 🔴 had to be
+  operator-overridden wholesale — issue #6.)
 
 ## Adoption note
 
@@ -129,7 +150,7 @@ integration layer's I1–I8.
 A/B/C) **reference this file** for the mechanic; they do not restate it. Any
 change to extract/author/vote/tally happens here, once, so the two modes cannot
 drift. The lifecycle-specific invariants S1–S7 live in `SDLC-LAYER.md`; the
-gate-primitive invariants S8–S9 live here because they bind both modes.
+gate-primitive invariants S8–S10 live here because they bind both modes.
 
 ## Provenance
 

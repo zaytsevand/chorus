@@ -51,6 +51,16 @@ operator-controlled (FR-019).
 4. **Analyse (bounded)** — for needs the repo doesn't answer, run a bounded,
    **operator-budget-controlled** analysis (the chorus's sampling discipline; no
    enumerate-everything). Record results as **inferred** (provisional, FR-006/011).
+   **Exception — gates are never inferred.** Each profile marks the needs its
+   lens **cannot honestly review without** as `[gate]` entries (who the user is
+   and how many, the grading bar, the ranked characteristics, …). A gate
+   resolves only as *referenced* or *operator-confirmed*: if the harvest doesn't
+   settle it, the lens **prompts for it** — a gap-question, never an analysis
+   that routes around the absence. Gate answers are typically operator intent,
+   not artifact-derivable; an inferred one defaults to the production-service
+   prior and poisons every downstream finding at once (S10). A profile with no
+   `[gate]` entry is asserting its lens can review honestly from artifacts
+   alone — that assertion is itself reviewable.
 5. **Raise gap-questions** — for needs neither reference nor analysis settled,
    emit gap-questions tagged `project-wide` or `lens-specific`. Do **not**
    interview the operator directly (FR-007).
@@ -136,6 +146,41 @@ way it is a cheap, bounded compare, not a re-exploration — and because re-grou
 already re-reads the source (memory is an index, never the endpoint), the freshness
 check rides on a read the advisor was going to do anyway.
 
+## Gate upkeep (the memory procedure)
+
+A gate list that never changes is ceremony; the point is each lens's **honest,
+current** preconditions. Gates live in the same two-tier memory as facts:
+
+- **Baseline** — the `[gate]` entries in the agent file's profile: portable
+  across projects, changed only by a normal canon edit.
+- **Project overlay** — in the advisor's per-project memory record:
+  1. the **standing answer** to each gate for *this* project (who the user is,
+     the bar, the ranking), with provenance and a freshness fingerprint —
+     re-validated on reuse like any reference, so a gate answered last round is
+     a cheap re-read this round, not a re-interview;
+  2. **gate-list deltas** — needs promoted to gates, or overlay gates retired,
+     for this project specifically.
+
+**Update triggers** (each seated advisor, at round close):
+
+- **Promote** a need to a gate when its absence let a wrong review through —
+  an operator override or a round retrospective showing the lens reviewed
+  against an invented answer is the evidence. The promotion records the
+  incident it came from.
+- **Refresh** standing answers whose fingerprint drifted or that the operator
+  has overridden — the override is the new answer, written back like any
+  operator-confirmed fact.
+- **Retire** an overlay gate that repeated rounds show settled or irrelevant
+  in this project (record why; a retired gate is demoted to an ordinary need,
+  not deleted from history).
+- **Graduate** an overlay gate that proves load-bearing across projects into
+  the agent file's baseline profile — a deliberate canon edit, reviewed like
+  any other.
+
+This keeps the gates *relevant* in both directions: a lens that keeps asking a
+settled question wastes the operator's interview budget; a lens that stops
+asking an unsettled one is back to inventing the frame.
+
 ## Incremental deltas
 
 On a later round the advisor re-examines **only** the needs touched by the
@@ -148,6 +193,12 @@ computes — the cheapest correct incrementality.
 
 The batched operator interview is **not** one wall of questions. It is:
 
+- **Gates-first** — unmet `[gate]` needs **lead session 1**, before any other
+  gap. They are the cheapest questions with the largest blast radius: one answer
+  (who the user is, what bar applies) can collapse or re-price whole clusters of
+  findings before they are authored. A deferred gate is named first in the
+  degradation summary, and the lens's dependent findings are authored as
+  **conditional on a stated assumption**, never as if the answer were known.
 - **Sessions of ≤ 5 questions** each.
 - **Re-entrant** — the operator may **defer** a session and **resume** it later;
   session state (answered / deferred / pending) persists.
@@ -179,7 +230,9 @@ findings are authored:
 1. **Coverage** — every item in the lens's information-needs profile resolves to
    an entry in its understanding record, tagged `referenced` / `inferred` /
    `operator-confirmed` / `open-gap`. A profile item with **no** record entry is
-   a detectable **coverage failure**, not a matter of interpretation.
+   a detectable **coverage failure**, not a matter of interpretation. A
+   **`[gate]` need** tagged `inferred` is likewise a coverage failure — gates
+   admit only `referenced` / `operator-confirmed` / `open-gap` (S10).
 2. **Reconciliation** — every cached `project-wide` fact carries a reconciliation
    locator to the addendum.
 

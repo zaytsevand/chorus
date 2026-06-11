@@ -1,6 +1,6 @@
 ---
 name: chorus-review
-description: Multi-advisor project state review (Evans/Richards/Cooper/Norman/Uncle Bob/Beck/Delivery-and-Ops/security/constraint-and-flow) with per-round RSVP self-selection, cross-evaluation, conflict reconciliation, and ranked recommendations. Use when the user asks for a chorus, a project-state review, or to "spawn the regular chorus." Produces a durable artifact at docs/reviews/YYYY-MM-DD-chorus-review.md. Also supports an agent-SDLC lifecycle mode ("run the agent-SDLC on feature 0NN") that interleaves scoped chorus gates with the speckit cycle — see SDLC-LAYER.md.
+description: Multi-advisor project state review (Evans/Richards/Cooper/Norman/Uncle Bob/Beck/Delivery-and-Ops/security/Goldratt) with per-round RSVP self-selection, cross-evaluation, conflict reconciliation, and ranked recommendations. Use when the user asks for a chorus, a project-state review, or to "spawn the regular chorus." Produces a durable artifact at docs/reviews/YYYY-MM-DD-chorus-review.md. Also supports an agent-SDLC lifecycle mode ("run the agent-SDLC on feature 0NN") that interleaves scoped chorus gates with the speckit cycle — see SDLC-LAYER.md.
 ---
 
 # Chorus Review — repeatable procedure
@@ -174,7 +174,7 @@ The exclusion gate prevents this.
     Norman (HCD), Uncle Bob (clean code/SOLID), Beck (TDD/simple design),
     Delivery-and-Ops (CD discipline / operability / observability / cost),
     Security-and-Trust (trust boundaries / threat modeling / security poverty line),
-    Constraint-and-Flow (deferral / opportunity cost / learning-loop throughput).
+    Goldratt (constraint & flow — deferral / opportunity cost / learning-loop throughput).
   - Per-round participation is decided by the Phase 0.5 RSVP step;
     the default *roster* is nine, the actual quorum each round may be smaller.
 - **Optional language lenses** — not part of the default nine; include one at Phase 0 when the

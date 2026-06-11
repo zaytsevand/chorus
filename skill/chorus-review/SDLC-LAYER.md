@@ -68,7 +68,7 @@ balanced** lifecycle: the workflow runs forward, stopping the operator only for 
 ### RSVP and seating (per gate)
 
 - RSVP fires **independently at every gate**. A persona's JOIN/ABSTAIN at one
-  gate never carries to another (S2). Constraint-and-flow may abstain on a code
+  gate never carries to another (S2). Goldratt may abstain on a code
   review yet join the design gate; a language lens abstains when its language is
   not in scope.
 - Each JOIN reply carries the **two-axis signal** (`DECISION-PRIMITIVE.md` §RSVP
@@ -85,9 +85,18 @@ balanced** lifecycle: the workflow runs forward, stopping the operator only for 
   once; abort the gate honestly on the second failure. The orchestrator still never
   judges lens merit (S3/D1) — it sorts persona-supplied evidence and applies a
   declared band.
+- **Mandate guardrail**: when the cap forces an out-seat, "covered by a seated
+  lens" is judged by **mandate, not by overlapping findings** — one shared
+  finding does not transfer a lens's role. In particular, the
+  **scope/deferral lens (Goldratt) is never out-seated at a gate
+  reviewing a new buildout**: it is the only seat whose mandate is the cut, and
+  out-seating it leaves a role the operator otherwise has to perform
+  themselves. (Provenance: a 2026-06-11 gate out-seated it as "covered"
+  by a lens that shared one staleness finding but not the cut mandate; the
+  operator then had to perform the cut manually — issue #6.)
 
 Expected (not enforced) attendance: **Gate A** — product, architecture,
-delivery-and-ops, security, + constraint-and-flow (scope/defer); **Gates B/C** —
+delivery-and-ops, security, + Goldratt (scope/defer); **Gates B/C** —
 architecture, domain, language lens (if code in scope), delivery-and-ops,
 security.
 
@@ -103,7 +112,12 @@ Gates B and C do not re-derive the project context Gate A established. Gap-quest
 feed the orchestrator's **one batched, sessioned operator interview** (≤ 5 Q/session,
 re-entrant, operator-paced; a deferred session yields a verdict degradation
 summary); project-wide answers are written back to the addendum (operator-accepted).
-The phase feeds Stage 1 Extract; it does not replace it.
+**Unmet `[gate]` needs lead session 1**: each seated lens prompts for the answers
+it has declared it cannot honestly review without (who the user is and how many,
+the grading bar, the characteristic ranking) before findings are authored — and
+keeps its gates and their standing answers current in its memory record
+(`EXPLORATORY-PHASE.md` § Gate upkeep). The phase feeds Stage 1 Extract; it does
+not replace it.
 
 ### Block on 🔴 — via the self-heal loop
 
@@ -165,7 +179,7 @@ gate.)
 
 ## Invariants (lifecycle level)
 
-These extend I1–I8. S8/S9 are gate-primitive-level and live in
+These extend I1–I9. S8/S9 are gate-primitive-level and live in
 `GATE-PRIMITIVE.md`; S1–S7 are lifecycle-level and live here.
 
 - **S1.** The orchestrator authors no spec/plan/tasks/code itself; every artefact
@@ -175,8 +189,10 @@ These extend I1–I8. S8/S9 are gate-primitive-level and live in
 - **S3.** No panel exceeds 5; overflow is seated by the persona-declared two-axis
   signal (`DECISION-PRIMITIVE.md`), banded as a decision: a strict sort auto-seats
   (🟢), a tie at the cap seats a recorded default + async override (🟡) — never an
-  operator interruption, never orchestrator lens-merit judgment (D1). (Extends I2;
-  the decision discipline is `DECISION-PRIMITIVE.md`, D1–D5.)
+  operator interruption, never orchestrator lens-merit judgment (D1). Out-seat
+  coverage is judged by mandate, never by overlapping findings; the scope/deferral
+  lens is never out-seated on a new buildout. (Extends I2; the decision discipline
+  is `DECISION-PRIMITIVE.md`, D1–D5.)
 - **S4.** No gate passes with an open 🔴; each 🔴 is resolved or waived with
   recorded rationale. (Extends I7.)
 - **S5.** Incorporation revises the spec and regenerates downstream artefacts via
