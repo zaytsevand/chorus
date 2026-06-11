@@ -1,0 +1,8 @@
+{
+  "p95_latency_ms":  {"max": 250, "direction": "lower_better"},
+  "rss_mb":          {"max": 512, "direction": "lower_better"},
+  "cost_per_req_usd":{"max": 0.002, "direction": "lower_better"},
+  "unused_fr_count": {"max": 0,   "direction": "lower_better"},
+  "dead_code_loc":   {"max": 0,   "direction": "lower_better"},
+  "throughput_rps":  {"min": 100, "direction": "higher_better"}
+}
