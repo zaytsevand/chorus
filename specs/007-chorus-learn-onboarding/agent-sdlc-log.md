@@ -355,3 +355,149 @@ gate has not reached zero, and the loop bound forbids a self-authorized 4th cycl
 operator decides; options framed in the response. C&F's runner-up concern is now live: a
 4th correctness cycle on a feature that has served **zero** newcomers is itself a
 cost-of-delay bet against the learning loop the feature exists to shorten.
+
+---
+
+## Gate A — clean-slate rerun (run 2, cycle 1 · 2026-06-12)
+
+**DecisionRecord `gateA-rerun-1`** · band 🔴 (operator order — N+1 holds sign-off) ·
+resolution: **operator-ordered clean-slate rerun**. The escalated run-1 verdict
+(cycles 1–3, BLOCKED, 6 🔴 in 3 clusters) is superseded by the operator's
+instruction: *"clean slate rerun for the spec. let's try again."* Run-1 sections
+above stand as history; the cycle counter resets.
+
+**Canon delta since run 1** (the reason a rerun can differ): **S10** — every
+persona names its `[gate]` needs and prompts for unmet ones, never infers
+(GATE-PRIMITIVE.md); gates-first interview session 1 (EXPLORATORY-PHASE.md);
+**I9** — the chair decides nothing; every decision routes to a named owner
+(INTEGRATION-LAYER.md); **Goldratt** seated by name with the
+constraint-location-today gate and the cut-first mandate; seating **mandate
+guardrail** (S3 — Goldratt never out-seated on a new buildout); persona voice
+reinforcement (Guido, D&Ops, Security).
+
+**Corpus** (as of `b7840e9` on `fix/issue-6-frame-check`):
+`specs/007-chorus-learn-onboarding/{spec,plan,research,data-model,quickstart}.md`
++ `contracts/{learn-mode,navigation,scaffold}.md`. No project addendum exists
+(`docs/reviews/CHORUS-PROJECT.md` absent — recorded honestly; project-wide facts
+come from the spec or the operator interview).
+
+_Run-2 cycle 1 proceeds: RSVP → mechanical seating → exploratory (gates first) →
+operator interview session 1 → extract → author → vote → tally._
+
+### RSVP (run 2 — self-declared relevance 0–3)
+
+| Lens | Decision | Rel. | One-line |
+|---|---|---:|---|
+| Cooper | JOIN | 3 | tutorial is interaction design end-to-end; my gate question is the spec's subject |
+| Norman | JOIN | 3 | pure HCD surface: navigation contract, feedback, resume disclosure |
+| Beck | JOIN | 3 | contracts + C1–C7+C5b are this feature's only test surface |
+| Goldratt | JOIN | 3 | cut seat; 13→15 FRs with zero newcomers served — prime gold-plating terrain |
+| Evans | JOIN | 2 | registration + three seam contracts are Published Language surfaces |
+| Richards | JOIN | 2 | coupling and conformance; run-1 deltas to verify |
+| Uncle Bob | JOIN | 2 | boundary/contract questions; structural conformance checks |
+| D&Ops | JOIN | 2 | release-path surface; run-1 D&O seeds need re-verification |
+| Security | JOIN | 1 | thin but real: sole-write invariant + consent gate |
+| Guido | ABSTAIN | 0 | no Python in scope |
+
+### Seating — DecisionRecord `gateA-r2-seating-1`
+
+- J = 9 → top 5 by mechanical sort. Four seats at relevance 3 (Cooper, Norman,
+  Beck, Goldratt — mandate guardrail satisfied without intervention). **Tie at
+  the 5th seat** (Evans/Richards/Uncle Bob/D&Ops, all 2) → **surfaced to the
+  operator per S3**; operator seated **Evans**.
+- band: 🟢 mechanical + 🔴 operator tie-break (owner: operator; recorded).
+
+### Exploratory phase + interview session 1 (gates first — S10 working)
+
+Gate status after exploratory: Norman referenced (spec §Context); Goldratt
+referenced (constraint = serialized path to the first real newcomer session;
+standing answer re-validated, expires next round); Beck none-declared;
+**Cooper OPEN** (user identity referenced, count unevidenced); **Evans OPEN**
+(Core Domain unnamed by any source).
+
+**Interview session 1 (4 Q, operator-resolved 2026-06-12):**
+
+| # | Question (owner lens) | Operator answer | Effect |
+|---|---|---|---|
+| 1 | Audience + count (Cooper gate) | **External/public audience** via README/plugin; cold-start framing and FR-015/C5b delivery scope correctly priced | Cooper + Goldratt grade at the external-newcomer bar; plugin channel is real-in-intent |
+| 2 | Core Domain (Evans gate) | **Canon = Core confirmed** (tutorial Supporting, deployment Generic) | Evans' modeling-effort pricing anchored |
+| 3 | Run-1 ledger status (Beck) | **Context only** — clean slate; panel free to re-find or not-find | no imported obligations |
+| 4 | Navigation-contract enforcement (Beck) | **Dogfood-only is intended** — no mechanical C8 | nav conformance rests on the Gate C walkthrough by design |
+
+**Open gaps carried with stated defaults (degradation note):** Goldratt —
+cost-of-delay on 007 unpriced (no deadline/inflow named) and Gate C
+verdict-closer unnamed; his findings price CoD conditionally. Evans — template
+staleness authority (default: installed copy operative). PR #5 merge horizon
+unstated (R8 serializes 007 behind it).
+
+### Author + vote + tally (run 2, cycle 1)
+
+Stage 1: 33 extract records (one Explore agent; one record orchestrator-corrected
+against the live `agents/` listing — the 2026-06-12 goldratt rename). Stage 2:
+**25 findings** (4 🔴 / 14 🟡 / 7 🟢-accepts filed as findings) + 35 recorded
+accepts. Stage 3: real votes, 4 non-author voters per finding; several voters
+re-verified claims against the live repo before voting. Stage 4 (arithmetic):
+
+| ID | summary (short) | prop | P | O | A | net | post | gating |
+|---|---|:-:|:-:|:-:|:-:|:-:|:-:|:-:|
+| COOP-1 | contract names renamed-away agent file | 🔴 | 4 | 0 | 0 | +4 | 🔴 | ✅ |
+| COOP-2 | C5b blind to phantom plugin.json entries | 🟡 | 4 | 0 | 0 | +4 | 🔴↑ | ✅ |
+| COOP-3 | claimed C5b description assert doesn't exist | 🟡 | 4 | 0 | 0 | +4 | 🔴↑ | ✅ |
+| COOP-4 | nav labels lack mechanical floor [challenges recorded decision] | 🟡 | 0 | 4 | 0 | −4 | 🟢↓ | — |
+| COOP-5 | FR-013 third staleness surface unchecked | 🟡 | 4 | 0 | 0 | +4 | 🔴↑ | ✅ |
+| COOP-6 | C3 granularity recorded accept | 🟢 | 4 | 0 | 0 | +4 | 🟡↑ | — |
+| NORM-1 | S2 cites install.sh — unresolvable on either install channel | 🔴 | 4 | 0 | 0 | +4 | 🔴 | ✅ |
+| NORM-2 | stale roster enumeration teaches a dead name | 🟡 | 4 | 0 | 0 | +4 | 🔴↑ | ✅ |
+| NORM-3 | nav labels unasserted [challenges recorded decision] | 🟡 | 0 | 4 | 0 | −4 | 🟢↓ | — |
+| NORM-4 | cite-failure honesty (accept) | 🟢 | 4 | 0 | 0 | +4 | 🟡↑ | — |
+| NORM-5 | run-1 reds resolved (accept) | 🟢 | 3 | 0 | 1 | +3 | 🟡↑ | — |
+| NORM-6 | accepts landed (accept) | 🟢 | 4 | 0 | 0 | +4 | 🟡↑ | — |
+| BECK-1 | C5b one-directional | 🔴 | 3 | 1 | 0 | +2 | 🔴 | ✅ |
+| BECK-2 | per-step cite cardinality unasserted (C3 global floor) | 🟡 | 3 | 1 | 0 | +2 | 🔴↑ | ✅ |
+| BECK-3 | failure-signal polarity inconsistent across suite | 🟡 | 3 | 1 | 0 | +2 | 🔴↑ | ✅ |
+| BECK-4 | C6 locality eyeball-judged | 🟡 | 2 | 1 | 1 | +1 | 🟡 | — |
+| BECK-5 | roster restated by name — cite-not-restate self-violation | 🟡 | 4 | 0 | 0 | +4 | 🔴↑ | ✅ |
+| BECK-6 | dogfood residue recorded (accept) | 🟢 | 4 | 0 | 0 | +4 | 🟡↑ | — |
+| GOLD-1 | PR #5 merge horizon unnamed | 🟡 | 1 | 1 | 2 | 0 | 🟡 | — |
+| GOLD-2 | verdict-closer unnamed; SCs satisfiable by self-dogfood | 🟡 | 4 | 0 | 0 | +4 | 🔴↑ | ✅ |
+| GOLD-3 | dead path ships if implemented as written | 🟡 | 4 | 0 | 0 | +4 | 🔴↑ | ✅ |
+| GOLD-4 | cost of delay unpriced [principle-only] | 🟡 | 0 | 2 | 2 | −2 | 🟢↓ | — |
+| GOLD-5 | implement is the constraint-shortening move (accept) | 🟢 | 2 | 0 | 2 | +2 | 🟡↑ | — |
+| EVAN-1 | named edit surface enumerates nonexistent file | 🔴 | 4 | 0 | 0 | +4 | 🔴 | ✅ |
+| EVAN-2 | C5b blind to phantom entries | 🟡 | 4 | 0 | 0 | +4 | 🔴↑ | ✅ |
+| EVAN-3 | C1 "ANY phrasing" claim vs two-literal scan | 🟡 | 3 | 1 | 0 | +2 | 🔴↑ | ✅ |
+| EVAN-4 | template staleness accepted w/ version-line mitigation | 🟢 | 4 | 0 | 0 | +4 | 🟡↑ | — |
+
+**Cycle-1 verdict: 15 gating 🔴 in 5 clusters** (all spec/check-text edits; no
+architectural rework):
+
+| Cluster | Findings | One-line fix direction (spec-sourced) |
+|---|---|---|
+| A stale roster name | COOP-1 NORM-2 BECK-5 GOLD-3 EVAN-1 | refresh the 3 stale lines (research.md:248, plan.md:154, learn-mode.md:18) AND declare `agents/` the authoritative roster — enumerations derived, never restated |
+| B C5b gaps | COOP-2 BECK-1 EVAN-2 COOP-3 | add the reverse direction (every plugin.json agent path resolves) + the description grep the contract already claims |
+| C claim-vs-check | COOP-5 EVAN-3 BECK-2 BECK-3 | C1 gains the spec-refs surface and an honest pattern-family scope; C3 asserts per-step cardinality; every stanza emits an explicit FAIL token |
+| D S2 cite | NORM-1 | make the S2 `install.sh` cite channel-conditional (file-path channel) or channel-resolvable — the plugin newcomer must not cite-fail on a healthy install |
+| E validation loop | GOLD-2 | add a ledger-recorded first-external-newcomer SC, or the operator explicitly defers the real-newcomer verdict (interview question) |
+
+**Working-as-designed notes:** the two challenges to the recorded dogfood-only
+decision (COOP-4, NORM-3) were demoted 4-0 to 🟢 — the vote defended the
+operator's recorded decision instead of re-arming it. GOLD-4 (principle-only,
+no corpus evidence) demoted. S10 fired pre-authoring: two gates held the gate
+until the operator answered.
+
+**Watch signal (tally wart — successor to issue #6, NOT patched mid-gate, I7):**
+all 7 🟢-accepts escalated to 🟡 by convergent PRIORITIZE, though the vote notes
+read as *endorsements of the accept* ("accurate recorded note", "correct
+severity"). PRIORITIZE is defined "at least as severe as proposed", so an
+agreement vote and an escalation vote are indistinguishable; the same mechanism
+inflated 🟡→🔴 on findings whose notes say "at correct severity" (e.g. EVAN-2).
+The escalations are non-gating for accepts but gating for 🟡s — the symmetric
+tally still amplifies convergence into severity. Candidate canon fix for a
+future round: a third vote value (CONFIRM = severity is right) or escalation
+requiring an explicit "under-rated" claim, not agreement.
+
+**DecisionRecord `gateA-r2-redloop-1`** · band 🟡 (catalog row 5, cycle 1 < 3) —
+auto-incorporate + re-run. Chosen: incorporate clusters A–D via
+`/speckit-clarify` → `/speckit-plan`; cluster E goes to interview session 2
+(operator question — verdict-closer). Non-gating 🟡s (BECK-4, GOLD-1) folded
+where one-line-cheap.
