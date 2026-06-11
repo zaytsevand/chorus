@@ -20,9 +20,8 @@ pre/post-conditions, invariants, and refusals. The procedure here describes
 *what* the chorus does; the integration-layer file describes *who runs it
 and what they are not allowed to do*. Both are load-bearing.
 
-The mechanic of a single review — the **frame check** (Stage 0) and the four
-stages **extract → author → vote → tally** — is defined once in
-`GATE-PRIMITIVE.md`; Phases 1/2/4 below run it
+The mechanic of a single review — the four stages **extract → author → vote →
+tally** — is defined once in `GATE-PRIMITIVE.md`; Phases 1/2/4 below run it
 (this file does not restate the mechanic). For the agent-SDLC lifecycle mode,
 read `SDLC-LAYER.md` as well.
 

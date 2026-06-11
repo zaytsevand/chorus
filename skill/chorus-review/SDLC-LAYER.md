@@ -4,7 +4,7 @@ This is the **lifecycle-mode** companion to `INTEGRATION-LAYER.md`. Where the
 integration layer orchestrates one project-state round, the SDLC layer
 orchestrates a whole **speckit spec lifecycle** — interleaving speckit
 phase-runners with three scoped **chorus gates** (design, plan/tasks,
-implementation). Each gate runs the gate primitive in `GATE-PRIMITIVE.md` (frame check + four stages).
+implementation). Each gate runs the four-stage primitive in `GATE-PRIMITIVE.md`.
 
 It is an **operating mode** of the existing `chorus-review` skill — not a new
 skill, not a speckit hook extension. The Dijkstra posture is unchanged, one level
@@ -54,7 +54,7 @@ lives.
 
 ## Gate mechanics
 
-Every gate runs the gate primitive (`GATE-PRIMITIVE.md`: frame check → extract →
+Every gate runs the four-stage primitive (`GATE-PRIMITIVE.md`: extract →
 uncapped author → real vote → deterministic tally). The lifecycle layer adds
 seating, gating, incorporation, and bound.
 
@@ -76,8 +76,8 @@ seating, gating, incorporation, and bound.
   finding does not transfer a lens's role. In particular, the
   **scope/deferral lens (constraint-and-flow) is never out-seated at a gate
   reviewing a new buildout**: it is the only seat whose mandate is the cut, and
-  out-seating it removes precisely the voice the frame check (`GATE-PRIMITIVE.md`
-  Stage 0) depends on. (Provenance: a 2026-06-11 gate out-seated it as "covered"
+  out-seating it leaves a role the operator otherwise has to perform
+  themselves. (Provenance: a 2026-06-11 gate out-seated it as "covered"
   by a lens that shared one staleness finding but not the cut mandate; the
   operator then had to perform the cut manually — issue #6.)
 
@@ -98,10 +98,12 @@ Gates B and C do not re-derive the project context Gate A established. Gap-quest
 feed the orchestrator's **one batched, sessioned operator interview** (≤ 5 Q/session,
 re-entrant, operator-paced; a deferred session yields a verdict degradation
 summary); project-wide answers are written back to the addendum (operator-accepted).
-**Frame questions lead session 1** (`GATE-PRIMITIVE.md` Stage 0): the gate's frame
-record — user & count, ranked characteristics, grading bar — is settled by reference
-or operator answer before findings are authored, and every author brief embeds it.
-The phase feeds Stage 1 Extract; it does not replace it.
+**Unmet `[gate]` needs lead session 1**: each seated lens prompts for the answers
+it has declared it cannot honestly review without (who the user is and how many,
+the grading bar, the characteristic ranking) before findings are authored — and
+keeps its gates and their standing answers current in its memory record
+(`EXPLORATORY-PHASE.md` § Gate upkeep). The phase feeds Stage 1 Extract; it does
+not replace it.
 
 ### Block on 🔴 only
 

@@ -5,9 +5,8 @@ Both the periodic project-state round (`INTEGRATION-LAYER.md`, Phases 1/2/4) and
 the per-feature SDLC gates (`SDLC-LAYER.md`, Gates A/B/C) run *this* mechanic.
 There is exactly one copy; neither layer restates it.
 
-A review is a **frame check** (Stage 0) followed by four **separable,
-specialized stages**, each with a distinct actor and a distinct success
-criterion. Running them blended is the failure mode this
+A review is four **separable, specialized stages**, each with a distinct actor
+and a distinct success criterion. Running them blended is the failure mode this
 file exists to prevent: a 2026-06-06 back-test of the constraint-and-flow lens
 showed that when one agent both **authored and graded** findings it ranked the
 new lens dead last; when authoring was split from a **real adversarial vote** the
@@ -16,54 +15,11 @@ cheap out on is the stage that lies to you — and stage 3 is load-bearing.
 
 ```mermaid
 flowchart TD
-    frame([Stage 0 · Frame — sourced bar: user, count, characteristics]) --> findings
     corpus([corpus]) -->|"Stage 1 · Extract — read-only agents → file:line records"| records([records])
-    records -->|"Stage 2 · Author — seated personas → findings, uncapped, AT THE RECORDED BAR"| findings([findings])
-    findings -->|"Stage 3 · Vote — OTHER personas → PRIORITIZE / OVER-RATE at the recorded bar"| votes([votes])
+    records -->|"Stage 2 · Author — seated personas → findings, uncapped"| findings([findings])
+    findings -->|"Stage 3 · Vote — OTHER personas → PRIORITIZE / OVER-RATE"| votes([votes])
     votes -->|"Stage 4 · Tally — orchestrator → deterministic severity + gating"| verdict([verdict])
 ```
-
-## Stage 0 — Frame (precondition to Author)
-
-A review graded against the wrong bar is wrong in every finding at once, and the
-later stages **amplify** rather than catch it: every vote asks "is this severe
-*within the frame*," so convergent PRIORITIZE escalates production-bar findings
-on a dev tool just as faithfully as real ones. A per-finding vote cannot see an
-altitude error — only a frame stated *before* authoring can. (Provenance: a
-2026-06-11 gate manufactured 13 gating 🔴 against an unexamined production bar on
-single-operator dev tooling; the operator overrode the entire set with one
-reframe. Issue #6.)
-
-- **Actor**: jointly the **product + architecture + scope** lenses among the
-  seated panel (any seated lens may contribute); the orchestrator records.
-- **Output**: the **frame record**, three answers:
-
-  | Question | Answer records |
-  |---|---|
-  | Who is the user, and how many? | named user(s) + count (one operator / a team / external customers) |
-  | Which characteristics does the artifact need? | ranked top 3–7 (simplicity/portability are characteristics too) |
-  | What bar are findings graded against? | production service · internal tooling · disposable experiment |
-
-- **Sourcing**: each answer carries its provenance — **spec/addendum reference
-  or operator confirmation only, never inference**. Frame inputs are operator
-  intent, not artifact-derivable; on a greenfield buildout there is nothing to
-  infer *from*. Unstated answers become **frame questions that lead the first
-  operator-interview session** (`EXPLORATORY-PHASE.md`); if the operator defers
-  them, the frame is recorded as **provisional** and the verdict carries that
-  degradation banner — a provisional-frame 🔴 is an operator question, not a
-  block.
-- **Consumption**: every Stage 2 author brief **embeds the frame record**, and
-  findings are proposed at the recorded bar (a finding that blocks at a
-  production bar may be a 🟢 nicety at an internal-tooling bar — the brief says
-  which applies). Stage 3 votes severity *at the recorded bar*.
-- **Frame challenge**: a persona that believes the frame itself is wrong files a
-  **frame objection routed to the frame record** (surfaced to the operator),
-  never a severity-graded finding — a frame fact filed as a 🟡 defect is
-  flattened by the vote into a nitpick, which is precisely the failure this
-  stage exists to prevent.
-- **Must not**: be skipped, inferred by the orchestrator, or answered by the
-  spec's own self-description when a lens's evidence contradicts it (the
-  contradiction routes to the operator).
 
 ## Stage 1 — Extract
 
@@ -97,8 +53,11 @@ reframe. Issue #6.)
 
 - **Actor**: the seated persona itself, one per lens (in the base round, the
   Round-1 agent; in an SDLC gate, the gate's seated panel).
-- **Input**: the **frame record** (Stage 0, embedded in the brief), the extract
-  records, plus the persona's own reading of the corpus.
+- **Input**: the extract records plus the persona's own reading of the corpus —
+  with the persona's own **gates** satisfied (`EXPLORATORY-PHASE.md`): the
+  answers it has declared it cannot honestly review without (who the user is and
+  how many, the grading bar, the characteristic ranking, …), each resolved by
+  reference or operator confirmation, never invented.
 - **Output**: **findings**, each:
   `{id, lens, evidence (file:line | [principle] | [principle:proposed]),
   proposed_severity (🔴/🟡/🟢), summary (≤ 20 words)}`.
@@ -108,7 +67,11 @@ reframe. Issue #6.)
   finding*, never the *number of findings*.
 - **Must not**: pad to hit a number; file a project-specific claim with no
   `file:line` and no principle tag (such a finding is demoted to
-  `[unsupported]` per I8 and excluded from the tally).
+  `[unsupported]` per I8 and excluded from the tally); **author past an unmet
+  gate** — when one of the persona's declared gates is unanswered, the honest
+  output is the question itself, with any dependent findings marked
+  **conditional on the stated assumption** rather than graded as if the answer
+  were known (S10).
 
 ## Stage 3 — Vote
 
@@ -167,18 +130,26 @@ integration layer's I1–I8.
 - **S9.** The orchestrator never synthesizes a vote or a grade. Stage 3 is a real
   dispatch to seated personas; stage 4 aggregates real votes only. A predicted
   reaction is not a vote. (Extends I1/I6 to the voting and tally stages.)
-- **S10.** No findings are authored without a frame record (Stage 0). Frame
-  inputs resolve only as *referenced* or *operator-confirmed* — never *inferred*.
-  A frame fact discovered at any stage routes to the frame record as a frame
-  objection, never into the findings register as a severity-graded defect.
+- **S10.** Every persona **names its gates explicitly** — the information needs
+  it cannot honestly review without (`[gate]` entries in its profile,
+  `EXPLORATORY-PHASE.md`) — and **prompts for an unmet gate instead of inferring
+  past it**. A gate resolves only as *referenced* or *operator-confirmed*; while
+  it is open, the persona leads with the question and marks dependent findings
+  conditional on the stated assumption. The later stages cannot catch a
+  wrong-bar review — every vote asks "is this severe *within the frame*," so
+  convergent PRIORITIZE amplifies an altitude error rather than correcting it.
+  Honesty about the frame lives in each persona's own chain of thought, before
+  authoring. (Provenance: a 2026-06-11 gate reviewed single-operator dev tooling
+  against an inferred production bar; 13 manufactured gating 🔴 had to be
+  operator-overridden wholesale — issue #6.)
 
 ## Adoption note
 
 `INTEGRATION-LAYER.md` (base round Phases 1/2/4) and `SDLC-LAYER.md` (gates
 A/B/C) **reference this file** for the mechanic; they do not restate it. Any
-change to frame/extract/author/vote/tally happens here, once, so the two modes
-cannot drift. The lifecycle-specific invariants S1–S7 live in `SDLC-LAYER.md`;
-the gate-primitive invariants S8–S10 live here because they bind both modes.
+change to extract/author/vote/tally happens here, once, so the two modes cannot
+drift. The lifecycle-specific invariants S1–S7 live in `SDLC-LAYER.md`; the
+gate-primitive invariants S8–S10 live here because they bind both modes.
 
 ## Provenance
 

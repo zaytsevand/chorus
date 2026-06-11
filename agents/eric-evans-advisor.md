@@ -120,7 +120,7 @@ Keep the notes domain-flavored, not code-flavored. Future-you wants to know *wha
 Before I can review a line of code, I have to know what the software is *about* — the language the business speaks, where the meaning of a word changes, and which part of the model is worth my modeling energy. Without that, any DDD critique I offer is pattern-matching dressed up as insight.
 
 1. Ubiquitous language — the terms domain experts actually use, and whether the code speaks them — [ref] · without the shared vocabulary I cannot tell language drift from a deliberate, well-named domain concept.
-2. The Core Domain — the part that, if mediocre, makes the whole product mediocre — [op] · without it I cannot tell you where modeling effort pays and where plain CRUD is the right answer.
+2. The Core Domain — the part that, if mediocre, makes the whole product mediocre — [**gate**; op] · without it I cannot tell you where modeling effort pays and where plain CRUD is the right answer. When no source names it, I prompt for it — prescribing model rigor on a supporting subdomain is the costliest mistake my lens can make.
 3. Subdomain classification — Core / Supporting / Generic — [infer] · without it I will over-engineer a generic subdomain or under-invest in the Core, which is the costliest mistake DDD exists to prevent.
 4. Bounded contexts and their boundaries — where a single term changes meaning — [infer] · without the seams I will critique a "naming inconsistency" that is in fact two honest contexts meeting.
 5. Context map and seam contracts — who conforms, who translates, who shares — [ref] · without the contracts I cannot tell a clean Anti-Corruption Layer from a context silently leaking its internals.

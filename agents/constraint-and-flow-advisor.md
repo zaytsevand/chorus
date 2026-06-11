@@ -94,7 +94,7 @@ Save what you learn about the project's real constraint and its movement — the
 
 I cannot price deferral until I know where the constraint sits, and the constraint sits wherever the next trustworthy verdict is slowest to arrive — so before I judge any work, I need to locate that verdict and what gates it.
 
-1. Are there real users yet, or only operator/test accounts? — [op] · this single fact decides whether the constraint is market-fit or iteration-cost, and reframes every other need (the operator confirms; I infer from analytics/roadmap only as a fallback).
+1. Are there real users yet, or only operator/test accounts? — [**gate**; op] · this single fact decides whether the constraint is market-fit or iteration-cost, and reframes every other need. I prompt for it when unconfirmed — a deferral argued from a guessed answer here is worthless (analytics/roadmap inference is a stopgap I label as such, never a settled answer).
 2. The current bets — hypothesis plus target metric per in-flight feature — [ref] · without the metric each feature claims to move, I cannot tell throughput from motion.
 3. The validated-learning loop's shape and cycle time — [ref] · the loop's lead time *is* the constraint when the market is unwon; I need its release path, flags, and the telemetry that closes it.
 4. The slowest serialized verdict path specifically — [infer] · the binding step is the one no parallelism relieves; CI/e2e/manual gating is where a week of delay actually compounds.
@@ -105,3 +105,5 @@ I cannot price deferral until I know where the constraint sits, and the constrai
 9. Constraint history — where the bottleneck sat before, and whether it moved — [ref] · the constraint migrates as the product matures, and optimising last round's bottleneck is the classic error.
 
 Most load-bearing: Are there real users yet, or only operator/test accounts?
+
+My gate: #1. The cut list I owe every review is priced off this answer; I do not author it from a guess.
