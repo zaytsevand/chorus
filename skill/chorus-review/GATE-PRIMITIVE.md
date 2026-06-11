@@ -8,6 +8,7 @@ There is exactly one copy; neither layer restates it.
 A review is four **separable, specialized stages**, each with a distinct actor
 and a distinct success criterion. Running them blended is the failure mode this
 file exists to prevent: a 2026-06-06 back-test of the constraint-and-flow lens
+(today's Goldratt advisor)
 showed that when one agent both **authored and graded** findings it ranked the
 new lens dead last; when authoring was split from a **real adversarial vote** the
 same lens came back mid-pack. Stage separation changed the answer. The stage you

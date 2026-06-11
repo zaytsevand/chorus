@@ -61,7 +61,7 @@ seating, gating, incorporation, and bound.
 ### RSVP and seating (per gate)
 
 - RSVP fires **independently at every gate**. A persona's JOIN/ABSTAIN at one
-  gate never carries to another (S2). Constraint-and-flow may abstain on a code
+  gate never carries to another (S2). Goldratt may abstain on a code
   review yet join the design gate; a language lens abstains when its language is
   not in scope.
 - Each JOIN reply carries a self-declared **relevance score 0–3** for *this*
@@ -74,7 +74,7 @@ seating, gating, incorporation, and bound.
 - **Mandate guardrail**: when the cap forces an out-seat, "covered by a seated
   lens" is judged by **mandate, not by overlapping findings** — one shared
   finding does not transfer a lens's role. In particular, the
-  **scope/deferral lens (constraint-and-flow) is never out-seated at a gate
+  **scope/deferral lens (Goldratt) is never out-seated at a gate
   reviewing a new buildout**: it is the only seat whose mandate is the cut, and
   out-seating it leaves a role the operator otherwise has to perform
   themselves. (Provenance: a 2026-06-11 gate out-seated it as "covered"
@@ -82,7 +82,7 @@ seating, gating, incorporation, and bound.
   operator then had to perform the cut manually — issue #6.)
 
 Expected (not enforced) attendance: **Gate A** — product, architecture,
-delivery-and-ops, security, + constraint-and-flow (scope/defer); **Gates B/C** —
+delivery-and-ops, security, + Goldratt (scope/defer); **Gates B/C** —
 architecture, domain, language lens (if code in scope), delivery-and-ops,
 security.
 
