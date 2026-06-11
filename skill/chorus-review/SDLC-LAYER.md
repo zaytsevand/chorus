@@ -156,7 +156,7 @@ gate.)
 
 ## Invariants (lifecycle level)
 
-These extend I1–I8. S8/S9 are gate-primitive-level and live in
+These extend I1–I9. S8/S9 are gate-primitive-level and live in
 `GATE-PRIMITIVE.md`; S1–S7 are lifecycle-level and live here.
 
 - **S1.** The orchestrator authors no spec/plan/tasks/code itself; every artefact

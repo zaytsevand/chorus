@@ -123,7 +123,7 @@ author-under-rated finding through.
 ## Invariants this primitive carries
 
 These bind every review — the base round and every SDLC gate. They extend the
-integration layer's I1–I8.
+integration layer’s I1–I9.
 
 - **S8.** The author of a finding is never its grader. Stage 3 dispatches to
   personas *other than* the author; a persona never votes on its own finding.
