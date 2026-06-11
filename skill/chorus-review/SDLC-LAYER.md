@@ -58,19 +58,33 @@ Every gate runs the four-stage primitive (`GATE-PRIMITIVE.md`: extract →
 uncapped author → real vote → deterministic tally). The lifecycle layer adds
 seating, gating, incorporation, and bound.
 
+**Operator-facing decisions** in this layer — seating, block-on-🔴, gate sign-off —
+are banded by the **decision primitive** (`DECISION-PRIMITIVE.md`: 🟢 auto-resolve /
+🟡 proceed-with-recorded-default + async override / 🔴 hard-block + instant ask, by
+**declared catalog predicate**, never orchestrator inference). The sections below
+reference that mechanic; they do not restate it. The point is a **self-unblocking yet
+balanced** lifecycle: the workflow runs forward, stopping the operator only for 🔴.
+
 ### RSVP and seating (per gate)
 
 - RSVP fires **independently at every gate**. A persona's JOIN/ABSTAIN at one
   gate never carries to another (S2). Goldratt may abstain on a code
   review yet join the design gate; a language lens abstains when its language is
   not in scope.
-- Each JOIN reply carries a self-declared **relevance score 0–3** for *this*
-  gate.
-- **Seating**: `3 ≤ J ≤ 5` → seat all. `J ≥ 6` → seat the **top 5 by relevance
-  score** (a mechanical descending sort on persona-supplied integers); a tie
-  spanning the 5th seat is **surfaced to the operator** to break — never resolved
-  by the orchestrator judging lens merit (S3). `J < 3` → re-ping once; abort the
-  gate honestly on the second failure.
+- Each JOIN reply carries the **two-axis signal** (`DECISION-PRIMITIVE.md` §RSVP
+  signal): **applicability** (≥1 cited round-context delta the lens touches; an
+  un-cited JOIN is not-applicable) and **expected stakes** (🟢/🟡/🔴-potential + a
+  hook). This replaces the old single relevance 0–3 score, which degenerated to
+  all-3s.
+- **Seating** is a *decision* banded by `DECISION-PRIMITIVE.md` (catalog rows 1–2):
+  `3 ≤ J ≤ 5` → seat all. `J ≥ 6` → sort by (applicability, then expected stakes); a
+  **strict** order at the 5th seat is 🟢 (auto-seat). A **tie** spanning the 5th seat
+  is **🟡** — seat a recorded default panel and queue it for async override, **never
+  an operator interruption** (this is the seating tie that parked feature 005 tried,
+  and failed, to resolve mechanically; as a 🟡 it self-unblocks). `J < 3` → re-ping
+  once; abort the gate honestly on the second failure. The orchestrator still never
+  judges lens merit (S3/D1) — it sorts persona-supplied evidence and applies a
+  declared band.
 - **Mandate guardrail**: when the cap forces an out-seat, "covered by a seated
   lens" is judged by **mandate, not by overlapping findings** — one shared
   finding does not transfer a lens's role. In particular, the
@@ -105,14 +119,23 @@ keeps its gates and their standing answers current in its memory record
 (`EXPLORATORY-PHASE.md` § Gate upkeep). The phase feeds Stage 1 Extract; it does
 not replace it.
 
-### Block on 🔴 only
+### Block on 🔴 — via the self-heal loop
 
-- A gate **halts** the pipeline on an unresolved 🔴 (post-tally per the
-  primitive). 🟡/🟢 are recorded and the operator proceeds at will.
-- The orchestrator never passes a 🔴 **silently**, and never overrides the
-  operator on non-🔴 findings (S4 / N+1 holds sign-off). The operator may
-  **waive** a 🔴 to proceed; the waiver and its rationale are recorded in the
-  ledger (a waived 🔴 is never a silently-passed 🔴).
+A post-tally gating 🔴 is a **decision** banded by `DECISION-PRIMITIVE.md` (catalog
+row 5, the self-heal loop):
+
+- While `cycle < 3` it is a **🟡 decision**: the orchestrator **auto-runs the
+  incorporation cascade and re-runs the gate** (the re-run tally is the verifying
+  sensor — "verify before you ask"), emitting an `in-progress` DecisionRecord **before
+  each next cycle** so an in-flight self-heal reads as progress, not runaway.
+- It **escalates to a 🔴 operator ask** at `cycle == 3` without clearing, **or** when a
+  **waiver** of a real concern is the only path. A waiver is never applied
+  automatically; 🔴 never auto-proceeds (D2).
+- 🟡/🟢 findings are recorded; the operator proceeds at will. N+1 holds sign-off (S4).
+- This stays inside the existing guarantees: **S4** (the 🔴 is *resolved and verified*,
+  never passed silently), **S5** (spec-sourced incorporation), **S7** (the 3-cycle
+  bound is the escalation trigger). It just stops asking the operator to push the
+  incorporate button each cycle.
 
 ### Vote dispatch (S8/S9)
 
@@ -163,11 +186,13 @@ These extend I1–I9. S8/S9 are gate-primitive-level and live in
   change traces to a speckit phase-runner. (Extends I1.)
 - **S2.** RSVP fires independently at each gate; no JOIN/ABSTAIN carries across
   gates. (Extends I2.)
-- **S3.** No panel exceeds 5; overflow is seated by persona-declared relevance
-  score, ties surfaced to the operator — never by orchestrator lens-merit
-  judgment. Out-seat coverage is judged by mandate, never by overlapping
-  findings; the scope/deferral lens is never out-seated on a new buildout.
-  (Extends I2.)
+- **S3.** No panel exceeds 5; overflow is seated by the persona-declared two-axis
+  signal (`DECISION-PRIMITIVE.md`), banded as a decision: a strict sort auto-seats
+  (🟢), a tie at the cap seats a recorded default + async override (🟡) — never an
+  operator interruption, never orchestrator lens-merit judgment (D1). Out-seat
+  coverage is judged by mandate, never by overlapping findings; the scope/deferral
+  lens is never out-seated on a new buildout. (Extends I2; the decision discipline
+  is `DECISION-PRIMITIVE.md`, D1–D5.)
 - **S4.** No gate passes with an open 🔴; each 🔴 is resolved or waived with
   recorded rationale. (Extends I7.)
 - **S5.** Incorporation revises the spec and regenerates downstream artefacts via
@@ -183,12 +208,15 @@ These extend I1–I9. S8/S9 are gate-primitive-level and live in
 Each run writes a per-feature ledger at `specs/<feature>/agent-sdlc-log.md`,
 appended once per gate execution. It is the audit trail proving each gate fired
 honestly — a reviewer must be able to reconstruct the run from it alone. Schema:
-RSVP table (joiners/abstainers/scores), findings register, vote tally, 🔴
-resolution/waiver log, unclaimed extract records, loop-cycle count, and the
-end-of-run **S1–S9 self-audit checklist** (each item marked pass with a pointer
-to its evidence row). The ledger is **not** placed under `docs/reviews/` — that
-directory is for periodic project-state rounds. (Full schema:
-`specs/003-agent-sdlc-workflow/contracts/sdlc-ledger.md`.)
+RSVP table (joiners/abstainers + the two-axis signal), findings register, vote
+tally, 🔴 resolution/waiver log, unclaimed extract records, loop-cycle count, a
+**`## Provisional decisions (review & override)`** section holding the 🟡
+DecisionRecords (default, runner-up, sensor evidence, override + cost — see
+`DECISION-PRIMITIVE.md`), and the end-of-run **S1–S9 self-audit checklist** (each
+item marked pass with a pointer to its evidence row). The ledger is **not** placed
+under `docs/reviews/` — that directory is for periodic project-state rounds. (Full
+schema: `specs/003-agent-sdlc-workflow/contracts/sdlc-ledger.md`; decision-record
+schema: `DECISION-PRIMITIVE.md`.)
 
 ## Refusals (lifecycle boundaries)
 

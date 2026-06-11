@@ -238,6 +238,15 @@ for the stages and invariants S8–S10. The gates below are the discipline aroun
 it; the SDLC gates (`SDLC-LAYER.md`) run the same primitive, so the two modes
 cannot drift.
 
+**Operator-facing decisions** in the base round — Phase 0 scope/exclusion
+confirmation, Phase 0.5 quorum/seating, and the RSVP two-axis signal — are banded by
+the **decision primitive** (`DECISION-PRIMITIVE.md`: 🟢 auto / 🟡 default + async
+override / 🔴 hard-block, by declared catalog predicate; invariants D1–D5). Scope
+confirmation is 🟢 when an addendum exists, 🟡 (infer defaults + async confirm) when
+absent (catalog rows 9–10); a capped-seating tie is 🟡 (catalog row 2). The base round
+is uncapped by default, so the seating-tie 🟡 bites only under a cap. This layer
+references that mechanic; it does not restate it.
+
 ### Phase 0 — Brief
 
 - **Pre:** user has invoked the skill; project addendum is locatable or its
@@ -363,6 +372,12 @@ repaired.
   stated assumption. These bind Phases 1/2/4 here exactly as
   they bind the SDLC gates — the back-test that produced them showed
   author-grades-self buries a lens.
+
+- **D1–D5 (decision-primitive invariants — defined in `DECISION-PRIMITIVE.md`).**
+  Operator-facing decisions are banded by a declared predicate, never inference (D1);
+  🔴 never auto-proceeds (D2); every 🟡 default is recorded and reversible (D3);
+  classification is mechanical (D4); signals are evidence-anchored (D5). They bind the
+  base round's decisions (scope, quorum, seating) exactly as they bind the SDLC gates.
 
 ## Refusals (system boundaries, not modesty)
 
