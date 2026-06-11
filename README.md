@@ -21,7 +21,7 @@ commit; the most recent artifact is the next round's baseline.
 
 ## Two modes
 
-The skill runs in two modes, both built on the same four-stage gate primitive
+The skill runs in two modes, both built on the same gate primitive (a frame check + four stages)
 (`skill/chorus-review/GATE-PRIMITIVE.md`: extract → uncapped author → real
 adversarial vote → deterministic tally):
 

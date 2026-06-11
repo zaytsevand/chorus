@@ -51,6 +51,13 @@ operator-controlled (FR-019).
 4. **Analyse (bounded)** — for needs the repo doesn't answer, run a bounded,
    **operator-budget-controlled** analysis (the chorus's sampling discipline; no
    enumerate-everything). Record results as **inferred** (provisional, FR-006/011).
+   **Exception — frame needs are never inferred.** A need that constitutes the
+   review frame (who the user is and how many; the ranked characteristics; the
+   grading bar — `GATE-PRIMITIVE.md` Stage 0) resolves only as *referenced* or
+   *operator-confirmed*; if the harvest doesn't settle it, it goes straight to a
+   gap-question. Frame inputs are operator intent, not artifact-derivable — an
+   inferred frame defaults to the production-service prior and poisons every
+   downstream finding at once (S10).
 5. **Raise gap-questions** — for needs neither reference nor analysis settled,
    emit gap-questions tagged `project-wide` or `lens-specific`. Do **not**
    interview the operator directly (FR-007).
@@ -148,6 +155,12 @@ computes — the cheapest correct incrementality.
 
 The batched operator interview is **not** one wall of questions. It is:
 
+- **Frame-first** — open frame questions (`GATE-PRIMITIVE.md` Stage 0: user &
+  count, characteristic ranking, grading bar) **lead session 1**, before any
+  lens-specific gap. They are the cheapest questions with the largest blast
+  radius: one answer can collapse or re-price whole clusters of findings before
+  they are authored. A deferred frame question leaves the frame **provisional**
+  and is named first in the degradation summary.
 - **Sessions of ≤ 5 questions** each.
 - **Re-entrant** — the operator may **defer** a session and **resume** it later;
   session state (answered / deferred / pending) persists.
@@ -179,7 +192,10 @@ findings are authored:
 1. **Coverage** — every item in the lens's information-needs profile resolves to
    an entry in its understanding record, tagged `referenced` / `inferred` /
    `operator-confirmed` / `open-gap`. A profile item with **no** record entry is
-   a detectable **coverage failure**, not a matter of interpretation.
+   a detectable **coverage failure**, not a matter of interpretation. A **frame
+   need** (Stage 0 input) tagged `inferred` is likewise a coverage failure —
+   frame inputs admit only `referenced` / `operator-confirmed` / `open-gap`
+   (S10).
 2. **Reconciliation** — every cached `project-wide` fact carries a reconciliation
    locator to the addendum.
 

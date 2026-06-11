@@ -167,8 +167,8 @@ When tempted to rule on something it does not see, refuse and surface.
 Each phase has gates. The integration layer enforces them. **A phase does
 not start until the previous phase's postcondition holds.**
 
-Phases 1, 2, and 4 run the four-stage review mechanic — see `GATE-PRIMITIVE.md`
-for the stages and invariants S8/S9. The gates below are the discipline around
+Phases 1, 2, and 4 run the review mechanic (frame check + four stages) — see
+`GATE-PRIMITIVE.md` for the stages and invariants S8–S10. The gates below are the discipline around
 it; the SDLC gates (`SDLC-LAYER.md`) run the same primitive, so the two modes
 cannot drift.
 
@@ -277,12 +277,15 @@ repaired.
   post-Round-1 and post-Round-2; SKILL.md's "Phase 1 evidence check"
   section describes the mechanism.
 
-- **S8 / S9 (gate-primitive invariants — defined in `GATE-PRIMITIVE.md`).**
+- **S8 / S9 / S10 (gate-primitive invariants — defined in `GATE-PRIMITIVE.md`).**
   A review's stages are separated. **S8:** the author of a finding is never its
   grader — the Phase-2 vote is dispatched to *other* lenses (an author never
   votes on its own finding). **S9:** the integration layer never synthesizes a
   vote or a grade; the stage-4 tally aggregates real votes only, and a
-  *predicted* reaction is not a vote. These bind Phases 1/2/4 here exactly as
+  *predicted* reaction is not a vote. **S10:** no findings are authored without
+  a frame record (Stage 0); frame inputs are referenced or operator-confirmed,
+  never inferred, and a frame fact routes to the frame record, never into the
+  findings register as a graded defect. These bind Phases 1/2/4 here exactly as
   they bind the SDLC gates — the back-test that produced them showed
   author-grades-self buries a lens.
 

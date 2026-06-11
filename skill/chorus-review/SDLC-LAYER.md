@@ -4,7 +4,7 @@ This is the **lifecycle-mode** companion to `INTEGRATION-LAYER.md`. Where the
 integration layer orchestrates one project-state round, the SDLC layer
 orchestrates a whole **speckit spec lifecycle** — interleaving speckit
 phase-runners with three scoped **chorus gates** (design, plan/tasks,
-implementation). Each gate runs the four-stage primitive in `GATE-PRIMITIVE.md`.
+implementation). Each gate runs the gate primitive in `GATE-PRIMITIVE.md` (frame check + four stages).
 
 It is an **operating mode** of the existing `chorus-review` skill — not a new
 skill, not a speckit hook extension. The Dijkstra posture is unchanged, one level
@@ -54,7 +54,7 @@ lives.
 
 ## Gate mechanics
 
-Every gate runs the four-stage primitive (`GATE-PRIMITIVE.md`: extract →
+Every gate runs the gate primitive (`GATE-PRIMITIVE.md`: frame check → extract →
 uncapped author → real vote → deterministic tally). The lifecycle layer adds
 seating, gating, incorporation, and bound.
 
@@ -71,6 +71,15 @@ seating, gating, incorporation, and bound.
   spanning the 5th seat is **surfaced to the operator** to break — never resolved
   by the orchestrator judging lens merit (S3). `J < 3` → re-ping once; abort the
   gate honestly on the second failure.
+- **Mandate guardrail**: when the cap forces an out-seat, "covered by a seated
+  lens" is judged by **mandate, not by overlapping findings** — one shared
+  finding does not transfer a lens's role. In particular, the
+  **scope/deferral lens (constraint-and-flow) is never out-seated at a gate
+  reviewing a new buildout**: it is the only seat whose mandate is the cut, and
+  out-seating it removes precisely the voice the frame check (`GATE-PRIMITIVE.md`
+  Stage 0) depends on. (Provenance: a 2026-06-11 gate out-seated it as "covered"
+  by a lens that shared one staleness finding but not the cut mandate; the
+  operator then had to perform the cut manually — issue #6.)
 
 Expected (not enforced) attendance: **Gate A** — product, architecture,
 delivery-and-ops, security, + constraint-and-flow (scope/defer); **Gates B/C** —
@@ -89,6 +98,9 @@ Gates B and C do not re-derive the project context Gate A established. Gap-quest
 feed the orchestrator's **one batched, sessioned operator interview** (≤ 5 Q/session,
 re-entrant, operator-paced; a deferred session yields a verdict degradation
 summary); project-wide answers are written back to the addendum (operator-accepted).
+**Frame questions lead session 1** (`GATE-PRIMITIVE.md` Stage 0): the gate's frame
+record — user & count, ranked characteristics, grading bar — is settled by reference
+or operator answer before findings are authored, and every author brief embeds it.
 The phase feeds Stage 1 Extract; it does not replace it.
 
 ### Block on 🔴 only
@@ -151,7 +163,9 @@ These extend I1–I8. S8/S9 are gate-primitive-level and live in
   gates. (Extends I2.)
 - **S3.** No panel exceeds 5; overflow is seated by persona-declared relevance
   score, ties surfaced to the operator — never by orchestrator lens-merit
-  judgment. (Extends I2.)
+  judgment. Out-seat coverage is judged by mandate, never by overlapping
+  findings; the scope/deferral lens is never out-seated on a new buildout.
+  (Extends I2.)
 - **S4.** No gate passes with an open 🔴; each 🔴 is resolved or waived with
   recorded rationale. (Extends I7.)
 - **S5.** Incorporation revises the spec and regenerates downstream artefacts via
