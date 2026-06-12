@@ -17,7 +17,7 @@ marker), structured per-step `Cites:` lists (≥1 per step, cardinality-asserted
 runtime failure pointers resolved via the **running skill's base path**, and
 dual-channel install detection **with dual-channel delivery** (FR-015).
 
-Technical approach: author a new companion doc `skill/chorus-review/LEARN.md` (the
+Technical approach: author a new companion doc `skill/chorus/LEARN.md` (the
 single canonical definition of the mode); register the mode across **all** cold-start
 surfaces — `SKILL.md` mode list **and YAML frontmatter**, the three-mode reframe of the
 "Two modes" heading, a Phase-0 note defining the scaffolded-addendum state for both
@@ -46,7 +46,7 @@ persona-agent set** (FR-015). No runtime code; same authoring shape as features
   navigation rules in FR-004 are designed against this hard budget
 - `templates/CHORUS-PROJECT.template.md` (scaffold source), `install.sh` (file-path
   deployment), and **`plugin.json`** (plugin-channel packaging — today it roots the
-  skill at `skill/chorus-review/`, ships 7 of 10 persona agents, and does not carry
+  skill at `skill/chorus/`, ships 7 of 10 persona agents, and does not carry
   `templates/`; FR-015 names it an edit surface)
 - **Both documented install channels**: file-path (`./install.sh` → `~/.claude`) and
   plugin — detection, **delivery**, and scaffold-source resolution must work on each
@@ -139,7 +139,7 @@ specs/007-chorus-learn-onboarding/
 ### Source Code (repository root)
 
 ```text
-skill/chorus-review/
+skill/chorus/
 ├── SKILL.md             # EDIT: mode list + YAML frontmatter description + "Two modes"→
 │                        #   three-mode heading + Phase-0 scaffolded-addendum note (FR-014)
 ├── LEARN.md             # NEW: the staged tutorial — single canonical definition of the mode

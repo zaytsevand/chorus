@@ -24,7 +24,7 @@ user: chorus learn
 S1 orient   "The chorus is a multi-lens review… It has three modes: two review
             modes (the project-state round and the agent-SDLC lifecycle) and
             this tutorial."
-            Cites: skill/chorus-review/SKILL.md
+            Cites: skill/chorus/SKILL.md
             [probes: template reachable ✓ (file-path channel) · agents ✓ ·
              addendum ✗ · in a repo ✓]
             Q: Continue → set up | Go deeper on the modes |
@@ -35,7 +35,7 @@ user: Continue
 S2 set up   "Each project gives the chorus a one-page addendum
             (CHORUS-PROJECT.md): scope exclusions, anchor surface, security
             checklist…"
-            Cites: templates/CHORUS-PROJECT.template.md, skill/chorus-review/SKILL.md, install.sh (file-path channel)
+            Cites: templates/CHORUS-PROJECT.template.md, skill/chorus/SKILL.md, install.sh (file-path channel)
             → dedicated confirm: "Scaffold docs/reviews/CHORUS-PROJECT.md from
               the template now? (creates one file; sections 2/3/5 left for you)"
 
@@ -47,7 +47,7 @@ user: Continue
 S3 run      "Say 'spawn the chorus'. Personas RSVP, then the review runs four
             stages — extract → author → vote → tally. (Note: these review
             stages are different from this tutorial's steps.)"
-            Cites: skill/chorus-review/GATE-PRIMITIVE.md, skill/chorus-review/SKILL.md
+            Cites: skill/chorus/GATE-PRIMITIVE.md, skill/chorus/SKILL.md
             Q: Continue → agent-SDLC | Deeper | Jump | Exit
 
 user: Continue
@@ -55,7 +55,7 @@ user: Continue
 S4 SDLC     "To gate a speckit feature: 'run the agent-SDLC on feature 0NN'.
             Three gates (design / plan / implementation); a 🔴 self-heals up
             to 3 cycles before it asks you."
-            Cites: skill/chorus-review/SDLC-LAYER.md, skill/chorus-review/DECISION-PRIMITIVE.md
+            Cites: skill/chorus/SDLC-LAYER.md, skill/chorus/DECISION-PRIMITIVE.md
             Q: Continue → work with results | Deeper | Jump | Exit
 
 user: Deeper → one expanded pass (the block-on-🔴 story at newcomer altitude)
@@ -66,7 +66,7 @@ user: Continue
 S5 results  "Each round leaves docs/reviews/YYYY-MM-DD-chorus-review.md —
             commit it; it is the next round's baseline. 🟡 decisions queue in
             the ledger's Provisional-decisions section for async override…"
-            Cites: skill/chorus-review/SKILL.md, skill/chorus-review/DECISION-PRIMITIVE.md
+            Cites: skill/chorus/SKILL.md, skill/chorus/DECISION-PRIMITIVE.md
             Q: Finish the tutorial | Go deeper on results |
                Jump (→ S1–S4, no "back"; free-text stays here) | Exit
             [depth state is per-step (G24): S4's deeper pass flipped only S4's
@@ -96,13 +96,13 @@ Gate C dogfood and the pre-merge pass; results land in the gate ledger (G9).
 grep -q "chorus learn" README.md   || echo "FAIL: README missing the mode"
 grep -q "chorus learn" install.sh  || echo "FAIL: install.sh Next: missing the mode"
 # frontmatter parsed as the whole ----delimited block, not a fixed line window (G11):
-awk '/^---$/{n++; next} n==1' skill/chorus-review/SKILL.md | grep -q "chorus learn" \
+awk '/^---$/{n++; next} n==1' skill/chorus/SKILL.md | grep -q "chorus learn" \
   || echo "FAIL: frontmatter description missing the trigger"
-grep -q "chorus learn" skill/chorus-review/SKILL.md || echo "FAIL: SKILL.md mode list missing the entry"
+grep -q "chorus learn" skill/chorus/SKILL.md || echo "FAIL: SKILL.md mode list missing the entry"
 # staleness: the STATED phrasing family on ALL THREE named surfaces (FR-013 — claim-check
 # parity; the family below IS the claim's scope, run-2 cluster C):
 STALE='[Tt]wo modes|[Bb]oth modes|two operating modes|either mode|2 modes'
-for f in skill/chorus-review/SKILL.md README.md; do
+for f in skill/chorus/SKILL.md README.md; do
   grep -nE "$STALE" "$f" && echo "FAIL: residual two-mode phrasing in $f"
 done
 # the spec's own references — normative text only (the Clarifications section quotes the
@@ -117,12 +117,12 @@ awk '/^## Clarifications/{skip=1} /^## User Scenarios/{skip=0} !skip' \
 
 ```bash
 # absent LEARN.md is a FAIL:, not a silent stderr error (run-2 Gate B cluster α):
-test -f skill/chorus-review/LEARN.md || echo "FAIL: LEARN.md missing"
+test -f skill/chorus/LEARN.md || echo "FAIL: LEARN.md missing"
 # exactly the five step headings present (per-step Cites resolution is C3's job; the
 # navigation-question block is exercised by the Gate C dogfood / T026, not here — C2's
 # claim is scoped to what it scans, run-2 Gate B BECK-3):
 n=$(grep -cE "^#{2,3} .*(orient|set up|run a round|agent-SDLC|work with results)" \
-      skill/chorus-review/LEARN.md 2>/dev/null)
+      skill/chorus/LEARN.md 2>/dev/null)
 [ "$n" -eq 5 ] || echo "FAIL: expected 5 step headings, found $n"
 # expect: no FAIL: lines
 ```
@@ -134,16 +134,16 @@ Scoped to the structured notation — never a bare-filename regex (the scaffold 
 
 ```bash
 # absent LEARN.md is a FAIL:, not a silent stderr error (run-2 Gate B cluster α):
-test -f skill/chorus-review/LEARN.md || echo "FAIL: LEARN.md missing"
+test -f skill/chorus/LEARN.md || echo "FAIL: LEARN.md missing"
 # PER-STEP cardinality (FR-008, run-2 cluster C): each step heading is followed by its
 # own Cites: line — a global floor would pass five cites clumped in S1:
 awk '/^#{2,3} .*(orient|set up|run a round|agent-SDLC|work with results)/{
        if (h && !c) print "FAIL: step without Cites: " h; h=$0; c=0 }
      /^Cites:/{c=1}
-     END{ if (h && !c) print "FAIL: step without Cites: " h }' skill/chorus-review/LEARN.md 2>/dev/null
-n=$(grep -c "^Cites:" skill/chorus-review/LEARN.md 2>/dev/null)
+     END{ if (h && !c) print "FAIL: step without Cites: " h }' skill/chorus/LEARN.md 2>/dev/null
+n=$(grep -c "^Cites:" skill/chorus/LEARN.md 2>/dev/null)
 [ "$n" -ge 5 ] || echo "FAIL: only $n Cites: lines (expect ≥5)"
-grep -n "^Cites:" skill/chorus-review/LEARN.md | sed 's/^[0-9]*:Cites: *//' | tr ',' '\n' \
+grep -n "^Cites:" skill/chorus/LEARN.md | sed 's/^[0-9]*:Cites: *//' | tr ',' '\n' \
   | sed 's/^ *//; s/ *$//; s/ (.*)//' | sort -u | while read p; do
   test -e "$p" || echo "FAIL: broken pointer $p"
 done
@@ -161,10 +161,10 @@ The canon's load-bearing definition blocks appear **only** in their canonical do
 
 ```bash
 # explicit FAIL tokens (run-2 cluster C — no silent-output polarity):
-grep -n "net ≥ +2\|net ≤ −2"             skill/chorus-review/LEARN.md && echo "FAIL: tally rule restated"
-grep -n "auto-resolve · audit"           skill/chorus-review/LEARN.md && echo "FAIL: band table restated"
-grep -n "| 1 | RSVP seating"             skill/chorus-review/LEARN.md && echo "FAIL: decision catalog restated"
-grep -n "J ∈ {3, 4}\|J ≥ 5.*full chorus" skill/chorus-review/LEARN.md && echo "FAIL: quorum table restated"
+grep -n "net ≥ +2\|net ≤ −2"             skill/chorus/LEARN.md && echo "FAIL: tally rule restated"
+grep -n "auto-resolve · audit"           skill/chorus/LEARN.md && echo "FAIL: band table restated"
+grep -n "| 1 | RSVP seating"             skill/chorus/LEARN.md && echo "FAIL: decision catalog restated"
+grep -n "J ∈ {3, 4}\|J ≥ 5.*full chorus" skill/chorus/LEARN.md && echo "FAIL: quorum table restated"
 # expect: no FAIL: lines
 ```
 
@@ -176,7 +176,7 @@ test -f templates/CHORUS-PROJECT.template.md || echo "FAIL: repo template missin
 grep -qE "^cp .*templates" install.sh || echo "FAIL: install.sh missing the templates deploy idiom"
 # installed-side assertion (one clean stanza; no leaked tempdir; FAIL: on non-deploy):
 CH=$(mktemp -d); CLAUDE_HOME="$CH" ./install.sh >/dev/null 2>&1
-test -f "$CH/skills/chorus-review/templates/CHORUS-PROJECT.template.md" \
+test -f "$CH/skills/chorus/templates/CHORUS-PROJECT.template.md" \
   || echo "FAIL: template not deployed (installed side)"
 rm -rf "$CH"
 # expect: no FAIL: lines
@@ -215,8 +215,8 @@ printf '%s\n' 'use the Write tool here' 'cp templates/x docs/' 'tee docs/out.md'
 # asserted MECHANICALLY (run-2 BECK-4): extract the accept-branch section (its heading
 # is pinned: "#### On accept" inside S2) and assert every hit falls inside it:
 ACC=$(mktemp)
-awk '/^#### On accept/{inA=1; next} /^#{1,4} /{inA=0} inA' skill/chorus-review/LEARN.md > "$ACC"
-grep -E "$SCAN" skill/chorus-review/LEARN.md | while IFS= read -r line; do
+awk '/^#### On accept/{inA=1; next} /^#{1,4} /{inA=0} inA' skill/chorus/LEARN.md > "$ACC"
+grep -E "$SCAN" skill/chorus/LEARN.md | while IFS= read -r line; do
   grep -qF -- "$line" "$ACC" || echo "FAIL: write idiom outside the accept branch: $line"
 done
 rm -f "$ACC"
