@@ -43,4 +43,9 @@
 - **Rev 2:** the former User Story 3 (Conductor's caveat) was cut after an all-lens fan-out
   put every reservation on it. Issue linkage is now: composes with #9 (does not depend on
   it); **#13 is out of scope** (presentation is not the place to fix or annotate a tally
-  defect). Planning should keep those boundaries crisp.
+  defect).
+- **Rev 3:** three fan-out refinements folded in — (a) persona self-marks its own pull-quote
+  (no conductor excerpting); (b) the detail-rich entry is the single source of truth and the
+  matrix is its projection; (c) SC-004 is a per-round drift check, not a one-shot example.
+  Implemented in `skill/chorus/{SKILL,INTEGRATION-LAYER,GATE-PRIMITIVE}.md` and verified by
+  `quickstart.md` (FR-011, Principle V).

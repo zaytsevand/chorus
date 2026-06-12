@@ -4,7 +4,7 @@
 
 **Created**: 2026-06-12
 
-**Status**: Draft (rev 2 — Conductor's caveat / former User Story 3 cut)
+**Status**: Draft (rev 3 — caveat cut; fan-out refinements folded; implemented in canon + quickstart)
 
 **Input**: User description — "the integration layer should relay the concrete formulations
 from each agent so we preserve each persona's unique voice and raise operator engagement;
@@ -105,17 +105,18 @@ carries an explicit lens/persona attribution.
 
 **Acceptance Scenarios**:
 
-1. **Given** a persona authored a finding with a one-line characterization in its report,
-   **When** the integration layer builds the findings register, **Then** that finding's
-   human-facing line is the persona's sentence verbatim, attributed to the persona, not a
-   conductor paraphrase.
-2. **Given** a persona's report has no quotable one-line characterization, **When** the
-   conductor would otherwise be tempted to paraphrase, **Then** it either quotes a verbatim
-   span from the report **or** routes back to the persona for a one-line characterization —
-   it never substitutes its own wording.
-3. **Given** a finding's verbatim quote would exceed the artifact's economy, **When** the
-   conductor relays it, **Then** exactly one short pull-quote per finding is surfaced (detail
-   lives in the expanded view of User Story 2, not in an unbounded quote).
+1. **Given** a persona authored a finding and **marked its own one-line pull-quote** in its
+   report, **When** the integration layer builds the findings register, **Then** that
+   finding's human-facing line is the marked pull-quote verbatim, attributed to the persona,
+   not a conductor paraphrase and not a conductor-chosen excerpt.
+2. **Given** a persona omitted to mark a pull-quote, **When** the integration layer assembles
+   the entry, **Then** it routes the finding back to that persona to mark one — it never
+   selects a span itself (conductor excerpting is restating-lite) and never paraphrases. If
+   the persona cannot be re-reached, the entry records "no pull-quote supplied" and links the
+   report; the conductor authors nothing.
+3. **Given** a persona's pull-quote, **When** it is relayed, **Then** the persona marked
+   **exactly one** short span as the pull-quote (the selection is the persona's, not the
+   conductor's), and longer reasoning stays in the report, linked, not inlined.
 
 ---
 
@@ -144,10 +145,11 @@ lens, the severity and what moved it, and the converging lenses — using only t
 2. **Given** a convergent finding, **When** the operator reads it, **Then** the converging
    lenses are identified and each contributes its own short verbatim note, so "3 lenses
    converged" becomes legible as *which three and in what words*.
-3. **Given** the consolidation matrix (the scoring surface), **When** the artifact is
-   assembled, **Then** the matrix may stay terse for arithmetic, but every identifier it
-   uses resolves to a detail-rich entry elsewhere in the same artifact — no `Fn` is a
-   dead-end reference.
+3. **Given** the detail-rich finding entries are the single human-facing source of truth,
+   **When** the consolidation matrix is produced, **Then** the matrix is a **projection** of
+   those entries (severity + convergence count, sorted) — derived from them, not a parallel
+   table maintained by hand — and every identifier it uses resolves to its entry. No `Fn` is
+   a dead-end reference, and severity appears authoritatively in exactly one place.
 4. **Given** the top-5 ranking and any conflicts (`Cn`), **When** the operator reads them,
    **Then** each entry carries enough detail to be understood in place and traces back to its
    finding's detail-rich entry.
@@ -156,11 +158,13 @@ lens, the severity and what moved it, and the converging lenses — using only t
 
 ### Edge Cases
 
-- **A persona writes no quotable line.** Story 1 AS-2 governs: quote a verbatim span or route
-  for a one-liner; never paraphrase. If the persona cannot be re-reached, the entry records
-  "no characterization supplied" rather than a conductor-authored substitute.
-- **A verbatim quote is very long or rambling.** One short pull-quote is surfaced (Story 1
-  AS-3); the rest of the persona's reasoning lives in its report, linked, not inlined.
+- **A persona marks no pull-quote.** Story 1 AS-2 governs: route back to that persona to
+  mark one; the conductor never selects a span or paraphrases. If the persona cannot be
+  re-reached, the entry records "no pull-quote supplied" and links the report — never a
+  conductor-authored substitute.
+- **A persona marks an over-long span.** The persona is asked to tighten its own pull-quote;
+  the conductor does not trim it (trimming is conductor excerpting). The rest of the
+  reasoning lives in the report, linked, not inlined.
 - **Convergence with conflicting characterizations.** When converging lenses describe the
   same finding differently, each lens's verbatim note stands; the conductor does not
   reconcile them into one sentence (that would be synthesis).
@@ -180,12 +184,16 @@ lens, the severity and what moved it, and the converging lenses — using only t
   as a verbatim span authored by the finding's persona, attributed to that persona/lens. It
   MUST NOT restate a finding in the conductor's own words. (Strengthens I6 and the
   "Speak in a persona's voice" refusal in `INTEGRATION-LAYER.md`.)
-- **FR-002**: When no quotable one-line characterization exists in a persona's report, the
-  integration layer MUST either quote a verbatim span from the report or route back to the
-  persona for one — paraphrase is never a permitted third option.
-- **FR-003**: Exactly one short pull-quote per finding is surfaced in the register-level view;
-  longer persona reasoning is referenced (to the report), not inlined, preserving artifact
-  economy (Dijkstra elegance — an artifact must not require its author standing beside it).
+- **FR-002**: Each persona MUST **mark its own one-line pull-quote** (and the finding's
+  evidence locator) in its report — the selection of which span represents the finding is the
+  persona's, not the conductor's. The integration layer relays the marked span; it MUST NOT
+  select, trim, or excerpt a span itself (conductor excerpting is restating-lite and re-opens
+  the I6 wound). When a persona omits the mark, the layer routes back to that persona; it
+  never substitutes its own selection or wording.
+- **FR-003**: Exactly one short pull-quote per finding (the persona-marked span) is surfaced
+  in the register-level view; longer persona reasoning is referenced (to the report), not
+  inlined, preserving artifact economy (Dijkstra elegance — an artifact must not require its
+  author standing beside it).
 
 **Detail-rich presentation (User Story 2)**
 
@@ -194,15 +202,18 @@ lens, the severity and what moved it, and the converging lenses — using only t
   `[principle]`/`[principle:proposed]` tag per I8), the final severity, and the convergence
   set as **named lenses**. An identifier plus a count is not a sufficient entry.
 - **FR-005**: Convergence MUST be rendered as which lenses converged and, for each, a short
-  verbatim note — replacing the bare "convergence count" as the *human-facing* convergence
-  signal. (The numeric count MAY remain in the scoring matrix.)
+  verbatim note (each converging persona marks its own agreement note, per FR-002's discipline)
+  — replacing the bare "convergence count" as the *human-facing* convergence signal. The
+  numeric count, if shown, is derived from this set (FR-007), not maintained separately.
 - **FR-006**: Short identifiers (`Fn`, `Cn`) MUST be retained as cross-reference anchors and
   MUST resolve, within the same artifact, to a detail-rich entry. No human-facing identifier
   may be a dead-end reference.
-- **FR-007**: The consolidation matrix MAY remain terse as a scoring/arithmetic surface, but
-  the artifact MUST also carry a detail-rich, reader-facing view of each finding such that an
-  operator who has not read the Round-1 reports can understand any 🔴/🟡 finding from the
-  artifact alone.
+- **FR-007**: The **detail-rich finding entry is the single human-facing source of truth** for
+  a finding (severity, convergence set, locator, pull-quote). The consolidation matrix MUST be
+  a **projection** of those entries (severity + convergence count, sorted for scoring) — derived,
+  not a parallel hand-maintained table — so severity appears authoritatively in exactly one
+  place and the two surfaces cannot drift. An operator who has not read the Round-1 reports
+  MUST be able to understand any 🔴/🟡 finding from its entry alone.
 - **FR-008**: The top-5 ranking and each conflict (`Cn`) MUST carry enough detail to be
   understood in place and MUST trace to the corresponding finding's detail-rich entry.
 
@@ -214,18 +225,22 @@ lens, the severity and what moved it, and the converging lenses — using only t
 - **FR-010**: The change MUST be additive to the artifact format: prior committed artifacts
   remain valid baselines and parse unchanged; absence of the new fields degrades to today's
   behavior.
-- **FR-011**: A `quickstart.md` conformance check (Principle V) MUST demonstrate, on a worked
-  example, that the same round yields (a) identical severities/gating and (b) a detail-rich,
-  verbatim-attributed artifact — proving presentation changed and decisions did not.
+- **FR-011**: A `quickstart.md` conformance check (Principle V) MUST define a **drift check**
+  that any reviewer (or gate) can run **on every round**, not just a one-shot worked example:
+  extract the severity + gating column from the round's artifact and assert it is unchanged by
+  the presentation layer (a recorded baseline round re-rendered through the new format yields a
+  byte-identical severity/gating set). The quickstart carries at least one worked example
+  proving the check passes; the check is the durable surface, the example is its demonstration.
 
 ### Key Entities
 
-- **Finding entry (human-facing)**: the reader-facing representation of one finding —
-  identifier (anchor), authoring lens, verbatim characterization, evidence locator, final
-  severity, named convergence set with per-lens verbatim notes. Distinct from the scoring
-  matrix row, which may stay terse.
-- **Verbatim pull-quote**: one short span of a persona's own words, attributed, relayed
-  unedited; the unit of voice preservation.
+- **Finding entry (human-facing)**: the **single source of truth** for one finding —
+  identifier (anchor), authoring lens, persona-marked pull-quote, evidence locator, final
+  severity, named convergence set with per-lens verbatim notes. The consolidation matrix is a
+  projection of these entries, not a parallel record.
+- **Verbatim pull-quote**: one short span of a persona's own words, **marked by that persona**,
+  attributed, relayed unedited; the unit of voice preservation. The conductor relays it; it
+  neither selects nor trims it.
 
 ## Success Criteria *(mandatory)*
 
@@ -238,17 +253,19 @@ lens, the severity and what moved it, and the converging lenses — using only t
   using only the committed artifact (measured on the worked example: 100% of such findings).
 - **SC-003**: Every human-facing short identifier (`Fn`, `Cn`) resolves to a detail-rich entry
   within the same artifact — 0 dead-end references.
-- **SC-004**: Across a default run, severities and gating are **byte-identical** to the
-  pre-change procedure on the same inputs (no decision drift attributable to presentation).
+- **SC-004**: The `quickstart.md` drift check (FR-011) passes on **every** recorded baseline
+  round in the corpus — severity + gating byte-identical to the pre-change procedure on the
+  same inputs, 0 rounds with drift — not merely on a single worked example.
 
 ## Assumptions
 
 - The artifact remains a single committed Markdown document at
   `docs/reviews/YYYY-MM-DD-chorus-review.md`; this feature changes its presentation, not its
   location or its committed-baseline role.
-- Personas already produce a one-line characterization of each finding (their reports carry a
-  "required ending" / finding statement); where they do not, FR-002 governs. This feature
-  does not mandate the typed result-tail of issue #9, but composes with it if present.
+- Personas can mark a one-line pull-quote + locator per finding in their report (their reports
+  already carry a "required ending" / finding statement to mark); where they do not, FR-002's
+  route-back governs. This per-finding mark is the same provenance the typed result-tail of
+  issue #9 would carry — this feature does not mandate #9, but composes with it if present.
 - "Detail-rich" is bounded by Dijkstra economy: enough that the artifact stands alone, not so
   much that it inlines whole reports. One pull-quote per finding plus structured fields, with
   deeper reasoning linked to the reports.

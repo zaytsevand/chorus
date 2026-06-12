@@ -61,7 +61,10 @@ flowchart TD
   reference or operator confirmation, never invented.
 - **Output**: **findings**, each:
   `{id, lens, evidence (file:line | [principle] | [principle:proposed]),
-  proposed_severity (🔴/🟡/🟢), summary (≤ 20 words)}`.
+  proposed_severity (🔴/🟡/🟢), pull_quote (one short verbatim sentence in the
+  persona's own words — the line the human-facing register relays unedited;
+  spec 008-detail-rich-relay)}`. The persona marks this line itself; the
+  orchestrator relays it and never paraphrases or excerpts one for the persona.
 - **Success criterion**: **uncapped**. The finding count is whatever the corpus
   honestly warrants — there is **no per-author target or quota** (no "3–6", no
   "limit to N"). A word limit, where one exists, bounds the *prose density per
@@ -114,6 +117,10 @@ flowchart TD
   tie-breaking exists only for SDLC cap-5 *seating*, never in the tally.)
 - **Must not**: re-weight by lens, author, or orchestrator preference; add a
   judgment clause to the gating decision.
+- **Rendered, never re-authored**: this post-tally severity is the value the
+  human-facing findings register and its derived matrix display (spec
+  `008-detail-rich-relay`, FR-007). Severity lives authoritatively here, in the
+  tally; the register renders it, the matrix projects it — neither re-computes it.
 
 Symmetry is deliberate. It encodes the long-standing chorus rule that **two
 lenses converging on a concern earn 🔴** (README): convergent PRIORITIZE escalates

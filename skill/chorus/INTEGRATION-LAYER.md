@@ -98,6 +98,8 @@ it must not make.**
 | "This 🟡 is cheap to fold in" | a scope decision during incorporation | the spec runner via clarify; the operator's recorded default |
 | "The panel clearly means…" | speaking for a lens; inference is not a report | re-read the report; if silent, ask the persona |
 | "I'll summarize the vote as…" | synthesizing a vote (S9) | the tally arithmetic, verbatim |
+| "I'll summarize this finding as…" | restating a lens in the conductor's voice (I6) | the persona's **marked pull-quote**, relayed verbatim |
+| "I'll pick the best line from the report" | conductor excerpting — selecting a span is restating-lite | the persona marks its own pull-quote; route back if unmarked |
 | "Given the findings, the verdict is…" | judgment added to gating | post-tally 🔴 set, arithmetic only |
 | "The operator probably wants…" | deciding above N+1 | ask; a 🟡 default is *recorded*, never silently assumed |
 | "This question can wait" (interview triage) | demoting another lens's gate | gates lead session 1; deferral is the operator's, recorded with its degradation |
@@ -209,8 +211,13 @@ boundaries is the signature failure mode.
 - The project addendum at `docs/reviews/CHORUS-PROJECT.md` (or the inline
   interview that substitutes for it)
 - The roster and each member's RSVP reply
-- The Phase 1 reports (text or memory-dir contents)
-- The consolidation matrix it builds in Phase 2
+- The Phase 1 reports (text or memory-dir contents), each carrying the persona's
+  **marked pull-quote** per finding (the verbatim span the artifact relays —
+  `SKILL.md` Phase 1 brief item 10; spec `008-detail-rich-relay`)
+- The detail-rich **findings register** it assembles in Phase 2 — the single
+  human-facing source of truth — and the **consolidation matrix**, which it
+  derives as a *projection* of that register (severity + convergence are carried
+  from the register, never re-authored, so the two surfaces cannot drift)
 - The Phase 2 reactions
 - The conflicts it frames in Phase 3 and `advisor()`'s response
 - The artifact under construction at `docs/reviews/YYYY-MM-DD-chorus-review.md`
