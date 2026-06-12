@@ -1,8 +1,13 @@
 <!--
 SYNC IMPACT REPORT
-Version change: (none) → 1.0.0
-Bump type: INITIAL RATIFICATION — backfills the constitution from machinery that
-           has governed the repo since feature 003 but was never written down.
+Version change: 1.0.0 → 1.1.0
+Bump type: MINOR — Principle III's counter-force clause materially changes state:
+           the convergence-vs-escalation ambiguity (issue #13) is RESOLVED by a canon
+           fix (the CONFIRM vote value; spec 009-confirm-vote-tally). The caveat is
+           dropped and the TODO(TALLY_WART) is closed. No principle added or removed.
+
+Prior (1.0.0) bump: INITIAL RATIFICATION — backfilled the constitution from machinery
+           that has governed the repo since feature 003 but was never written down.
            No principle is newly invented here; each is lifted from an existing
            canon invariant (I1–I9 in INTEGRATION-LAYER.md, S1–S10 across
            GATE-PRIMITIVE.md / SDLC-LAYER.md, the band table in
@@ -30,10 +35,11 @@ Templates updated:
   - README.md ✅ already describes the machinery these principles formalize.
 
 Follow-up TODOs:
-  - TODO(TALLY_WART): Principle III's counter-force names the convergence-vs-escalation
-    ambiguity (issue #6 successor, observed at gates A2/B/C). A canon fix (a CONFIRM
-    vote value, or escalation gated on an explicit "under-rated" claim) is owed before
-    III can drop the caveat. Tracked as issue #13.
+  - DONE(TALLY_WART) @ 1.1.0: the convergence-vs-escalation ambiguity (issue #13, #6
+    successor, observed at gates A2/B/C) is fixed by the CONFIRM vote value
+    (spec 009-confirm-vote-tally). PRIORITIZE = under-rated → escalate; CONFIRM = agree
+    at severity → hold but count as convergence for ranking. Principle III's counter-force
+    caveat is dropped below.
 -->
 
 # Chorus Constitution
@@ -112,11 +118,13 @@ votes.
 **Value.** Convergent independent judgment is trustworthy precisely because no single
 voice — including the orchestrator's — can manufacture it.
 
-**Counter-force / known defect.** The symmetric tally cannot yet distinguish "I agree,
-rank the fix high" from "this is under-rated, escalate," so convergent agreement can
-inflate a polish 🟡 into a gating 🔴. This is recorded, not hidden (gates A2/B/C); a canon
-fix is owed (see the Sync Impact Report TODO). Until then the arithmetic stands **and**
-the inflation is flagged.
+**Counter-force.** Convergence must not become severity by popularity. The tally
+distinguishes "I agree, rank the fix high" (`CONFIRM` — counts as convergence for ranking,
+holds severity) from "this is under-rated, escalate" (`PRIORITIZE` — the only value that
+moves a finding up); `net = PRIORITIZE − OVER-RATE`, CONFIRM excluded. This resolves the
+former inflation defect (issue #13, observed at gates A2/B/C) — a fix delivered by
+spec 009-confirm-vote-tally, v1.1.0. Escalation now requires an explicit under-rated claim,
+not agreement.
 
 **Watch for.** A severity set by narration instead of a vote count; an author voting on
 their own finding; "given the findings, the verdict is…". *(canon: S8/S9, GATE-PRIMITIVE.md)*
@@ -342,4 +350,4 @@ Amendments MUST:
 6. **Procedure over artifact (Principle X).** An amendment is ratified by the operator
    (N+1), recorded in git history, and never back-dated to look cleaner than it was.
 
-**Version**: 1.0.0 | **Ratified**: 2026-06-12 | **Last Amended**: 2026-06-12
+**Version**: 1.1.0 | **Ratified**: 2026-06-12 | **Last Amended**: 2026-06-12

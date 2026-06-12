@@ -488,8 +488,12 @@ no original report to react with). Each gets:
    introduced in Round 2 carry `[principle:proposed]`. The same
    evidence-check gate that ran post-Round-1 runs post-Round-2: unsupported
    project-specific assertions are demoted, not registered as findings.
-5. **End with:** "which finding does YOUR-LENS want PRIORITIZED, and which
-   does YOUR-LENS think is over-rated?"
+5. **End with the three-way call** (one per finding you have a view on): "is this
+   finding **under-rated** (PRIORITIZE — should escalate), **correctly rated**
+   (CONFIRM — you agree at the proposed severity), or **over-rated** (OVER-RATE —
+   should demote)?" CONFIRM is agreement, not escalation: use it when you'd rank the
+   fix highly but the author's severity is right. Only PRIORITIZE moves a finding up
+   (`GATE-PRIMITIVE.md` stage 3; spec `009-confirm-vote-tally`).
 6. **Convergence note (per agreement)** — "For any finding you converge with,
    mark **one short sentence in your own words** as your agreement note (same
    `PULL-QUOTE:`-style mark as Round 1). This is relayed verbatim under the
@@ -497,13 +501,16 @@ no original report to react with). Each gets:
 
 Word limit: 500–600.
 
-Phase 2 is **stage 3 (Vote)** of the gate primitive: PRIORITIZE / OVER-RATE are
-the votes. After the reactions arrive, finalize each finding's severity with the
-primitive's **deterministic stage-4 tally** (`GATE-PRIMITIVE.md`): among
-non-author voters, `net = P − O`; `net ≥ +2` escalates one level, `net ≤ −2`
-demotes one level, otherwise hold. The long-standing "two converging lenses earn
-🔴" rule *is* this tally (a convergent PRIORITIZE escalation). Severity is
-arithmetic over real votes — never the orchestrator's judgment (S9).
+Phase 2 is **stage 3 (Vote)** of the gate primitive: PRIORITIZE / CONFIRM /
+OVER-RATE are the votes. After the reactions arrive, finalize each finding's severity
+with the primitive's **deterministic stage-4 tally** (`GATE-PRIMITIVE.md`): among
+non-author voters, `net = P − O` (**CONFIRM excluded from net**); `net ≥ +2` escalates
+one level, `net ≤ −2` demotes one level, otherwise hold. The convergence count used for
+ranking is `P + C` (all agreement) — so a finding many lenses CONFIRM still ranks highly
+while honestly holding its severity. The old "two converging lenses earn 🔴" rule is
+amended: two **under-rated** (PRIORITIZE) claims escalate; mere agreement (CONFIRM) holds
+(spec `009-confirm-vote-tally`, closing issue #13). Severity is arithmetic over real
+votes — never the orchestrator's judgment (S9).
 
 After Round 2 reactions arrive, append a `### Round 2 brief` subsection to the
 artifact (2–4 sentences): which findings were sharpened, which were pushed back

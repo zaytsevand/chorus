@@ -52,9 +52,10 @@ contract exists to prevent.
 - **Actor**: the **real** seated personas, in character — **never** the author
   of the finding, **never** a synthetic grader (S8, S9).
 - **Input**: the findings register.
-- **Output**: per non-author persona, one **vote** per finding it has an opinion
-  on: `PRIORITIZE` (≥ proposed severity) or `OVER-RATE` (< proposed severity),
-  with optional rationale; abstention allowed.
+- **Output**: per non-author persona, one **declared vote** per finding it has an
+  opinion on: `PRIORITIZE` (under-rated → escalate), `CONFIRM` (correctly rated →
+  agree/hold), or `OVER-RATE` (over-rated → demote), with optional rationale;
+  abstention allowed (spec `009-confirm-vote-tally`).
 - **Success criterion**: adversarial and real — each vote traces to a dispatched
   persona; no finding is voted on by its author.
 - **Must not**: be predicted, inferred, or summarized by the orchestrator.
@@ -64,8 +65,9 @@ contract exists to prevent.
 - **Actor**: the orchestrator, deterministic.
 - **Input**: the votes.
 - **Output**: each finding's **post-tally severity** and **gating flag**, by the
-  fixed **symmetric** rule. Let `P` = PRIORITIZE count, `O` = OVER-RATE count
-  among **non-author** voters, and `net = P − O`:
+  fixed **symmetric** rule. Let `P` = PRIORITIZE, `C` = CONFIRM, `O` = OVER-RATE
+  count among **non-author** voters, and `net = P − O` (**CONFIRM excluded**;
+  convergence-for-ranking = `P + C`):
   - `net ≥ +2` → escalate one level (🟢→🟡→🔴, capped at 🔴).
   - `net ≤ −2` → demote one level (🔴→🟡→🟢, 🟢→drop).
   - `|net| < 2` → hold author-proposed severity. (`net = 0` from all-abstain is
