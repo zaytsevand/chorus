@@ -1,0 +1,31 @@
+{
+  "frs": [
+    {"id": "FR-001", "oracle": "invalidated", "source": "interview-2026-06", "domain": "onboarding"},
+    {"id": "FR-002", "oracle": "invalidated", "source": "interview-2026-06", "domain": "exports"},
+    {"id": "FR-003", "oracle": "invalidated", "source": "interview-2026-06", "domain": "exports"},
+    {"id": "FR-004", "oracle": "validated", "source": "interview-2026-06", "domain": "core"},
+    {"id": "FR-005", "oracle": "validated", "source": "interview-2026-06", "domain": "core"},
+    {"id": "FR-006", "oracle": "validated", "source": "interview-2026-06", "domain": "auth"},
+    {"id": "FR-007", "oracle": "unknown", "domain": "reporting"},
+    {"id": "FR-008", "oracle": "unknown", "domain": "reporting"}
+  ],
+  "variants": {
+    "baseline": {
+      "FR-001": "cut", "FR-002": "keep", "FR-003": "keep",
+      "FR-004": "keep", "FR-005": "keep", "FR-006": "keep",
+      "FR-007": "keep", "FR-008": "keep"
+    },
+    "reinforced": {
+      "FR-001": "cut", "FR-002": "cut", "FR-003": "cut",
+      "FR-004": "keep", "FR-005": "keep", "FR-006": "keep",
+      "FR-007": "cut", "FR-008": "keep"
+    },
+    "over_corrected": {
+      "FR-001": "cut", "FR-002": "cut", "FR-003": "cut",
+      "FR-004": "cut", "FR-005": "keep", "FR-006": "keep",
+      "FR-007": "cut", "FR-008": "cut"
+    }
+  },
+  "baseline_variant": "baseline",
+  "beta": 0.5
+}
