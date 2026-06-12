@@ -18,7 +18,7 @@ cp templates/CHORUS-PROJECT.template.md  →  $SKILL_DST/templates/
 ```
 
 Without this, an installed skill cannot reach the template from a user project
-(research.md R6 — install.sh:36 ships only `skill/chorus-review/*.md` today). The
+(research.md R6 — install.sh:36 ships only `skill/chorus/*.md` today). The
 installer's "Next:" prose leads with `chorus learn` and cites the installed template
 location as the manual fallback (FR-013). **Check C5 asserts the installed side**:
 after `./install.sh` into a temp `CLAUDE_HOME`, the template exists at

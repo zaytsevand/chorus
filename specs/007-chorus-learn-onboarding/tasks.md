@@ -16,7 +16,7 @@ responsible for. The checks already exist; implementation makes them pass (zero 
 tokens).
 
 **Organization**: Tasks are grouped by user story. The implementation artifact is Markdown
-+ Bash (no runtime code). Note that `skill/chorus-review/LEARN.md` is a **shared file**
++ Bash (no runtime code). Note that `skill/chorus/LEARN.md` is a **shared file**
 written across US1/US2/US3/US4 — tasks that touch it are **not** parallel-safe with each
 other; only distinct-file tasks carry `[P]`.
 
@@ -29,7 +29,7 @@ other; only distinct-file tasks carry `[P]`.
 ## Path Conventions
 
 Single-repo skill layout (unchanged from features 003–006). Edit surfaces:
-`skill/chorus-review/LEARN.md` (new), `skill/chorus-review/SKILL.md`, `README.md`,
+`skill/chorus/LEARN.md` (new), `skill/chorus/SKILL.md`, `README.md`,
 `install.sh`, `plugin.json`, `templates/CHORUS-PROJECT.template.md`. Normative contracts
 live under `specs/007-chorus-learn-onboarding/contracts/`.
 
@@ -39,7 +39,7 @@ live under `specs/007-chorus-learn-onboarding/contracts/`.
 
 **Purpose**: Establish the dependency baseline and a red test surface before authoring.
 
-- [X] T001 Verify feature 006 / PR #5 status (`skill/chorus-review/DECISION-PRIMITIVE.md` arrives on that branch — research.md R8) and record the PR #5 **merge horizon** as the open operator item in `specs/007-chorus-learn-onboarding/plan.md` (run-2 GOLD-1); 007 lands after 006.
+- [X] T001 Verify feature 006 / PR #5 status (`skill/chorus/DECISION-PRIMITIVE.md` arrives on that branch — research.md R8) and record the PR #5 **merge horizon** as the open operator item in `specs/007-chorus-learn-onboarding/plan.md` (run-2 GOLD-1); 007 lands after 006.
 - [X] T002 Run the conformance suite C1–C7+C5b from `specs/007-chorus-learn-onboarding/quickstart.md` against the current tree to capture the **pre-implementation baseline** (expect `FAIL:` tokens — `LEARN.md` absent); confirm each stanza emits `FAIL:` rather than silent output (SC-008 suite-wide rule).
 
 ---
@@ -50,8 +50,8 @@ live under `specs/007-chorus-learn-onboarding/contracts/`.
 
 **⚠️ CRITICAL**: No user-story work begins until this phase is complete.
 
-- [X] T003 Create `skill/chorus-review/LEARN.md` with the **five step headings** (`### S1 orient` / `set up` / `run a round` / `agent-SDLC` / `work with results`) matching C2's regex, each followed by a placeholder `Cites:` line and a navigation-question block — the shared spine all stories fill (data-model.md §Step map; FR-002).
-- [X] T004 Register the mode in `skill/chorus-review/SKILL.md`: add the third entry to the mode list, add the `chorus learn` trigger to the **YAML frontmatter description** (the harness routing surface), and reframe the "Two modes" heading region to **three modes**, removing every phrase in C1's stated stale-phrasing family (FR-001/FR-013).
+- [X] T003 Create `skill/chorus/LEARN.md` with the **five step headings** (`### S1 orient` / `set up` / `run a round` / `agent-SDLC` / `work with results`) matching C2's regex, each followed by a placeholder `Cites:` line and a navigation-question block — the shared spine all stories fill (data-model.md §Step map; FR-002).
+- [X] T004 Register the mode in `skill/chorus/SKILL.md`: add the third entry to the mode list, add the `chorus learn` trigger to the **YAML frontmatter description** (the harness routing surface), and reframe the "Two modes" heading region to **three modes**, removing every phrase in C1's stated stale-phrasing family (FR-001/FR-013).
 
 **Checkpoint**: The mode routes and `LEARN.md` has its five-step skeleton — stories can now proceed.
 
@@ -63,9 +63,9 @@ live under `specs/007-chorus-learn-onboarding/contracts/`.
 
 **Independent Test**: A user who has read no skill doc invokes `chorus learn`, proceeds through the steps, and ends able to (a) locate/install the skill, (b) author/scaffold the addendum, (c) spawn a first round and read its artifact.
 
-- [X] T005 [US1] Author **S1 orient** in `skill/chorus-review/LEARN.md`: the what-is-the-chorus + three-modes summary, plus the read-only **dual-channel** detection probes (template reachable via base path, persona agents, addendum present + marker state, in-repo) — read-only, routes accordingly (FR-006).
-- [X] T006 [US1] Author the concise newcomer-altitude explanations for **S2/S3/S4/S5** in `skill/chorus-review/LEARN.md`, each ≤ one AskUserQuestion interaction's worth (FR-003), including the **S3 step/stage disambiguation** line (FR-012).
-- [X] T007 [US1] Author the **FR-011 wrap-up** in `skill/chorus-review/LEARN.md` for every completed/exited path (concrete next command + step reached + resume scope + canon pointers); make the **S1 exit wrap-up the expert cheat-sheet** (addendum checklist + command list + "any step is one jump away").
+- [X] T005 [US1] Author **S1 orient** in `skill/chorus/LEARN.md`: the what-is-the-chorus + three-modes summary, plus the read-only **dual-channel** detection probes (template reachable via base path, persona agents, addendum present + marker state, in-repo) — read-only, routes accordingly (FR-006).
+- [X] T006 [US1] Author the concise newcomer-altitude explanations for **S2/S3/S4/S5** in `skill/chorus/LEARN.md`, each ≤ one AskUserQuestion interaction's worth (FR-003), including the **S3 step/stage disambiguation** line (FR-012).
+- [X] T007 [US1] Author the **FR-011 wrap-up** in `skill/chorus/LEARN.md` for every completed/exited path (concrete next command + step reached + resume scope + canon pointers); make the **S1 exit wrap-up the expert cheat-sheet** (addendum checklist + command list + "any step is one jump away").
 - [X] T008 [P] [US1] Edit `README.md`: name all three modes and lead the quick-start with `chorus learn`, keeping the manual template copy as the cited fallback citing the **installed template path as deployed** (no environment-specific literals) (FR-013).
 - [X] T009 [P] [US1] Edit `install.sh` "Next:" prose to lead with `chorus learn` (manual fallback cites the installed template location) (FR-013).
 - [X] T010 [US1] Run **C1 + C2** from `quickstart.md`; confirm registration/staleness and the five steps present & reachable pass with zero `FAIL:` (US1 independent-test surface).
@@ -80,10 +80,10 @@ live under `specs/007-chorus-learn-onboarding/contracts/`.
 
 **Independent Test**: A user with the skill installed performs **one navigation action** at S1 (Jump → "run a round", ≤2 interactions) and lands in S3 with setup not replayed; re-invoking after exit in the same conversation offers resume-or-restart.
 
-- [X] T011 [US2] Author the per-step **NavigationChoice** in `skill/chorus-review/LEARN.md` per `contracts/navigation.md`: all four affordances (advance / jump / deeper / exit) at **every** step incl. S1; S1 exit label **signifies the cheat-sheet** before selection; S5 advance = **Finish** (declared-convergent with exit on the wrap-up); S5 jump lists S1–S4 with **no "back"** and discloses free-text stays at S5 (FR-004).
-- [X] T012 [US2] Author the **per-step depth state + deeper rule** in `skill/chorus-review/LEARN.md`: after one deeper pass on a step, that step's slot 2 re-presents as "recap this step"; depth is per-step (a step with no deeper pass never shows recap) (FR-004; data-model.md §NavigationChoice).
-- [X] T013 [US2] Author **ResumeState** behavior in `skill/chorus-review/LEARN.md`: track `last_step` at **every** transition (incl. silent abandonment), offer resume-or-restart on same-conversation re-invocation, disclose conversation-scope in the wrap-up; the resume question is **outside** the SC-003 navigation-action unit (FR-010, SC-003/SC-007).
-- [X] T014 [US2] Reconcile `skill/chorus-review/LEARN.md` against `contracts/navigation.md` (labels, ordering, per-step depth) — the normative pins; nav conformance is **dogfood-only** by recorded decision (verified at the Gate C walkthrough, no mechanical check).
+- [X] T011 [US2] Author the per-step **NavigationChoice** in `skill/chorus/LEARN.md` per `contracts/navigation.md`: all four affordances (advance / jump / deeper / exit) at **every** step incl. S1; S1 exit label **signifies the cheat-sheet** before selection; S5 advance = **Finish** (declared-convergent with exit on the wrap-up); S5 jump lists S1–S4 with **no "back"** and discloses free-text stays at S5 (FR-004).
+- [X] T012 [US2] Author the **per-step depth state + deeper rule** in `skill/chorus/LEARN.md`: after one deeper pass on a step, that step's slot 2 re-presents as "recap this step"; depth is per-step (a step with no deeper pass never shows recap) (FR-004; data-model.md §NavigationChoice).
+- [X] T013 [US2] Author **ResumeState** behavior in `skill/chorus/LEARN.md`: track `last_step` at **every** transition (incl. silent abandonment), offer resume-or-restart on same-conversation re-invocation, disclose conversation-scope in the wrap-up; the resume question is **outside** the SC-003 navigation-action unit (FR-010, SC-003/SC-007).
+- [X] T014 [US2] Reconcile `skill/chorus/LEARN.md` against `contracts/navigation.md` (labels, ordering, per-step depth) — the normative pins; nav conformance is **dogfood-only** by recorded decision (verified at the Gate C walkthrough, no mechanical check).
 
 **Checkpoint**: One-navigation-action reach to any step works; resume/restart works in-conversation.
 
@@ -96,11 +96,11 @@ live under `specs/007-chorus-learn-onboarding/contracts/`.
 **Independent Test**: At S2 the user accepts on the dedicated confirm → a `CHORUS-PROJECT.md` is created with SCAFFOLDED marker + sections 2/3/5 flagged; declining or running outside a repo writes nothing (with a stated unavailability notice outside a repo).
 
 - [X] T015 [P] [US3] Make `templates/CHORUS-PROJECT.template.md`'s copy-instructions preamble **copy-safe** (comment-wrapped) so the scaffolded file reads correctly post-copy (FR-007, family G).
-- [X] T016 [US3] Author the **S2 scaffold offer** in `skill/chorus-review/LEARN.md` per `contracts/scaffold.md`: dedicated confirm **before** the navigation question; the pinned `#### On accept` branch performs **exactly one write**; SCAFFOLDED marker as first line after the title; sections 2/3/5 `<!-- TO FILL -->`; the three guards (opt-in / no-overwrite / outside-repo notice); source resolution order (repo → `<skill-base>/templates/` → plugin root) (FR-005/FR-007).
-- [X] T017 [US3] Author the **S1 install sub-step** in `skill/chorus-review/LEARN.md` as **instruct-only** (effects: none — never executes, never writes) with remedy text **branched by detected channel** (file-path: clone + `./install.sh`; plugin: reinstall/update the plugin) (FR-006).
+- [X] T016 [US3] Author the **S2 scaffold offer** in `skill/chorus/LEARN.md` per `contracts/scaffold.md`: dedicated confirm **before** the navigation question; the pinned `#### On accept` branch performs **exactly one write**; SCAFFOLDED marker as first line after the title; sections 2/3/5 `<!-- TO FILL -->`; the three guards (opt-in / no-overwrite / outside-repo notice); source resolution order (repo → `<skill-base>/templates/` → plugin root) (FR-005/FR-007).
+- [X] T017 [US3] Author the **S1 install sub-step** in `skill/chorus/LEARN.md` as **instruct-only** (effects: none — never executes, never writes) with remedy text **branched by detected channel** (file-path: clone + `./install.sh`; plugin: reinstall/update the plugin) (FR-006).
 - [X] T018 [US3] Extend `install.sh` to deploy `templates/` → `$SKILL_DST/templates/` (file-path channel delivery; asserted installed-side by C5) (FR-015/R6). **Not `[P]`**: edits `install.sh`, the same file as T009 — sequence them (run-2 Gate B RICH-1).
 - [X] T019 [P] [US3] Edit `plugin.json` (FR-015): package `templates/` and **every file in `agents/`** (the directory is the authoritative roster — **no filename enumeration**); refresh the stale advisor-count description.
-- [X] T020 [US3] Add the **Phase-0 note** to `skill/chorus-review/SKILL.md` defining scaffolded-addendum consumer behavior for **both** consumers — the Phase-0 orchestrator and the per-advisor exploratory cache (marker-bearing = structure, never operator-confirmed facts) (FR-014).
+- [X] T020 [US3] Add the **Phase-0 note** to `skill/chorus/SKILL.md` defining scaffolded-addendum consumer behavior for **both** consumers — the Phase-0 orchestrator and the per-advisor exploratory cache (marker-bearing = structure, never operator-confirmed facts) (FR-014).
 - [X] T021 [US3] Run **C5, C5b, C6, C7** from `quickstart.md`; confirm template delivery on both channels, the write-idiom scan fires on its fixtures **and** finds no write outside the `#### On accept` branch, and the four-path scaffold matrix (accept/decline/existing-target/outside-repo) records its expected outcomes — zero `FAIL:`.
 
 **Checkpoint**: Scaffold accept/decline/existing/outside-repo all behave; both channels deliver the template.
@@ -113,8 +113,8 @@ live under `specs/007-chorus-learn-onboarding/contracts/`.
 
 **Independent Test**: S3/S4 summarize the flows and link `GATE-PRIMITIVE.md` / `SDLC-LAYER.md` / `DECISION-PRIMITIVE.md`; the structured `Cites:` lists resolve; an inspection finds no restated canonical definition.
 
-- [X] T022 [US4] Author the structured per-step **`Cites:` lists** in `skill/chorus-review/LEARN.md`: **≥1 per step**, channel-resolvable (annotate `install.sh` as file-path/checkout-channel-only), onboarding-altitude summaries (not definitions), plus the **runtime-failure clause** (doc missing at runtime → state plainly, continue at summary altitude, point to the source resolved via the **running skill's base path**; never reconstruct from memory) (FR-008, SC-005; data-model.md §CanonicalPointer).
-- [X] T023 [US4] Ensure **S3 (round)** and **S4 (agent-SDLC)** in `skill/chorus-review/LEARN.md` summarize the four-stage flow / the gate pipeline + block-on-🔴 at newcomer altitude and link the canon — with **no** restated tally rule, band table, decision catalog, or quorum table (FR-009/FR-008).
+- [X] T022 [US4] Author the structured per-step **`Cites:` lists** in `skill/chorus/LEARN.md`: **≥1 per step**, channel-resolvable (annotate `install.sh` as file-path/checkout-channel-only), onboarding-altitude summaries (not definitions), plus the **runtime-failure clause** (doc missing at runtime → state plainly, continue at summary altitude, point to the source resolved via the **running skill's base path**; never reconstruct from memory) (FR-008, SC-005; data-model.md §CanonicalPointer).
+- [X] T023 [US4] Ensure **S3 (round)** and **S4 (agent-SDLC)** in `skill/chorus/LEARN.md` summarize the four-stage flow / the gate pipeline + block-on-🔴 at newcomer altitude and link the canon — with **no** restated tally rule, band table, decision catalog, or quorum table (FR-009/FR-008).
 - [X] T024 [US4] Run **C3 + C4** from `quickstart.md`; confirm per-step cite cardinality + resolution (incl. channel-resolvable entries) and no-restatement (pinned delimiters) pass with zero `FAIL:`.
 
 **Checkpoint**: Both modes taught; every mechanic resolves through a cite; nothing restated.

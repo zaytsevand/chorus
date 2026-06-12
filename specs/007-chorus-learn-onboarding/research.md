@@ -8,7 +8,7 @@ clusters (G1–G27). Ledger: `agent-sdlc-log.md`.
 
 ## R1 — Where the mode lives: `LEARN.md` companion, not inline *(unchanged)*
 
-- **Decision**: Author the tutorial as `skill/chorus-review/LEARN.md` — the single
+- **Decision**: Author the tutorial as `skill/chorus/LEARN.md` — the single
   canonical definition of the learn mode. `SKILL.md` registers it (see R9 for the full
   registration surface).
 - **Rationale**: `SKILL.md` is read in full every round; a ~12 KB tutorial inlined there
@@ -26,11 +26,11 @@ clusters (G1–G27). Ledger: `agent-sdlc-log.md`.
   one-line disambiguation (FR-012).
   | Step | Teaches | Cites |
   |---|---|---|
-  | S1 orient | what the chorus is; the three modes; what's reachable | `skill/chorus-review/SKILL.md` |
-  | S2 set up | install; the addendum (sections 2/3/5); the roster | `templates/CHORUS-PROJECT.template.md`, `skill/chorus-review/SKILL.md` (addendum + roster sections), `install.sh` |
-  | S3 run a round | "spawn the chorus": RSVP → the four review stages → artifact | `skill/chorus-review/GATE-PRIMITIVE.md`, `skill/chorus-review/SKILL.md` (procedure) |
-  | S4 agent-SDLC | gating a speckit feature; block-on-🔴; self-heal | `skill/chorus-review/SDLC-LAYER.md`, `skill/chorus-review/DECISION-PRIMITIVE.md` |
-  | S5 work with results | the artifact, baselines, 🟡 override surfaces, next round | `skill/chorus-review/SKILL.md` (artifact), `skill/chorus-review/DECISION-PRIMITIVE.md` (review surfaces) |
+  | S1 orient | what the chorus is; the three modes; what's reachable | `skill/chorus/SKILL.md` |
+  | S2 set up | install; the addendum (sections 2/3/5); the roster | `templates/CHORUS-PROJECT.template.md`, `skill/chorus/SKILL.md` (addendum + roster sections), `install.sh` |
+  | S3 run a round | "spawn the chorus": RSVP → the four review stages → artifact | `skill/chorus/GATE-PRIMITIVE.md`, `skill/chorus/SKILL.md` (procedure) |
+  | S4 agent-SDLC | gating a speckit feature; block-on-🔴; self-heal | `skill/chorus/SDLC-LAYER.md`, `skill/chorus/DECISION-PRIMITIVE.md` |
+  | S5 work with results | the artifact, baselines, 🟡 override surfaces, next round | `skill/chorus/SKILL.md` (artifact), `skill/chorus/DECISION-PRIMITIVE.md` (review surfaces) |
 - **Rationale**: SC-002 caps the count; declared sub-steps keep conditional paths from
   multiplying steps while making their effects auditable (gate finding F5: an
   undeclared sub-step is an undeclared write surface).
@@ -78,7 +78,7 @@ clusters (G1–G27). Ledger: `agent-sdlc-log.md`.
 - **Decision**: S1 probes are read-only and **artefact-grounded**: the mode running is
   itself evidence the skill is reachable, so probes verify what routing actually needs —
   **(1) template availability** at either documented channel (file-path
-  `$CLAUDE_HOME/skills/chorus-review/templates/` or the plugin's skill directory,
+  `$CLAUDE_HOME/skills/chorus/templates/` or the plugin's skill directory,
   resolved from the running skill's own base path), **(2) persona agents present**,
   **(3) project addendum** (`docs/reviews/CHORUS-PROJECT.md`, including its SCAFFOLDED
   marker state — R9), **(4) repo context** (`git rev-parse --is-inside-work-tree`).
@@ -106,12 +106,12 @@ clusters (G1–G27). Ledger: `agent-sdlc-log.md`.
   authoritative (source of truth); **(2)** otherwise `<skill-base>/templates/` —
   the running skill's own copy, whichever channel installed it; **(3)** the
   **plugin root's `templates/`** as fallback (the plugin layout roots the skill at
-  `skill/chorus-review/` with `templates/` a sibling at the plugin root — G6/G12;
+  `skill/chorus/` with `templates/` a sibling at the plugin root — G6/G12;
   delivery is R11). The scaffold copies the template with sections 2/3/5 flagged
   `<!-- TO FILL -->`, prepends the **SCAFFOLDED marker** (R9), and the template's
   copy-instructions preamble is **comment-wrapped in the template itself** so the
   scaffolded file reads correctly post-copy (F7).
-- **Rationale**: install.sh:36 ships only `skill/chorus-review/*.md` today — FR-007 is
+- **Rationale**: install.sh:36 ships only `skill/chorus/*.md` today — FR-007 is
   unimplementable outside this repo without the edit (verified by 3 lenses, F49
   "verifies true"). Repo-first ordering inside this repo fixes the ownership inversion
   (F47). Cycle 2 (G6/G12) showed `<skill-base>/templates/` alone does not exist on the

@@ -10,7 +10,7 @@ Audit trail for the gated lifecycle of `specs/007-chorus-learn-onboarding`. Sche
 
 **Corpus**: `specs/007-chorus-learn-onboarding/{spec,plan,research,data-model,quickstart}.md`
 + `contracts/{learn-mode,navigation,scaffold}.md`, with the touched surfaces
-(`skill/chorus-review/SKILL.md`, `install.sh`, `plugin.json`,
+(`skill/chorus/SKILL.md`, `install.sh`, `plugin.json`,
 `templates/CHORUS-PROJECT.template.md`, `README.md`, `agents/`). No project addendum
 exists (`docs/reviews/CHORUS-PROJECT.md` absent — recorded honestly; project-wide
 facts come from the spec or the operator interview).
@@ -325,7 +325,7 @@ passing against the authored `LEARN.md`/`plugin.json`.
 (feature 006)** — `DECISION-PRIMITIVE.md` is now present, so RICH-2/GOLD-1 are resolved
 (`plan.md` updated). All 28 tasks executed (`tasks.md` marked `[X]`).
 
-**Authored:** `skill/chorus-review/LEARN.md` (new — the canonical mode definition: 5
+**Authored:** `skill/chorus/LEARN.md` (new — the canonical mode definition: 5
 steps, navigation per `contracts/navigation.md`, the S1 instruct-only install sub-step,
 the S2 opt-in scaffold under the pinned `#### On accept` heading, per-step channel-
 resolvable `Cites:`, the FR-011 wrap-up / S1 cheat-sheet). **Edited:** `SKILL.md`
@@ -361,7 +361,7 @@ the now-green suite as the dogfood.
 
 ## Gate C — implementation review (cycle 1) — 2026-06-12
 
-**Corpus**: the authored implementation (commit `2cc010f`) — `skill/chorus-review/LEARN.md`
+**Corpus**: the authored implementation (commit `2cc010f`) — `skill/chorus/LEARN.md`
 + the SKILL.md/README/install.sh/plugin.json/template edits. **Fixed viewpoint**: the
 headless `spec-walkthrough` (`walkthrough-headless.md`) returned **CLEAN** — zero
 transformation DRIFT, every US traces; ingested as extract records. The SC-008 suite
