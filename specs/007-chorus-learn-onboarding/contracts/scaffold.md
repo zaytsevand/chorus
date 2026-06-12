@@ -41,6 +41,11 @@ vs the `agents/` directory).
 | Content | the template with: **(1)** the SCAFFOLDED marker as the first line after the title — `<!-- SCAFFOLDED by chorus learn YYYY-MM-DD — sections 2/3/5 unfilled; a chorus round treats this file as structure, not facts, until the marker is removed -->`; **(2)** sections 2/3/5 flagged `<!-- TO FILL -->`; **(3)** the template's copy-instructions preamble already comment-wrapped in the template itself, so the scaffolded file reads correctly post-copy (family G / F7) |
 | Wrap-up | states what was created, the sections to fill, and that removing the marker is the "this is now real" signal (FR-014) |
 
+The accept branch lives under a **pinned heading — `#### On accept`** — inside S2's
+section of `LEARN.md`: check C6's mechanical locality assertion extracts the section
+by this heading (run-2 BECK-4), so the heading is part of this contract, not a style
+choice.
+
 ## Consumer behavior (the Phase-0 note — FR-014)
 
 The registration edit adds to `SKILL.md`: an addendum bearing the SCAFFOLDED marker is

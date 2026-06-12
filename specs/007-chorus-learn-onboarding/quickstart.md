@@ -1,6 +1,10 @@
 # Quickstart: `chorus learn` — Interactive Staged Onboarding
 
-**Feature**: 007-chorus-learn-onboarding | **Date**: 2026-06-10 (cycle-3 regen)
+**Feature**: 007-chorus-learn-onboarding | **Date**: 2026-06-12 (run-2 cycle-1 regen)
+
+**Suite-wide rule (SC-008, run-2 cluster C):** every stanza emits an **explicit
+`FAIL:` token** on failure — no silent-output polarity anywhere; an operator greps
+the suite output for `FAIL:` and an empty result is a pass.
 
 Two parts: a worked walkthrough (what the feature feels like when done —
 **illustrative**; the normative labels/ordering live in `contracts/navigation.md`,
@@ -31,7 +35,7 @@ user: Continue
 S2 set up   "Each project gives the chorus a one-page addendum
             (CHORUS-PROJECT.md): scope exclusions, anchor surface, security
             checklist…"
-            Cites: templates/CHORUS-PROJECT.template.md, skill/chorus-review/SKILL.md, install.sh
+            Cites: templates/CHORUS-PROJECT.template.md, skill/chorus-review/SKILL.md, install.sh (file-path channel)
             → dedicated confirm: "Scaffold docs/reviews/CHORUS-PROJECT.md from
               the template now? (creates one file; sections 2/3/5 left for you)"
 
@@ -89,14 +93,24 @@ Gate C dogfood and the pre-merge pass; results land in the gate ledger (G9).
 ### C1 — registration & staleness (FR-001/FR-013, families I/J; structural parse per G11)
 
 ```bash
-grep -n "chorus learn" README.md install.sh                       # both surfaces name the mode
+grep -q "chorus learn" README.md   || echo "FAIL: README missing the mode"
+grep -q "chorus learn" install.sh  || echo "FAIL: install.sh Next: missing the mode"
 # frontmatter parsed as the whole ----delimited block, not a fixed line window (G11):
-awk '/^---$/{n++; next} n==1' skill/chorus-review/SKILL.md | grep "chorus learn" \
+awk '/^---$/{n++; next} n==1' skill/chorus-review/SKILL.md | grep -q "chorus learn" \
   || echo "FAIL: frontmatter description missing the trigger"
-grep -n "chorus learn" skill/chorus-review/SKILL.md               # mode-list entry → LEARN.md
-# staleness: ANY residual two-mode phrasing on the named surfaces (G14), not one literal:
-grep -nE "Two modes|[Bb]oth modes" skill/chorus-review/SKILL.md README.md
-# expect: first three hit; the staleness grep returns NOTHING (three-mode reframe done)
+grep -q "chorus learn" skill/chorus-review/SKILL.md || echo "FAIL: SKILL.md mode list missing the entry"
+# staleness: the STATED phrasing family on ALL THREE named surfaces (FR-013 — claim-check
+# parity; the family below IS the claim's scope, run-2 cluster C):
+STALE='[Tt]wo modes|[Bb]oth modes|two operating modes|either mode|2 modes'
+for f in skill/chorus-review/SKILL.md README.md; do
+  grep -nE "$STALE" "$f" && echo "FAIL: residual two-mode phrasing in $f"
+done
+# the spec's own references — normative text only (the Clarifications section quotes the
+# old phrasing by design and is excluded as a structural unit):
+awk '/^## Clarifications/{skip=1} /^## User Scenarios/{skip=0} !skip' \
+  specs/007-chorus-learn-onboarding/spec.md | grep -nE "$STALE" \
+  && echo "FAIL: residual two-mode phrasing in spec normative text"
+# expect: no FAIL: lines
 ```
 
 ### C2 — steps present & reachable (FR-002, SC-006)
@@ -113,14 +127,23 @@ Scoped to the structured notation — never a bare-filename regex (the scaffold 
 `CHORUS-PROJECT.md` in prose must NOT trip it):
 
 ```bash
-# cardinality floor first (G26): zero Cites: lines must FAIL, never pass vacuously
+# PER-STEP cardinality (FR-008, run-2 cluster C): each step heading is followed by its
+# own Cites: line — a global floor would pass five cites clumped in S1:
+awk '/^#{2,3} .*(orient|set up|run a round|agent-SDLC|work with results)/{
+       if (h && !c) print "FAIL: step without Cites: " h; h=$0; c=0 }
+     /^Cites:/{c=1}
+     END{ if (h && !c) print "FAIL: step without Cites: " h }' skill/chorus-review/LEARN.md
 n=$(grep -c "^Cites:" skill/chorus-review/LEARN.md)
-[ "$n" -ge 5 ] || echo "FAIL: only $n Cites: lines (expect ≥5 — one per step)"
+[ "$n" -ge 5 ] || echo "FAIL: only $n Cites: lines (expect ≥5)"
 grep -n "^Cites:" skill/chorus-review/LEARN.md | sed 's/^[0-9]*:Cites: *//' | tr ',' '\n' \
   | sed 's/^ *//; s/ *$//; s/ (.*)//' | sort -u | while read p; do
-  test -e "$p" || echo "BROKEN POINTER: $p"
+  test -e "$p" || echo "FAIL: broken pointer $p"
 done
-# expect: no output (every Cites: path resolves repo-relative; count ≥5)
+# channel-resolvable cites (FR-008, run-2 cluster D): channel-conditional entries
+# (install.sh — file-path/checkout channel only) carry their channel annotation in
+# LEARN.md and resolve repo-relative here; the plugin-channel S2 cite resolves to the
+# packaged template + SKILL.md, exercised by the C7 dogfood on that channel.
+# expect: no FAIL: lines
 # recorded limitation: doc granularity — section renames surface at re-read, not here
 ```
 
@@ -129,10 +152,12 @@ done
 The canon's load-bearing definition blocks appear **only** in their canonical docs:
 
 ```bash
-grep -n "net ≥ +2\|net ≤ −2"            skill/chorus-review/LEARN.md  # tally rule       — expect none
-grep -n "auto-resolve · audit"          skill/chorus-review/LEARN.md  # band table       — expect none
-grep -n "| 1 | RSVP seating"            skill/chorus-review/LEARN.md  # decision catalog — expect none
-grep -n "J ∈ {3, 4}\|J ≥ 5.*full chorus" skill/chorus-review/LEARN.md # quorum table     — expect none
+# explicit FAIL tokens (run-2 cluster C — no silent-output polarity):
+grep -n "net ≥ +2\|net ≤ −2"             skill/chorus-review/LEARN.md && echo "FAIL: tally rule restated"
+grep -n "auto-resolve · audit"           skill/chorus-review/LEARN.md && echo "FAIL: band table restated"
+grep -n "| 1 | RSVP seating"             skill/chorus-review/LEARN.md && echo "FAIL: decision catalog restated"
+grep -n "J ∈ {3, 4}\|J ≥ 5.*full chorus" skill/chorus-review/LEARN.md && echo "FAIL: quorum table restated"
+# expect: no FAIL: lines
 ```
 
 ### C5 — scaffold deployment, repo + installed side (FR-007, R6, F46; dead stanza removed per G2/G8/G25)
@@ -146,16 +171,23 @@ CH=$(mktemp -d); CLAUDE_HOME="$CH" ./install.sh >/dev/null \
   && echo "template deployed (installed side)"; rm -rf "$CH"
 ```
 
-### C5b — plugin-side packaging (FR-015/SC-009, R11, G6/G12/G16)
+### C5b — plugin-side packaging, both directions (FR-015/SC-009, R11; run-2 clusters A+B)
 
 ```bash
 # the plugin channel must DELIVER, not merely probe:
-grep -n '"templates' plugin.json || echo "FAIL: plugin.json does not package templates/"
-# full persona-agent set — packaged list vs the agents/ directory (10/10, not 7/10):
+grep -q '"templates' plugin.json || echo "FAIL: plugin.json does not package templates/"
+# direction 1 — every file in agents/ (the authoritative roster) is packaged:
 for a in agents/*.md; do
-  grep -q "\"$a\"" plugin.json || echo "MISSING FROM PLUGIN: $a"
+  grep -q "\"$a\"" plugin.json || echo "FAIL: missing from plugin: $a"
 done
-# expect: no FAIL/MISSING output
+# direction 2 — every packaged agent path resolves to a file (no phantom entries;
+# the 2026-06-12 rename is the recorded incident this direction exists to catch):
+grep -oE '"agents/[^"]+"' plugin.json | tr -d '"' | while read -r p; do
+  test -f "$p" || echo "FAIL: phantom plugin entry: $p"
+done
+# the refreshed description — no stale advisor count (the claim learn-mode.md makes):
+grep -n '"description".*[Ss]even' plugin.json && echo "FAIL: stale plugin description"
+# expect: no FAIL: lines
 ```
 
 ### C6 — write surface, mechanical + self-tested (FR-005, SC-008, family K; alternation fixed per G7/G13/G23)
@@ -168,9 +200,16 @@ SCAN='Write tool|Edit tool|\bcp |\btee |\bmkdir |> docs/|>> '
 printf '%s\n' 'use the Write tool here' 'cp templates/x docs/' 'tee docs/out.md' \
   'mkdir docs/reviews' 'echo hi > docs/x.md' 'cat <<EOF >> docs/x.md' \
   | grep -cE "$SCAN" | grep -qx 6 || echo "FAIL: write-idiom scan is dead on a fixture"
-# the real scan — hits may appear ONLY inside the scaffold sub-step's accept branch:
-grep -nE "$SCAN" skill/chorus-review/LEARN.md
-# expect: fixture test silent; scan hits only within the S2 accept-branch section
+# the real scan — hits may appear ONLY inside the scaffold sub-step's accept branch,
+# asserted MECHANICALLY (run-2 BECK-4): extract the accept-branch section (its heading
+# is pinned: "#### On accept" inside S2) and assert every hit falls inside it:
+ACC=$(mktemp)
+awk '/^#### On accept/{inA=1; next} /^#{1,4} /{inA=0} inA' skill/chorus-review/LEARN.md > "$ACC"
+grep -E "$SCAN" skill/chorus-review/LEARN.md | while IFS= read -r line; do
+  grep -qF -- "$line" "$ACC" || echo "FAIL: write idiom outside the accept branch: $line"
+done
+rm -f "$ACC"
+# expect: no FAIL: lines (fixture self-test above must also stay silent)
 ```
 
 ### C7 — four-path scaffold matrix (SC-004/SC-008, family K)
@@ -191,11 +230,12 @@ Dogfood in a scratch repo; each path's outcome recorded:
 | walkthrough | US1, US2, FR-003/004/011, SC-001/002/003 (illustrative; navigation.md is normative — R12) |
 | C1 | FR-001, FR-013 (frontmatter as structural block + any-two-mode-phrasing staleness) |
 | C2 | FR-002, SC-006 |
-| C3, C4 | FR-008, US4, SC-005 (+ cardinality floor ≥5 + quorum-table pin) |
+| C3, C4 | FR-008, US4, SC-005 (per-step cardinality + channel-resolvable cites + quorum-table pin; FAIL tokens) |
 | C5 | FR-007 deployment, repo + installed side (single clean stanza) |
-| C5b | FR-015, SC-009 — plugin packaging: templates/ + 10/10 agents |
+| C5b | FR-015, SC-009 — plugin packaging **both directions** (roster = agents/ directory; no phantom entries) + refreshed description |
 | C6 | FR-005, SC-008 (fixture-self-tested scan) |
 | C7 | FR-005/006/007/014, US3, SC-004, SC-008 |
 | resume question (navigation.md §Resume) | FR-010, SC-007 (incl. silent abandonment; outside SC-003's unit — G4) |
 | S1 exit wrap-up | FR-004's fast-exit-rides-exit + FR-011 disclosure (label pinned — G19) |
 | ownership binding (header) | SC-008's named owner + trigger: Gate C dogfood + pre-merge, ledger-recorded (G9) |
+| first-newcomer record (post-merge) | SC-010 — within 30 days of merge, one real external newcomer session in the gate ledger (channel + outcome); until then the ledger says the loop is open |
