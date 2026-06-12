@@ -41,9 +41,11 @@ Quorum: <ok | re-pinged | aborted>.
 | F1 | ...  | file:line / [principle] | 🔴/🟡/🟢 | 🔴/🟡/🟢 | yes/no | ≤20 words |
 
 ### Vote tally
-| ID | PRIORITIZE | OVER-RATE | Abstain | Result |
-|----|-----------|-----------|---------|--------|
-| F1 | n | n | n | hold/demote/unvoted |
+`net = PRIORITIZE − OVER-RATE` (CONFIRM excluded from net); convergence = PRIORITIZE + CONFIRM.
+See `skill/chorus/GATE-PRIMITIVE.md` / spec `009-confirm-vote-tally`.
+| ID | PRIORITIZE | CONFIRM | OVER-RATE | Abstain | Result |
+|----|-----------|---------|-----------|---------|--------|
+| F1 | n | n | n | n | escalate/hold/agreed/demote/unvoted |
 
 ### 🔴 resolution log
 | ID | Disposition | Detail |
