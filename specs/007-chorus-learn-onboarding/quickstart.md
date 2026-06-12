@@ -116,9 +116,15 @@ awk '/^## Clarifications/{skip=1} /^## User Scenarios/{skip=0} !skip' \
 ### C2 — steps present & reachable (FR-002, SC-006)
 
 ```bash
-grep -nE "^#{2,3} .*(orient|set up|run a round|agent-SDLC|work with results)" \
-  skill/chorus-review/LEARN.md
-# expect: 5 step headings, each followed by a Cites: line and a navigation-question block
+# absent LEARN.md is a FAIL:, not a silent stderr error (run-2 Gate B cluster α):
+test -f skill/chorus-review/LEARN.md || echo "FAIL: LEARN.md missing"
+# exactly the five step headings present (per-step Cites resolution is C3's job; the
+# navigation-question block is exercised by the Gate C dogfood / T026, not here — C2's
+# claim is scoped to what it scans, run-2 Gate B BECK-3):
+n=$(grep -cE "^#{2,3} .*(orient|set up|run a round|agent-SDLC|work with results)" \
+      skill/chorus-review/LEARN.md 2>/dev/null)
+[ "$n" -eq 5 ] || echo "FAIL: expected 5 step headings, found $n"
+# expect: no FAIL: lines
 ```
 
 ### C3 — structured cite-resolution + cardinality (FR-008, SC-005, family H + G26)
@@ -127,13 +133,15 @@ Scoped to the structured notation — never a bare-filename regex (the scaffold 
 `CHORUS-PROJECT.md` in prose must NOT trip it):
 
 ```bash
+# absent LEARN.md is a FAIL:, not a silent stderr error (run-2 Gate B cluster α):
+test -f skill/chorus-review/LEARN.md || echo "FAIL: LEARN.md missing"
 # PER-STEP cardinality (FR-008, run-2 cluster C): each step heading is followed by its
 # own Cites: line — a global floor would pass five cites clumped in S1:
 awk '/^#{2,3} .*(orient|set up|run a round|agent-SDLC|work with results)/{
        if (h && !c) print "FAIL: step without Cites: " h; h=$0; c=0 }
      /^Cites:/{c=1}
-     END{ if (h && !c) print "FAIL: step without Cites: " h }' skill/chorus-review/LEARN.md
-n=$(grep -c "^Cites:" skill/chorus-review/LEARN.md)
+     END{ if (h && !c) print "FAIL: step without Cites: " h }' skill/chorus-review/LEARN.md 2>/dev/null
+n=$(grep -c "^Cites:" skill/chorus-review/LEARN.md 2>/dev/null)
 [ "$n" -ge 5 ] || echo "FAIL: only $n Cites: lines (expect ≥5)"
 grep -n "^Cites:" skill/chorus-review/LEARN.md | sed 's/^[0-9]*:Cites: *//' | tr ',' '\n' \
   | sed 's/^ *//; s/ *$//; s/ (.*)//' | sort -u | while read p; do
@@ -163,12 +171,15 @@ grep -n "J ∈ {3, 4}\|J ≥ 5.*full chorus" skill/chorus-review/LEARN.md && ech
 ### C5 — scaffold deployment, repo + installed side (FR-007, R6, F46; dead stanza removed per G2/G8/G25)
 
 ```bash
-test -f templates/CHORUS-PROJECT.template.md && echo "template present (repo)"
-grep -nE "^cp .*templates" install.sh   # the actual deploy idiom — prose mentions cannot match (G8)
-# installed-side assertion (one clean stanza; no leaked tempdir):
-CH=$(mktemp -d); CLAUDE_HOME="$CH" ./install.sh >/dev/null \
-  && test -f "$CH/skills/chorus-review/templates/CHORUS-PROJECT.template.md" \
-  && echo "template deployed (installed side)"; rm -rf "$CH"
+# explicit FAIL: on absence — no success-only / silent polarity (run-2 Gate B cluster α):
+test -f templates/CHORUS-PROJECT.template.md || echo "FAIL: repo template missing"
+grep -qE "^cp .*templates" install.sh || echo "FAIL: install.sh missing the templates deploy idiom"
+# installed-side assertion (one clean stanza; no leaked tempdir; FAIL: on non-deploy):
+CH=$(mktemp -d); CLAUDE_HOME="$CH" ./install.sh >/dev/null 2>&1
+test -f "$CH/skills/chorus-review/templates/CHORUS-PROJECT.template.md" \
+  || echo "FAIL: template not deployed (installed side)"
+rm -rf "$CH"
+# expect: no FAIL: lines
 ```
 
 ### C5b — plugin-side packaging, both directions (FR-015/SC-009, R11; run-2 clusters A+B)

@@ -98,7 +98,7 @@ live under `specs/007-chorus-learn-onboarding/contracts/`.
 - [ ] T015 [P] [US3] Make `templates/CHORUS-PROJECT.template.md`'s copy-instructions preamble **copy-safe** (comment-wrapped) so the scaffolded file reads correctly post-copy (FR-007, family G).
 - [ ] T016 [US3] Author the **S2 scaffold offer** in `skill/chorus-review/LEARN.md` per `contracts/scaffold.md`: dedicated confirm **before** the navigation question; the pinned `#### On accept` branch performs **exactly one write**; SCAFFOLDED marker as first line after the title; sections 2/3/5 `<!-- TO FILL -->`; the three guards (opt-in / no-overwrite / outside-repo notice); source resolution order (repo → `<skill-base>/templates/` → plugin root) (FR-005/FR-007).
 - [ ] T017 [US3] Author the **S1 install sub-step** in `skill/chorus-review/LEARN.md` as **instruct-only** (effects: none — never executes, never writes) with remedy text **branched by detected channel** (file-path: clone + `./install.sh`; plugin: reinstall/update the plugin) (FR-006).
-- [ ] T018 [P] [US3] Extend `install.sh` to deploy `templates/` → `$SKILL_DST/templates/` (file-path channel delivery; asserted installed-side by C5) (FR-015/R6).
+- [ ] T018 [US3] Extend `install.sh` to deploy `templates/` → `$SKILL_DST/templates/` (file-path channel delivery; asserted installed-side by C5) (FR-015/R6). **Not `[P]`**: edits `install.sh`, the same file as T009 — sequence them (run-2 Gate B RICH-1).
 - [ ] T019 [P] [US3] Edit `plugin.json` (FR-015): package `templates/` and **every file in `agents/`** (the directory is the authoritative roster — **no filename enumeration**); refresh the stale advisor-count description.
 - [ ] T020 [US3] Add the **Phase-0 note** to `skill/chorus-review/SKILL.md` defining scaffolded-addendum consumer behavior for **both** consumers — the Phase-0 orchestrator and the per-advisor exploratory cache (marker-bearing = structure, never operator-confirmed facts) (FR-014).
 - [ ] T021 [US3] Run **C5, C5b, C6, C7** from `quickstart.md`; confirm template delivery on both channels, the write-idiom scan fires on its fixtures **and** finds no write outside the `#### On accept` branch, and the four-path scaffold matrix (accept/decline/existing-target/outside-repo) records its expected outcomes — zero `FAIL:`.
@@ -126,7 +126,7 @@ live under `specs/007-chorus-learn-onboarding/contracts/`.
 **Purpose**: Whole-suite verification, dogfood, and the post-merge validated-learning obligations.
 
 - [ ] T025 Run the **full** conformance suite C1–C7+C5b from the repo root; confirm **zero `FAIL:` tokens** suite-wide and no dead/vestigial assertions; record the run in `specs/007-chorus-learn-onboarding/agent-sdlc-log.md` (SC-008 ownership: Gate C dogfood + pre-merge).
-- [ ] T026 Perform the **dogfood walkthrough** in this repo — **decline** the scaffold by default (spec Assumptions); confirm all five steps present & reachable, the four navigation affordances behave, and the S1 exit wrap-up reads as the cheat-sheet (US1/US2; SC-001/002/003/006).
+- [ ] T026 Perform the **dogfood walkthrough** in this repo — **decline** the scaffold by default (spec Assumptions); confirm all five steps present & reachable, the four navigation affordances behave, the S1 exit wrap-up reads as the cheat-sheet, **and the SKILL.md Phase-0 note (T020/FR-014) treats a marker-bearing addendum as structure-not-facts for both consumers** (run-2 Gate B BECK-2) (US1/US2; SC-001/002/003/006).
 - [ ] T027 [P] Record the **SC-010** obligation in `specs/007-chorus-learn-onboarding/agent-sdlc-log.md`: within 30 days of merge, capture one **real external newcomer** session (channel used + outcome); until then the ledger states the loop is open.
 - [ ] T028 [P] Apply the **GOLD-6** fix at SC-010's day-30 expiry in `specs/007-chorus-learn-onboarding/spec.md`: name the reader (operator) and the decision (continue / extend / retire) so the verdict-closer cannot expire unread (non-gating amber carried from Gate A).
 
@@ -165,10 +165,10 @@ live under `specs/007-chorus-learn-onboarding/contracts/`.
 ## Parallel Example: User Story 3 distinct-file edits
 
 ```bash
-# These edit three different files and can proceed together:
+# These edit two different files and can proceed together:
 Task: "T015 copy-safe preamble in templates/CHORUS-PROJECT.template.md"
-Task: "T018 deploy templates/ in install.sh"
 Task: "T019 package templates/ + agents/ in plugin.json"
+# T018 edits install.sh (shared with T009) — NOT parallel; sequence it (RICH-1).
 # LEARN.md tasks (T016, T017) run sequentially, not in this batch.
 ```
 
