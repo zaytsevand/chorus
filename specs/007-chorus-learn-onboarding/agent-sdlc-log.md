@@ -356,3 +356,140 @@ external newcomer — no row yet]_
 **Ready for Gate C** (implementation review): reviews `LEARN.md` + the edit surfaces for
 their own soundness, ingests the `spec-walkthrough` headless reconciliation, and treats
 the now-green suite as the dogfood.
+
+---
+
+## Gate C — implementation review (cycle 1) — 2026-06-12
+
+**Corpus**: the authored implementation (commit `2cc010f`) — `skill/chorus-review/LEARN.md`
++ the SKILL.md/README/install.sh/plugin.json/template edits. **Fixed viewpoint**: the
+headless `spec-walkthrough` (`walkthrough-headless.md`) returned **CLEAN** — zero
+transformation DRIFT, every US traces; ingested as extract records. The SC-008 suite
+C1–C6+C5b is green (Beck re-verified empirically; confirmed not vacuous).
+
+> Phase-0 process SURPRISE: the first `Explore` mapped the **main checkout** (007
+> unimplemented there) and reported everything ABSENT — subagents default cwd to the main
+> repo, not the worktree. Re-dispatched with absolute worktree paths. Every author/voter
+> brief thereafter pinned the absolute worktree path.
+
+### RSVP (fresh, S2 — relevance 0–3)
+
+Cooper 3, Norman 3, Security 3, Richards 3, Beck 3, Evans 3, Goldratt 3 (all JOIN);
+**D&Ops ABSTAIN (2)** — "realized-delivery review is small and well-bounded; flip me in if
+C5/suite-gating needs a hard look".
+
+### Seating — DecisionRecord `gateC-seating-1`
+
+J = 7 → cap 5. Goldratt auto-seated (mandate). Six lenses tied at relevance 3 for 4 seats
+→ **tie surfaced to the operator (S3/I9)**. Operator chose **Cooper, Norman, Security, Beck**
+(+Goldratt) — the newcomer-UX + trust + check-rigor panel; Richards + Evans to runner-up
+(nav-contract conformance partly covered by dogfood; cite-not-restate already green C3/C4).
+
+### Findings register & tally
+
+Author stage uncapped; I8: 0 demoted. Votes real, author-excluded (S8); symmetric tally
+(S9). **No finding was proposed 🔴.**
+
+| ID | Lens | prop | P | O | A | net | post | gating |
+|---|---|:-:|:-:|:-:|:-:|:-:|:-:|:-:|
+| COOP-1 | Cooper | 🟡 | 2 | 0 | 2 | +2 | 🔴↑ | ✅ |
+| COOP-2 | Cooper | 🟡 | 4 | 0 | 0 | +4 | 🔴↑ | ✅ |
+| COOP-5 | Cooper | 🟡 | 2 | 0 | 2 | +2 | 🔴↑ | ✅ |
+| COOP-7 | Cooper | 🟡 | 3 | 0 | 1 | +3 | 🔴↑ | ✅ |
+| NORM-1 | Norman | 🟡 | 3 | 0 | 1 | +3 | 🔴↑ | ✅ |
+| NORM-2 | Norman | 🟡 | 3 | 0 | 1 | +3 | 🔴↑ | ✅ |
+| SEC-1 | Security | 🟡 | 2 | 0 | 2 | +2 | 🔴↑ | ✅ |
+| BECK-4 | Beck | 🟡 | 0 | 2 | 2 | −2 | 🟢↓ | — |
+
+Plus 🟢 accepts (not voted): COOP-3/4/6/8, NORM-3, SEC-2, BECK-1/2/3/5, GOLD-1/2/3 — the
+green suite is honest (not vacuous), the consent gate is intact, the scaffold writes only
+its single declared target, the install sub-step is instruct-only, and the build is minimal
+(Goldratt: no gold-plating, "merge now").
+
+### Cycle-1 verdict: **BLOCKED (mechanically) — 7 gating 🔴 in 3 clusters**
+
+| Cluster | Findings | Defect | Fix direction (LEARN.md prose / SKILL.md note — no spec change) |
+|---|---|---|---|
+| R register/altitude | COOP-1 COOP-2 COOP-5 COOP-7 | `LEARN.md` user-facing prose leaks author/contract register the runtime newcomer never needs: FR-/SC- citations and "declared convergence" bookkeeping in nav prose, the full machine-readable SCAFFOLDED-marker string at the accept point, the steps-vs-stages note pre-loaded (and doubled at S3), S1 opening with probe internals before the payoff | rewrite the user-facing prose to newcomer register: strip FR-/SC-/convergence bookkeeping from the nav narration, lead S1 with "what you'll be able to do" before probe internals, move/trim the steps-vs-stages note to S3 only, reduce the marker explanation to the actionable "remove the marker = real". **Keep** the per-step `Cites:` lines (C3) and the four-option structure (C2/navigation.md) |
+| D disclosure/reachability | NORM-1 NORM-2 | NORM-1 (the substantive one): resume conversation-scope honesty is delivered only in the wrap-up, but the silent-abandonment path (FR-010) never reaches a wrap-up — that user meets the resume offer never told the scope. NORM-2: the S1–S4 jump "back to where I was" option is pinned in navigation.md but undisclosed in LEARN.md prose | NORM-1: the resume-or-restart offer itself states the conversation-scope (not only the wrap-up). NORM-2: disclose the S1–S4 "back" option in the navigation prose |
+| T trust defense-in-depth | SEC-1 | marker trust is fail-open: stripping the SCAFFOLDED marker reclassifies template placeholder text as operator-confirmed facts; nothing verifies the sections were filled | SKILL.md Phase-0 note: the consumer ALSO re-scans for residual `<!-- TO FILL -->` / `<placeholder>` tokens, not the marker alone (cheap defense-in-depth) |
+
+Demoted: BECK-4 🟡→🟢 (2 OVER-RATE — Security + Goldratt judged a mechanical nav-drift guard unearned at dogfood-only scale; recorded as a future-round candidate, not gating).
+
+**TALLY-WART (I7 — recorded, not patched; successor to issue #6, third occurrence A2/B/C):**
+all 7 gating 🔴 were **proposed 🟡** by their authors and escalated 🟡→🔴 solely by
+convergent PRIORITIZE. The vote rationales read "prioritize the fix" / "a clean cut", not
+"this blocks ship"; Goldratt (scope lens) explicitly voted **merge now**. The symmetric
+tally cannot distinguish "agree, and rank the fix high" from "under-rated, escalate" — so
+polish 🟡s inflate to merge-blocking 🔴s. BECK-4's −2 demotion shows the panel *did*
+discriminate, so the votes are honest; the defect is the primitive. **Candidate canon fix
+(future round): a third vote value (CONFIRM = severity is right) or escalation gated on an
+explicit "under-rated" claim.** Per S9 the arithmetic stands; the operator owns whether to
+incorporate the 🔴 set or waive the wart-inflated ones (S4/I9).
+
+### Incorporation + re-verify (lean) — **Gate C CLEAR**
+
+**Operator selected: lean-fix all 3 clusters** — the findings are real,
+newcomer-serving prose improvements (the register cluster *is* the feature's purpose:
+a tutorial written for the newcomer, not the author), all cheap, no spec change.
+
+Cluster R (`LEARN.md` register): dropped the pre-loaded steps-vs-stages callout (S3
+keeps the FR-012 disambiguation, COOP-1); S1 now leads with "what you'll be able to do"
+before the read-only-probe summary, jargon trimmed (COOP-2); the `#### On accept` block
+reduced to the actionable essence — the verbatim marker string + consumer semantics moved
+to a pointer to SKILL.md/scaffold contract (COOP-5); the navigation prose rewritten to
+plain register, every FR-/SC-/"declared convergence"/budget-arithmetic citation stripped
+from user-facing text (COOP-7; sweep confirms clean).
+
+Cluster D (`LEARN.md` disclosure): the **resume offer itself now states it is
+conversation-scoped** — no longer relying only on a wrap-up the silent-abandonment path
+never reaches (NORM-1, the substantive reachability fix); the S1–S4 jump **"back to where
+I was"** option is now disclosed in the navigation prose (NORM-2).
+
+Cluster T (`SKILL.md` Phase-0 note): both addendum consumers now **also re-scan for
+residual `<!-- TO FILL -->` / `<placeholder>` tokens**, treating them as unfilled
+structure even if the marker is absent — a stripped marker can no longer silently promote
+placeholder text to operator-confirmed facts (SEC-1, defense-in-depth).
+
+**Re-verify (empirical, 2026-06-12):** the full suite C1–C6+C5b re-run after the rewrites
+— **0 `FAIL:` tokens**; all 5 step headings present, every per-step `Cites:` resolves, no
+restated canon, no write idiom outside `#### On accept`, no residual contract-register
+citation in `LEARN.md`. The 7 gating 🔴 are resolved; BECK-4 stays demoted 🟢 (recorded
+future-round candidate — a mechanical nav-prose↔contract drift guard).
+
+### Gate C verdict: **CLEAR** (7 🔴 resolved + re-verified; no open 🔴)
+
+### S1–S9 self-audit (Gate C)
+
+| # | Invariant | Pass | Evidence |
+|---|---|:-:|---|
+| S1 | orchestrator authored via the phase-runner; fixes are operator-authorized prose edits | ✅ | `/speckit-implement` produced the build; lean-fix authorized by operator |
+| S2 | RSVP fired fresh at this gate | ✅ | Gate C RSVP (7 JOIN / 1 ABSTAIN) |
+| S3 | cap-5; tie surfaced to operator; Goldratt not out-seated | ✅ | `gateC-seating-1` (operator chose Cooper/Norman/Security/Beck; Goldratt mandate-seated) |
+| S4 | no 🔴 passed silently; all resolved | ✅ | 7 gating 🔴 fixed + re-verified; none waived |
+| S5 | fixes converge artifacts toward the (correct) spec | ✅ | prose-only, no spec change; suite re-green |
+| S6 / I8 | every counted finding cites file:line | ✅ | 0 demoted; findings cite LEARN.md/SKILL.md lines |
+| S7 | within loop bound | ✅ | cycle 1 + lean re-verify; no escalation |
+| S8 | author excluded from own finding's vote | ✅ | tally: non-author voters only |
+| S9 | severity is tally arithmetic (incl. the wart) | ✅ | recorded the 🟡→🔴 escalations faithfully + flagged the wart (I7) |
+
+---
+
+## SDLC run complete — feature 007 `chorus learn`
+
+**All three gates CLEAR.** Gate A (design) → Gate B (plan/tasks) → `/speckit-implement` →
+Gate C (implementation). The `spec-walkthrough` fixed viewpoint returned CLEAN. The SC-008
+conformance suite (C1–C6+C5b) is green. No open 🔴 anywhere in the pipeline.
+
+**Open, non-gating (carried for the operator / post-merge):**
+- **SC-010** — no real external newcomer has run `chorus learn` yet; the validated-learning
+  loop is **OPEN** until one session is recorded here (channel + outcome) within 30 days of
+  merge; day-30 owner named (GOLD-6). _[awaiting first external newcomer — no row yet]_
+- **BECK-4 🟢** (Gate C) — a future-round candidate: a mechanical check binding `LEARN.md`'s
+  navigation prose to `contracts/navigation.md` (currently dogfood-only by recorded decision).
+- **Tally-wart** (I7, recorded A2/B/C) — candidate canon fix for a future methodology round:
+  a CONFIRM vote value or an explicit "under-rated" gate on escalation, so convergent
+  agreement on a 🟡 stops inflating it to a merge-blocking 🔴.
+
+The feature is ready to merge; the first newcomer session is the remaining validated-learning
+step, which begins at merge.

@@ -95,6 +95,12 @@ facts**, and both of its consumers MUST treat it so:
   marker-bearing addendum's content as structure only — never as
   operator-confirmed facts.
 
+As defense-in-depth, both consumers also treat any section still bearing a
+`<!-- TO FILL -->` flag (or visibly templated `<placeholder>` text) as unfilled
+structure **even if the marker is absent** — so a marker accidentally stripped
+before the sections are filled cannot silently promote placeholder text to
+operator-confirmed facts (Gate C SEC-1).
+
 Removing the marker is the operator's "this is now real" signal. The tutorial's
 end-of-round addendum offer (Phase 5 — Sign-off) and this scaffold are the two
 creation paths; the template is the single source of structure for both (F22).

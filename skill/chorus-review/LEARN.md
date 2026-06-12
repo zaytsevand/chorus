@@ -5,71 +5,56 @@ This file is the **single canonical definition** of the `chorus learn` mode
 skill — explanatory and navigational. It mutates nothing except one **opt-in**
 scaffold the user explicitly confirms (S2). The orchestrator running this mode
 delivers each step as a short explanation **plus** an AskUserQuestion navigation
-choice — never a wall of text (FR-003).
-
-> **Steps vs stages.** A tutorial unit here is a **step** (S1–S5). The word
-> *stage* is reserved for the review canon's four-stage flow (extract → author →
-> vote → tally) that step S3 teaches — S3 disambiguates the two explicitly
-> (FR-012).
+choice — never a wall of text.
 
 **Three modes.** The chorus has three modes: two *review* modes — the
 project-state round ("spawn the chorus") and the agent-SDLC lifecycle ("run the
 agent-SDLC on feature 0NN") — and this navigational tutorial. The two review
 modes share the gate primitive; this tutorial teaches, it does not gate.
 
-## How navigation works (read once, applies to every step)
+## How navigation works (the same four choices on every step)
 
-Each step ends with **exactly one** navigation question of **four** options, in
-this pinned order — labels and ordering are normative in
-`specs/007-chorus-learn-onboarding/contracts/navigation.md`:
+Every step ends with one question offering the same four choices:
 
-1. **Continue → <next step>** (recommended, first). At **S5** this is **"Finish
-   the tutorial"**, which delivers the wrap-up (a declared convergence with Exit —
-   both reach the wrap-up; Finish marks completion).
-2. **Go deeper on <current topic>** — one expanded pass on this step; afterward
-   this slot re-presents on **this step** as **"Recap this step"** (depth bounded
-   at one level, per-step — a step whose own deeper pass has not happened never
-   shows "Recap").
-3. **Jump to another step** — fires the jump follow-up (the other steps by name;
-   the chosen step is not replayed from the start).
-4. **Exit the tutorial.** At **S1** the label is **"Exit — get the cheat-sheet"**,
-   because the S1 exit wrap-up *is* the expert cheat-sheet — the fast exit rides
-   this affordance and displaces nothing.
+1. **Continue** to the next step (the recommended first choice). On the last step
+   this reads **"Finish the tutorial"** and takes you to the wrap-up.
+2. **Go deeper** on the current step. After one deeper pass this choice becomes
+   **"Recap this step"** on that step — going deeper is bounded to one level, and
+   only the step you deepened shows "Recap".
+3. **Jump to another step** — pick any step by name and land there directly,
+   without replaying the ones you skipped. On steps S1–S4 the jump list also
+   offers **"back to where I was"**; on S5 there is no "back" (you are at the end),
+   and the question says so — typing free text keeps you on S5.
+4. **Exit.** On S1 this reads **"Exit — get the cheat-sheet"**, because exiting
+   from orientation hands an expert the whole command surface at once.
 
-All four appear at every step, S1 included (FR-004). The tool's built-in "Other"
-free-text needs no slot; an arbitrary ask is answered, then the question
-re-presents. Navigation is single-select (never multiSelect).
+You can also just type what you want in the tool's free-text box. From any step,
+one jump reaches any other step.
 
-**Resume.** The last step reached is tracked at **every** transition (explicit
-exit or silent abandonment). Re-invoking "chorus learn" **in the same
-conversation** offers **resume at <last step> / restart from orientation**. This
-offer is conversation-scoped — it does not survive a new session or a different
-machine — and the wrap-up says so. The resume question sits *outside* a
-navigation action: re-entering then jumping costs the resume question plus one
-navigation action (FR-010).
-
-**Reaching any step in one action.** From any step, Jump → <target> lands you
-there directly (≤2 AskUserQuestion interactions). From S1, "run a round" is one
-navigation action away (SC-003).
+**Resume.** If you leave the tutorial — whether you exit or simply stop replying —
+re-saying "chorus learn" **in the same conversation** offers to resume where you
+left off or restart. That offer itself tells you it only lives in this
+conversation: in a new session, say "chorus learn" and jump straight to any step.
 
 ---
 
 ## S1 · orient
 
-The chorus is a **multi-lens review**: a panel of persona advisors (architecture,
-domain, product, human factors, clean code, simple design, delivery/ops,
-security, and the scope/flow lens) each reads your target through one lens, and
-their findings are scored by a deterministic vote — not by any single opinion. It
-has **three modes**: two review modes (the project-state round and the agent-SDLC
-lifecycle) and this tutorial. You do not need to read the companion docs first —
-that is what this tutorial is for.
+By the end of this tutorial you will be able to set up the chorus on your project
+and run your first review — without reading the dense companion docs first. That
+is what this tutorial is for.
 
-**What the orientation checks (read-only).** On entry the mode runs read-only
-probes across **both** documented install channels (the file-path install and the
-plugin install): is the addendum template reachable via the running skill's base
-path, are the persona agents present, does a project addendum already exist, and
-are you inside a repository. The mode running at all is itself evidence the skill
-is reachable — the probes test *artefact availability*, not bare presence.
+The chorus is a **multi-lens review**: a panel of persona advisors each reads your
+target through one lens (architecture, domain, product, security, and more), and
+their findings are scored by a vote rather than any single opinion. It has **three
+modes** — two review modes (the project-state round and the agent-SDLC lifecycle)
+and this tutorial.
+
+On entry the tutorial quietly checks that what it needs is reachable — the addendum
+template, the persona agents, whether you already have a project addendum, and
+whether you are inside a repository — across both ways the skill can be installed.
+These checks only read; they change nothing. If something it needs is genuinely
+missing, it shows you how to fix it (below) — it never runs anything for you.
 
 **Install sub-step (only if something the mode needs is genuinely missing).** If a
 needed artefact is unreachable, S1 **instructs** — it never runs commands and
@@ -113,20 +98,14 @@ root's `templates/`. So both install channels genuinely deliver, not merely prob
 
 #### On accept
 
-The mode creates `docs/reviews/CHORUS-PROJECT.md` from the resolved template (the
-folder is created if absent — this is part of the accepted action), with:
-
-- a machine-readable **SCAFFOLDED marker** as the first line after the title —
-  `<!-- SCAFFOLDED by chorus learn YYYY-MM-DD — sections 2/3/5 unfilled; a chorus
-  round treats this file as structure, not facts, until the marker is removed -->`;
-- sections **2, 3, and 5** flagged `<!-- TO FILL -->` (exclusions · anchors ·
-  security checklist);
-- the template's copy-instructions preamble already comment-wrapped, so the new
-  file reads correctly.
-
-This is the tutorial's **only** write, and it happens only on explicit acceptance
-of the dedicated question. The wrap-up names the sections to fill and notes that
-removing the marker is the "this is now real" signal.
+The tutorial creates `docs/reviews/CHORUS-PROJECT.md` from the template (creating
+the folder if needed). The new file carries a **SCAFFOLDED marker** as its first
+line, and its sections 2, 3, and 5 (exclusions · anchors · security checklist) are
+flagged for you to fill. This is the tutorial's **only** write, and only on explicit
+acceptance of the dedicated question. When you have filled the sections, deleting the
+marker line is how you tell the chorus the file is now real. (The exact marker text,
+and how a later review round reads it, are defined in `SKILL.md` and the scaffold
+contract.)
 
 **Other outcomes.** Decline → nothing is written and the tutorial proceeds. An
 addendum already present → the offer becomes "review/extend your existing
@@ -192,14 +171,12 @@ builds on it.
 Cites: skill/chorus-review/SKILL.md, skill/chorus-review/DECISION-PRIMITIVE.md
 
 **Navigation question (S5):** **Finish the tutorial** · Go deeper on results ·
-Jump (→ S1–S4; there is no "back" slot here — free-text/Other stays at S5) · Exit
-the tutorial. (Finish and Exit converge on the wrap-up by declaration; Finish
-marks completion. Depth state is per-step: if you went deeper on an earlier step,
-S5 still shows "Go deeper", not "Recap".)
+Jump to an earlier step (S1–S4) · Exit the tutorial. (No "back" slot here — you
+are at the end; typing free text keeps you on S5.)
 
 ---
 
-## The wrap-up (every completed or exited path — FR-011)
+## The wrap-up (every completed or exited path)
 
 Conclude with a plain wrap-up: the concrete next command ("say 'spawn the
 chorus'"), **the step reached and the resume scope** ("this resume offer lives in
