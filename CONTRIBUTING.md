@@ -4,7 +4,7 @@ Thanks for considering a contribution.
 
 ## What's in scope
 
-- **Skill prose** (`skill/chorus-review/SKILL.md`, `INTEGRATION-LAYER.md`) —
+- **Skill prose** (`skill/chorus/SKILL.md`, `INTEGRATION-LAYER.md`) —
   procedure refinements, phase-gate tightening, new failure-mode entries,
   clearer briefs.
 - **Persona agents** (`agents/*.md`) — sharpening voice, fixing calibration
@@ -16,7 +16,7 @@ Thanks for considering a contribution.
 
 ## What's out of scope
 
-- New personas beyond the roster of seven without prior discussion. The
+- New personas beyond the roster of nine without prior discussion. The
   roster is balanced deliberately; additions affect quorum math and brief
   templates.
 - Tooling for *running* the chorus outside Claude Code. The chorus

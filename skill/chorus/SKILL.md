@@ -1,13 +1,14 @@
 ---
-name: chorus-review
-description: Multi-advisor project state review (Evans/Richards/Cooper/Norman/Uncle Bob/Beck/Delivery-and-Ops/security/Goldratt) with per-round RSVP self-selection, cross-evaluation, conflict reconciliation, and ranked recommendations. Use when the user asks for a chorus, a project-state review, or to "spawn the regular chorus." Produces a durable artifact at docs/reviews/YYYY-MM-DD-chorus-review.md. Also supports an agent-SDLC lifecycle mode ("run the agent-SDLC on feature 0NN") that interleaves scoped chorus gates with the speckit cycle — see SDLC-LAYER.md.
+name: chorus
+description: Multi-advisor guardrails across SDLC stages (Evans/Richards/Cooper/Norman/Uncle Bob/Beck/Delivery-and-Ops/security/Goldratt): a panel reviews each stage through their lenses with per-round RSVP self-selection, cross-evaluation, conflict reconciliation, and ranked recommendations. Use when the user asks for a chorus, a project-state review, or to "spawn the regular chorus." Produces a durable artifact at docs/reviews/YYYY-MM-DD-chorus-review.md. Also supports an agent-SDLC lifecycle mode ("run the agent-SDLC on feature 0NN") that interleaves scoped chorus gates with the speckit cycle — see SDLC-LAYER.md — and a "chorus learn" tutorial mode (trigger: "chorus learn" / "/chorus learn"), an interactive staged onboarding that teaches setup and both review modes — see LEARN.md.
 ---
 
-# Chorus Review — repeatable procedure
+# Chorus — repeatable procedure
 
-A multi-lens review of whatever you point it at — **most often a spec or a
-feature's design, occasionally a full-codebase sweep.** Each round produces a
-durable artifact future rounds baseline against, rather than re-derive.
+A multi-lens guardrail you can drop onto any SDLC stage — **most often a spec or
+a feature's design, occasionally a full-codebase sweep.** A panel of persona
+lenses reviews the stage; each round produces a durable artifact future rounds
+baseline against, rather than re-derive.
 
 This skill is project-agnostic. Project-specific facts (exclusions, topology,
 security data-surface, baseline references) come from an optional per-project
@@ -27,20 +28,21 @@ read `SDLC-LAYER.md` as well.
 
 Before findings are authored, participating advisors build a persisted,
 lens-specific understanding of the target — the **exploratory phase**, defined
-once in `EXPLORATORY-PHASE.md` (Phase 0.7 below). Both modes run it; this file
-does not restate it.
+once in `EXPLORATORY-PHASE.md` (Phase 0.7 below). Both review modes run it; this
+file does not restate it.
 
 When the chorus must involve the operator — seating a capped panel, blocking on a
 🔴, confirming scope — the decision is banded by the **decision primitive**, defined
 once in `DECISION-PRIMITIVE.md`: 🟢 auto-resolve, 🟡 proceed-with-recorded-default +
 async override, 🔴 hard-block + instant ask, by declared catalog predicate (never
 orchestrator inference). It makes the workflow **self-unblocking yet balanced** — it
-runs forward, stopping the operator only for 🔴. Both modes reference it; this file
-does not restate it.
+runs forward, stopping the operator only for 🔴. Both review modes reference it;
+this file does not restate it.
 
-## Two modes
+## Three modes
 
-Both modes are built on the same gate primitive (`GATE-PRIMITIVE.md`):
+The chorus has three modes — two *review* modes built on the same gate primitive
+(`GATE-PRIMITIVE.md`), plus a navigational tutorial:
 
 - **Project-state round** — a multi-lens review of a scope you choose: most
   often a spec or a feature's design, occasionally the whole codebase (the
@@ -50,6 +52,11 @@ Both modes are built on the same gate primitive (`GATE-PRIMITIVE.md`):
   design, plan/tasks, and implementation reviews. Trigger: "run the agent-SDLC
   on feature 0NN." Driven by `SDLC-LAYER.md`; output:
   `specs/<feature>/agent-sdlc-log.md`. Read `SDLC-LAYER.md` before running it.
+- **`chorus learn`** (tutorial) — an interactive staged onboarding that teaches
+  setup and both review modes via the AskUserQuestion tool, mutating nothing
+  except one opt-in scaffold. Trigger: "chorus learn" / `/chorus learn`. Defined
+  once in `LEARN.md` (this file carries only its registration). The two review
+  modes are gated; the tutorial is navigational.
 
 ## When to use
 
@@ -75,6 +82,29 @@ If present, the orchestrator reads it before Phase 0 and uses its contents to
 fill the project-specific slots in the procedure. If absent, the orchestrator
 asks the user inline at Phase 0 and offers to write the file at the end of
 the round.
+
+**Phase-0 note — the scaffolded-but-unfilled addendum (FR-014).** The `chorus
+learn` tutorial can scaffold this addendum (see `LEARN.md` S2), producing a file
+that bears a **SCAFFOLDED marker** on its first content line and carries sections
+2/3/5 flagged `<!-- TO FILL -->`. A marker-bearing addendum is **structure, not
+facts**, and both of its consumers MUST treat it so:
+
+- the **Phase-0 orchestrator** confirms the flagged sections with the operator
+  (as if those sections were absent but pre-structured) and never consumes their
+  placeholder text as operator-confirmed project facts;
+- the **per-advisor exploratory cache** (`EXPLORATORY-PHASE.md`) caches a
+  marker-bearing addendum's content as structure only — never as
+  operator-confirmed facts.
+
+As defense-in-depth, both consumers also treat any section still bearing a
+`<!-- TO FILL -->` flag (or visibly templated `<placeholder>` text) as unfilled
+structure **even if the marker is absent** — so a marker accidentally stripped
+before the sections are filled cannot silently promote placeholder text to
+operator-confirmed facts (Gate C SEC-1).
+
+Removing the marker is the operator's "this is now real" signal. The tutorial's
+end-of-round addendum offer (Phase 5 — Sign-off) and this scaffold are the two
+creation paths; the template is the single source of structure for both (F22).
 
 The addendum should contain:
 

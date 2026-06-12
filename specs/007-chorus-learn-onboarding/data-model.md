@@ -31,7 +31,7 @@ step/stage disambiguation line (FR-012).
 | id | name | sub-steps | cites |
 |---|---|---|---|
 | S1 | orient | install sub-step (instruct-only; FR-006) | `skill/chorus-review/SKILL.md` |
-| S2 | set up | scaffold offer (dedicated confirm; FR-007) | `templates/CHORUS-PROJECT.template.md`, `skill/chorus-review/SKILL.md` (addendum + roster sections), `install.sh` |
+| S2 | set up | scaffold offer (dedicated confirm; FR-007) | `templates/CHORUS-PROJECT.template.md`, `skill/chorus-review/SKILL.md` (addendum + roster sections), `install.sh` **(file-path/checkout channel only — channel-resolvable cites, FR-008; the plugin-channel S2 cite resolves to the packaged template + SKILL.md)** |
 | S3 | run a round | — | `skill/chorus-review/GATE-PRIMITIVE.md`, `skill/chorus-review/SKILL.md` (procedure) |
 | S4 | agent-SDLC | — | `skill/chorus-review/SDLC-LAYER.md`, `skill/chorus-review/DECISION-PRIMITIVE.md` |
 | S5 | work with results | — | `skill/chorus-review/SKILL.md` (artifact), `skill/chorus-review/DECISION-PRIMITIVE.md` (review surfaces) |

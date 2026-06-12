@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
-# chorus-review uninstaller.
+# chorus uninstaller.
 #
-# Removes the chorus-review skill and its persona agents from
+# Removes the chorus skill and its persona agents from
 # your Claude Code config. Refuses to touch any other files.
 #
 # Usage:
@@ -14,7 +14,7 @@ CLAUDE_HOME="${CLAUDE_HOME:-$HOME/.claude}"
 REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 AGENTS_SRC="$REPO_DIR/agents"
 
-SKILL_DST="$CLAUDE_HOME/skills/chorus-review"
+SKILL_DST="$CLAUDE_HOME/skills/chorus"
 AGENTS_DST="$CLAUDE_HOME/agents"
 
 if [[ -d "$SKILL_DST" ]]; then

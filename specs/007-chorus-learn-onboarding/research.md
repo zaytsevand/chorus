@@ -244,13 +244,16 @@ clusters (G1–G27). Ledger: `agent-sdlc-log.md`.
 
 - **Decision**: The plugin channel becomes a **delivery** surface, not just a
   detection target. `plugin.json` is the **named edit surface**: it gains
-  **`templates/`** in the packaged file set and the **three missing persona agents**
-  (`constraint-and-flow-advisor.md`, `security-and-trust-advisor.md`,
-  `guido-python-reviewer.md` — today it ships 7 of 10), and its stale "Seven persona
-  advisors" description is refreshed. Scaffold/cite resolution honors the plugin
-  layout via R6's pinned order (`<skill-base>/templates/` → plugin root). **C5b**
-  asserts the packaging (agent list compared against `agents/`; template path
-  present). The S1 probe's remedy text branches per channel (R5).
+  **`templates/`** in the packaged file set and **every file in `agents/`** — the
+  directory is the **authoritative roster**, and no artefact restates agent
+  filenames (run-2 cluster A: a 2026-06-12 agent rename stale-ified the three
+  corpus surfaces that had enumerated names; the enumeration broke within days
+  while the glob survived). The stale "Seven persona advisors" description is
+  refreshed. Scaffold/cite resolution honors the plugin layout via R6's pinned
+  order (`<skill-base>/templates/` → plugin root). **C5b** asserts the packaging
+  **in both directions** (every `agents/*.md` packaged AND every packaged agent
+  path resolves to a file) plus the refreshed description (run-2 cluster B). The
+  S1 probe's remedy text branches per channel (R5).
 - **Rationale**: Cycle 2's highest-converged cluster (G6 🔴 4–0, G12 🔴 4–0, G18 🔴
   4–0): detection promised both channels but `install.sh` never runs on the plugin
   channel and `<skill-base>/templates/` does not exist there — the "both install

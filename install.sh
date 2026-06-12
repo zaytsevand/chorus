@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# chorus-review installer.
+# chorus installer.
 #
 # Copies the skill + its persona agents into your Claude Code config.
 # Idempotent. No sudo. Refuses to overwrite agent files you may have customized
@@ -19,10 +19,10 @@ if [[ "${1:-}" == "--force" ]]; then
 fi
 
 REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-SKILL_SRC="$REPO_DIR/skill/chorus-review"
+SKILL_SRC="$REPO_DIR/skill/chorus"
 AGENTS_SRC="$REPO_DIR/agents"
 
-SKILL_DST="$CLAUDE_HOME/skills/chorus-review"
+SKILL_DST="$CLAUDE_HOME/skills/chorus"
 AGENTS_DST="$CLAUDE_HOME/agents"
 
 if [[ ! -d "$SKILL_SRC" || ! -d "$AGENTS_SRC" ]]; then
@@ -32,8 +32,12 @@ fi
 
 mkdir -p "$SKILL_DST" "$AGENTS_DST"
 
-echo "Installing chorus-review skill -> $SKILL_DST"
+echo "Installing chorus skill -> $SKILL_DST"
 cp -f "$SKILL_SRC"/*.md "$SKILL_DST/"
+
+echo "Installing addendum template -> $SKILL_DST/templates"
+mkdir -p "$SKILL_DST/templates"
+cp -f "$REPO_DIR/templates"/*.md "$SKILL_DST/templates/"
 
 echo "Installing $(ls "$AGENTS_SRC"/*.md | wc -l) persona agents -> $AGENTS_DST"
 installed=0
@@ -55,10 +59,13 @@ echo
 echo "Installed: $installed agent(s). Skipped: $skipped."
 echo
 echo "Next:"
-echo "  1. Copy templates/CHORUS-PROJECT.template.md into your project at"
-echo "       docs/reviews/CHORUS-PROJECT.md"
-echo "     and fill in sections 2, 3, and 5 (exclusions, anchors, security)."
-echo "  2. In Claude Code, say: 'spawn the chorus'."
+echo "  1. In Claude Code, say: 'chorus learn' — a guided tutorial that sets you"
+echo "     up and teaches both review modes, one step at a time."
+echo "  2. Or set up by hand: copy the installed template at"
+echo "       $SKILL_DST/templates/CHORUS-PROJECT.template.md"
+echo "     into your project at docs/reviews/CHORUS-PROJECT.md and fill in"
+echo "     sections 2, 3, and 5 (exclusions, anchors, security)."
+echo "  3. Then say: 'spawn the chorus'."
 echo
 echo "The skill produces docs/reviews/YYYY-MM-DD-chorus-review.md as a durable"
 echo "artifact you commit. The most recent artifact is the next round's baseline."
