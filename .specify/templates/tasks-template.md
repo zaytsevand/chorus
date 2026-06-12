@@ -11,6 +11,8 @@ description: "Task list template for feature implementation"
 
 **Tests**: The examples below include test tasks. Tests are OPTIONAL - only include them if explicitly requested in the feature specification.
 
+**Conformance (Constitution Principles V / X)**: for this Markdown methodology repo, a feature's `quickstart.md` conformance checks (the SC-008 pattern) are a **first-class, non-optional** verification surface. Each user story owns a task that runs the checks it is responsible for, placed AFTER the content it verifies and BEFORE the story is called done. A check that cannot fail is not a check.
+
 **Organization**: Tasks are grouped by user story to enable independent implementation and testing of each story.
 
 ## Format: `[ID] [P?] [Story] Description`

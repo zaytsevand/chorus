@@ -40,7 +40,22 @@
 
 *GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
 
-[Gates determined based on constitution file]
+Verify the plan against the project constitution (`.specify/memory/constitution.md`):
+
+- **I — Cite, never restate**: any canon mechanic this feature references is cited, not
+  copied into the plan/spec/tutorial; a conformance check pins it where the feature
+  authors prose over the canon.
+- **V — Evidence**: every claim about existing artefacts carries a `file:line` or a cited
+  principle; the conformance suite is named as a first-class verification surface.
+- **VIII — Spec is source of truth**: the plan changes no downstream artefact by hand;
+  every artefact change traces to a speckit phase-runner.
+- **IX — Build on the constraint**: the plan names the binding constraint and defers
+  correctness the next validated step won't exercise (deferrals stated explicitly).
+- **Authoring constraints**: Markdown-only (no runtime code beyond `install.sh` + check
+  stanzas); new capability is a mode of the `chorus` skill, not a new skill.
+
+Record any violation in Complexity Tracking with the counter-force or absolutism that
+justifies it (Governance balance check).
 
 ## Project Structure
 
