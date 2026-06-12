@@ -1,6 +1,6 @@
 # Chorus Integration Layer
 
-This is the **integration layer** of the `chorus-review` program. It is not a
+This is the **integration layer** of the `chorus` program. It is not a
 persona. It does not hold a lens. It does not produce findings. It is the
 session running the skill — the module that composes the personas, the user,
 and `advisor()` into a procedure whose output the team can trust.

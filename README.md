@@ -1,8 +1,8 @@
-# chorus-review
+# chorus
 
-A Claude Code skill that runs a structured multi-advisor review of **whatever
-you point it at** — most often a spec or a feature's design, occasionally a
-full-codebase sweep. Nine persona advisors, each reviewing the target through
+A Claude Code skill that drops multi-advisor guardrails onto any **SDLC
+stage** — most often a spec or a feature's design, occasionally a
+full-codebase sweep. Nine persona advisors review the stage through
 their lens:
 
 - **Eric Evans** — DDD / domain model
@@ -13,7 +13,7 @@ their lens:
 - **Kent Beck** — TDD / simple design
 - **Delivery-and-Ops** — synthesized (Farley · Hightower · Majors)
 - **Security-and-Trust** — synthesized (Schneier · Shostack · Nather)
-- **Goldratt** — Eliyahu M. Goldratt (Theory of Constraints; deferral / opportunity cost), modernized by Reinertsen flow economics
+- **Eliyahu Goldratt** — Theory of Constraints; deferral / opportunity cost, modernized by Reinertsen flow economics
 
 An optional **Guido** (Python) language lens joins only on rounds with Python in
 scope. Conflicts go to `advisor()`. Output is a durable markdown artifact you
@@ -22,7 +22,7 @@ commit; the most recent artifact is the next round's baseline.
 ## Three modes
 
 The skill runs in three modes — two *review* modes built on the same four-stage
-gate primitive (`skill/chorus-review/GATE-PRIMITIVE.md`: extract → uncapped
+gate primitive (`skill/chorus/GATE-PRIMITIVE.md`: extract → uncapped
 author → real adversarial vote → deterministic tally), plus a navigational
 onboarding tutorial:
 
@@ -37,12 +37,12 @@ onboarding tutorial:
   one first. Each gate is RSVP-scoped,
   capped at five lenses, and blocks the pipeline only on an unresolved 🔴.
   Trigger: **"run the agent-SDLC on feature 0NN."** Driven by
-  `skill/chorus-review/SDLC-LAYER.md`; output:
+  `skill/chorus/SDLC-LAYER.md`; output:
   `specs/<feature>/agent-sdlc-log.md`.
 - **`chorus learn`** (tutorial) — an interactive staged onboarding that teaches
   setup and both review modes via the AskUserQuestion tool, one step at a time,
   mutating nothing except one opt-in scaffold. Trigger: **"chorus learn."**
-  Defined in `skill/chorus-review/LEARN.md`. **New here? Start with this.**
+  Defined in `skill/chorus/LEARN.md`. **New here? Start with this.**
 
 The gate primitive is shared so the review modes cannot drift. The rest of this
 README describes the project-state round.
@@ -70,7 +70,7 @@ Two design choices worth knowing about:
   a thin orchestrator with explicit refusals — it routes between personas,
   the user, and `advisor()`, but never holds a lens, never adds findings of
   its own, never substitutes `advisor()` for cognitive work. See
-  `skill/chorus-review/INTEGRATION-LAYER.md`.
+  `skill/chorus/INTEGRATION-LAYER.md`.
 
 ## Lifecycle of a review
 
@@ -159,7 +159,7 @@ between personas, the user, and `advisor()`, but never holds a lens, never
 adds findings of its own, and never substitutes `advisor()` for cognitive
 work. The invariants enforcing that — including the **I8 evidence gate** the
 diagram references — live in
-[`skill/chorus-review/INTEGRATION-LAYER.md`](skill/chorus-review/INTEGRATION-LAYER.md).
+[`skill/chorus/INTEGRATION-LAYER.md`](skill/chorus/INTEGRATION-LAYER.md).
 
 Before Round 1, participating advisors run the **exploratory phase**: each builds
 and persists a lens-specific understanding of the target, harvested
@@ -168,7 +168,7 @@ reference-first over a **two-tier memory** — the operator-owned
 per-advisor records that may cache from it. Persisted memory is an index of
 locators, never a finding's evidentiary endpoint — findings re-ground in the live
 material. The mechanic lives in
-[`skill/chorus-review/EXPLORATORY-PHASE.md`](skill/chorus-review/EXPLORATORY-PHASE.md).
+[`skill/chorus/EXPLORATORY-PHASE.md`](skill/chorus/EXPLORATORY-PHASE.md).
 
 ## Principles
 
@@ -201,7 +201,7 @@ that list under "Constitutional ROI."
 Findings cite either `file:line` (claims about the project's artefacts)
 or `[principle]` (claims grounded in a project-named principle the
 addendum carries). The I8 evidence gate refuses findings that do
-neither — see [`skill/chorus-review/INTEGRATION-LAYER.md`](skill/chorus-review/INTEGRATION-LAYER.md).
+neither — see [`skill/chorus/INTEGRATION-LAYER.md`](skill/chorus/INTEGRATION-LAYER.md).
 
 ## Lens coverage
 
@@ -243,12 +243,12 @@ version of this matrix — heatmap, radar, and per-axis breakdown — is at
 ### Canonical (clone + script)
 
 ```sh
-git clone https://github.com/<your-org>/chorus-review.git
-cd chorus-review
+git clone https://github.com/<your-org>/chorus.git
+cd chorus
 ./install.sh
 ```
 
-This copies the skill into `~/.claude/skills/chorus-review/` and its
+This copies the skill into `~/.claude/skills/chorus/` and its
 persona agents into `~/.claude/agents/`. Existing same-named files are
 preserved unless you pass `--force`.
 
@@ -279,7 +279,7 @@ modes one step at a time. Everything below is the manual path.
    installed template into your project:
 
    ```sh
-   cp ~/.claude/skills/chorus-review/templates/CHORUS-PROJECT.template.md \
+   cp ~/.claude/skills/chorus/templates/CHORUS-PROJECT.template.md \
       docs/reviews/CHORUS-PROJECT.md
    ```
 

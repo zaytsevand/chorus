@@ -1,10 +1,10 @@
 {
-  "name": "chorus-review",
+  "name": "chorus",
   "version": "0.1.0",
-  "description": "Multi-advisor project-state review for Claude Code. A panel of persona advisors run a structured, RSVP-gated review through their lenses; conflicts go to advisor(); output is a durable markdown artifact you commit. Also offers an agent-SDLC lifecycle mode and a 'chorus learn' onboarding tutorial.",
+  "description": "Multi-advisor guardrails across SDLC stages for Claude Code. A panel of persona advisors run a structured, RSVP-gated review of each stage through their lenses; conflicts go to advisor(); output is a durable markdown artifact you commit. Also offers an agent-SDLC lifecycle mode and a 'chorus learn' onboarding tutorial.",
   "license": "CC-BY-4.0",
   "skills": [
-    "skill/chorus-review"
+    "skill/chorus"
   ],
   "templates": [
     "templates/CHORUS-PROJECT.template.md"

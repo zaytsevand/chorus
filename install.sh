@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# chorus-review installer.
+# chorus installer.
 #
 # Copies the skill + its persona agents into your Claude Code config.
 # Idempotent. No sudo. Refuses to overwrite agent files you may have customized
@@ -19,10 +19,10 @@ if [[ "${1:-}" == "--force" ]]; then
 fi
 
 REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-SKILL_SRC="$REPO_DIR/skill/chorus-review"
+SKILL_SRC="$REPO_DIR/skill/chorus"
 AGENTS_SRC="$REPO_DIR/agents"
 
-SKILL_DST="$CLAUDE_HOME/skills/chorus-review"
+SKILL_DST="$CLAUDE_HOME/skills/chorus"
 AGENTS_DST="$CLAUDE_HOME/agents"
 
 if [[ ! -d "$SKILL_SRC" || ! -d "$AGENTS_SRC" ]]; then
@@ -32,7 +32,7 @@ fi
 
 mkdir -p "$SKILL_DST" "$AGENTS_DST"
 
-echo "Installing chorus-review skill -> $SKILL_DST"
+echo "Installing chorus skill -> $SKILL_DST"
 cp -f "$SKILL_SRC"/*.md "$SKILL_DST/"
 
 echo "Installing addendum template -> $SKILL_DST/templates"

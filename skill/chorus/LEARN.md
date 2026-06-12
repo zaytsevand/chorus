@@ -1,7 +1,7 @@
 # `chorus learn` — the guided onboarding tutorial
 
 This file is the **single canonical definition** of the `chorus learn` mode
-(trigger: "chorus learn" / `/chorus learn`). It is a mode of the chorus-review
+(trigger: "chorus learn" / `/chorus learn`). It is a mode of the chorus
 skill — explanatory and navigational. It mutates nothing except one **opt-in**
 scaffold the user explicitly confirms (S2). The orchestrator running this mode
 delivers each step as a short explanation **plus** an AskUserQuestion navigation
@@ -67,7 +67,7 @@ never writes — with remedy text matched to the detected channel:
 
 If nothing is missing, the sub-step does not appear.
 
-Cites: skill/chorus-review/SKILL.md
+Cites: skill/chorus/SKILL.md
 
 **Navigation question (S1):** Continue → set up · Go deeper on the three modes ·
 Jump to another step · **Exit — get the cheat-sheet**. (Exit here delivers the
@@ -116,7 +116,7 @@ scaffold would do, why it is unavailable here, and that re-running inside a
 project repository enables it (never silent). In every non-accept case the write
 count is zero.
 
-Cites: templates/CHORUS-PROJECT.template.md, skill/chorus-review/SKILL.md, install.sh (file-path channel)
+Cites: templates/CHORUS-PROJECT.template.md, skill/chorus/SKILL.md, install.sh (file-path channel)
 
 **Navigation question (S2):** Continue → run a round · Go deeper on the addendum ·
 Jump to another step · Exit the tutorial.
@@ -134,7 +134,7 @@ screen of this tutorial.) The severity of each finding comes from the vote
 arithmetic, not from any one advisor — see `GATE-PRIMITIVE.md` for the mechanic;
 this tutorial summarizes, it does not restate it.
 
-Cites: skill/chorus-review/GATE-PRIMITIVE.md, skill/chorus-review/SKILL.md
+Cites: skill/chorus/GATE-PRIMITIVE.md, skill/chorus/SKILL.md
 
 **Navigation question (S3):** Continue → agent-SDLC · Go deeper on a round · Jump
 to another step · Exit the tutorial.
@@ -152,7 +152,7 @@ or asks you — it never passes a 🔴 silently, and operator decisions are *ban
 hard-block for your call). The pipeline and the block-on-🔴 rule live in
 `SDLC-LAYER.md`; the decision banding lives in `DECISION-PRIMITIVE.md`.
 
-Cites: skill/chorus-review/SDLC-LAYER.md, skill/chorus-review/DECISION-PRIMITIVE.md
+Cites: skill/chorus/SDLC-LAYER.md, skill/chorus/DECISION-PRIMITIVE.md
 
 **Navigation question (S4):** Continue → work with results · Go deeper on
 block-on-🔴 · Jump to another step · Exit the tutorial.
@@ -168,7 +168,7 @@ operator decisions queue in the ledger's provisional-decisions section for async
 override. That is the whole loop: set up → run → read the artifact → next round
 builds on it.
 
-Cites: skill/chorus-review/SKILL.md, skill/chorus-review/DECISION-PRIMITIVE.md
+Cites: skill/chorus/SKILL.md, skill/chorus/DECISION-PRIMITIVE.md
 
 **Navigation question (S5):** **Finish the tutorial** · Go deeper on results ·
 Jump to an earlier step (S1–S4) · Exit the tutorial. (No "back" slot here — you

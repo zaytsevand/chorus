@@ -6,7 +6,7 @@ orchestrates a whole **speckit spec lifecycle** — interleaving speckit
 phase-runners with three scoped **chorus gates** (design, plan/tasks,
 implementation). Each gate runs the four-stage primitive in `GATE-PRIMITIVE.md`.
 
-It is an **operating mode** of the existing `chorus-review` skill — not a new
+It is an **operating mode** of the existing `chorus` skill — not a new
 skill, not a speckit hook extension. The Dijkstra posture is unchanged, one level
 up the hierarchy: the SDLC orchestrator routes between speckit phase-runners, the
 personas, and the operator; it audits that each gate fired honestly; it refuses

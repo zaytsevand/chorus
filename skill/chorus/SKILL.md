@@ -1,13 +1,14 @@
 ---
-name: chorus-review
-description: Multi-advisor project state review (Evans/Richards/Cooper/Norman/Uncle Bob/Beck/Delivery-and-Ops/security/Goldratt) with per-round RSVP self-selection, cross-evaluation, conflict reconciliation, and ranked recommendations. Use when the user asks for a chorus, a project-state review, or to "spawn the regular chorus." Produces a durable artifact at docs/reviews/YYYY-MM-DD-chorus-review.md. Also supports an agent-SDLC lifecycle mode ("run the agent-SDLC on feature 0NN") that interleaves scoped chorus gates with the speckit cycle — see SDLC-LAYER.md — and a "chorus learn" tutorial mode (trigger: "chorus learn" / "/chorus learn"), an interactive staged onboarding that teaches setup and both review modes — see LEARN.md.
+name: chorus
+description: Multi-advisor guardrails across SDLC stages (Evans/Richards/Cooper/Norman/Uncle Bob/Beck/Delivery-and-Ops/security/Goldratt): a panel reviews each stage through their lenses with per-round RSVP self-selection, cross-evaluation, conflict reconciliation, and ranked recommendations. Use when the user asks for a chorus, a project-state review, or to "spawn the regular chorus." Produces a durable artifact at docs/reviews/YYYY-MM-DD-chorus-review.md. Also supports an agent-SDLC lifecycle mode ("run the agent-SDLC on feature 0NN") that interleaves scoped chorus gates with the speckit cycle — see SDLC-LAYER.md — and a "chorus learn" tutorial mode (trigger: "chorus learn" / "/chorus learn"), an interactive staged onboarding that teaches setup and both review modes — see LEARN.md.
 ---
 
-# Chorus Review — repeatable procedure
+# Chorus — repeatable procedure
 
-A multi-lens review of whatever you point it at — **most often a spec or a
-feature's design, occasionally a full-codebase sweep.** Each round produces a
-durable artifact future rounds baseline against, rather than re-derive.
+A multi-lens guardrail you can drop onto any SDLC stage — **most often a spec or
+a feature's design, occasionally a full-codebase sweep.** A panel of persona
+lenses reviews the stage; each round produces a durable artifact future rounds
+baseline against, rather than re-derive.
 
 This skill is project-agnostic. Project-specific facts (exclusions, topology,
 security data-surface, baseline references) come from an optional per-project

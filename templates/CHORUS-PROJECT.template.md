@@ -1,6 +1,6 @@
 # Chorus Project Addendum — `<your-project-name>`
 
-This file feeds the global `chorus-review` skill with project-specific facts.
+This file feeds the global `chorus` skill with project-specific facts.
 The skill itself is generic; this addendum carries everything that would
 otherwise be hard-coded for this repo.
 
@@ -108,7 +108,7 @@ so the next round knows which baseline to load.
 ## 7. Project understanding
 
 > Operator-confirmed, project-wide facts gathered by the advisor **exploratory
-> phase** (`skill/chorus-review/EXPLORATORY-PHASE.md`). This section is the
+> phase** (`skill/chorus/EXPLORATORY-PHASE.md`). This section is the
 > **authoritative system of record** for these facts — advisors reference it (and
 > may cache from it, reconciling on change) rather than re-asking. Each entry was
 > **accepted by you**: advisors propose additions, you accept or edit them.
