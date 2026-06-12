@@ -12,9 +12,9 @@ Prior (1.0.0) bump: INITIAL RATIFICATION — backfilled the constitution from ma
            canon invariant (I1–I9 in INTEGRATION-LAYER.md, S1–S10 across
            GATE-PRIMITIVE.md / SDLC-LAYER.md, the band table in
            DECISION-PRIMITIVE.md) and given a uniform Rule / Value / Counter-force
-           / Watch-for shape borrowed from the LinkedInTools constitution v2.0.0.
+           / Watch-for shape applied uniformly across all principles.
 
-Form stolen from masheraAnna/LinkedInTools constitution v2.0.0:
+Form:
   - the Rule / Value / Counter-force / Watch-for principle block
   - the balance-check governance rule (every rule names a counter-force OR
     declares absolutism)
@@ -307,7 +307,7 @@ trail. *(canon: I1–I7 + the Dijkstra posture, INTEGRATION-LAYER.md; S7, SDLC-L
   **authoritative roster**; no artefact enumerates agent filenames.
 - **No secrets, ever (absolute).** No credential, token, session cookie, or
   `CHORUS-PROJECT.md` carrying private project facts is committed. A committed secret is a
-  one-way door; there is no legitimate case. *(form borrowed from LinkedInTools V)*
+  one-way door; there is no legitimate case.
 
 ## Review Workflow
 
