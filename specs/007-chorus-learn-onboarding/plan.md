@@ -37,7 +37,9 @@ persona-agent set** (FR-015). No runtime code; same authoring shape as features
 - **Feature 006 (PR #5, open)** — `DECISION-PRIMITIVE.md` exists only on that branch;
   007 lands after it (research.md R8). Note: 006 does **not** deliver a three-mode
   SKILL.md — its SKILL.md still lists two modes; **007 itself performs the
-  two→three-modes reframe** (R8 corrected per finding F25)
+  two→three-modes reframe** (R8 corrected per finding F25). The PR #5 **merge
+  horizon is an open operator item** (run-2 GOLD-1, held 🟡): the serialized path to
+  the first newcomer session starts at that merge; record the horizon when known
 - The AskUserQuestion tool (≤4 options per question plus built-in "Other") — the
   navigation rules in FR-004 are designed against this hard budget
 - `templates/CHORUS-PROJECT.template.md` (scaffold source), `install.sh` (file-path
@@ -150,9 +152,9 @@ templates/
 
 install.sh               # EDIT: deploy templates/ → $SKILL_DST/templates/ + "Next:" leads
                          #   with `chorus learn`
-plugin.json              # EDIT (FR-015): package templates/ + the 3 missing persona agents
-                         #   (constraint-and-flow, security-and-trust, guido); refresh the
-                         #   stale 7-advisor description
+plugin.json              # EDIT (FR-015): package templates/ + every file in agents/
+                         #   (the directory is the authoritative roster — no filename
+                         #   enumeration here or anywhere); refresh the stale description
 README.md                # EDIT: three modes named; quick-start leads with `chorus learn`;
                          #   manual copy remains as cited fallback (installed template path)
 ```

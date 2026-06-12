@@ -13,7 +13,7 @@
 The chorus-review skill is powerful but has a steep cold-start: a new user faces several
 dense companion docs (`SKILL.md`, `INTEGRATION-LAYER.md`, `SDLC-LAYER.md`,
 `GATE-PRIMITIVE.md`, `EXPLORATORY-PHASE.md`, `DECISION-PRIMITIVE.md`), a per-project
-addendum to author, and two operating modes. There is no guided on-ramp. `chorus learn`
+addendum to author, and two review modes. There is no guided on-ramp. `chorus learn`
 adds one: an **interactive, staged tutorial** that teaches a newcomer — in a few
 self-paced **steps**, using the **AskUserQuestion tool** as the interaction primitive —
 how to **set up** the chorus and how to **work with** it, without making them read the
@@ -420,8 +420,8 @@ definition.
   surface), in the README — whose quick-start leads with `chorus learn` before the
   manual template copy (which remains as the cited fallback, citing the **installed
   template path as deployed** — no environment-specific literals) — and in
-  `install.sh`'s "Next:" text. The mode-registry edits ("Two modes" → three-mode
-  framing in SKILL.md, README, and this spec's own references) are named edit surfaces
+  `install.sh`'s "Next:" text. The mode-registry edits (the stale two-mode heading
+  region → three-mode framing in SKILL.md, README, and this spec's own references) are named edit surfaces
   with a staleness check that scans **all three named surfaces** for a **stated
   phrasing family** (the family is enumerated in the check itself — claim and check
   exactly as strong as each other, never a broad claim over a narrow scan).

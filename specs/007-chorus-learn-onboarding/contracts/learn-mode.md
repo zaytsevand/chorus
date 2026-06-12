@@ -15,7 +15,7 @@
 | `SKILL.md` **Phase-0 note** | a SCAFFOLDED-marker-bearing addendum is present-but-unfilled: the **Phase-0 orchestrator** confirms the flagged sections with the operator and never consumes placeholder text as project facts; the **per-advisor exploratory cache** caches a marker-bearing addendum as structure only, never as operator-confirmed facts (FR-014 — both consumers, G17) |
 | `README.md` | names all three modes with triggers; the quick-start **leads with `chorus learn`**, the manual template copy remains as the cited fallback — citing the **installed template path as deployed**, no environment-specific literals (family M, G5) |
 | `install.sh` "Next:" | leads with `chorus learn`; cites the installed template location for the manual fallback |
-| **`plugin.json`** | packages `templates/` and the **full persona-agent set** (10/10 — adds constraint-and-flow, security-and-trust, guido); stale 7-advisor description refreshed (FR-015/R11; asserted by C5b) |
+| **`plugin.json`** | packages `templates/` and **every file in `agents/`** — the directory is the authoritative roster; this contract names **no** agent filenames (run-2 cluster A: an enumeration here went stale within days of an agent rename). Stale plugin description refreshed. (FR-015/R11; asserted by C5b **in both directions** + description grep) |
 | Definition locus | `LEARN.md` is the **single canonical definition** of the mode; any change to steps, navigation, or the scaffold happens there, once |
 
 ## Mode behavior (normative)
