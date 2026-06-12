@@ -316,3 +316,43 @@ the **full** C1–C7+C5b suite (now FAIL-token-clean) as the SC-008 dogfood. Wat
 RICH-2 (PR #5 horizon before the cite-checks can pass — `DECISION-PRIMITIVE.md` must be
 present), EVAN-1 (F22 single-source), and the per-step C3 / bidirectional C5b actually
 passing against the authored `LEARN.md`/`plugin.json`.
+
+---
+
+## Implementation (`/speckit-implement`) — 2026-06-12
+
+**Precondition cleared:** the branch was rebased onto `origin/main`, pulling in **PR #5
+(feature 006)** — `DECISION-PRIMITIVE.md` is now present, so RICH-2/GOLD-1 are resolved
+(`plan.md` updated). All 28 tasks executed (`tasks.md` marked `[X]`).
+
+**Authored:** `skill/chorus-review/LEARN.md` (new — the canonical mode definition: 5
+steps, navigation per `contracts/navigation.md`, the S1 instruct-only install sub-step,
+the S2 opt-in scaffold under the pinned `#### On accept` heading, per-step channel-
+resolvable `Cites:`, the FR-011 wrap-up / S1 cheat-sheet). **Edited:** `SKILL.md`
+(frontmatter trigger + three-mode reframe + FR-014 Phase-0 note, both consumers),
+`README.md` (three modes; quick-start leads with `chorus learn`; installed-template-path
+fallback, no author-machine literal), `install.sh` (deploys `templates/`; "Next:" leads
+with `chorus learn`), `plugin.json` (packages `templates/` + all 10 `agents/*.md`,
+refreshed description), `templates/CHORUS-PROJECT.template.md` (copy-safe preamble),
+`spec.md` (GOLD-6: SC-010 day-30 owner named).
+
+**Conformance suite (the SC-008 dogfood, run from repo root):** C1–C6 + C5b all pass —
+**0 `FAIL:` tokens**. C1 again caught two live staleness items ("Both modes run it" /
+"Both modes reference it" in `SKILL.md`) — fixed to "Both review modes". C5 installed-side
+verified (template deploys under a temp `CLAUDE_HOME`). C5b both directions green (10/10
+agents packaged, no phantom entries, no stale count in the description). C6 fixture
+self-test fires 6/6 and no write idiom appears outside the `#### On accept` branch. C2/C3
+green against the authored `LEARN.md` (5 steps, ≥1 `Cites:` per step, all pointers resolve
+incl. `DECISION-PRIMITIVE.md`). C4 finds no restated canon block. C7's four paths
+(accept/decline/existing/outside-repo) are defined in `LEARN.md` S2 and exercised at the
+live dogfood.
+
+**Carried obligation — SC-010 (T027, post-merge):** within **30 days of merge**, one real
+external-newcomer `chorus learn` session must be recorded here (install channel + outcome).
+**Until that row exists, this loop is OPEN.** At day 30 without it, the operator records a
+ledger entry deciding continue / extend / retire (GOLD-6, now in SC-010). _[awaiting first
+external newcomer — no row yet]_
+
+**Ready for Gate C** (implementation review): reviews `LEARN.md` + the edit surfaces for
+their own soundness, ingests the `spec-walkthrough` headless reconciliation, and treats
+the now-green suite as the dogfood.

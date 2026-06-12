@@ -19,11 +19,12 @@ An optional **Guido** (Python) language lens joins only on rounds with Python in
 scope. Conflicts go to `advisor()`. Output is a durable markdown artifact you
 commit; the most recent artifact is the next round's baseline.
 
-## Two modes
+## Three modes
 
-The skill runs in two modes, both built on the same four-stage gate primitive
-(`skill/chorus-review/GATE-PRIMITIVE.md`: extract → uncapped author → real
-adversarial vote → deterministic tally):
+The skill runs in three modes — two *review* modes built on the same four-stage
+gate primitive (`skill/chorus-review/GATE-PRIMITIVE.md`: extract → uncapped
+author → real adversarial vote → deterministic tally), plus a navigational
+onboarding tutorial:
 
 - **Project-state round** — a multi-lens review of a scope you choose: most
   often a spec or a feature's design, occasionally the whole codebase (the
@@ -38,8 +39,12 @@ adversarial vote → deterministic tally):
   Trigger: **"run the agent-SDLC on feature 0NN."** Driven by
   `skill/chorus-review/SDLC-LAYER.md`; output:
   `specs/<feature>/agent-sdlc-log.md`.
+- **`chorus learn`** (tutorial) — an interactive staged onboarding that teaches
+  setup and both review modes via the AskUserQuestion tool, one step at a time,
+  mutating nothing except one opt-in scaffold. Trigger: **"chorus learn."**
+  Defined in `skill/chorus-review/LEARN.md`. **New here? Start with this.**
 
-The gate primitive is shared so the two modes cannot drift. The rest of this
+The gate primitive is shared so the review modes cannot drift. The rest of this
 README describes the project-state round.
 
 ## Why
@@ -266,10 +271,15 @@ addenda and chorus artifacts under `docs/reviews/` are left untouched.
 
 ## Run a round
 
-1. **Drop the template into your project:**
+**New here? Say `chorus learn`** — a guided tutorial that orients you, helps set
+up the addendum (it can scaffold it for you on request), and teaches both review
+modes one step at a time. Everything below is the manual path.
+
+1. **Set up the addendum** — let `chorus learn` scaffold it, or copy the
+   installed template into your project:
 
    ```sh
-   cp ~/code/chorus-review/templates/CHORUS-PROJECT.template.md \
+   cp ~/.claude/skills/chorus-review/templates/CHORUS-PROJECT.template.md \
       docs/reviews/CHORUS-PROJECT.md
    ```
 

@@ -6,11 +6,13 @@ otherwise be hard-coded for this repo.
 
 Read by the orchestrator at Phase 0 of every chorus round.
 
-Copy this template to `docs/reviews/CHORUS-PROJECT.md` in your project and
-fill in the sections below. Sections (2), (3), and (5) are required before
-the chorus can launch. Sections (1), (4), and (6) can be inferred from your
-project layout / `CLAUDE.md` / governance docs if you leave them empty, but
-filling them in speeds up every round.
+<!-- Copy-safe preamble (comment-wrapped so a scaffolded copy reads correctly —
+007 family G / F7): To use this template, copy it to
+`docs/reviews/CHORUS-PROJECT.md` in your project and fill in the sections below.
+Sections (2), (3), and (5) are required before the chorus can launch. Sections
+(1), (4), and (6) can be inferred from your project layout / `CLAUDE.md` /
+governance docs if you leave them empty, but filling them in speeds up every
+round. (`chorus learn` can scaffold this file for you — say "chorus learn".) -->
 
 ## 1. Project summary
 

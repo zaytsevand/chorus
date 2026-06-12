@@ -34,12 +34,14 @@ persona-agent set** (FR-015). No runtime code; same authoring shape as features
 **Primary Dependencies**:
 - The chorus canon the tutorial cites: `SKILL.md`, `INTEGRATION-LAYER.md`,
   `SDLC-LAYER.md`, `GATE-PRIMITIVE.md`, `EXPLORATORY-PHASE.md`, `DECISION-PRIMITIVE.md`
-- **Feature 006 (PR #5, open)** — `DECISION-PRIMITIVE.md` exists only on that branch;
-  007 lands after it (research.md R8). Note: 006 does **not** deliver a three-mode
-  SKILL.md — its SKILL.md still lists two modes; **007 itself performs the
-  two→three-modes reframe** (R8 corrected per finding F25). The PR #5 **merge
-  horizon is an open operator item** (run-2 GOLD-1, held 🟡): the serialized path to
-  the first newcomer session starts at that merge; record the horizon when known
+- **Feature 006 (PR #5, merged 2026-06-12)** — `DECISION-PRIMITIVE.md` is now present
+  in this branch's tree (merged via rebase onto `main`); 007 lands after it
+  (research.md R8). Note: 006 does **not** deliver a three-mode SKILL.md — its
+  SKILL.md listed only the review modes; **007 itself performs the two→three-modes
+  reframe** (R8 corrected per finding F25). The PR #5 **merge horizon is now closed**
+  (run-2 GOLD-1 resolved): the serialized path to the first newcomer session starts at
+  this merge, which has occurred — so S4's `DECISION-PRIMITIVE.md` cite resolves and the
+  conformance suite can pass green (Gate B RICH-2 precondition cleared)
 - The AskUserQuestion tool (≤4 options per question plus built-in "Other") — the
   navigation rules in FR-004 are designed against this hard budget
 - `templates/CHORUS-PROJECT.template.md` (scaffold source), `install.sh` (file-path

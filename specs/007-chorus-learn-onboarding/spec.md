@@ -514,7 +514,10 @@ definition.
   **30 days of merge**, one session by a **real external newcomer** (not the operator,
   not a team simulation) running `chorus learn` is recorded in the gate ledger —
   install channel used and outcome reached. Until that record exists, the feature's
-  validated-learning loop is open and the ledger says so.
+  validated-learning loop is open and the ledger says so. **At day 30 without that
+  record, the operator records a ledger entry deciding continue / extend the window /
+  retire** — so the verdict-closer is acted on by a named owner, never silently
+  expired (GOLD-6).
 
 ## Assumptions
 
