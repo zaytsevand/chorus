@@ -265,6 +265,12 @@ SC-007 / SC-008.
 this file** for the mechanic; they do not restate it. Any change to the phase
 happens here, once, so the two modes cannot drift.
 
+The **read side** above runs *before* a gate. Its **write-side bookend** — the
+sign-off **memory update phase** (`SDLC-LAYER.md` § Memory update; spec 010) — reuses the
+same scope-tagged, operator-accepted write-back (`project-wide` → addendum;
+`lens-specific` → record) at the end of an SDLC run, so the loop this file opens on read
+is closed on write. It adds no new write path and no fingerprint mechanic of its own.
+
 ## Provenance
 
 Specified in `specs/004-advisor-exploratory-phase/` (spec FR-001..FR-023, research

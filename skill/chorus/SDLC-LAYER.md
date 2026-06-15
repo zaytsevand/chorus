@@ -39,7 +39,8 @@ flowchart TD
     B -->|clear| impl["/speckit-implement → code + tests"]
     impl --> C{"Gate C · implementation review"}
     C -->|"🔴 fix code, or clarify → re-implement"| C
-    C -->|clear| done([feature reviewed])
+    C -->|clear| mem["memory update · dispatch each seated lens write-back (sign-off bookend)"]
+    mem --> done([feature reviewed · memory updated])
 ```
 
 The feature's spec is the entry point, not a step the orchestrator must author:
@@ -177,6 +178,58 @@ when substantial pre-existing code is in scope to reconcile against. (Its job is
 spec↔code reconciliation, so it is empty on a greenfield pre-implementation
 gate.)
 
+### Memory update phase (sign-off)
+
+Once per lifecycle, **after Gate C clears and as the sign-off bookend**, the orchestrator
+runs the **memory update phase** — the write-side counterpart to the exploratory phase's
+read-side (`EXPLORATORY-PHASE.md`). Where the exploratory phase *reads* each lens's
+understanding before a gate, this phase *writes back* what the cycle taught, so the next run
+starts from the last run's understanding instead of re-deriving it (spec 010). It does **not**
+fire per gate, per self-heal cycle, or on a run aborted before sign-off (010 FR-001).
+
+It reuses the exploratory phase's write-back contract and invents **no new write path**
+(Principle I):
+
+- **Dispatch, never synthesize (S1/S9).** The orchestrator **dispatches each seated persona**
+  to update **its own** `~/.claude/agent-memory/<persona>/` record; it authors no record and
+  synthesizes no learning. Each lens distills **only its own contributions to this run's ledger**
+  (its findings-register rows + its understanding record) — a re-read of its own prior output, not
+  a fresh harvest. (The cheaper "orchestrator distills the whole ledger in one pass" alternative is
+  refused: it would synthesize what a lens learned — 010 TOC-3.)
+- **Durable-only (010 FR-003a).** A learning persists **iff** it (a) carries a re-groundable
+  locator into a live source **and** (b) generalizes beyond this run's spec delta. Persisted text is
+  a **locator + ≤~2-sentence hint**, never a standalone verdict ("memory is an index, never the
+  endpoint").
+- **Secret pre-filter first (010 FR-007).** An **agent-applied, ledger-audited** deny-filter runs on
+  **every** candidate fact **before** any record write or proposal, independent of the operator-confirm.
+  Its detector class is **two-part**: credential-shaped secrets (high-entropy tokens, known
+  credential/key prefixes, `.env`/secret-file path captures) **and** structured private project facts
+  (internal hostnames, personal/customer names, ticket IDs — the constitution's boundary is broader
+  than credentials, and low-entropy private prose sails past an entropy check). Matches are dropped and
+  flagged in the ledger on **both** paths (the `project-wide` proposal path **and** the auto
+  `lens-specific` write path). The secrets boundary is absolute and does not ride on the confirm —
+  but because the skill has **no runtime**, this is **persona-applied discipline made verifiable by the
+  ledger drop-record**, not a "mechanical" runtime pass; the ledger audit, not the label, is the guard.
+- **Scope routing, banded by `DECISION-PRIMITIVE.md`.**
+  - **`lens-specific` facts → mechanically-decidable → 🟢 auto.** Each persona writes them to its own
+    record (the exploratory-phase fact, written at sign-off).
+  - **`project-wide` facts → operator-owned → surfaced, never auto-written.** The orchestrator
+    **collates a single accept/reject diff** to `docs/reviews/CHORUS-PROJECT.md`'s "Project
+    understanding" section — the existing scope-tagged, operator-accepted write-back (spec 004
+    FR-005/FR-017), not a new path. **Accept** applies it; **reject** discards it (a DecisionRecord is
+    written, default = addendum unchanged); **no-response** defers it — the proposal is queued in the
+    ledger's pending list and re-offered at the next sign-off, never silently lost. The re-offer is
+    **bounded (010 FR-006): after N = 3 unanswered sign-offs the proposal lapses** to a
+    passively-readable pending list — a terminal state, no longer actively re-offered (so "defer" never
+    becomes a standing tax that re-asks forever). The addendum stays byte-unchanged unless the operator
+    accepts, and **sign-off is never blocked** on the answer (self-unblocking discipline, spec 006).
+- **No-op is recorded (010 FR-009).** With no durable learnings, or for a persona with no memory dir,
+  the phase records a no-op **naming which test produced it** (no locator / does-not-generalize / no
+  memory dir) — it never fabricates a record or surfaces an empty proposal.
+
+The phase records its outcome in the ledger under `## Memory update (sign-off)` (below), and the
+end-of-run self-audit gains the check "orchestrator authored no record / synthesized no learning."
+
 ## Invariants (lifecycle level)
 
 These extend I1–I9. S8/S9 are gate-primitive-level and live in
@@ -212,7 +265,10 @@ RSVP table (joiners/abstainers + the two-axis signal), findings register, vote
 tally, 🔴 resolution/waiver log, unclaimed extract records, loop-cycle count, a
 **`## Provisional decisions (review & override)`** section holding the 🟡
 DecisionRecords (default, runner-up, sensor evidence, override + cost — see
-`DECISION-PRIMITIVE.md`), and the end-of-run **S1–S9 self-audit checklist** (each
+`DECISION-PRIMITIVE.md`), a **`## Memory update (sign-off)`** section (per-persona
+write-back counts, the proposed `project-wide` diff or its locator, the operator
+accept/reject/deferred decision, the pending-proposals list, and any secret-filter
+drops — spec 010 FR-008), and the end-of-run **S1–S9 self-audit checklist** (each
 item marked pass with a pointer to its evidence row). The ledger is **not** placed
 under `docs/reviews/` — that directory is for periodic project-state rounds. (Full
 schema: `specs/003-agent-sdlc-workflow/contracts/sdlc-ledger.md`; decision-record
@@ -231,6 +287,9 @@ The SDLC orchestrator refuses, plainly, to:
 - **Loop forever.** Three uncleared cycles escalate (S7).
 - **Treat a fixed viewpoint as authoritative.** `spec-walkthrough` is an input,
   not a gate (FR-018).
+- **Auto-write the shared addendum, or author a persona's memory.** At sign-off the
+  memory update phase *dispatches* the write-back to each persona; the operator owns
+  the addendum, written only via an accepted, scope-tagged proposal (S1/S9, spec 010).
 
 ## When to consult this file
 
