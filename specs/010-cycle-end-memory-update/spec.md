@@ -129,11 +129,14 @@ Held 🟡 (recorded, non-gating; the operator proceeds at will):
 
 - **TOC-2 / TOC-3** (Goldratt) — *spec 004's read-side has never been exercised by a real run, and
   004 is itself still `Draft`*; building the write-side now buys correctness for a loop that has never
-  closed once. The recorded cost-of-delay rationale (build now; 004 pays nothing back until the loop
-  closes) is legible but unmeasured. **Cheapest experiment, deferred to the operator:** run **one**
-  full lifecycle, persist write-back **by hand** into two or three lens records, and confirm run 2's
-  exploratory phase reads them back — before relying on the automated phase. This did not gate (most
-  voters CONFIRMed), but it is the most load-bearing strategic caveat on the feature.
+  closed once. **RESOLVED by experiment (2026-06-15).** The cheapest-experiment was run: three lens
+  records were persisted by hand (the write-side output) and three real personas then ran their run-2
+  exploratory **Reuse** step. Result — all three read the persisted memory back and re-grounded their
+  entries in the live source; a deliberately-planted stale entry (a constitution line removed in PR #17)
+  was **caught and flagged**, not silently trusted (fails safe — "false-fresh is the dangerous
+  direction"). The 004 read-side closes the loop. Residual: the write-side was hand-simulated (it is
+  ordinary persona dispatch), and one of three dispatches misfired and needed a re-dispatch — addressed
+  by FR-002a below.
 - **ARCH-3** (Richards) — add a doc-test fitness function asserting the FR-010 section names no
   fingerprint write-verb, so the 004 reuse cannot silently fork later. Recommended, non-blocking.
 
@@ -258,6 +261,12 @@ record, the two-tier memory could drift invisibly.
   applying FR-003a — a re-read of its own prior output, not a fresh corpus harvest. The cheaper
   "orchestrator distills the whole ledger in one pass" alternative is **refused**: it would
   synthesize what a lens learned, violating S1/S9 (TOC-3 resolution above).
+- **FR-002a (dispatch robustness)**: A dispatched lens that does not return a usable record
+  write-back (empty/errored response, no tool activity) MUST be **re-dispatched at least once**
+  before the phase records a skip for that lens, mirroring the gate's existing dispatch discipline.
+  A persistent non-response is recorded as a skip in the ledger (FR-009), never silently dropped and
+  never fabricated by the orchestrator. *(Validated need: the 2026-06-15 read-side experiment saw 1
+  of 3 dispatches misfire and succeed on re-dispatch.)*
 - **FR-003**: Persisted learnings MUST be **locators + ≤~2-sentence navigational hints**, never
   standalone authoritative conclusions — preserving "memory is an index, never the endpoint."
 - **FR-003a (definition)**: A learning is **durable** — and therefore eligible to persist — iff it
