@@ -84,9 +84,64 @@ requirements below:
 - **FR-007** — moved the secrets boundary to a mechanical **pre-filter** that runs before any
   write/proposal and independently of the operator-confirm. *(clears ARCH-3 🔴, SEC-1/SEC-2 🟡.)*
 
-Held 🟡 left open as design notes, not blockers: **TOC-3** (is write-back the cheapest way to close
-the loop, vs. one ledger-distillation pass? — settle before build) and **DDD-2** (the "delta/
-proposal" vocabulary vs. canon's scope-tagged confirmed-fact terms).
+Both held 🟡 are now **resolved** (2026-06-12, second pass):
+
+- **TOC-3** (Goldratt — cheapest loop-closer) — the "one ledger-distillation pass" alternative is
+  **rejected as canon-illegal**: a single pass that reads the run ledger and distills what each lens
+  learned is *orchestrator synthesis of a learning*, which S1/S9 forbid. Per-lens dispatch is therefore
+  the **minimum legal** mechanism, not gold-plating. It is made as cheap as the constraint allows
+  (FR-002): each lens distills **only its own ledger contributions from this run** — a re-read of its
+  own prior output, riding the context it already holds at sign-off, never a fresh corpus harvest.
+  Cost-of-delay favors building now: the read-side (spec 004) is already shipped and pays nothing back
+  until the write-side closes the loop — every run re-derives until it exists. *(clears TOC-3 🟡.)*
+- **DDD-2** (Evans — ubiquitous language) — the spec no longer coins a parallel vocabulary. A
+  "lens-specific delta" is named for what canon already calls it: a **scope=`lens-specific`
+  operator-confirmed/referenced fact** written to the persona record (the same fact the exploratory
+  phase writes, written at a new moment). A "project-wide proposal" is the **scope=`project-wide`,
+  operator-accepted write-back** (spec 004 FR-005/FR-017) surfaced as accept/reject — not a new write
+  path or entity. Only **deferred write-back** (the unanswered-`project-wide` state) is genuinely new,
+  and it is defined as a *state of* that write-back, reusing the re-entrant interview's deferred-session
+  notion. See the canon-mapped **Key Entities** below. *(clears DDD-2 🟡.)*
+
+### Gate C implementation review (2026-06-12)
+
+A 5-lens chorus SDLC implementation gate (Security / Goldratt / Evans / Richards / Cooper; seated
+from 8 RSVP joiners, 5th seat a recorded 🟡 tie-default; author-excluded vote, deterministic tally)
+reviewed the canon implementation. It produced **three gating 🔴**, all incorporated here (cycle 1):
+
+- **SEC-1** (net +4, unanimous) — FR-007 called the secret pre-filter "**mechanical**," but the skill
+  has no runtime, so it is a deny-rule the dispatched persona applies to itself — self-attestation, not
+  a compiled pass. **Fix:** reframed as "**agent-applied, ledger-audited**"; the ledger drop-record is
+  the verifiable guard, and the spec no longer claims a determinism the substrate can't give.
+- **SEC-2** (net +2) — the detector class named only credential-shaped secrets; the constitution's
+  boundary is broader ("private project facts"), and low-entropy private prose (internal hostnames,
+  names, ticket IDs) sails past an entropy check. **Fix:** FR-007 now names a **two-part** detector
+  class — credential-shaped **and** structured-private-fact.
+- **COOP-2** (net +2) — FR-006's no-response → defer → re-offer had **no bound**: an unanswered
+  proposal re-asked at every future sign-off (an aggregate with no terminal state; an ever-growing
+  queue; a standing operator tax). **Fix:** bounded to **N = 3 re-offers**, then **lapse** to a
+  passively-readable pending list — a terminal state distinct from reject.
+
+Folded in the same cycle: **SEC-4** (held 🟡) — the ledger drop-record now logs drops on the auto
+`lens-specific` path too, not just the proposal path.
+
+Held 🟡 (recorded, non-gating; the operator proceeds at will):
+
+- **TOC-2 / TOC-3** (Goldratt) — *spec 004's read-side has never been exercised by a real run, and
+  004 is itself still `Draft`*; building the write-side now buys correctness for a loop that has never
+  closed once. The recorded cost-of-delay rationale (build now; 004 pays nothing back until the loop
+  closes) is legible but unmeasured. **Cheapest experiment, deferred to the operator:** run **one**
+  full lifecycle, persist write-back **by hand** into two or three lens records, and confirm run 2's
+  exploratory phase reads them back — before relying on the automated phase. This did not gate (most
+  voters CONFIRMed), but it is the most load-bearing strategic caveat on the feature.
+- **ARCH-3** (Richards) — add a doc-test fitness function asserting the FR-010 section names no
+  fingerprint write-verb, so the 004 reuse cannot silently fork later. Recommended, non-blocking.
+
+Demoted to 🟢 by the tally (net −2): **SEC-6** (`.gitignore` — the memory dir is outside the repo, so
+a repo ignore-rule was never its control surface), **DDD-2-bis** (rename "deferred write-back" →
+"deferred proposal" — the room judged "write-back" names the trust-bearing direction more honestly),
+**COOP-3** (re-present the diff outside sign-off — cuts against the deliberate sign-off-bookend design;
+the bounded-lapse fix above already removes the fatigue tax).
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -184,8 +239,9 @@ record, the two-tier memory could drift invisibly.
 - **Stale cache after write.** An accepted addendum write changes the cited span; caches in lens
   records re-validate via spec 004's read-side digest on next re-read (weak/eventual consistency,
   addendum authoritative). This phase adds no fingerprint mutator of its own.
-- **Secret leakage.** The mechanical secret pre-filter (FR-007) runs on every candidate fact before
-  any write or proposal and independently of the operator answer; matches are dropped and flagged in
+- **Secret leakage.** The agent-applied, ledger-audited secret pre-filter (FR-007) runs on every
+  candidate fact before any write or proposal and independently of the operator answer; matches
+  (credential-shaped or structured-private-fact) are dropped and flagged in
   the ledger, never persisted or proposed (constitution security principle).
 
 ## Requirements *(mandatory)*
@@ -197,7 +253,11 @@ record, the two-tier memory could drift invisibly.
   fire per gate, per self-heal cycle, or on an aborted run.
 - **FR-002**: The phase MUST **dispatch to each seated persona** to update **its own**
   `~/.claude/agent-memory/<persona>/` record. The orchestrator MUST NOT author any persona's
-  record or synthesize a learning (S1/S9).
+  record or synthesize a learning (S1/S9). Each dispatched persona distills **only its own
+  contributions to this run's ledger** (its findings-register rows + its understanding record),
+  applying FR-003a — a re-read of its own prior output, not a fresh corpus harvest. The cheaper
+  "orchestrator distills the whole ledger in one pass" alternative is **refused**: it would
+  synthesize what a lens learned, violating S1/S9 (TOC-3 resolution above).
 - **FR-003**: Persisted learnings MUST be **locators + ≤~2-sentence navigational hints**, never
   standalone authoritative conclusions — preserving "memory is an index, never the endpoint."
 - **FR-003a (definition)**: A learning is **durable** — and therefore eligible to persist — iff it
@@ -221,14 +281,37 @@ record, the two-tier memory could drift invisibly.
     queued (recorded in the ledger's pending-proposals list) and **re-offered** at the next run's
     sign-off / read by the next exploratory phase. A `project-wide` learning is never silently lost
     to inattention — only to an explicit reject.
-- **FR-007**: A **mechanical secret pre-filter MUST run on every candidate fact BEFORE it is
-  written to a lens record or surfaced in any proposal**, and MUST run regardless of whether the
-  operator later answers — the secrets boundary is absolute (constitution: "No secrets, ever") and
-  MUST NOT depend on the operator-confirm. A fact matching the filter is **dropped and flagged in
-  the ledger**, never persisted and never proposed. The detector class MUST be named (at minimum:
-  high-entropy tokens, known credential/key prefixes, and `.env`/secret-file path captures); it is
-  a deny-filter, not a human eyeball. The operator-confirm (FR-005) governs only **whether an
-  already-secret-free `project-wide` fact is written** — it is not the secrets gate.
+  - **Bounded re-offer (terminal state; COOP-2).** Re-offer is **not** unbounded. After **N = 3**
+    consecutive sign-offs unanswered, the deferred proposal **auto-expires to a `lapsed` state** — a
+    *terminal* state distinct from reject: not discarded with prejudice, but **no longer actively
+    re-offered**. A lapsed proposal moves to a **passively-readable** pending list the operator may
+    consult on their own initiative (and which the next exploratory phase may still read), but it
+    **stops interrupting sign-off**. This bounds the deferred-proposal queue (it cannot grow without
+    limit), gives the proposal aggregate a terminal state for chronic non-response (not only for
+    accept/reject), and ensures "defer" never becomes a standing tax that re-asks at every future
+    sign-off until the operator capitulates. Re-activation is operator-initiated from the pending
+    list, never automatic.
+- **FR-007**: An **agent-applied, ledger-audited secret pre-filter MUST run on every candidate fact
+  BEFORE it is written to a lens record or surfaced in any proposal**, and MUST run regardless of
+  whether the operator later answers — the secrets boundary is absolute (constitution: "No secrets,
+  ever") and MUST NOT depend on the operator-confirm. A fact matching the filter is **dropped and
+  flagged in the ledger**, never persisted and never proposed; the **ledger drop-record is where the
+  filter's operation is audited**, and it MUST log drops on **both** paths — the `project-wide`
+  proposal path **and** the auto `lens-specific` write path (the unwatched path; SEC-4). The detector
+  class MUST be named in two parts:
+  - **credential-shaped secrets** — high-entropy tokens, known credential/key prefixes, and
+    `.env`/secret-file path captures;
+  - **structured private project facts** — the constitution's boundary is broader than credentials
+    (`.specify/memory/constitution.md`: a committed `CHORUS-PROJECT.md` carrying *private project
+    facts*): internal hostnames/endpoints, personal or customer names, and ticket/issue identifiers.
+    Low-entropy private prose sails past an entropy check, so it MUST be a named class, not an
+    afterthought — it is exactly the surface a harvest-to-replay phase moves toward a committed file.
+  **Substrate honesty (this skill has no runtime — see Assumptions):** the filter is a deny-rule the
+  dispatched persona applies to itself before writing, **not** a compiled mechanical pass; its
+  enforcement is **persona-applied discipline made verifiable by the ledger drop-record**, not a
+  runtime guarantee. The spec MUST NOT call it "mechanical" — that word claims a determinism the
+  substrate cannot give. The operator-confirm (FR-005) governs only **whether an already-secret-free
+  `project-wide` fact is written** — it is not the secrets gate.
 - **FR-008**: The phase MUST record its outcome in the ledger under a `## Memory update (sign-off)`
   section: per-persona write-back counts, the proposed `project-wide` diff (or its locator), and the
   operator decision. The end-of-run S1–S9 self-audit MUST include "orchestrator authored no record /
@@ -246,12 +329,25 @@ record, the two-tier memory could drift invisibly.
 ### Key Entities
 
 - **Memory update phase**: the sign-off lifecycle bookend that dispatches write-back.
-- **Lens-specific delta**: a scope-tagged locator+hint written autonomously to a persona's record.
-- **Project-wide proposal**: a collated accept/reject diff to the shared addendum (operator-owned).
-- **Deferred proposal**: a `project-wide` proposal the operator did not answer — queued in the
-  ledger's pending list and re-offered at the next sign-off (distinct from a rejected proposal).
-- **Secret pre-filter**: the mechanical deny-filter that drops secret-shaped candidate facts before
-  any write or proposal, independent of the operator-confirm.
+- **Lens-specific delta** *(canon: a scope=`lens-specific` operator-confirmed/referenced fact)*: a
+  locator+hint written autonomously to a persona's record — the exploratory-phase fact, written at
+  sign-off. "Delta" is informal shorthand for this cycle's new such facts, never a new entity or
+  write path.
+- **Project-wide proposal** *(canon: the scope=`project-wide`, operator-accepted write-back, spec 004
+  FR-005/FR-017)*: that existing write-back surfaced as a single accept/reject diff to the shared
+  addendum (operator-owned) — not a new write path.
+- **Deferred write-back**: a `project-wide` write-back the operator did not answer — a *state of* the
+  write-back (reusing the re-entrant interview's deferred-session notion), queued in the ledger's
+  pending list and re-offered at the next sign-off, **bounded to N = 3 re-offers** (FR-006). Distinct
+  from a rejected write-back (discarded).
+- **Lapsed proposal**: a deferred write-back that went unanswered for N = 3 consecutive sign-offs —
+  a *terminal* state (distinct from reject): moved to a passively-readable pending list, no longer
+  actively re-offered, re-activatable only on operator initiative. This is what bounds the queue and
+  gives the proposal aggregate a terminal state for chronic non-response (COOP-2).
+- **Secret pre-filter**: the **agent-applied, ledger-audited** deny-filter that drops secret-shaped
+  **and structured-private-fact** candidate facts before any write or proposal, independent of the
+  operator-confirm. Persona-applied discipline made verifiable by the ledger drop-record — not a
+  runtime "mechanical" pass (this skill has no runtime).
 - **Memory-update ledger section**: the audit record of what entered memory, what was deferred, and
   the operator decision.
 
@@ -267,11 +363,17 @@ record, the two-tier memory could drift invisibly.
   sign-off (run completes in 100% of such cases).
 - **SC-003a**: A `project-wide` learning the operator did not answer is **re-offered at the next
   sign-off** in 100% of cases (0 silent losses to inattention); only an explicit reject discards it.
+- **SC-003b**: A deferred proposal unanswered for **N = 3** consecutive sign-offs is **lapsed** (moved
+  to the passively-readable pending list and no longer actively re-offered) in 100% of cases — the
+  re-offer queue is bounded and never re-interrupts a fourth sign-off (COOP-2).
 - **SC-004**: Every run's ledger contains a reconstructable `## Memory update (sign-off)` section;
   a reviewer can determine what entered memory from it alone.
-- **SC-005**: 0 secret-shaped facts persisted or proposed across the conformance scenarios — every
-  match is dropped by the FR-007 pre-filter **before** any write/proposal, with identical outcomes
-  whether or not the operator answers (the secrets gate does not depend on the confirm).
+- **SC-005**: 0 secret-shaped **and 0 structured-private-fact** candidates persisted or proposed
+  across the conformance scenarios — every match is dropped by the FR-007 pre-filter **before** any
+  write/proposal, with identical outcomes whether or not the operator answers (the secrets gate does
+  not depend on the confirm). The detector covers **both** named classes (credential-shaped and
+  structured private facts), and the **ledger drop-record logs drops on both the proposal path and
+  the auto `lens-specific` path** — the pre-filter is the audited boundary, not the word "mechanical."
 - **SC-006**: A `quickstart.md` worked example shows a two-run sequence where run 2's exploratory
   phase reads a fact that run 1's memory update phase persisted — demonstrating the closed loop.
 
