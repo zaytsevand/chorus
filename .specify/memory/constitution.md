@@ -293,9 +293,16 @@ trail. *(canon: I1–I7 + the Dijkstra posture, INTEGRATION-LAYER.md; S7, SDLC-L
 
 ## Authoring Constraints
 
-- **Markdown-only, no runtime code.** The repo is Claude Code skill/prompt authoring; the
-  only executable surfaces are `install.sh` (deployment) and the conformance-check stanzas
-  in a feature's `quickstart.md`. A feature that proposes runtime code is out of shape.
+- **Markdown-first; executable surfaces are enumerated and bounded.** The repo is Claude
+  Code skill/prompt authoring. The permitted executable surfaces are exactly three:
+  `install.sh` (deployment), the conformance-check stanzas in a feature's `quickstart.md`,
+  and **Workflow runner scripts** that execute a canon primitive on a native Workflow
+  substrate (feature 011) — a script that only dispatches `agent()`s and computes over their
+  returns, owning no wall-clock, no RNG, and no direct filesystem writes. A runner script
+  carries **no gate *meaning*** (severities, thresholds, banding rules stay single-sourced in
+  canon per Principle I); it is an alternative *executor*, conformance-locked to the prose it
+  runs. A feature proposing any other runtime code, or a runner that re-authors canon meaning
+  in code, is out of shape. *(Carved 2026-06-16 to admit feature 011; subject to its own review.)*
 - **Mode of one skill, not many skills.** New capability is registered as a mode of the
   `chorus` skill (e.g. "spawn the chorus" / "run the agent-SDLC" / "chorus learn"), not a
   new skill — registered across every cold-start surface (`SKILL.md` mode list + YAML

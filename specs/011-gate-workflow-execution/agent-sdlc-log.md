@@ -120,3 +120,60 @@ reasons: (a) **CF-8 is a constitution/governance decision** the catalog does not
 strategic "defer half the FRs" call on the operator's own design. Auto-rewriting the spec nine times
 would synthesize design decisions that belong to the operator. DecisionRecord: `gateA-block-1`,
 state = **escalated**, awaiting operator direction.
+
+### Operator decision (2026-06-16) — `gateA-block-1` resolved
+
+Operator directed: (a) **amend the constitution** to admit a bounded Workflow runner as a third
+executable surface (CF-8 resolved — `.specify/memory/constitution.md` Authoring Constraints,
+"Markdown-first; executable surfaces are enumerated and bounded"); (b) **incorporate the fixes
+into a v2 spec and re-verify** (self-heal cycle 1).
+
+### Self-heal cycle 1 — incorporation + re-verification
+
+The spec was revised to rev 2 (see § "Gate A resolution (2026-06-16)" in `spec.md`). Re-verification
+dispatched to the lenses that raised each theme. All nine 🔴 **CLEARED**; no new gating issue.
+
+| 🔴 | Resolution in rev 2 | Verifier | Verdict |
+|----|--------------------|----------|---------|
+| CF-1 | FR-004a: thresholds as cited data + frozen-vote conformance fixture in CI on every runner/primitive change | Richards | CLEARED |
+| CF-2 | SC-001 rewritten: parity on a frozen `{findings,votes}` fixture vs canon band table; escape hatch removed | Beck | CLEARED |
+| CF-3 | FR-007 + US3 + SC-003: only an explicit non-🔴 band releases; null/absent = gating (fail-closed) | Security | CLEARED |
+| CF-4 | Self-heal deferred to Slice 2; integrity (diff/hash, told-what-changed, no self-vote) recorded as binding obligation; FR-011 makes Slice 1 write-nothing | Security | CLEARED (by deferral) |
+| CF-5 | Scope split: Slice 1 = Author→Vote→Tally + integrity; self-heal + extract deferred behind a passed SC-001 | Goldratt | CLEARED |
+| CF-6 | FR-013 + SC-008: per-agent transcript handle on every finding/vote → divergence diagnosable | Delivery | CLEARED |
+| CF-7 | FR-006a: per-stage timeout → recorded `stage-timeout`; non-interruptibility named, timeout is the bound | Delivery | CLEARED |
+| CF-12 | FR-003a + SC-002: executable S8 assertion (no finding on own ballot), by test not inspection | Beck | CLEARED |
+| CF-16 | FR-004b + SC-007: orchestrator re-derives band from votes, asserts == claimed (audit, not re-tally) | Richards | CLEARED |
+
+Also folded: CF-9 (finding-centric Published Language return, FR-008) confirmed cleared; R-F1
+(characteristic ranking) now explicit. One cheap re-verify residual applied immediately: FR-004b
+now reads the **same cited canon thresholds** as FR-004a (Richards — else CF-1 reappears at the
+auditor layer).
+
+### Held 🟡 (non-gating; recorded for Slice 2 / tasks.md — operator proceeds at will)
+
+- **Throughput axis unmeasured (Goldratt F3)** — every SC measures conformance; none measures
+  cycle-time / operator-minutes, the axis the prior "strictly negative" verdict turned on. The
+  eventual *adoption* call is blind on that axis. Add a CD-facing measurement to the SC-001 run.
+- **CF-4 obligation is prose, not CI (Security)** — when Slice 2 is specced, the diff/hash
+  re-verification-trail requirement must become an FR-004a-style conformance fixture, or it lapses.
+- **SC-009 names no falsification (Beck)** — "reconstructable… only formatting" has no named red,
+  unlike the other eight SCs. Give it a testable red.
+- **FR-006a pins no timeout value (Delivery)** — tasks.md must pin a concrete default (single-digit
+  minutes via `args`) + owner, so the bound is concrete not aspirational.
+
+### Gate A verdict (post cycle 1): **CLEARS**
+
+0 unresolved gating 🔴. The held 🟡 are recorded and non-blocking. Slice 2 (self-heal + extract)
+remains deferred behind a passed SC-001. Next gate is **Gate B (plan/tasks)** if/when the operator
+advances 011 to `/speckit-plan`.
+
+### S-invariant self-audit (Gate A)
+
+| Invariant | Status |
+|-----------|--------|
+| S1 (orchestrator authors nothing) | held — all findings author-sourced; consolidation was Extract/formatting |
+| S8 (author never grades own finding) | held — every voter's authored findings explicitly excluded |
+| S9 (orchestrator synthesizes no vote) | held — every band from the deterministic tally, not orchestrator judgment |
+| Self-heal bound (S7) | held — cleared at cycle 1; escalation to operator occurred before any auto-rewrite |
+| Block on 🔴 (Principle VII) | held — gate escalated, not silently passed; operator adjudicated |
