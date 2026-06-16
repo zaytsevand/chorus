@@ -4,7 +4,15 @@
 
 **Created**: 2026-06-07
 
-**Status**: Draft
+**Status**: Ratified — read-side in active use across features 007/077/085/091/461
+(per-persona records under `~/.claude/agent-memory/<persona>/`, indexed by each lens's
+`MEMORY.md`; ~100+ locator+hint records accumulated, with cross-run read-back observed,
+e.g. Norman's 007 "run-2 clean-slate revalidated"). The write-back contract 010 reuses is
+thereby exercised, not merely specced. Goldratt's instrumented one-cycle round-trip
+experiment (010 held 🟡 TOC-2/3) has additionally been run (see 010 commit 705f292,
+2026-06-15): 3 hand-persisted records, 3 personas re-read on run 2, a planted stale
+entry caught and flagged — the loop closes and fails safe. Caveat retired on both
+counts: in-use evidence and a passing instrumented round-trip.
 
 **Input**: User description: "advisor exploratory phase. Each advisor may need to
 build a deeper understanding of the project and record it in its memory before
