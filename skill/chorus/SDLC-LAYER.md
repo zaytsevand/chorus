@@ -196,6 +196,11 @@ It reuses the exploratory phase's write-back contract and invents **no new write
   (its findings-register rows + its understanding record) — a re-read of its own prior output, not
   a fresh harvest. (The cheaper "orchestrator distills the whole ledger in one pass" alternative is
   refused: it would synthesize what a lens learned — 010 TOC-3.)
+- **Dispatch is robust, not best-effort (010 FR-002a).** A dispatched lens that returns no usable
+  write-back (empty/errored response, no tool activity) MUST be **re-dispatched at least once** before
+  the phase records a skip for it — mirroring the gate's existing dispatch discipline. A persistent
+  non-response is recorded as a skip in the ledger (no-op, below), **never silently dropped and never
+  fabricated** by the orchestrator. *(The 2026-06-15 read-side experiment saw 1 of 3 dispatches misfire.)*
 - **Durable-only (010 FR-003a).** A learning persists **iff** it (a) carries a re-groundable
   locator into a live source **and** (b) generalizes beyond this run's spec delta. Persisted text is
   a **locator + ≤~2-sentence hint**, never a standalone verdict ("memory is an index, never the
