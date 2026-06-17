@@ -230,6 +230,36 @@ It reuses the exploratory phase's write-back contract and invents **no new write
 The phase records its outcome in the ledger under `## Memory update (sign-off)` (below), and the
 end-of-run self-audit gains the check "orchestrator authored no record / synthesized no learning."
 
+### Gate execution on the Workflow substrate (Slice 1, SC-001-gated — feature 011)
+
+An **optional** second execution substrate for a gate's mechanical core (Author → Vote → Tally),
+defined by spec 011 and bounded by the constitution's executable-surface carve-out. It is **off by
+default**: gates run via plain `Agent` dispatches until the SC-001 parity experiment passes and the
+operator adopts it ([[no-ultracode-mode]]). It changes *how a gate executes*, never what it means —
+severities/thresholds stay single-sourced in `GATE-PRIMITIVE.md`.
+
+When used, the orchestrator (not the runner) does the operator-facing and meaning-bearing work:
+
+- **Build `args`**: read the canon band thresholds from `GATE-PRIMITIVE.md` and pass them as
+  `args.bands` (injected data, never hardcoded in the runner — FR-004a; the conformance suite
+  `skill/chorus/workflows/conformance/run-all.mjs` C2 locks `args.bands` to the canon table).
+- **Invoke** `skill/chorus/workflows/gate-runner.mjs` with `{runId, bands, brief, corpusLocators,
+  seated[]}`. The runner fans out authors/voters, routes author-excluded ballots (S8), tallies in
+  code via `gate-core.mjs`, and returns the **finding-centric** `GateReturn`
+  (`specs/011-gate-workflow-execution/contracts/gate-return.md`).
+- **Re-derive** each band from the returned `votes[]` using **the same injected thresholds** and
+  assert equality with the runner's claimed band (FR-004b / SC-007) before persisting — a
+  consistency audit, not a re-tally.
+- **Consume fail-closed** (FR-007): any finding whose band is `null`/absent is treated as **gating**;
+  only an explicit `🟢`/`🟡` releases it. The runner acts on nothing — `🔴`/`null` are *data*; the
+  orchestrator performs the block/ask inline (Principle VI/VII).
+- **Persist** the ledger from the return alone (Principle X / SC-009).
+
+**Deferred to Slice 2 (behind a passed SC-001)**: the Extract pre-pass + short-circuit, and the
+self-heal re-verify loop — the latter MUST, when specced, carry a per-cycle artefact diff/hash
+(CF-4) and surface the in-flight signifier on resume (CF-11). Until then, self-heal runs **inline**
+(this file's § Block on 🔴 / Incorporation loop), unchanged.
+
 ## Invariants (lifecycle level)
 
 These extend I1–I9. S8/S9 are gate-primitive-level and live in
