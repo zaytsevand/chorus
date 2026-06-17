@@ -180,11 +180,14 @@ await check('C12', 'SC-001', async () => {
   // F5's voters all failed → recorded as gaps, not silently dropped (FR-006), and band fail-closed null
   const f5gaps = ret.gaps.filter((g) => g.stage === 'vote');
   assert(f5gaps.length === 4, `expected 4 vote gaps for F5, got ${f5gaps.length}`);
+  assert(f5gaps.every((g) => g.findingId === 'F5'), 'vote gap missing findingId correlator (dogfood fix)');
   assert(ret.findings.find((f) => f.id === 'F5').band === null, 'F5 (all voters failed) must be fail-closed null');
   // handles present in the return (SC-008 live)
   assert(ret.findings.every((f) => f.transcriptHandle?.agentLabel), 'a finding lacks a transcript handle');
   assert(ret.stageOutcomes.author === 'ok', '5 authors should be ok');
-  return `runGate executed: ${ret.findings.length} findings, bands match, S8 clean, ${f5gaps.length} gaps recorded, F5 fail-closed`;
+  // vote outcome reflects reality, not a hardcoded 'ok' (dogfood: 3 lenses flagged the lie)
+  assert(ret.stageOutcomes.vote === 'quorum-failed', `vote outcome should be quorum-failed (F5 lost all votes), got ${ret.stageOutcomes.vote}`);
+  return `runGate executed: ${ret.findings.length} findings, bands match, S8 clean, ${f5gaps.length} findingId-tagged gaps, F5 fail-closed, vote=${ret.stageOutcomes.vote}`;
 });
 
 // ── report ──────────────────────────────────────────────────────────────────────────────

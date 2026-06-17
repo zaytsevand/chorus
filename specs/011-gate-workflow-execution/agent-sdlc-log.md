@@ -322,3 +322,37 @@ Assume closed: Slice 1 core + shell + conformance (the gate-runner substrate, ve
 Re-evaluate next: the **live SC-001 parity experiment** (the only thing that retires the prior verdict);
 **Slice 2** (self-heal re-verify loop with CF-4 diff/hash + CF-11 in-flight signifier; Extract pre-pass +
 short-circuit); the held 🟡 (CF-E auditor-side callers, CF-F vote stage-outcome/timeout/quorum-floor).
+
+## Dogfood — live substrate run (2026-06-17)
+
+Operator-directed. Ran an **inlined, self-contained** copy of the runner as a real Workflow on a tiny
+target (review `runGate` itself; 3 lenses — Beck, Uncle Bob, Richards; `sonnet`). This is the first
+execution of the actual machinery (live runtime binding + fan-out), not mocked primitives.
+
+**Result — the substrate works.** Valid `GateReturn`: 10 findings, **0 gaps, S8 clean on every finding,
+tally arithmetic + band derivation all correct live** (e.g. `net −2 → 🟡→🟢 demote`, `net −1 → hold`).
+The runtime binding ran — but I had to **inline** gate-core/gate-shell because the Workflow runtime does
+not resolve local ESM imports, **confirming CF-A's flagged integration assumption was real**, not theoretical.
+
+**Cost (Goldratt/CF-H throughput data):** 23 agents, **~673k tokens, ~265s (4.4 min)** for a *3-lens*
+micro-review. A real 5–9-lens gate extrapolates to ~1.5–2M tokens — the concrete "is this earned?" figure
+the adoption decision (CF-H) needs. The substrate is *correct*; it is not *cheap*.
+
+**Honest scope:** this demonstrates the live half is **feasible and correct**, NOT the full SC-001 parity
+(I ran only the Workflow side; no plain-Agent gate on the same target to compare bands). "Live substrate
+validated" — still not "SC-001 retired."
+
+**The dogfood found real bugs (convergent with Gate C):**
+- **3 lenses independently flagged `stageOutcomes.vote: 'ok'` hardcode → three 🔴** = Gate C's CF-F,
+  reconfirmed live and escalated. **Fixed**: `voteStageOutcome(findings)` computes it from real outcomes
+  (a finding fail-closed for lack of votes → `quorum-failed`), and conformance now asserts it (the test
+  gap Beck named). CF-F is now **resolved**, not held.
+- **2 lenses**: vote-stage gap record omitted the finding correlator. **Fixed**: `recordGap(...,findingId)`;
+  contract + C12 updated.
+- **2 lenses**: author-authored `pull_quote`/`evidence` interpolated into the voter prompt unescaped
+  (prompt-injection surface). **Fixed**: delimited + labelled DATA-not-instructions in the vote prompt.
+- Self-corrected: the "mutation-before-read" finding was **demoted 🟢** by the live votes (net −2) — the
+  tally working as designed on the gate's own findings.
+
+Conformance after fixes: **11 pass / 0 fail / 1 skip**. Net: the dogfood validated the substrate AND
+hardened it — the gate reviewed its own runner and the runner improved.

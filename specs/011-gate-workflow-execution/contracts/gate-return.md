@@ -54,11 +54,12 @@ force the orchestrator to re-correlate, which is re-authoring → an S1 leak).
       "type": "array",
       "items": {
         "type": "object",
-        "required": ["stage","lens","reason"], "additionalProperties": false,
+        "required": ["stage","lens","findingId","reason"], "additionalProperties": false,
         "properties": {
-          "stage":  { "enum": ["author","vote"] },
-          "lens":   { "type": "string" },
-          "reason": { "enum": ["null-isolated","timeout"] }
+          "stage":     { "enum": ["author","vote"] },
+          "lens":      { "type": "string" },
+          "findingId": { "oneOf": [ { "type": "string" }, { "type": "null" } ] },
+          "reason":    { "enum": ["null-isolated","timeout"] }
         }
       }
     },

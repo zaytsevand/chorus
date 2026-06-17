@@ -104,9 +104,17 @@ export function flattenAuthored(survivors, handle) {
 }
 // recordGap: the FR-006 no-silent-loss primitive — push a gap, return null (the filtered value).
 // A named function with an explicit assertion (C12), not a comma-operator side effect.
-export function recordGap(gaps, stage, lens) {
-  gaps.push({ stage, lens, reason: 'null-isolated' });
+// findingId ties a vote-stage gap to the finding it failed on (dogfood: gap log was un-correlatable).
+export function recordGap(gaps, stage, lens, findingId = null) {
+  gaps.push({ stage, lens, findingId, reason: 'null-isolated' });
   return null;
+}
+
+// voteStageOutcome: a finding that lost all its votes (band null) means the vote stage couldn't
+// reach quorum on it — report that instead of an unconditional 'ok' (dogfood: 3 lenses flagged the
+// hardcoded 'ok' as a correctness lie). Computed AFTER tally, from real outcomes.
+export function voteStageOutcome(findings) {
+  return findings.some((f) => f.band === null) ? 'quorum-failed' : 'ok';
 }
 
 // --- Quorum floor (FR-006): below the floor the author stage is not a hollow gate -----------
