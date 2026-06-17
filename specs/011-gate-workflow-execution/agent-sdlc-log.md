@@ -181,3 +181,44 @@ advances 011 to `/speckit-plan`.
 | S9 (orchestrator synthesizes no vote) | held — every band from the deterministic tally, not orchestrator judgment |
 | Self-heal bound (S7) | held — cleared at cycle 1; escalation to operator occurred before any auto-rewrite |
 | Block on 🔴 (Principle VII) | held — gate escalated, not silently passed; operator adjudicated |
+
+## /speckit-plan → /speckit-tasks → /speckit-implement (2026-06-17)
+
+**Gate B (plan/tasks review) was SKIPPED** by operator direction (went plan→tasks→implement
+directly). Recorded so Gate C weighs the plan/tasks unreviewed.
+
+**Plan/tasks**: plan.md (Constitution PASS pre & post; one justified deviation = runtime code under
+the CF-8 carve-out), research.md (U1/U2/U4 resolved; U3 bounded residual), data-model.md,
+contracts/gate-return.md, quickstart.md (C1–C11), tasks.md (29 tasks). A stale `.specify/feature.json`
+pinned to feature 010 made both setup scripts misfire to 010; repointed to 011.
+
+**Implementation (Slice 1)**:
+- `skill/chorus/workflows/gate-core.mjs` — pure deterministic core (tally, deriveBand with injected
+  thresholds, S8, fail-closed, re-derive, ledger render). Owns no gate meaning.
+- `skill/chorus/workflows/gate-runner.mjs` — bounded Workflow shell (Author→Vote→Tally fan-out),
+  delegates all decisions to gate-core. **Integration assumption flagged** (Gate C): assumes the
+  Workflow runtime resolves the local ESM import of gate-core; if not, inline + core-parity-lock.
+- `skill/chorus/workflows/conformance/` — frozen fixture + `run-all.mjs` suite.
+
+**Conformance result**: `node …/run-all.mjs` → **10 pass / 0 fail / 1 runtime-deferred skip** (exit 0).
+C1 SC-001, C2 FR-004a, C3 SC-002(S8), C4 SC-002(honesty), C5 SC-003, C6 SC-004, C8 SC-006, C9 SC-007,
+C10 SC-008, C11 SC-009 all PASS. C7 (hang) SKIP — needs the live runtime. *(C4 caught a real false
+positive on first run — a prose `net = P − O` string in the runner — fixed by comment/string-stripping;
+evidence the suite can fail.)*
+
+### Inputs for Gate C (implementation review)
+
+- **Gate B was skipped** — Gate C should also sanity-check plan/tasks coherence, not just the code.
+- **Integration assumption (runtime import)** — gate-runner imports gate-core; unverified against the
+  live Workflow runtime. The deterministic guarantees are verified against gate-core directly, so this
+  affects only the live fan-out, but Gate C should weigh it.
+- **U3 timeout-without-a-clock residual** — a hung author is bounded only by the substrate's infra
+  timeout (→ null → recorded gap); a *named* `stage-timeout` distinct from error needs a substrate
+  signal that may not exist. Fail-safe holds regardless.
+- **The live half of SC-001 is unrun** — only the deterministic tally tail is proven in node. The live
+  fan-out parity (Workflow gate vs plain-Agent gate on the same corpus) is the operator-gated adoption
+  experiment, intentionally not run here ([[no-ultracode-mode]]).
+- **Standing held 🟡 (from Gate A)**: throughput-axis SC unmeasured (Goldratt); CF-4 diff/hash is a
+  Slice-2 obligation; FR-006a timeout *value* — pinned conceptually to the orchestrator's run-level
+  bound (T020), but the runner cannot self-enforce it (U3).
+- **Deviations**: 11 conformance stanzas implemented as one suite file; C7/C10 runtime-deferred.

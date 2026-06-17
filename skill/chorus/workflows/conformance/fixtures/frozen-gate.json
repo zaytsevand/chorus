@@ -1,0 +1,47 @@
+{
+  "_comment": "Frozen deterministic fixture for 011 Slice 1 conformance. Covers escalate / demote / hold / cap / null-band (fail-closed). Voters always exclude the finding's author lens (S8).",
+  "bands": { "escalateAt": 2, "demoteAt": -2 },
+  "canonBands": { "escalateAt": 2, "demoteAt": -2 },
+  "seated": ["richards", "goldratt", "beck", "evans", "security"],
+  "authored": [
+    {
+      "id": "F1", "lens": "richards", "proposed_severity": "🟡",
+      "evidence": "spec.md:42", "pull_quote": "escalate case",
+      "votes": [
+        { "voter": "goldratt", "ballot": "PRIORITIZE", "reason": "x" },
+        { "voter": "beck", "ballot": "PRIORITIZE", "reason": "x" },
+        { "voter": "evans", "ballot": "PRIORITIZE", "reason": "x" }
+      ]
+    },
+    {
+      "id": "F2", "lens": "goldratt", "proposed_severity": "🟡",
+      "evidence": "spec.md:43", "pull_quote": "demote case",
+      "votes": [
+        { "voter": "richards", "ballot": "OVER-RATE", "reason": "x" },
+        { "voter": "beck", "ballot": "OVER-RATE", "reason": "x" }
+      ]
+    },
+    {
+      "id": "F3", "lens": "beck", "proposed_severity": "🔴",
+      "evidence": "spec.md:44", "pull_quote": "escalate-capped case",
+      "votes": [
+        { "voter": "richards", "ballot": "PRIORITIZE", "reason": "x" },
+        { "voter": "evans", "ballot": "PRIORITIZE", "reason": "x" }
+      ]
+    },
+    {
+      "id": "F4", "lens": "evans", "proposed_severity": "🟢",
+      "evidence": "spec.md:45", "pull_quote": "hold case",
+      "votes": [
+        { "voter": "richards", "ballot": "CONFIRM", "reason": "x" },
+        { "voter": "beck", "ballot": "CONFIRM", "reason": "x" }
+      ]
+    },
+    {
+      "id": "F5", "lens": "security", "proposed_severity": "🟡",
+      "evidence": "spec.md:46", "pull_quote": "vote-agent errored — no votes",
+      "_noVotes": true
+    }
+  ],
+  "expectedBands": { "F1": "🔴", "F2": "🟢", "F3": "🔴", "F4": "🟢", "F5": null }
+}
