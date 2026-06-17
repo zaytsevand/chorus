@@ -241,12 +241,18 @@ agent receives a short, self-contained brief:
 1. Their lens identity
 2. The round-context paragraph
 3. The scope-exclusion list (verbatim, as in Phase 1 below)
-4. RSVP instructions: reply in ≤80 words with `JOIN` or `ABSTAIN`, plus the
-   **two-axis signal** (`DECISION-PRIMITIVE.md` §RSVP signal) — **applicability**
-   (cite ≥1 concrete round-context delta your lens touches; no citable delta →
-   ABSTAIN) and **expected stakes** (🟢/🟡/🔴-potential + a one-line hook) — and a
-   one-sentence reason. (This replaces the old relevance 0–3 score, which degenerated
-   to all-3s; seating ties on it are now a self-unblocking 🟡, not an operator ask.)
+4. RSVP instructions: reply in ≤80 words with `JOIN`, `ABSTAIN`, or an
+   **exceptional entry**, plus the **two-axis signal** (`DECISION-PRIMITIVE.md` §RSVP
+   signal) — **applicability** (cite ≥1 concrete round-context delta your lens touches;
+   no citable delta → ABSTAIN) and **expected stakes** (🟢/🟡/🔴-potential + a one-line
+   hook) — and a one-sentence reason. (This replaces the old relevance 0–3 score, which
+   degenerated to all-3s; seating ties on it are now a self-unblocking 🟡, not an
+   operator ask.) An **exceptional entry** is a JOIN that asks for a seat *beyond* the
+   ordinary cap by **citing a concrete uncovered delta no seated ordinary lens covers**;
+   it is evidence-gated and rare (an un-anchored exceptional claim is refused), confers a
+   **voice not weight**, and is seated per the cap + exceptional-entry rule defined once
+   in `SDLC-LAYER.md` (seating). The base round is uncapped by default, so exceptional
+   entry matters chiefly where a cap applies (the SDLC gates).
 
 Cost: ~7 small parallel calls, ~30s wall time, ~3K tokens total. Cheap
 relative to a saved Phase 1 round.
@@ -503,14 +509,15 @@ Word limit: 500–600.
 
 Phase 2 is **stage 3 (Vote)** of the gate primitive: PRIORITIZE / CONFIRM /
 OVER-RATE are the votes. After the reactions arrive, finalize each finding's severity
-with the primitive's **deterministic stage-4 tally** (`GATE-PRIMITIVE.md`): among
-non-author voters, `net = P − O` (**CONFIRM excluded from net**); `net ≥ +2` escalates
-one level, `net ≤ −2` demotes one level, otherwise hold. The convergence count used for
-ranking is `P + C` (all agreement) — so a finding many lenses CONFIRM still ranks highly
-while honestly holding its severity. The old "two converging lenses earn 🔴" rule is
-amended: two **under-rated** (PRIORITIZE) claims escalate; mere agreement (CONFIRM) holds
-(spec `009-confirm-vote-tally`, closing issue #13). Severity is arithmetic over real
-votes — never the orchestrator's judgment (S9).
+with the primitive's **deterministic stage-4 tally** — defined once in
+`GATE-PRIMITIVE.md` (Stage 4): `net = P − O` over non-author voters (CONFIRM excluded),
+compared against the **board-scaled threshold** defined there (it scales with the
+non-author voter count `N` and reduces to the prior `±2` at the standard 5-seat board). The convergence count used for ranking is `P + C` (all
+agreement) — so a finding many lenses CONFIRM still ranks highly while honestly holding
+its severity. The old "two converging lenses earn 🔴" rule is amended: two **under-rated**
+(PRIORITIZE) claims escalate; mere agreement (CONFIRM) holds (spec
+`009-confirm-vote-tally`, closing issue #13). Severity is arithmetic over real votes —
+never the orchestrator's judgment (S9).
 
 After Round 2 reactions arrive, append a `### Round 2 brief` subsection to the
 artifact (2–4 sentences): which findings were sharpened, which were pushed back

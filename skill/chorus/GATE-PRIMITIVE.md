@@ -104,16 +104,23 @@ flowchart TD
 - **Actor**: the orchestrator, deterministic.
 - **Input**: the votes.
 - **Output**: each finding's **post-tally severity** and **gating flag**, by the
-  fixed **symmetric** rule. Let `P` = PRIORITIZE count, `C` = CONFIRM count, and
-  `O` = OVER-RATE count among **non-author** voters, and `net = P − O` (**CONFIRM is
-  excluded from `net`** — agreement-at-severity does not move severity):
+  fixed **symmetric**, **board-scaled** rule. Let `P` = PRIORITIZE count, `C` = CONFIRM
+  count, and `O` = OVER-RATE count among **non-author** voters; `net = P − O` (**CONFIRM
+  is excluded from `net`** — agreement-at-severity does not move severity). Let `N` be
+  the count of **non-author voters** on the finding and `T = max(1, floor(N / 2))` the
+  **board-scaled threshold** (a wider board demands proportionally more agreement, so
+  exceptional entry — `SDLC-LAYER.md` seating — cannot make escalation cheaper):
 
   | Condition | Effect |
   |---|---|
-  | `net ≥ +2` | escalate one level (🟢→🟡→🔴, capped at 🔴) |
-  | `net ≤ −2` | demote one level (🔴→🟡→🟢, 🟢→drop) |
-  | `\|net\| < 2` | hold author-proposed severity |
+  | `net ≥ T` | escalate one level (🟢→🟡→🔴, capped at 🔴) |
+  | `net ≤ −T` | demote one level (🔴→🟡→🟢, 🟢→drop) |
+  | `\|net\| < T` | hold author-proposed severity |
 
+  - At the standard full board of 5 (`N = 4`), `T = floor(4/2) = 2` — the rule reduces
+    **exactly** to the prior fixed `±2`, so this change is backward-compatible at the
+    size the canon was calibrated for. The floor `T ≥ 1` holds for any voted finding; a
+    tally **MUST NOT** run at `N < 2`.
   - `net = 0` (all-abstain, or all-CONFIRM, or balanced) holds; an all-abstain
     finding is marked **unvoted** (non-gating, surfaced). A finding held by CONFIRM
     is **agreed-at-severity**, not unvoted — it has real votes, they just don't move it.
@@ -125,9 +132,11 @@ flowchart TD
     *rank*, never to *escalate*. Severity escalation counts only `P`. This decouples
     the two meanings of "convergence" that issue #13 conflated: a finding many lenses
     agree on can rank in the top-5 while honestly holding at 🟡.
-- **Success criterion**: arithmetic only — no judgment added. Identical votes
-  always yield identical severities; there are **no tally ties**. (Operator
-  tie-breaking exists only for SDLC cap-5 *seating*, never in the tally.)
+- **Success criterion**: arithmetic only — no judgment added. Identical votes at an
+  identical `N` always yield identical severities; there are **no tally ties**, and no
+  seat's vote is re-weighted (severity is presence-blind — entry buys a voice, not
+  weight). (Operator tie-breaking exists only for SDLC **ordinary-seat** cap seating,
+  never in the tally.)
 - **Must not**: re-weight by lens, author, or orchestrator preference; add a
   judgment clause to the gating decision.
 - **Rendered, never re-authored**: this post-tally severity is the value the
