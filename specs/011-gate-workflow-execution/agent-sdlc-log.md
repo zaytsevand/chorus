@@ -292,3 +292,33 @@ canon; traced the falsification path). Conformance: **11 pass / 0 fail / 1 skip*
 | S8 (author never grades own finding) | held — every voter's authored findings excluded; C3 + C12 assert it executably |
 | Self-heal bound (S7) | held — cleared at cycle 1; the 🔴 were mechanical, self-healed not escalated |
 | Block on 🔴 (Principle VII) | held — gate did not clear until both 🔴 were incorporated + re-verified |
+
+## Sign-off (2026-06-17)
+
+Lifecycle complete for **Slice 1**: spec → **Gate A ✅** → plan → tasks → implement → **Gate C ✅**.
+Gate B (plan/tasks) was operator-skipped and absorbed into Gate C. Conformance **11 pass / 0 fail /
+1 runtime-deferred skip**.
+
+**What is signed off**: the implementation is verified **to the substrate boundary** — the deterministic
+core and the shell logic (fan-out, S8 routing, gaps, tally, fail-closed, re-derive) are executed and
+asserted in node. **What is NOT signed off**: adoption. The live half of SC-001 (real persona agents on
+a real corpus + the Workflow-runtime import/global binding) is unrun by design; replacing plain-Agent
+dispatch remains a separate operator-gated experiment ([[no-ultracode-mode]]). Honest status:
+**"Slice-1 verified; adoption unproven."**
+
+### Memory-update phase (sign-off bookend, spec 010 FR-001)
+
+Satisfied organically: the seated lenses persisted lens-specific records to
+`~/.claude/agent-memory/<persona>/` **during** the gate rounds (e.g. Goldratt's
+`project-011-gate-workflow-substrate.md`, Delivery's `project-chorus-011-gate-workflow.md`, Richards'
+re-verify record). No standalone re-distillation dispatched — the durable learnings are already written,
+and re-running 5 author dispatches at sign-off would be redundant motion. **Project-wide proposal: none**
+— this repo runs addendum-less (no `docs/reviews/CHORUS-PROJECT.md`), so there is no shared addendum to
+propose a write-back to. Recorded no-op on the project-wide path.
+
+### Next-cycle baseline
+
+Assume closed: Slice 1 core + shell + conformance (the gate-runner substrate, verified to the boundary).
+Re-evaluate next: the **live SC-001 parity experiment** (the only thing that retires the prior verdict);
+**Slice 2** (self-heal re-verify loop with CF-4 diff/hash + CF-11 in-flight signifier; Extract pre-pass +
+short-circuit); the held 🟡 (CF-E auditor-side callers, CF-F vote stage-outcome/timeout/quorum-floor).
