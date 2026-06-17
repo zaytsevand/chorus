@@ -246,8 +246,14 @@ inline until the operator adjudicates (Principle VII).
   band for 100% of findings; any divergence fails the gate.
 - **SC-008 (diagnosability, CF-6)**: Every finding and vote in the return carries a resolvable per-agent
   transcript handle; a parity divergence can be traced to the agent that produced it.
-- **SC-009 (reconstructable, Principle X)**: The gate's `agent-sdlc-log.md` ledger is rebuildable from the
-  return alone, with the orchestrator contributing only formatting.
+- **SC-009 (reconstructable — falsifiable, Principle X)**: From a frozen gate-return fixture, a
+  deterministic renderer rebuilds the `agent-sdlc-log.md` ledger body, and **every register/tally/band
+  value in the rendered ledger is byte-traceable to a field in the return** — 0 values the orchestrator
+  supplied beyond formatting (headings, table scaffolding, dates from `args`). **Red:** any ledger value
+  with no source field in the return, or any divergence between the rendered value and the return field,
+  fails this criterion. (This gives SC-009 the named falsification the other SCs carry and that CF-12
+  forced for S8 — an honesty invariant asserted in prose without an executable red is the gap, not the
+  invariant.)
 
 ### Out of scope (this feature)
 

@@ -157,8 +157,12 @@ auditor layer).
   eventual *adoption* call is blind on that axis. Add a CD-facing measurement to the SC-001 run.
 - **CF-4 obligation is prose, not CI (Security)** — when Slice 2 is specced, the diff/hash
   re-verification-trail requirement must become an FR-004a-style conformance fixture, or it lapses.
-- **SC-009 names no falsification (Beck)** — "reconstructable… only formatting" has no named red,
-  unlike the other eight SCs. Give it a testable red.
+- **SC-009 names no falsification (Beck)** — ~~"reconstructable… only formatting" has no named red,
+  unlike the other eight SCs.~~ **RESOLVED 2026-06-17**: a 4-haiku sanity-check workflow re-flagged
+  this as the same pattern as CF-12 (honesty invariant by inspection, no executable red). SC-009
+  rewritten with a falsifiable red (frozen-return fixture → byte-traceability of every rendered ledger
+  value to a return field; 0 orchestrator-supplied values beyond formatting). Consistent with CF-12's
+  FR-003a/SC-002 fix.
 - **FR-006a pins no timeout value (Delivery)** — tasks.md must pin a concrete default (single-digit
   minutes via `args`) + owner, so the bound is concrete not aspirational.
 
