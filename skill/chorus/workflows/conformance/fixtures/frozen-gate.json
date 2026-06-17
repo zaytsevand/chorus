@@ -1,7 +1,6 @@
 {
-  "_comment": "Frozen deterministic fixture for 011 Slice 1 conformance. Covers escalate / demote / hold / cap / null-band (fail-closed). Voters always exclude the finding's author lens (S8).",
+  "_comment": "Frozen deterministic fixture for 011 Slice 1 conformance. Covers escalate / demote / hold / cap / null-band (fail-closed). Voters are COMPLETE: every non-author seated lens votes on every finding (neutral CONFIRMs don't change net), so in the C12 end-to-end run the only gaps are F5's 4 deliberately-failed voters. Voters always exclude the finding's author lens (S8).",
   "bands": { "escalateAt": 2, "demoteAt": -2 },
-  "canonBands": { "escalateAt": 2, "demoteAt": -2 },
   "seated": ["richards", "goldratt", "beck", "evans", "security"],
   "authored": [
     {
@@ -10,7 +9,8 @@
       "votes": [
         { "voter": "goldratt", "ballot": "PRIORITIZE", "reason": "x" },
         { "voter": "beck", "ballot": "PRIORITIZE", "reason": "x" },
-        { "voter": "evans", "ballot": "PRIORITIZE", "reason": "x" }
+        { "voter": "evans", "ballot": "PRIORITIZE", "reason": "x" },
+        { "voter": "security", "ballot": "CONFIRM", "reason": "x" }
       ]
     },
     {
@@ -18,7 +18,9 @@
       "evidence": "spec.md:43", "pull_quote": "demote case",
       "votes": [
         { "voter": "richards", "ballot": "OVER-RATE", "reason": "x" },
-        { "voter": "beck", "ballot": "OVER-RATE", "reason": "x" }
+        { "voter": "beck", "ballot": "OVER-RATE", "reason": "x" },
+        { "voter": "evans", "ballot": "CONFIRM", "reason": "x" },
+        { "voter": "security", "ballot": "CONFIRM", "reason": "x" }
       ]
     },
     {
@@ -26,7 +28,9 @@
       "evidence": "spec.md:44", "pull_quote": "escalate-capped case",
       "votes": [
         { "voter": "richards", "ballot": "PRIORITIZE", "reason": "x" },
-        { "voter": "evans", "ballot": "PRIORITIZE", "reason": "x" }
+        { "voter": "evans", "ballot": "PRIORITIZE", "reason": "x" },
+        { "voter": "goldratt", "ballot": "CONFIRM", "reason": "x" },
+        { "voter": "security", "ballot": "CONFIRM", "reason": "x" }
       ]
     },
     {
@@ -34,12 +38,14 @@
       "evidence": "spec.md:45", "pull_quote": "hold case",
       "votes": [
         { "voter": "richards", "ballot": "CONFIRM", "reason": "x" },
-        { "voter": "beck", "ballot": "CONFIRM", "reason": "x" }
+        { "voter": "beck", "ballot": "CONFIRM", "reason": "x" },
+        { "voter": "goldratt", "ballot": "CONFIRM", "reason": "x" },
+        { "voter": "security", "ballot": "CONFIRM", "reason": "x" }
       ]
     },
     {
       "id": "F5", "lens": "security", "proposed_severity": "🟡",
-      "evidence": "spec.md:46", "pull_quote": "vote-agent errored — no votes",
+      "evidence": "spec.md:46", "pull_quote": "all voters errored — no surviving votes",
       "_noVotes": true
     }
   ],

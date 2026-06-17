@@ -222,3 +222,73 @@ evidence the suite can fail.)*
   Slice-2 obligation; FR-006a timeout *value* — pinned conceptually to the orchestrator's run-level
   bound (T020), but the runner cannot self-enforce it (U3).
 - **Deviations**: 11 conformance stanzas implemented as one suite file; C7/C10 runtime-deferred.
+
+## Gate C — implementation review (2026-06-17)
+
+Run via plain `Agent` dispatches. Seated by obvious applicability (no separate RSVP; exploratory
+folded into briefs — proportionate to a ~340-line code delta): Richards, Beck, Uncle Bob, Security,
+Goldratt. Norman abstained at Gate A on the same basis (no operator-facing surface); Guido out by
+language rule (JS). The code under review reviewed the gate runner itself.
+
+### Findings register + tally (`net = P − O`)
+
+| ID | Proposed | Finding | net | Result |
+|----|----------|---------|-----|--------|
+| CF-A | 🔴 | The Workflow shell had **zero executed coverage** — conformance tested gate-core in isolation or grepped runner source; import seam / fan-out / S8 wiring / gaps recording never executed | +3 | 🔴 **gating** |
+| CF-B | 🔴 | C2 (the CF-1 drift guard) was **circular** — asserted `fixture.bands == fixture.canonBands` (both hand-authored); never read GATE-PRIMITIVE.md | +3 | 🔴 **gating** |
+| CF-C | 🟡 | C1 tests fixture self-consistency, not canon (`expectedBands` hand-authored beside votes) | 0 | 🟡 held |
+| CF-D | 🟡 | C4/C10 are static regex — assert spelling not behavior | 0 | 🟡 held |
+| CF-E | 🟡 | Fail-closed + FR-004b re-derive have **zero shipping callers** (auditor-side, invoked by the inline LLM orchestrator via SDLC-LAYER prose); C9 is same-code-path | 0 | 🟡 held |
+| CF-F | 🟡 | Return over-promises: `stageOutcomes.vote` hardcoded `'ok'`; gaps `'timeout'` reason has no code path; no vote-stage quorum floor | +1 | 🟡 held |
+| CF-G | 🟡 | Two untested shell transforms (lens/handle-tag → silent S8 break; gaps comma-operator side effect) | 0 | 🟡 held |
+| CF-H | 🟡 | 10/0/1 green is progress on the core, **zero on the live experiment** — claim "Slice-1-core proven", not "SC-001 retired" | +1 | 🟡 held |
+
+Affirmations (recorded, not balloted): bounded-runner boundary upheld (R); clean core/DIP/ubiquitous
+language (UB); C7 honest skip + C3/C9 plant-and-catch are the suite's best (B); Gate-B skip was the
+right deferral (G); no gold-plating (G). Goldratt's reconciliation: **CF-A/B/C/D/G are one root cause**
+— the suite verified source text + gate-core in isolation, never executed the shell against canon.
+
+### Verdict: did NOT clear — 2 gating 🔴 → self-heal cycle 1 (mechanical, not operator-escalated)
+
+Both 🔴 were mechanical code fixes (no governance/operator decision), so per `DECISION-PRIMITIVE.md`
+this self-healed rather than escalating (contrast Gate A's CF-8). Incorporation:
+
+- **CF-A** — extracted the shell into `gate-shell.mjs` as `runGate({args, agent, parallel, phase})`
+  (runtime primitives injected); `gate-runner.mjs` is now a ~25-line Workflow entry. New conformance
+  **C12** imports `runGate` and **executes the real shell end-to-end** with mocked primitives over the
+  frozen fixture (bands match, S8 clean, F5's 4 failed voters recorded as gaps, F5 fail-closed null,
+  handles present). The two shell transforms (CF-G) were pulled into gate-core as tested
+  `flattenAuthored`/`recordGap`.
+- **CF-B** — C2 now reads `GATE-PRIMITIVE.md`, parses the threshold table (`net ≥ +2` / `net ≤ −2`),
+  and asserts `fixture.bands` equals it; `fixture.canonBands` removed. Editing canon without updating
+  the fixture now turns C2 red. Hardened (Beck re-verify) to require exactly one ≥/≤ row.
+- **Bonus correctness**: `assembleFindings` now fail-closes a finding with **zero surviving votes**
+  (all voters failed) to `band:null` instead of a confident hold — partially addresses CF-F.
+
+**Re-verification (cycle 1)**: Richards → **CF-A CLEARED** (shell genuinely executed by C12; residual =
+the irreducible ~3-line Workflow binding, live-only, acceptable). Beck → **CF-B CLEARED** (C2 locks to
+canon; traced the falsification path). Conformance: **11 pass / 0 fail / 1 skip** (C7 live-runtime hang).
+
+### Gate C verdict (post cycle 1): **CLEARS**
+
+0 unresolved gating 🔴. Held 🟡 (non-gating, recorded):
+- **CF-H (claims hygiene)** — the deterministic core + shell logic are verified in node; the **live half
+  of SC-001 (real agents on a real corpus + the Workflow-runtime binding) is unrun**. Honest status:
+  **"Slice-1 verified to the substrate boundary"**, NOT "SC-001 retired / adoption justified". Adoption
+  remains the operator-gated experiment ([[no-ultracode-mode]]).
+- **CF-E** — fail-closed/re-derive are auditor-side; their only caller is the inline LLM orchestrator
+  (SDLC-LAYER prose), per the hybrid design. Defensible for Slice 1; revisit if an orchestrator-side
+  helper is ever coded.
+- **CF-F** — residual over-promise (vote stage-outcome, `timeout` reason, vote-quorum floor) — Slice 2 /
+  honest-labeling debt; the zero-votes fail-closed fix took the sharpest edge off.
+- **CF-C/CF-D** — now backed by C12's behavioral execution, not just static/oracle checks.
+- Richards' 🟢 nit (self-test the C4 strip-regex) — optional, not applied.
+
+### S-invariant self-audit (Gate C)
+
+| Invariant | Status |
+|-----------|--------|
+| S1 / S9 (orchestrator authors nothing / synthesizes no vote) | held — findings author-sourced; bands from the deterministic tally |
+| S8 (author never grades own finding) | held — every voter's authored findings excluded; C3 + C12 assert it executably |
+| Self-heal bound (S7) | held — cleared at cycle 1; the 🔴 were mechanical, self-healed not escalated |
+| Block on 🔴 (Principle VII) | held — gate did not clear until both 🔴 were incorporated + re-verified |

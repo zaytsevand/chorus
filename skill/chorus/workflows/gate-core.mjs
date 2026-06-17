@@ -76,7 +76,9 @@ export function consistencyViolations(gateReturn, bands) {
 // A finding whose votes are missing (vote agent errored) gets band:null → fail-closed gating.
 export function assembleFindings(authored, bands) {
   return authored.map((f) => {
-    const hasVotes = Array.isArray(f.votes);
+    // Zero surviving votes (missing OR all voters failed) → fail-closed null, never a confident
+    // hold at proposed (Gate C: a no-quorum finding must gate, not sail through). Non-empty → tally.
+    const hasVotes = Array.isArray(f.votes) && f.votes.length > 0;
     const t = hasVotes ? tally(f.votes) : { P: 0, O: 0, net: 0 };
     const band = hasVotes ? deriveBand(f.proposed_severity, t.net, bands) : null;
     return {
@@ -91,6 +93,20 @@ export function assembleFindings(authored, bands) {
       transcriptHandle: f.transcriptHandle ?? null,
     };
   });
+}
+
+// --- Shell transforms pulled into the tested core (Gate C CF-G) -----------------------------
+// flattenAuthored: [{lens, findings:[…]}] → flat findings tagged with author lens + handle.
+// A wrong lens tag here silently breaks S8 routing downstream, so it is tested, not stranded.
+export function flattenAuthored(survivors, handle) {
+  return survivors.flatMap(({ lens, findings }) =>
+    findings.map((f) => ({ ...f, lens, transcriptHandle: handle(`author:${lens}`) })));
+}
+// recordGap: the FR-006 no-silent-loss primitive — push a gap, return null (the filtered value).
+// A named function with an explicit assertion (C12), not a comma-operator side effect.
+export function recordGap(gaps, stage, lens) {
+  gaps.push({ stage, lens, reason: 'null-isolated' });
+  return null;
 }
 
 // --- Quorum floor (FR-006): below the floor the author stage is not a hollow gate -----------
