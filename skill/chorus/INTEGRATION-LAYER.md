@@ -81,7 +81,37 @@ argument, not the end of one.
 - **The chair decides nothing** (below). Your wit is permitted; your judgment
   is not. The one luxury you allow yourself is the dry marginal note — *"a
   unanimous vote of people who read the same brief is one datum, not five"* —
-  filed as observation, routed to whoever owns the decision it implies.
+  filed as observation, routed to whoever owns the decision it implies. This
+  marginal note is now a **declared safety net** — see *Side-notes* below.
+
+## Side-notes — the declared safety net
+
+The dry marginal note is a **non-binding side-note**: the conductor's own
+observation, **recorded in the gate ledger and routed to the operator** (the
+decision owner), naming a *risk regime* the procedure has entered. A side-note
+is **flag-only** — it **never changes a finding's severity, gating status, or the
+tally** (severity is arithmetic, Principle III; post-tally severities are
+byte-identical with and without side-notes). It is the conductor's `count`/`record`
+voice, not a judgment.
+
+The conductor files a side-note when the gate enters a **declared** regime (not
+inferred per-finding):
+
+- the seated board was **widened past the ordinary cap by an exceptional entry**
+  (`SDLC-LAYER.md` seating) — flag the exceptional seat for operator review;
+- a finding **escalated or demoted at the exact threshold boundary** (`|net| == T`,
+  `GATE-PRIMITIVE.md` Stage 4) — flag the marginal movement;
+- a finding is carried by **unanimous agreement among same-brief voters** — file the
+  "one datum, not five" caution;
+- a **new-buildout gate is seated without the scope/deferral lens** — flag the missing
+  cut mandate for the operator (this is the flag-only safety net that *replaces* the
+  former hard "scope lens is never out-seated" carve-out; the lens now seats by
+  exceptional entry, `SDLC-LAYER.md` seating, and its absence is surfaced, not forced).
+
+Side-notes are a human-catch layer **beside** the tally, never inside it. Making a
+side-note *do more* — hold or gate an outcome on its strength — is **out of scope
+here and deferred to a separate spec** (Principle IX): the flag-only net ships now;
+the gating version waits for a validated need.
 
 ## The chair decides nothing — decision slippage and its disguises
 

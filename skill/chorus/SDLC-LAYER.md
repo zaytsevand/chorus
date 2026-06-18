@@ -77,24 +77,45 @@ balanced** lifecycle: the workflow runs forward, stopping the operator only for 
   un-cited JOIN is not-applicable) and **expected stakes** (🟢/🟡/🔴-potential + a
   hook). This replaces the old single relevance 0–3 score, which degenerated to
   all-3s.
-- **Seating** is a *decision* banded by `DECISION-PRIMITIVE.md` (catalog rows 1–2):
-  `3 ≤ J ≤ 5` → seat all. `J ≥ 6` → sort by (applicability, then expected stakes); a
-  **strict** order at the 5th seat is 🟢 (auto-seat). A **tie** spanning the 5th seat
-  is **🟡** — seat a recorded default panel and queue it for async override, **never
-  an operator interruption** (this is the seating tie that parked feature 005 tried,
-  and failed, to resolve mechanically; as a 🟡 it self-unblocks). `J < 3` → re-ping
-  once; abort the gate honestly on the second failure. The orchestrator still never
-  judges lens merit (S3/D1) — it sorts persona-supplied evidence and applies a
-  declared band.
-- **Mandate guardrail**: when the cap forces an out-seat, "covered by a seated
-  lens" is judged by **mandate, not by overlapping findings** — one shared
-  finding does not transfer a lens's role. In particular, the
-  **scope/deferral lens (Goldratt) is never out-seated at a gate
-  reviewing a new buildout**: it is the only seat whose mandate is the cut, and
-  out-seating it leaves a role the operator otherwise has to perform
-  themselves. (Provenance: a 2026-06-11 gate out-seated it as "covered"
-  by a lens that shared one staleness finding but not the cut mandate; the
-  operator then had to perform the cut manually — issue #6.)
+- **Ordinary seating** is a *decision* banded by `DECISION-PRIMITIVE.md` (catalog rows 1–2):
+  the cap is **5 ordinary (JOIN) seats**. `3 ≤ J ≤ 5` → seat all. `J ≥ 6` → sort by
+  (applicability, then expected stakes); a **strict** order at the 5th seat is 🟢
+  (auto-seat). A **tie** spanning the 5th seat is **🟡** — seat a recorded default panel
+  and queue it for async override, **never an operator interruption** (this is the
+  seating tie that parked feature 005 tried, and failed, to resolve mechanically; as a
+  🟡 it self-unblocks). `J < 3` → re-ping once; abort the gate honestly on the second
+  failure. The orchestrator still never judges lens merit (S3/D1) — it sorts
+  persona-supplied evidence and applies a declared band.
+- **Exceptional entry** (uncapped, rare): a lens may enter *beyond* the 5 ordinary seats
+  via an **exceptional-reasoning entry** — an RSVP answer that **cites a concrete
+  round-context delta no seated ordinary lens covers**. The bar is **evidence, not an
+  adjudicator**: the cited delta is held to the same rule as any RSVP signal — an
+  un-anchored "I'm exceptional" claim is **refused** (I8/D5); distinct entries must cite
+  **distinct** uncovered deltas (duplicate-delta claims do not each earn a seat, which
+  self-limits packing). **No actor approves** the entry (self-selection preserved — no
+  operator-pin, no mandate); a lens that cannot articulate an uncovered delta has not
+  demonstrated value, and not seating it is the bar working, not exclusion. An
+  exceptional seat confers a **voice, not weight** — its vote counts exactly as an
+  ordinary seat's (severity stays arithmetic, `GATE-PRIMITIVE.md` Stage 4). Seated board
+  size = `min(roster, min(5, |ordinary JOIN|) + |exceptional|)`; the board never exceeds
+  the roster. Exceptional entries (with cited deltas) and the ordinary/exceptional split
+  are recorded in the ledger. Because the exceptional path is always open, the ordinary
+  cap keeps boards small and legible without ever *truly* excluding articulated value.
+- **Mandate guardrail**: when the cap forces an ordinary out-seat, "covered by a seated
+  lens" is judged by **mandate, not by overlapping findings** — one shared finding does
+  not transfer a lens's role.
+- **The scope/deferral lens secures its seat by exceptional entry, not a bespoke
+  mandate.** A new buildout always presents an uncovered **scope/deferral delta** (the
+  cut — no other lens holds that mandate), so the scope/deferral lens (Goldratt)
+  **exceptional-enters** by citing it and, being uncapped, is never out-seated by the
+  cap — the same evidence-gated path any lens uses, not a hard carve-out. This replaces
+  the former "Goldratt is never out-seated on a new buildout" rule: the carve-out existed
+  because the *cap* could force the scope lens out (issue #6 — a 2026-06-11 gate
+  out-seated it as "covered", and the operator had to perform the cut by hand);
+  uncapped exceptional entry removes that root cause for every lens, so the special-case
+  is retired. **Safety net** (not a mandate): if a **new-buildout gate is seated without
+  the scope/deferral lens**, the conductor files a side-note for the operator
+  (`INTEGRATION-LAYER.md` § Side-notes) — flag-only, never an auto-seat.
 
 Expected (not enforced) attendance: **Gate A** — product, architecture,
 delivery-and-ops, security, + Goldratt (scope/defer); **Gates B/C** —
@@ -239,13 +260,17 @@ These extend I1–I9. S8/S9 are gate-primitive-level and live in
   change traces to a speckit phase-runner. (Extends I1.)
 - **S2.** RSVP fires independently at each gate; no JOIN/ABSTAIN carries across
   gates. (Extends I2.)
-- **S3.** No panel exceeds 5; overflow is seated by the persona-declared two-axis
-  signal (`DECISION-PRIMITIVE.md`), banded as a decision: a strict sort auto-seats
-  (🟢), a tie at the cap seats a recorded default + async override (🟡) — never an
-  operator interruption, never orchestrator lens-merit judgment (D1). Out-seat
-  coverage is judged by mandate, never by overlapping findings; the scope/deferral
-  lens is never out-seated on a new buildout. (Extends I2; the decision discipline
-  is `DECISION-PRIMITIVE.md`, D1–D5.)
+- **S3.** No **ordinary** panel exceeds 5; ordinary overflow is seated by the
+  persona-declared two-axis signal (`DECISION-PRIMITIVE.md`), banded as a decision: a
+  strict sort auto-seats (🟢), a tie at the cap seats a recorded default + async override
+  (🟡) — never an operator interruption, never orchestrator lens-merit judgment (D1).
+  **Exceptional entries** are additive and uncapped but **evidence-anchored** (cite an
+  uncovered delta or be refused, I8/D5; distinct deltas; no adjudicator); the board never
+  exceeds the roster, and an exceptional seat is a voice, not weight. Out-seat coverage
+  is judged by mandate, never by overlapping findings; the scope/deferral lens secures
+  its seat by **exceptional entry** (the always-uncovered cut delta on a new buildout),
+  not a bespoke carve-out, and a new-buildout gate seated without it is **side-noted**,
+  not auto-seated. (Extends I2; the decision discipline is `DECISION-PRIMITIVE.md`, D1–D5.)
 - **S4.** No gate passes with an open 🔴; each 🔴 is resolved or waived with
   recorded rationale. (Extends I7.)
 - **S5.** Incorporation revises the spec and regenerates downstream artefacts via
