@@ -1,0 +1,8 @@
+{
+  "p95_latency_ms": 240,
+  "rss_mb": 300,
+  "cost_per_req_usd": 0.0014,
+  "unused_fr_count": 3,
+  "dead_code_loc": 0,
+  "throughput_rps": 120
+}
