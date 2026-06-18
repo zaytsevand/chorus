@@ -99,7 +99,8 @@ balanced** lifecycle: the workflow runs forward, stopping the operator only for 
 Expected (not enforced) attendance: **Gate A** — product, architecture,
 delivery-and-ops, security, + Goldratt (scope/defer); **Gates B/C** —
 architecture, domain, language lens (if code in scope), delivery-and-ops,
-security.
+security. **Gate A's seated panel runs the premise pass first** (§ Gate A —
+premise pass), before its within-frame review.
 
 ### Exploratory phase (per gate)
 
@@ -119,6 +120,82 @@ the grading bar, the characteristic ranking) before findings are authored — an
 keeps its gates and their standing answers current in its memory record
 (`EXPLORATORY-PHASE.md` § Gate upkeep). The phase feeds Stage 1 Extract; it does
 not replace it.
+
+### Gate A — premise pass (runs first)
+
+Gate A runs a **premise pass before its within-frame design review**. A multi-lens
+review tends to *develop the design within the frame it was given* — surfacing
+requirements, bugs, and inconsistencies — far more readily than it challenges
+whether the frame itself is right; and same-distribution review (an AI panel
+reviewing an AI-authored spec) is **circular unless it diverges from the input**.
+The premise pass is the charter that makes Gate A *attack the frame* before helping
+build it.
+It is **an added pass + brief, not a new pipeline phase**: same gate, same
+primitive, an added pass and a finding tag. (The standalone `chorus challenge`
+mode invokes this same brief on any target — `SKILL.md`; defined here once, cited
+there.)
+
+**1 · The brief.** The seated panel is briefed to adversarially attack the spec's
+**premise** — its stated problem, its necessity *now*, the chosen framing, and the
+load-bearing assumptions — and to **steelman the null or a named alternative**
+(don't-build / build-X-instead). Each premise finding MUST carry at least one of: a
+**steelman for not building**, a **reframe**, a **root-cause doubt**, or a **named
+unvalidated assumption + the cheapest experiment** that would settle it.
+
+**2 · Scope is set in the vote, not by a stanza.** Every Gate-A finding carries a
+**scope** attribute — `premise` (attacks problem / necessity / framing /
+assumption) or `within-frame` (improves the design as framed). Scope is
+**declared by the authoring persona and confirmed by the non-author vote**, on the
+same authority the personas hold over severity (`GATE-PRIMITIVE.md` S8/S9) — no
+text-matching stanza or regex reads authorial intent. A `within-frame` finding is
+**parked for the within-frame design review**, not discarded, and does **not** count
+as premise divergence.
+
+**3 · The fixed red-team checklist (out-of-distribution floor).** Because the
+panel shares the spec author's training distribution, same-model steelmanning can
+only relocate a shared blind spot. Beneath the persona attacks the pass
+applies a **fixed, author-independent, prior-free checklist** — each item a
+question whose outcome is **recorded every pass** (it is a question set, not a
+classifier):
+
+| # | Item | What it surfaces |
+|---|------|------------------|
+| RT-1 | Is the problem **observed or forecast**? | a premise built on speculation, not evidence |
+| RT-2 | **Symptom or root cause**? | a fix aimed at a symptom of a deeper cause |
+| RT-3 | Does the feature **manufacture its own need**? | self-justifying scope |
+| RT-4 | What is the **cheapest experiment** that would settle this instead of building? | inventory ahead of evidence (the deferral cut) |
+| RT-5 | Who is **harmed if we do nothing** — and is that harm evidenced? | absent / weak cost-of-inaction |
+| RT-6 | Is the premise **falsifiable** — what would prove it wrong? | unfalsifiable framing |
+
+The list is fixed prose, not model-generated (a generated list would share the
+panel's priors and defeat the floor).
+
+**4 · Honest-null (substantive, fails closed).** When no genuine premise objection
+lands, the pass records an **honest-null**: every "what we tried" entry carries a
+**lens + one of the four attack forms of §1** (steelman / reframe / root-cause
+doubt / named assumption + cheapest experiment) — the same evidence shape as a real
+finding — **and** the RT-1..RT-6 outcomes. A bare or boilerplate `sound` does not
+satisfy it. A pass in which the panel did **not genuinely attack** the premise is a
+**failed pass, re-run** — bounded at **N = 3** re-runs (the self-heal **Loop
+bound**/S7 below), after which it **escalates to the operator**
+(`DECISION-PRIMITIVE.md` 🔴) rather than looping. A sound premise is
+proven by attacks that landed and held, never by silence.
+
+**5 · Outcome is the existing tally.** The premise outcome is the **existing
+deterministic Stage-4 tally** (`GATE-PRIMITIVE.md`) taken over the **premise-tagged
+findings** — a finding-attribute scope on the same arithmetic, **not** a new
+mechanic. A premise finding that tallies to 🔴 is a **premise-level block**:
+operator-owned and self-unblocking (`DECISION-PRIMITIVE.md`) — the operator
+reframes the spec, proceeds with a recorded override, or stops; it never
+hard-blocks on its own (Principle II / chair-decides-nothing). There is **no new
+verdict mechanic, no severity→band mapping, and no new canonical doc** — the
+premise pass reuses the gate primitive and the decision bands by citation.
+
+> The premise-pass brief, the RT-1..RT-6 checklist, and the honest-null rule have
+> their **single canonical home here**. `SKILL.md`'s `chorus challenge` mode and the
+> standalone invocation cite this subsection; they MUST NOT restate it, and it MUST
+> NOT be split into a separate canon file (Principle I; that would be the new home
+> SC-005 forbids).
 
 ### Block on 🔴 — via the self-heal loop
 
@@ -273,6 +350,12 @@ item marked pass with a pointer to its evidence row). The ledger is **not** plac
 under `docs/reviews/` — that directory is for periodic project-state rounds. (Full
 schema: `specs/003-agent-sdlc-workflow/contracts/sdlc-ledger.md`; decision-record
 schema: `DECISION-PRIMITIVE.md`.)
+
+**At Gate A** the ledger records, in order: the **premise pass** (RSVP, the
+premise-tagged findings, the RT-1..RT-6 outcomes, the tally, and the honest-null),
+then the **within-frame findings**, then the **parked-from-premise findings** —
+reconstructable end-to-end. This reuses the existing register/tally schema (the
+scope tag is a finding attribute); it adds no new schema.
 
 ## Refusals (lifecycle boundaries)
 
