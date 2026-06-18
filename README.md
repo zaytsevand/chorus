@@ -19,9 +19,9 @@ An optional **Guido** (Python) language lens joins only on rounds with Python in
 scope. Conflicts go to `advisor()`. Output is a durable markdown artifact you
 commit; the most recent artifact is the next round's baseline.
 
-## Three modes
+## Four modes
 
-The skill runs in three modes — two *review* modes built on the same four-stage
+The skill runs in four modes — three *review* modes built on the same four-stage
 gate primitive (`skill/chorus/GATE-PRIMITIVE.md`: extract → uncapped
 author → real adversarial vote → deterministic tally), plus a navigational
 onboarding tutorial:
@@ -39,8 +39,15 @@ onboarding tutorial:
   Trigger: **"run the agent-SDLC on feature 0NN."** Driven by
   `skill/chorus/SDLC-LAYER.md`; output:
   `specs/<feature>/agent-sdlc-log.md`.
+- **`chorus challenge`** (premise pass, standalone) — grills a target's
+  **premise** (problem / necessity-now / framing / load-bearing assumptions) and
+  steelmans the null or an alternative, on any spec, design note, or raw idea.
+  It is Gate A's premise pass run on its own — same brief, fixed red-team
+  checklist, and substantive honest-null, defined once in
+  `skill/chorus/SDLC-LAYER.md` (§ Gate A — premise pass). The same pass runs first
+  inside every Gate A. Trigger: **"chorus challenge `<target>`."**
 - **`chorus learn`** (tutorial) — an interactive staged onboarding that teaches
-  setup and both review modes via the AskUserQuestion tool, one step at a time,
+  setup and the review modes via the AskUserQuestion tool, one step at a time,
   mutating nothing except one opt-in scaffold. Trigger: **"chorus learn."**
   Defined in `skill/chorus/LEARN.md`. **New here? Start with this.**
 

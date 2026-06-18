@@ -99,7 +99,8 @@ balanced** lifecycle: the workflow runs forward, stopping the operator only for 
 Expected (not enforced) attendance: **Gate A** — product, architecture,
 delivery-and-ops, security, + Goldratt (scope/defer); **Gates B/C** —
 architecture, domain, language lens (if code in scope), delivery-and-ops,
-security.
+security. **Gate A's seated panel runs the premise pass first** (§ Gate A —
+premise pass), before its within-frame review.
 
 ### Exploratory phase (per gate)
 
@@ -119,6 +120,59 @@ the grading bar, the characteristic ranking) before findings are authored — an
 keeps its gates and their standing answers current in its memory record
 (`EXPLORATORY-PHASE.md` § Gate upkeep). The phase feeds Stage 1 Extract; it does
 not replace it.
+
+### Gate A — premise pass (runs first)
+
+Gate A runs a **premise pass before its within-frame design review**: the seated
+panel **attacks the spec's premise** — problem, necessity *now*, framing, and
+load-bearing assumptions — and steelmans the null or a named alternative. It is an
+**added pass + brief, not a new pipeline phase**. (The `chorus challenge` mode,
+`SKILL.md`, invokes the same brief standalone — defined here once, cited there.)
+*Why:* a multi-lens review develops *within* the given frame far more readily than
+it challenges the frame, and same-distribution review is circular unless it diverges
+from the input.
+
+**1 · The brief.** Each premise finding MUST carry at least one of: a **steelman
+for not building**, a **reframe**, a **root-cause doubt**, or a **named unvalidated
+assumption + the cheapest experiment** that would settle it.
+
+**2 · Scope is set in the vote.** Each finding carries a `premise` / `within-frame`
+**scope**, **declared by the authoring persona and confirmed by the non-author
+vote** — the same authority personas hold over severity (`GATE-PRIMITIVE.md`
+S8/S9); no text-matching stanza or regex reads authorial intent. A `within-frame`
+finding is **parked for the within-frame design review**, not counted as premise
+divergence.
+
+**3 · Fixed red-team checklist (out-of-distribution floor).** A same-distribution
+panel can only relocate a blind spot it shares with the author, so beneath the
+persona attacks the pass applies a **fixed, prior-free** question set — each item's
+outcome **recorded every pass** (questions, not a classifier; fixed prose, not
+model-generated):
+
+| # | Item | What it surfaces |
+|---|------|------------------|
+| RT-1 | Is the problem **observed or forecast**? | a premise built on speculation, not evidence |
+| RT-2 | **Symptom or root cause**? | a fix aimed at a symptom of a deeper cause |
+| RT-3 | Does the feature **manufacture its own need**? | self-justifying scope |
+| RT-4 | What is the **cheapest experiment** that would settle this instead of building? | inventory ahead of evidence (the deferral cut) |
+| RT-5 | Who is **harmed if we do nothing** — and is that harm evidenced? | absent / weak cost-of-inaction |
+| RT-6 | Is the premise **falsifiable** — what would prove it wrong? | unfalsifiable framing |
+
+**4 · Honest-null (substantive, fails closed).** When the premise survives, every
+"what we tried" entry carries a **lens + one of §1's four attack forms** plus the
+RT-1..RT-6 outcomes — the evidence shape of a real finding. A bare or boilerplate
+`sound` does not satisfy it: a pass that did **not genuinely attack** the premise is
+a **failed pass, re-run** (bounded **N = 3**, the self-heal **Loop bound**/S7 below,
+then escalate to the operator, `DECISION-PRIMITIVE.md` 🔴).
+
+**5 · Outcome is the existing tally.** The outcome is the **existing deterministic
+Stage-4 tally** (`GATE-PRIMITIVE.md`) over the **premise-tagged** findings — a
+finding-attribute scope on the same arithmetic. A premise 🔴 is a **premise-level
+block**: **operator-owned and self-unblocking** (`DECISION-PRIMITIVE.md` — reframe,
+recorded override, or stop; never an auto-kill, Principle II). **No new verdict
+mechanic, no severity→band mapping, and no new canonical doc**: this brief lives
+**only here** and **MUST NOT be split into a separate canon file** — `SKILL.md`
+cites it, never restates (Principle I; that new home is what SC-005 forbids).
 
 ### Block on 🔴 — via the self-heal loop
 
@@ -273,6 +327,12 @@ item marked pass with a pointer to its evidence row). The ledger is **not** plac
 under `docs/reviews/` — that directory is for periodic project-state rounds. (Full
 schema: `specs/003-agent-sdlc-workflow/contracts/sdlc-ledger.md`; decision-record
 schema: `DECISION-PRIMITIVE.md`.)
+
+**At Gate A** the ledger records, in order: the **premise pass** (RSVP, the
+premise-tagged findings, the RT-1..RT-6 outcomes, the tally, and the honest-null),
+then the **within-frame findings**, then the **parked-from-premise findings** —
+reconstructable end-to-end. This reuses the existing register/tally schema (the
+scope tag is a finding attribute); it adds no new schema.
 
 ## Refusals (lifecycle boundaries)
 
