@@ -1,6 +1,6 @@
 ---
 name: chorus
-description: Multi-advisor guardrails across SDLC stages (Evans/Richards/Cooper/Norman/Uncle Bob/Beck/Delivery-and-Ops/security/Goldratt): a panel reviews each stage through their lenses with per-round RSVP self-selection, cross-evaluation, conflict reconciliation, and ranked recommendations. Use when the user asks for a chorus, a project-state review, or to "spawn the regular chorus." Produces a durable artifact at docs/reviews/YYYY-MM-DD-chorus-review.md. Also supports an agent-SDLC lifecycle mode ("run the agent-SDLC on feature 0NN") that interleaves scoped chorus gates with the speckit cycle — see SDLC-LAYER.md — and a "chorus learn" tutorial mode (trigger: "chorus learn" / "/chorus learn"), an interactive staged onboarding that teaches setup and both review modes — see LEARN.md.
+description: Multi-advisor guardrails across SDLC stages (Evans/Richards/Cooper/Norman/Uncle Bob/Beck/Delivery-and-Ops/security/Goldratt): a panel reviews each stage through their lenses with per-round RSVP self-selection, cross-evaluation, conflict reconciliation, and ranked recommendations. Use when the user asks for a chorus, a project-state review, or to "spawn the regular chorus." Produces a durable artifact at docs/reviews/YYYY-MM-DD-chorus-review.md. Also supports an agent-SDLC lifecycle mode ("run the agent-SDLC on feature 0NN") that interleaves scoped chorus gates with the speckit cycle — see SDLC-LAYER.md — a "chorus challenge" mode (trigger: "chorus challenge <target>") that grills a target's premise standalone — Gate A's premise pass run on its own, see SDLC-LAYER.md — and a "chorus learn" tutorial mode (trigger: "chorus learn" / "/chorus learn"), an interactive staged onboarding that teaches setup and the review modes — see LEARN.md.
 ---
 
 # Chorus — repeatable procedure
@@ -39,9 +39,9 @@ orchestrator inference). It makes the workflow **self-unblocking yet balanced** 
 runs forward, stopping the operator only for 🔴. Both review modes reference it;
 this file does not restate it.
 
-## Three modes
+## Four modes
 
-The chorus has three modes — two *review* modes built on the same gate primitive
+The chorus has four modes — three *review* modes built on the same gate primitive
 (`GATE-PRIMITIVE.md`), plus a navigational tutorial:
 
 - **Project-state round** — a multi-lens review of a scope you choose: most
@@ -52,6 +52,14 @@ The chorus has three modes — two *review* modes built on the same gate primiti
   design, plan/tasks, and implementation reviews. Trigger: "run the agent-SDLC
   on feature 0NN." Driven by `SDLC-LAYER.md`; output:
   `specs/<feature>/agent-sdlc-log.md`. Read `SDLC-LAYER.md` before running it.
+- **`chorus challenge`** (premise pass, standalone) — grills a target's
+  **premise** (problem / necessity-now / framing / load-bearing assumptions) and
+  steelmans the null or an alternative, on any spec, design note, or raw idea —
+  often before a spec exists. Trigger: "chorus challenge `<target>`." It is a thin
+  standalone invocation of Gate A's premise pass: same brief, same fixed red-team
+  checklist, same substantive honest-null — **defined once in `SDLC-LAYER.md` §
+  Gate A — premise pass; cited here, not restated** (Principle I). Output: a
+  durable premise artifact (no feature directory required).
 - **`chorus learn`** (tutorial) — an interactive staged onboarding that teaches
   setup and both review modes via the AskUserQuestion tool, mutating nothing
   except one opt-in scaffold. Trigger: "chorus learn" / `/chorus learn`. Defined
@@ -65,6 +73,9 @@ The chorus has three modes — two *review* modes built on the same gate primiti
   feature 0NN" for the gated lifecycle (see `SDLC-LAYER.md`).
 - **A full-codebase sweep** for periodic project-state review — the occasional
   case; quarterly or after a major release.
+- **Grilling a premise** before sunk design effort — "chorus challenge `<target>`"
+  on a spec, a design note, or a raw idea (divergence is cheapest at the idea
+  stage). The same premise pass runs first inside every Gate A.
 
 Don't use for:
 - Single-lens questions (just spawn the relevant persona agent directly)
