@@ -12,12 +12,12 @@ equally important, *what it is not allowed to do*.
 
 **The mode-independent discipline lives in the substrate.** The EWD-340
 methodology, the conductor's voice & shtick, "the chair decides nothing" + its
-slippage table, the discipline cascade, the system-boundary refusals, and **the
-full `I1–I9` invariant catalog** are defined once in
-**chorus-core/CONDUCTOR.md (REQUIRED: chorus-core)** and are not restated here.
-This file carries only what is specific to a project-state round: position in the
-system for a round, the per-phase pre/post-conditions for Phases 0–5, and what a
-round sees / does not see.
+slippage table, the side-note safety net, the discipline cascade, the
+system-boundary refusals, and **the full `I1–I9` invariant catalog** are defined
+once in **chorus-core/CONDUCTOR.md (REQUIRED: chorus-core)** and are not restated
+here. This file carries only what is specific to a project-state round: position
+in the system for a round, the per-phase pre/post-conditions for Phases 0–5, and
+what a round sees / does not see.
 
 ## Position in the system
 
@@ -53,8 +53,13 @@ boundaries is the signature failure mode (the refusals enforcing it are in
 - The project addendum at `docs/reviews/CHORUS-PROJECT.md` (or the inline
   interview that substitutes for it)
 - The roster and each member's RSVP reply
-- The Phase 1 reports (text or memory-dir contents)
-- The consolidation matrix it builds in Phase 2
+- The Phase 1 reports (text or memory-dir contents), each carrying the persona's
+  **marked pull-quote** per finding (the verbatim span the artifact relays —
+  `SKILL.md` Phase 1 brief item 10; spec `008-detail-rich-relay`)
+- The detail-rich **findings register** it assembles in Phase 2 — the single
+  human-facing source of truth — and the **consolidation matrix**, which it
+  derives as a *projection* of that register (severity + convergence are carried
+  from the register, never re-authored, so the two surfaces cannot drift)
 - The Phase 2 reactions
 - The conflicts it frames in Phase 3 and `advisor()`'s response
 - The artifact under construction at `docs/reviews/YYYY-MM-DD-chorus-review.md`
@@ -132,15 +137,20 @@ extends the I8 evidence discipline upstream of Round 1.
 - **Pre:** Phase 0.7 post holds (exploratory understanding built); quorum branch
   is "proceed" (not "abort").
 - **Post:** every joiner has produced a report (or been substituted with a
-  bounded `Explore` and marked as substituted). Reports are referenceable
-  by file path or memory-dir path.
+  bounded `Explore` and marked as substituted), each finding carrying its
+  **persona-marked pull-quote** (`SKILL.md` Phase 1 brief item 10) — a finding
+  with no marked pull-quote is routed back, never excerpted by the conductor.
+  Reports are referenceable by file path or memory-dir path.
 
 ### Phase 2 — Cross-evaluation
 
-- **Pre:** Phase 1 post holds; consolidation matrix written with every
-  finding cited as `Fn`.
+- **Pre:** Phase 1 post holds; the detail-rich **findings register** is written
+  (every finding's verbatim pull-quote relayed), and the **consolidation matrix**
+  is written as a projection of it with every finding cited as `Fn`.
 - **Post:** every non-substituted joiner has produced a Round-2 reaction
-  ending with their priority/over-rated call.
+  ending with its three-way call (PRIORITIZE / CONFIRM / OVER-RATE), and any
+  convergence note it marked is relayed verbatim under the finding's register
+  entry.
 
 ### Phase 3 — Conflict reconciliation
 
@@ -154,7 +164,9 @@ extends the I8 evidence discipline upstream of Round 1.
 - **Pre:** Phase 3 post holds.
 - **Post:** surviving recommendations scored on Cost / Value /
   Constitutional ROI (if addendum lists principles) / Convergence; top-5
-  drafted by the integration layer (not delegated to a fresh agent).
+  drafted by the integration layer (not delegated to a fresh agent), each entry
+  resolved to its persona-marked pull-quote and traced back to its register
+  entry (never a bare `Fn` + score).
 
 ### Phase 5 — Sign-off
 

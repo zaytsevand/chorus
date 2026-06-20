@@ -83,6 +83,11 @@
 <!--
   ACTION REQUIRED: The content in this section represents placeholders.
   Fill them out with the right functional requirements.
+
+  CONSTITUTION (Principle I — cite, never restate): when a requirement references a canon
+  mechanic (the gate primitive, the invariants, the decision bands), it MUST cite the
+  canon doc, not restate the definition. For this Markdown methodology repo, a feature's
+  quickstart.md conformance checks are the first-class verification surface (Principle V).
 -->
 
 ### Functional Requirements

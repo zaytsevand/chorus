@@ -17,7 +17,7 @@ marker), structured per-step `Cites:` lists (≥1 per step, cardinality-asserted
 runtime failure pointers resolved via the **running skill's base path**, and
 dual-channel install detection **with dual-channel delivery** (FR-015).
 
-Technical approach: author a new companion doc `skill/chorus-review/LEARN.md` (the
+Technical approach: author a new companion doc `skill/chorus/LEARN.md` (the
 single canonical definition of the mode); register the mode across **all** cold-start
 surfaces — `SKILL.md` mode list **and YAML frontmatter**, the three-mode reframe of the
 "Two modes" heading, a Phase-0 note defining the scaffolded-addendum state for both
@@ -34,15 +34,19 @@ persona-agent set** (FR-015). No runtime code; same authoring shape as features
 **Primary Dependencies**:
 - The chorus canon the tutorial cites: `SKILL.md`, `INTEGRATION-LAYER.md`,
   `SDLC-LAYER.md`, `GATE-PRIMITIVE.md`, `EXPLORATORY-PHASE.md`, `DECISION-PRIMITIVE.md`
-- **Feature 006 (PR #5, open)** — `DECISION-PRIMITIVE.md` exists only on that branch;
-  007 lands after it (research.md R8). Note: 006 does **not** deliver a three-mode
-  SKILL.md — its SKILL.md still lists two modes; **007 itself performs the
-  two→three-modes reframe** (R8 corrected per finding F25)
+- **Feature 006 (PR #5, merged 2026-06-12)** — `DECISION-PRIMITIVE.md` is now present
+  in this branch's tree (merged via rebase onto `main`); 007 lands after it
+  (research.md R8). Note: 006 does **not** deliver a three-mode SKILL.md — its
+  SKILL.md listed only the review modes; **007 itself performs the two→three-modes
+  reframe** (R8 corrected per finding F25). The PR #5 **merge horizon is now closed**
+  (run-2 GOLD-1 resolved): the serialized path to the first newcomer session starts at
+  this merge, which has occurred — so S4's `DECISION-PRIMITIVE.md` cite resolves and the
+  conformance suite can pass green (Gate B RICH-2 precondition cleared)
 - The AskUserQuestion tool (≤4 options per question plus built-in "Other") — the
   navigation rules in FR-004 are designed against this hard budget
 - `templates/CHORUS-PROJECT.template.md` (scaffold source), `install.sh` (file-path
   deployment), and **`plugin.json`** (plugin-channel packaging — today it roots the
-  skill at `skill/chorus-review/`, ships 7 of 10 persona agents, and does not carry
+  skill at `skill/chorus/`, ships 7 of 10 persona agents, and does not carry
   `templates/`; FR-015 names it an edit surface)
 - **Both documented install channels**: file-path (`./install.sh` → `~/.claude`) and
   plugin — detection, **delivery**, and scaffold-source resolution must work on each
@@ -135,7 +139,7 @@ specs/007-chorus-learn-onboarding/
 ### Source Code (repository root)
 
 ```text
-skill/chorus-review/
+skill/chorus/
 ├── SKILL.md             # EDIT: mode list + YAML frontmatter description + "Two modes"→
 │                        #   three-mode heading + Phase-0 scaffolded-addendum note (FR-014)
 ├── LEARN.md             # NEW: the staged tutorial — single canonical definition of the mode
@@ -150,9 +154,9 @@ templates/
 
 install.sh               # EDIT: deploy templates/ → $SKILL_DST/templates/ + "Next:" leads
                          #   with `chorus learn`
-plugin.json              # EDIT (FR-015): package templates/ + the 3 missing persona agents
-                         #   (constraint-and-flow, security-and-trust, guido); refresh the
-                         #   stale 7-advisor description
+plugin.json              # EDIT (FR-015): package templates/ + every file in agents/
+                         #   (the directory is the authoritative roster — no filename
+                         #   enumeration here or anywhere); refresh the stale description
 README.md                # EDIT: three modes named; quick-start leads with `chorus learn`;
                          #   manual copy remains as cited fallback (installed template path)
 ```

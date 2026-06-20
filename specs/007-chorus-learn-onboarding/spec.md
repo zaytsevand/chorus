@@ -13,7 +13,7 @@
 The chorus-review skill is powerful but has a steep cold-start: a new user faces several
 dense companion docs (`SKILL.md`, `INTEGRATION-LAYER.md`, `SDLC-LAYER.md`,
 `GATE-PRIMITIVE.md`, `EXPLORATORY-PHASE.md`, `DECISION-PRIMITIVE.md`), a per-project
-addendum to author, and two operating modes. There is no guided on-ramp. `chorus learn`
+addendum to author, and two review modes. There is no guided on-ramp. `chorus learn`
 adds one: an **interactive, staged tutorial** that teaches a newcomer — in a few
 self-paced **steps**, using the **AskUserQuestion tool** as the interaction primitive —
 how to **set up** the chorus and how to **work with** it, without making them read the
@@ -137,6 +137,55 @@ skill/prompt authoring — no runtime code.
   stays at S5 — the escape is stated, not assumed.
 - Out of 007 scope (recorded): stale-present installed canon left by the additive-only
   installer (G10) — future-round candidate, logged in the ledger.
+
+### Session 2026-06-12 — Gate A run 2, cycle 1 (clean-slate rerun; findings register in `agent-sdlc-log.md`)
+
+Operator-confirmed frame (interview session 1): the audience is **external/public
+newcomers** via the README/plugin channel; the canon is the **Core Domain**
+(tutorial Supporting, deployment Generic); run-1's ledger is context only; the
+navigation contract is enforced by the **Gate C dogfood only** (recorded decision —
+the panel's challenges to it were demoted 4-0).
+
+- Q: Three corpus surfaces enumerate persona agents by filename, and the
+  2026-06-12 agent rename already made that list stale (cluster A — COOP-1/NORM-2/
+  BECK-5/GOLD-3/EVAN-1). → A: the **`agents/` directory is the authoritative
+  roster**; spec, plan, research, and contracts **derive** roster facts from it and
+  never restate filenames (the feature's own cite-not-restate discipline, applied
+  to itself). The plugin.json edit is specified as "package every file in
+  `agents/`", not as a name list.
+- Q: C5b asserts directory ⊆ plugin.json but is blind to phantom packaged paths,
+  and the description refresh it claims to assert has no check (cluster B —
+  COOP-2/BECK-1/EVAN-2/COOP-3). → A: C5b asserts **both directions** (every
+  `agents/*.md` is packaged AND every packaged agent path resolves to a file) and
+  greps the refreshed plugin description; a claim with no check exactly as strong
+  as the claim is a spec defect by this spec's own SC-008.
+- Q: Three checks are weaker than the claims they assert: C1 scans two of FR-013's
+  three named staleness surfaces with two literals under an "any phrasing" claim;
+  C3 asserts a global cite floor where FR-008 pins per-step cardinality; C1/C4
+  signal failure by silent output while C3/C5b/C6 emit FAIL tokens (cluster C —
+  COOP-5/EVAN-3/BECK-2/BECK-3). → A: **claim-check parity** is the rule: C1 covers
+  all three named surfaces and scopes its scan to a **stated phrasing family**
+  (the family is enumerated in the check, and the claim says "the stated family",
+  not "any"); C3 iterates per step heading and asserts ≥1 Cites: per step; every
+  conformance stanza emits an **explicit FAIL token** on failure — silent-output
+  polarity is retired suite-wide.
+- Q: S2's Cites: list names `install.sh`, which is neither deployed by install.sh
+  nor packaged by plugin.json — the operator-confirmed primary audience would hit
+  a cite-failure on a healthy install (cluster D — NORM-1, proposed 🔴 held).
+  → A: Cites: entries MUST be **channel-resolvable**: a channel-specific artefact
+  is cited **conditionally on the channel that carries it** (install.sh on the
+  file-path/checkout channel only); the plugin-channel S2 cite resolves to the
+  packaged template and SKILL.md. The cite-resolution check (C3) gains a
+  channel-awareness note.
+- Q: Every success criterion was satisfiable by self-dogfood; no SC required a
+  real external newcomer despite the operator-confirmed external audience
+  (cluster E — GOLD-2). → A: **new SC-010** (operator-selected 2026-06-12): within
+  30 days of merge, **one real external newcomer session** is recorded in the gate
+  ledger — channel used and outcome — closing the validated-learning loop on a
+  real user, not a simulation.
+- Folded non-gating 🟡s: C6's locality assertion is made mechanical (extract the
+  S2 accept-branch section, assert hits ⊆ it — BECK-4); the plan's R8 sequencing
+  note records the PR #5 merge horizon as an open operator item (GOLD-1).
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -341,9 +390,12 @@ definition.
 - **FR-008**: For any mechanic the canonical docs define (the gate primitive, the
   invariants, the exploratory phase, the decision discipline), the tutorial MUST **cite /
   link** the canonical doc, not restate it. Each step carries a structured **Cites:**
-  list (**≥1 entry per step** — the conformance check asserts cardinality, so a
-  tutorial with zero Cites: lines fails rather than passing vacuously) of paths the
-  conformance check resolves. If a cited doc is missing at runtime, the tutorial states
+  list (**≥1 entry per step** — the conformance check asserts cardinality **per
+  step**, so a tutorial with zero Cites: lines, or with all its cites clumped in one
+  step, fails rather than passing vacuously) of paths the
+  conformance check resolves. Cites: entries MUST be **channel-resolvable**: a
+  channel-specific artefact (e.g. `install.sh`) is cited only on the channel that
+  carries it; no healthy install may cite-fail on its own channel. If a cited doc is missing at runtime, the tutorial states
   that plainly, continues at summary altitude, and points to the canonical source
   **resolved via the running skill's base path** (repo path in-repo, installed/plugin
   base otherwise) — it never reconstructs canon from memory.
@@ -368,10 +420,11 @@ definition.
   surface), in the README — whose quick-start leads with `chorus learn` before the
   manual template copy (which remains as the cited fallback, citing the **installed
   template path as deployed** — no environment-specific literals) — and in
-  `install.sh`'s "Next:" text. The mode-registry edits ("Two modes" → three-mode
-  framing in SKILL.md, README, and this spec's own references) are named edit surfaces
-  with a staleness check that scans for **any residual two-mode phrasing** on those
-  surfaces, not a single literal.
+  `install.sh`'s "Next:" text. The mode-registry edits (the stale two-mode heading
+  region → three-mode framing in SKILL.md, README, and this spec's own references) are named edit surfaces
+  with a staleness check that scans **all three named surfaces** for a **stated
+  phrasing family** (the family is enumerated in the check itself — claim and check
+  exactly as strong as each other, never a broad claim over a narrow scan).
 - **FR-014**: The scaffolded-but-unfilled addendum state MUST be defined for **both of
   its consumers**: the SCAFFOLDED marker signals structure-without-facts, and the
   registration edit to `SKILL.md` MUST instruct (a) the **Phase-0 orchestrator** to
@@ -384,8 +437,12 @@ definition.
   needs, not merely be probed: the addendum template resolves via the running skill's
   base path (`<skill-base>/templates/`, falling back to the plugin root), and the
   plugin packaging (`plugin.json`) is a **named edit surface** gaining the template and
-  the **full persona-agent set**. The conformance suite asserts delivery on both
-  channels (repo-side deploy assertion + plugin-side packaging assertion).
+  the **full persona-agent set — specified as "every file in `agents/`", the
+  authoritative roster; no artefact restates agent filenames** (the rename that
+  stale-ified three corpus surfaces is the recorded evidence). The conformance suite
+  asserts delivery on both channels: repo-side deploy assertion + plugin-side
+  packaging assertion **in both directions** (every `agents/*.md` packaged AND every
+  packaged agent path resolves) plus the refreshed plugin description.
 
 ### Key Entities
 
@@ -441,14 +498,26 @@ definition.
   scan, and a **four-path scaffold matrix** (accept / decline / existing-target /
   outside-repo) each with a recorded expected outcome. The conformance suite carries
   **no dead or vestigial assertions**, parses structural units (frontmatter block,
-  tables) rather than fixed line windows, and has a **named owner and trigger**: C1–C7
+  tables) rather than fixed line windows, emits an **explicit FAIL token on every
+  failing stanza** (no silent-output polarity anywhere in the suite), makes the C6
+  locality assertion mechanical (hits ⊆ the extracted S2 accept-branch section, not
+  eyeball-judged), and has a **named owner and trigger**: C1–C7
   execute at the Gate C dogfood and before merge, with results recorded in the gate
   ledger.
 - **SC-009**: **Both install channels deliver**: a repo-side assertion verifies the
   template deploys via `install.sh`, and a plugin-side assertion verifies the plugin
-  packaging carries the template and the full persona-agent set (FR-015); the install
+  packaging carries the template and the full persona-agent set **in both directions**
+  (FR-015); the install
   remedy text branches by detected channel (FR-006), so no documented channel degrades
   silently.
+- **SC-010**: **The loop closes on a real user** (operator-selected 2026-06-12): within
+  **30 days of merge**, one session by a **real external newcomer** (not the operator,
+  not a team simulation) running `chorus learn` is recorded in the gate ledger —
+  install channel used and outcome reached. Until that record exists, the feature's
+  validated-learning loop is open and the ledger says so. **At day 30 without that
+  record, the operator records a ledger entry deciding continue / extend the window /
+  retire** — so the verdict-closer is acted on by a named owner, never silently
+  expired (GOLD-6).
 
 ## Assumptions
 

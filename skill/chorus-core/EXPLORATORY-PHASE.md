@@ -3,8 +3,8 @@
 The **single canonical definition** of how a participating advisor builds and
 persists a lens-specific *understanding* of the review target **before** it
 authors findings. Both modes reference this file: the project-state round
-(`chorus-review/INTEGRATION-LAYER.md`) runs it between Phase 0.5 (RSVP) and Phase 1 (Round 1);
-the SDLC gates (`chorus-sdlc/SKILL.md`) run it before a gate's Author stage
+(`INTEGRATION-LAYER.md`) runs it between Phase 0.5 (RSVP) and Phase 1 (Round 1);
+the SDLC gates (`SDLC-LAYER.md`) run it before a gate's Author stage
 (`GATE-PRIMITIVE.md` stage 2). There is exactly one copy; neither layer restates
 the mechanic.
 
@@ -261,9 +261,15 @@ SC-007 / SC-008.
 
 ## Adoption note
 
-`chorus-review/INTEGRATION-LAYER.md` (base round) and `chorus-sdlc/SKILL.md` (gates A/B/C) **reference
+`INTEGRATION-LAYER.md` (base round) and `SDLC-LAYER.md` (gates A/B/C) **reference
 this file** for the mechanic; they do not restate it. Any change to the phase
 happens here, once, so the two modes cannot drift.
+
+The **read side** above runs *before* a gate. Its **write-side bookend** — the
+sign-off **memory update phase** (`SDLC-LAYER.md` § Memory update; spec 010) — reuses the
+same scope-tagged, operator-accepted write-back (`project-wide` → addendum;
+`lens-specific` → record) at the end of an SDLC run, so the loop this file opens on read
+is closed on write. It adds no new write path and no fingerprint mechanic of its own.
 
 ## Provenance
 

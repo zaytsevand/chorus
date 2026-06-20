@@ -1,8 +1,8 @@
 # Chorus Gate Primitive
 
 This is the **single canonical definition** of how a chorus conducts one review.
-Both the periodic project-state round (`chorus-review/INTEGRATION-LAYER.md`, Phases 1/2/4) and
-the per-feature SDLC gates (`chorus-sdlc/SKILL.md`, Gates A/B/C) run *this* mechanic.
+Both the periodic project-state round (`INTEGRATION-LAYER.md`, Phases 1/2/4) and
+the per-feature SDLC gates (`SDLC-LAYER.md`, Gates A/B/C) run *this* mechanic.
 There is exactly one copy; neither layer restates it.
 
 A review is four **separable, specialized stages**, each with a distinct actor
@@ -18,7 +18,7 @@ cheap out on is the stage that lies to you — and stage 3 is load-bearing.
 flowchart TD
     corpus([corpus]) -->|"Stage 1 · Extract — read-only agents → file:line records"| records([records])
     records -->|"Stage 2 · Author — seated personas → findings, uncapped"| findings([findings])
-    findings -->|"Stage 3 · Vote — OTHER personas → PRIORITIZE / OVER-RATE"| votes([votes])
+    findings -->|"Stage 3 · Vote — OTHER personas → PRIORITIZE / CONFIRM / OVER-RATE"| votes([votes])
     votes -->|"Stage 4 · Tally — orchestrator → deterministic severity + gating"| verdict([verdict])
 ```
 
@@ -26,7 +26,7 @@ flowchart TD
 
 - **Actor**: read-only `Explore` / general-purpose agents, in parallel.
 - **Input**: the review corpus (for the base round, the artefacts named in the
-  brief; for an SDLC gate, the gate's corpus per `chorus-sdlc/SKILL.md`).
+  brief; for an SDLC gate, the gate's corpus per `SDLC-LAYER.md`).
 - **Output**: structured **extract records** — one factual observation each:
 
   ```
@@ -48,7 +48,7 @@ flowchart TD
   records with `source: "spec-walkthrough"`. It is **not authoritative** — a
   persona must author a record into a finding for it to face the vote; any
   DRIFT/SURPRISE no persona claims is logged as an unclaimed record (visible,
-  non-gating). See `chorus-sdlc/SKILL.md`.
+  non-gating). See `SDLC-LAYER.md`.
 
 ## Stage 2 — Author
 
@@ -61,7 +61,10 @@ flowchart TD
   reference or operator confirmation, never invented.
 - **Output**: **findings**, each:
   `{id, lens, evidence (file:line | [principle] | [principle:proposed]),
-  proposed_severity (🔴/🟡/🟢), summary (≤ 20 words)}`.
+  proposed_severity (🔴/🟡/🟢), pull_quote (one short verbatim sentence in the
+  persona's own words — the line the human-facing register relays unedited;
+  spec 008-detail-rich-relay)}`. The persona marks this line itself; the
+  orchestrator relays it and never paraphrases or excerpts one for the persona.
 - **Success criterion**: **uncapped**. The finding count is whatever the corpus
   honestly warrants — there is **no per-author target or quota** (no "3–6", no
   "limit to N"). A word limit, where one exists, bounds the *prose density per
@@ -80,10 +83,17 @@ flowchart TD
   the finding, **never** a synthetic grader (S8, S9). In the base round this is
   the Phase-2 cross-evaluation; in an SDLC gate it is the gate's vote stage.
 - **Input**: the findings register.
-- **Output**: per non-author persona, one **vote** on each finding it has a view
-  on: `PRIORITIZE` (this is at least as severe as the author proposed) or
-  `OVER-RATE` (less severe than proposed), with optional rationale. Abstention on
-  a finding is allowed.
+- **Output**: per non-author persona, one **declared vote** on each finding it has a
+  view on — one of three values:
+  - `PRIORITIZE` — **under-rated**: more severe than the author proposed → counts toward escalation.
+  - `CONFIRM` — **correctly rated**: agree at the proposed severity → holds; counts as
+    convergence for ranking, but **not** toward escalation.
+  - `OVER-RATE` — **over-rated**: less severe than proposed → counts toward demotion.
+
+  The value is **declared by the voter**, never inferred by the orchestrator from prose
+  (S9). Abstention on a finding is allowed. The `CONFIRM` value exists so the tally can tell
+  "I agree, rank it high" apart from "this is under-rated, escalate" — the ambiguity that
+  inflated convergent agreement into gating severity (issue #13; spec `009-confirm-vote-tally`).
 - **Success criterion**: adversarial and real — each vote traces to a dispatched
   persona, and no finding is voted on by its own author.
 - **Must not**: be predicted, inferred, or summarized by the orchestrator. A
@@ -94,31 +104,53 @@ flowchart TD
 - **Actor**: the orchestrator, deterministic.
 - **Input**: the votes.
 - **Output**: each finding's **post-tally severity** and **gating flag**, by the
-  fixed **symmetric** rule. Let `P` = PRIORITIZE count and `O` = OVER-RATE count
-  among **non-author** voters, and `net = P − O`:
+  fixed **symmetric**, **board-scaled** rule. Let `P` = PRIORITIZE count, `C` = CONFIRM
+  count, and `O` = OVER-RATE count among **non-author** voters; `net = P − O` (**CONFIRM
+  is excluded from `net`** — agreement-at-severity does not move severity). Let `N` be
+  the count of **non-author voters** on the finding and `T = max(1, floor(N / 2))` the
+  **board-scaled threshold** (a wider board demands proportionally more agreement, so
+  exceptional entry — `SDLC-LAYER.md` seating — cannot make escalation cheaper):
 
   | Condition | Effect |
   |---|---|
-  | `net ≥ +2` | escalate one level (🟢→🟡→🔴, capped at 🔴) |
-  | `net ≤ −2` | demote one level (🔴→🟡→🟢, 🟢→drop) |
-  | `\|net\| < 2` | hold author-proposed severity |
+  | `net ≥ T` | escalate one level (🟢→🟡→🔴, capped at 🔴) |
+  | `net ≤ −T` | demote one level (🔴→🟡→🟢, 🟢→drop) |
+  | `\|net\| < T` | hold author-proposed severity |
 
-  - `net = 0` from all-abstain holds and is marked **unvoted** (non-gating,
-    surfaced).
+  - At the standard full board of 5 (`N = 4`), `T = floor(4/2) = 2` — the rule reduces
+    **exactly** to the prior fixed `±2`, so this change is backward-compatible at the
+    size the canon was calibrated for. The floor `T ≥ 1` holds for any voted finding; a
+    tally **MUST NOT** run at `N < 2`.
+  - `net = 0` (all-abstain, or all-CONFIRM, or balanced) holds; an all-abstain
+    finding is marked **unvoted** (non-gating, surfaced). A finding held by CONFIRM
+    is **agreed-at-severity**, not unvoted — it has real votes, they just don't move it.
   - Movement is **one level per tally**, regardless of margin (a 4–0 OVER-RATE
     demotes 🔴→🟡, not to nothing — the finding survives in the record).
   - A finding is **gating** iff its post-tally severity is 🔴 — full stop. No
     additional judgment clause: the vote is the confirmation.
-- **Success criterion**: arithmetic only — no judgment added. Identical votes
-  always yield identical severities; there are **no tally ties**. (Operator
-  tie-breaking exists only for SDLC cap-5 *seating*, never in the tally.)
+  - **Convergence count** (for Phase-4 ranking) is `P + C` — all agreement, used to
+    *rank*, never to *escalate*. Severity escalation counts only `P`. This decouples
+    the two meanings of "convergence" that issue #13 conflated: a finding many lenses
+    agree on can rank in the top-5 while honestly holding at 🟡.
+- **Success criterion**: arithmetic only — no judgment added. Identical votes at an
+  identical `N` always yield identical severities; there are **no tally ties**, and no
+  seat's vote is re-weighted (severity is presence-blind — entry buys a voice, not
+  weight). (Operator tie-breaking exists only for SDLC **ordinary-seat** cap seating,
+  never in the tally.)
 - **Must not**: re-weight by lens, author, or orchestrator preference; add a
   judgment clause to the gating decision.
+- **Rendered, never re-authored**: this post-tally severity is the value the
+  human-facing findings register and its derived matrix display (spec
+  `008-detail-rich-relay`, FR-007). Severity lives authoritatively here, in the
+  tally; the register renders it, the matrix projects it — neither re-computes it.
 
-Symmetry is deliberate. It encodes the long-standing chorus rule that **two
-lenses converging on a concern earn 🔴** (README): convergent PRIORITIZE escalates
-just as clear OVER-RATE demotes. A demote-only tally would silently let an
-author-under-rated finding through.
+Symmetry is deliberate: convergent `PRIORITIZE` escalates just as clear `OVER-RATE`
+demotes; a demote-only tally would silently let an author-under-rated finding through.
+The older rule was "two lenses converging on a concern earn 🔴" — **amended** by spec
+`009-confirm-vote-tally` (closing issue #13): two lenses **both claiming under-rated**
+(`PRIORITIZE`) earn the escalation; two lenses merely **agreeing** at the proposed
+severity (`CONFIRM`) hold it. Agreement is convergence for *ranking*, not a force on
+*severity* — escalation now requires an explicit under-rated claim, not popularity.
 
 ## Invariants this primitive carries
 
@@ -146,10 +178,10 @@ integration layer’s I1–I9.
 
 ## Adoption note
 
-`chorus-review/INTEGRATION-LAYER.md` (base round Phases 1/2/4) and `chorus-sdlc/SKILL.md` (gates
+`INTEGRATION-LAYER.md` (base round Phases 1/2/4) and `SDLC-LAYER.md` (gates
 A/B/C) **reference this file** for the mechanic; they do not restate it. Any
 change to extract/author/vote/tally happens here, once, so the two modes cannot
-drift. The lifecycle-specific invariants S1–S7 live in `chorus-sdlc/SKILL.md`; the
+drift. The lifecycle-specific invariants S1–S7 live in `SDLC-LAYER.md`; the
 gate-primitive invariants S8–S10 live here because they bind both modes.
 
 ## Provenance

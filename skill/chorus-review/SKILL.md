@@ -229,12 +229,18 @@ agent receives a short, self-contained brief:
 1. Their lens identity
 2. The round-context paragraph
 3. The scope-exclusion list (verbatim, as in Phase 1 below)
-4. RSVP instructions: reply in ≤80 words with `JOIN` or `ABSTAIN`, plus the
-   **two-axis signal** (`chorus-core/DECISION-PRIMITIVE.md` §RSVP signal) — **applicability**
-   (cite ≥1 concrete round-context delta your lens touches; no citable delta →
-   ABSTAIN) and **expected stakes** (🟢/🟡/🔴-potential + a one-line hook) — and a
-   one-sentence reason. (This replaces the old relevance 0–3 score, which degenerated
-   to all-3s; seating ties on it are now a self-unblocking 🟡, not an operator ask.)
+4. RSVP instructions: reply in ≤80 words with `JOIN`, `ABSTAIN`, or an
+   **exceptional entry**, plus the **two-axis signal** (`chorus-core/DECISION-PRIMITIVE.md`
+   §RSVP signal) — **applicability** (cite ≥1 concrete round-context delta your lens touches;
+   no citable delta → ABSTAIN) and **expected stakes** (🟢/🟡/🔴-potential + a one-line
+   hook) — and a one-sentence reason. (This replaces the old relevance 0–3 score, which
+   degenerated to all-3s; seating ties on it are now a self-unblocking 🟡, not an operator
+   ask.) An **exceptional entry** is a JOIN that asks for a seat *beyond* the ordinary cap by
+   **citing a concrete uncovered delta no seated ordinary lens covers**; it is evidence-gated
+   and rare (an un-anchored exceptional claim is refused), confers a **voice not weight**, and
+   is seated per the cap + exceptional-entry rule defined once in the **`chorus-sdlc`**
+   sibling skill (its seating section). The base round is uncapped by default, so
+   exceptional entry matters chiefly where a cap applies (the SDLC gates).
 
 Cost: ~7 small parallel calls, ~30s wall time, ~3K tokens total. Cheap
 relative to a saved Phase 1 round.
@@ -363,6 +369,15 @@ Required brief sections per agent:
    check gate (see below).
 9. **Required ending** — "End with [specific call-to-action: a
    recommendation, a finding, a persona name]."
+10. **Pull-quote mark (per finding)** — "For each finding, mark **one short
+    sentence in your own words** as its pull-quote — the line that best
+    characterizes the finding as *you* see it — and give its evidence locator
+    (`file:line` or principle tag). Format the mark so the integration layer can
+    lift it verbatim, e.g. a line beginning `PULL-QUOTE:` directly under the
+    finding." This is the voice the artifact relays unedited (spec
+    `008-detail-rich-relay`, FR-002): the integration layer **selects nothing** —
+    it relays the span you marked. A finding with no marked pull-quote is routed
+    back to you; the conductor never excerpts or paraphrases one for you.
 
 **Persona-agent failure mode (hung-on-enumeration pattern):** if an agent goes
 silent for >5 minutes with a substantial transcript already written, it has
@@ -394,10 +409,13 @@ Round-1 report and verifies:
    convergence counts. Pure `[principle]` findings (existing, cited) and
    `[principle:proposed]` findings (newly named) are accepted as-is.
 
-3. **The register Summary column** preserves the `[principle]` /
-   `[principle:proposed]` / `[unsupported]` tag so future readers can
-   distinguish evidence-grounded findings from declarative or unsupported
-   ones at a glance.
+3. **A pull-quote was marked** (Phase-1 brief item 10). A finding whose persona
+   marked no pull-quote is routed back to that persona to mark one; the
+   integration layer never selects or authors a span itself. The register's
+   pull-quote cell preserves the `[principle]` / `[principle:proposed]` /
+   `[unsupported]` tag alongside the verbatim line so future readers can
+   distinguish evidence-grounded findings from declarative or unsupported ones at
+   a glance.
 
 The gate is enforced by I8 in `chorus-core/CONDUCTOR.md`. The integration layer
 never accepts a report whose project-specific findings lack `file:line` or
@@ -405,23 +423,39 @@ a principle tag.
 
 ### Phase 2 — Cross-evaluation (parallel reactions, one per joiner)
 
-Once all Round 1 reports are in, write a **findings register** followed by a
-**consolidation matrix** as Phase 1 artifact.
+Once all Round 1 reports are in, write a **findings register** — the **single
+human-facing source of truth** for every finding — followed by a **consolidation
+matrix** that is a *projection* of it (spec `008-detail-rich-relay`).
 
-**Findings register** — one row per finding, written BEFORE the matrix:
+**Findings register** — one entry per finding, written BEFORE the matrix. Each
+entry carries enough that an operator who has **not** read the Round-1 reports can
+understand it from the entry alone (FR-004/FR-007):
 
-| ID | Advisor | Lens | Severity | Target | Summary |
-|----|---------|------|----------|--------|---------|
-| F1 | Evans | DDD | 🔴 | `webapp/data/models.py` | Aggregate root has no invariant enforcement; Order can be saved in illegal state |
-| … | | | | | |
+| ID | Advisor · Lens | Severity | Target (locator) | Pull-quote (verbatim — the persona's own words) |
+|----|----------------|----------|------------------|--------------------------------------------------|
+| F1 | Evans · DDD | 🔴 | `webapp/data/models.py:42` | "The Order aggregate has no root to enforce its invariants — it can be persisted in a state the domain forbids." |
+| … | | | | |
 
-Every cell in the Summary column must be a complete sentence readable without
-context — someone skimming the artifact at next chorus should understand the
-finding without reading the Round 1 report. One sentence, ≤20 words.
+- The **Pull-quote** cell is the persona-marked span (Phase-1 brief item 10),
+  lifted **verbatim** and attributed — never a conductor paraphrase and never a
+  conductor-chosen excerpt (this is the I6 / "speak in a persona's voice" refusal,
+  mechanized). Preserve any `[principle]` / `[principle:proposed]` / `[unsupported]`
+  tag in the cell.
+- For each **convergent** finding, list the converging lenses directly under its
+  entry, each with its **own** one-line verbatim note (marked in Round 2, below) —
+  so "3 lenses converged" reads as *which three and in whose words*, not a bare
+  count:
+  > **Converging:** Richards · *"this is the same seam I flagged — the model leaks
+  > persistence concerns"*; Beck · *"agreed, and the duplication makes it worse"*.
+- A finding with no persona-marked pull-quote is routed back, not summarized by the
+  conductor (Phase-1 evidence check item 3).
 
-**Consolidation matrix** — one row per finding, columns = `[ID, severity (🔴🟠🟡🟢),
-convergence count, lenses converged]`. Cite finding IDs `F1`, `F2`, ... so they're
-referenceable. The matrix is for scoring/ranking; the register is for reading.
+**Consolidation matrix** — a **derived projection** of the register for
+scoring/ranking, columns = `[ID, severity (🔴🟠🟡🟢), convergence count, lenses
+converged]`. Severity and the convergence set come **from the register entries** —
+the matrix re-authors nothing, so severity appears authoritatively in exactly one
+place and the two surfaces cannot drift (FR-007). Cite finding IDs `F1`, `F2`, …
+so they remain referenceable.
 
 After appending the matrix, add a `### Round 1 brief` subsection (3–5 sentences)
 summarizing the dominant themes across all findings — what the round found as a
@@ -448,18 +482,30 @@ no original report to react with). Each gets:
    introduced in Round 2 carry `[principle:proposed]`. The same
    evidence-check gate that ran post-Round-1 runs post-Round-2: unsupported
    project-specific assertions are demoted, not registered as findings.
-5. **End with:** "which finding does YOUR-LENS want PRIORITIZED, and which
-   does YOUR-LENS think is over-rated?"
+5. **End with the three-way call** (one per finding you have a view on): "is this
+   finding **under-rated** (PRIORITIZE — should escalate), **correctly rated**
+   (CONFIRM — you agree at the proposed severity), or **over-rated** (OVER-RATE —
+   should demote)?" CONFIRM is agreement, not escalation: use it when you'd rank the
+   fix highly but the author's severity is right. Only PRIORITIZE moves a finding up
+   (`chorus-core/GATE-PRIMITIVE.md` stage 3; spec `009-confirm-vote-tally`).
+6. **Convergence note (per agreement)** — "For any finding you converge with,
+   mark **one short sentence in your own words** as your agreement note (same
+   `PULL-QUOTE:`-style mark as Round 1). This is relayed verbatim under the
+   finding's register entry; the integration layer never writes it for you."
 
 Word limit: 500–600.
 
-Phase 2 is **stage 3 (Vote)** of the gate primitive: PRIORITIZE / OVER-RATE are
-the votes. After the reactions arrive, finalize each finding's severity with the
-primitive's **deterministic stage-4 tally** (`chorus-core/GATE-PRIMITIVE.md`): among
-non-author voters, `net = P − O`; `net ≥ +2` escalates one level, `net ≤ −2`
-demotes one level, otherwise hold. The long-standing "two converging lenses earn
-🔴" rule *is* this tally (a convergent PRIORITIZE escalation). Severity is
-arithmetic over real votes — never the orchestrator's judgment (S9).
+Phase 2 is **stage 3 (Vote)** of the gate primitive: PRIORITIZE / CONFIRM /
+OVER-RATE are the votes. After the reactions arrive, finalize each finding's severity
+with the primitive's **deterministic stage-4 tally** — defined once in
+`chorus-core/GATE-PRIMITIVE.md` (Stage 4): `net = P − O` over non-author voters (CONFIRM
+excluded), compared against the **board-scaled threshold** defined there (it scales with
+the non-author voter count `N` and reduces to the prior `±2` at the standard 5-seat
+board). The convergence count used for ranking is `P + C` (all agreement) — so a finding
+many lenses CONFIRM still ranks highly while honestly holding its severity. The old "two
+converging lenses earn 🔴" rule is amended: two **under-rated** (PRIORITIZE) claims
+escalate; mere agreement (CONFIRM) holds (spec `009-confirm-vote-tally`, closing issue
+#13). Severity is arithmetic over real votes — never the orchestrator's judgment (S9).
 
 After Round 2 reactions arrive, append a `### Round 2 brief` subsection to the
 artifact (2–4 sentences): which findings were sharpened, which were pushed back
@@ -500,6 +546,13 @@ Produce a top-5. Prefer drafting yourself rather than spawning yet another
 ranking agent — by Phase 4 the keystones are explicit and a fresh agent will
 mostly restate. Use `advisor()` for sanity-check after drafting if the
 ordering is non-obvious.
+
+Each top-5 entry MUST carry enough to be understood in place — its `Fn` anchor,
+the persona-marked pull-quote, and the locator — and MUST trace back to the
+finding's register entry (FR-008). An entry that is a bare `Fn` + score is a
+dead-end reference; resolve it to its pull-quote. Conflicts (`Cn`) in the Phase 3
+brief carry the same: enough detail to follow in place, traced to the findings
+they touch.
 
 ### Phase 5 — Sign-off
 
@@ -558,7 +611,7 @@ roster like any other abstention.
 | Conflicts unresolved after Phase 2 | Lens-vs-lens disagreement won't self-resolve | Single `advisor()` call beats another round |
 | All personas join every round | RSVP became performative; round context too vague | Tighten round-context paragraph; require concrete deltas, not "general project state" |
 | Project-fact interview every round | Missing project addendum | Phase 5 offers to write `CHORUS-PROJECT.md` |
-| Artifact references Fn/Cn that have no description | Findings register omitted; matrix-only artifact | Phase 2 requires findings register with Summary column before the matrix |
+| Artifact references Fn/Cn that have no description | Findings register omitted; matrix-only artifact | Phase 2 requires the detail-rich findings register (with persona-marked pull-quotes) before the matrix; the matrix is a projection of it |
 
 ## Artifact path
 
