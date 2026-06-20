@@ -32,6 +32,20 @@ Approved design: `docs/superpowers/specs/2026-06-20-chorus-suite-decomposition-d
   the repo source, which has no stale files, so this does not affect correctness
   of the deliverable.)
 
+### Session 2026-06-20 — Gate A incorporation (agent-sdlc-log.md)
+
+- Q (Gate A F11, Beck+Goldratt): full parity for byte-identical moves too? → A:
+  **Tier it.** Structural-equivalence + reachability for the three byte-identical
+  primitive moves (GATE/DECISION/EXPLORATORY); full RED-GREEN only for
+  content-changed skills. (Revises the prior "every skill" choice; see FR-015.)
+- Q (Gate A F6, 🔴, 4 lenses): installer prune vs the recorded no-migration choice?
+  → A: **Keep no-migration; waive F6 with recorded rationale.** Obsolete-file
+  cleanup stays a documented manual upgrade step (quickstart). The re-install
+  double-definition risk on *existing installs* is operator-accepted; the
+  *deliverable* (repo source) is unaffected since FC1 runs on source. (See
+  FR-012 waiver note + quickstart upgrade step.)
+- Gate A auto-incorporated 🔴/🟠s F1, F2, F5, F19, F4, F7 — see the FRs below.
+
 ## User Scenarios & Testing *(mandatory)*
 
 The "users" of this feature are the **operator** who invokes the chorus and the
@@ -200,6 +214,15 @@ no callback/hook execution code is added.
   index and directs on-demand reads of its four substrate files (it MUST NOT load
   all substrate content on every reference), and MUST open with a reachability
   self-check that fails loudly if its files are not reachable.
+- **FR-002a** *(Gate A F5/F19)*: Because `REQUIRED: chorus-core` is advisory (not
+  loader-enforced), the core-side self-check cannot fire when core is *absent* — the
+  router never runs. Therefore each **sibling** (`chorus-review`, `chorus-sdlc`)
+  MUST carry a **sibling-side substrate guard**: before relying on any core
+  mechanic, assert `chorus-core` is reachable and **fail loudly** (naming the
+  missing skill + the recovery action) if not. The runtime enforcement of "fail
+  loudly on absent core" lives sibling-side; fitness checks #1/#3 are the
+  out-of-band enforcer for drift — neither is the advisory marker. SC-007 is
+  satisfied by the sibling-side guard, not by the core-side self-check.
 - **FR-003**: `chorus-core` MUST be marked as substrate referenced by sibling
   skills, not as a user-triggered skill (its description carries no operator
   trigger phrase).
@@ -219,10 +242,19 @@ no callback/hook execution code is added.
 **Anti-drift (load-bearing)**
 
 - **FR-007**: Every invariant token (`In`, `Sn`, `Dn`) MUST be defined in exactly
-  one file, and every such definition MUST reside in `chorus-core`.
+  one file, and every such definition MUST reside in `chorus-core`. *(Exception of
+  record: the lifecycle tokens `S1–S7` are defined in `chorus-sdlc` — their natural
+  home — but they only ever **reference** core's `I1–I9`; no `I`/`D`/`S8–S10` token
+  is defined outside core.)*
 - **FR-008**: Every invariant token referenced by any suite skill MUST resolve to
   its single definition through that skill's declared composition (no dangling
   cross-skill references).
+- **FR-008a** *(Gate A F4/F7, 🟠)*: The invariant-resolution check (FC1) MUST enforce
+  **residence, not merely resolution**: it MUST fail if any `I`/`D`/`S8–S10` token
+  is defined anywhere outside `chorus-core` (so a sibling-local redefinition cannot
+  pass by resolving to itself). FC1 operates on repo source; the spec records that
+  installed-dir drift (F6) is out of FC1's scope and is covered by the F6 waiver's
+  manual upgrade step, not by FC1.
 
 **Findings→memory seam (contract only)**
 
@@ -231,6 +263,20 @@ no callback/hook execution code is added.
   incorporating chorus findings into memory.
 - **FR-010**: `chorus-core` MUST document the findings-artifact shape and the
   agent-memory layout as a contract a future callback can consume.
+- **FR-010a** *(Gate A F1/F2/F3, 🔴)*: The findings→memory contract MUST specify the
+  **secret pre-filter as an enforced behavioral obligation**, not a noun:
+  **deny-default** (drop the excerpt unless it passes), a **named detector class**
+  (high-entropy/credential-shaped tokens + structured private facts — internal
+  hostnames, personal/customer names, ticket IDs), and an **audit line** so a
+  dropped excerpt is visible, not silent. This obligation MUST be recorded as a
+  **hard precondition on the deferred callback** (the callback spec carries
+  "implements FR-010a" as a gate), so the deferred work cannot ship conforming yet
+  unfiltered. *(Reuses the existing SDLC-LAYER memory-update secret pre-filter
+  language; this names it as the contract the callback inherits.)*
+- **FR-010b** *(Gate A F13)*: The contract MUST declare the documented
+  findings-artifact shape the **sole** surface the future callback may reach — it
+  MUST NOT bind to `chorus-core` file internals (mirrors the siblings' "never
+  redefine" fence).
 - **FR-011**: The feature MUST NOT implement the findings→memory callback/hook
   wiring (explicitly deferred and redesignable later).
 
@@ -242,10 +288,21 @@ no callback/hook execution code is added.
   directory unchanged. It does NOT perform stale-file migration on existing
   installs — obsolete-file cleanup is handled out-of-band via Claude, not codified
   in `install.sh`.
-- **FR-013**: The plugin manifest MUST list all suite skills and MUST be
-  corrected for its existing drift (it currently claims a security agent it does
-  not list and omits Goldratt and the optional Guido lens against the nine-lens
-  roster).
+  - **F6 waiver (Gate A, operator-recorded).** Four lenses found that copy-only
+    re-install leaves orphaned pre-split files that double-define `I1–I9` in the
+    live install dir. The operator **waives** the install-prune fix and keeps
+    copy-only; the accepted mitigation is a **documented manual upgrade step** in
+    quickstart (remove the old single-skill `~/.claude/skills/chorus-review/` before
+    re-installing the suite). The risk is scoped to *existing installs*; the
+    deliverable (repo source) is unaffected (FC1 runs on source). Rationale of
+    record: at this scale the per-upgrade manual step is accepted over installer
+    complexity.
+- **FR-013** *(wording corrected per Gate A F15)*: The plugin manifest MUST list all
+  suite skills and MUST be corrected for its existing drift. The actual drift
+  (runtime-verified): `plugin.json` lists 7 agents while `agents/` holds 10 — it
+  **omits three on-disk agents** (`security-and-trust-advisor`, `eliyahu-goldratt-
+  advisor`, `guido-python-reviewer`) and its prose `description` undercounts the
+  roster. (The drift is present-on-disk-but-unlisted, not "claims an agent it lacks.")
 - **FR-014**: The feature MUST provide three greppable, manually-runnable fitness
   checks: (a) invariant-resolution (FR-008), (b) no-fat-sibling-import (FR-006),
   (c) packaging-manifest sync (manifest arrays match disk and the advisor count
@@ -256,12 +313,23 @@ no callback/hook execution code is added.
 
 **Behavior parity & naming**
 
-- **FR-015**: The decomposition MUST NOT change reviewing behavior; review and
-  lifecycle MUST execute the same procedure as before. Parity MUST be proven by
-  **full writing-skills RED-GREEN pressure/application scenarios for every moved
-  or split skill** (`chorus-core`, `chorus-review`, `chorus-sdlc`) — a baseline
-  captured pre-split, the scenarios re-run post-split, and equivalence
-  demonstrated — not by structural equivalence alone and never merely asserted.
+- **FR-015** *(tiered per Gate A F11)*: The decomposition MUST NOT change reviewing
+  behavior; review and lifecycle MUST execute the same procedure as before. Parity
+  is proven in **two tiers, by change kind**:
+  - **Byte-identical moves** (`GATE-PRIMITIVE.md`, `DECISION-PRIMITIVE.md`,
+    `EXPLORATORY-PHASE.md` — moved as-is): **structural-equivalence + reachability**
+    (content unchanged vs pre-split, definition reachable via composition). A full
+    behavioral scenario here re-proves what `diff` + FC1 already cover.
+  - **Content-changed skills** (the `INTEGRATION-LAYER` split, the `SKILL.md` slim,
+    the `SDLC-LAYER`→`chorus-sdlc` cross-ref rewrite, the new `CONDUCTOR.md`): **full
+    writing-skills RED-GREEN pressure/application scenarios** — a baseline captured
+    pre-split, scenarios re-run post-split, equivalence demonstrated.
+  - **Both tiers (F8):** every parity scenario MUST assert on an **observable output**
+    (the ledger, the produced artifact, the phase/gate sequence) — *composed
+    behavior*, not file presence — and MUST demonstrate its own RED (be shown
+    failing against a deliberately-broken composition) so it cannot pass
+    green-by-coincidence. Parity scenarios are committed in the same change as the
+    relocation they justify.
 - **FR-016**: The work MUST keep the review skill named `chorus-review` and MUST
   record the published `chorus` vs source `chorus-review` name mismatch as an
   explicit reconciliation task; it MUST NOT silently rename the published skill.
@@ -285,8 +353,9 @@ no callback/hook execution code is added.
 - **chorus-review**: the project-state-round skill; composes core.
 - **chorus-sdlc**: the lifecycle-gating skill; composes core; independent of
   review.
-- **Invariant catalog**: the `I1–I9` / `S1–S7` / `S8–S10` / `D1–D5` token set,
-  each defined once, all resident in core.
+- **Invariant catalog**: the `I1–I9` / `S1–S7` / `S8–S10` / `D1–D5` token set, each
+  defined once; `I`/`D`/`S8–S10` resident in core, `S1–S7` in `chorus-sdlc`
+  referencing core's `I1–I9` (FR-008a residence check).
 - **CHORUS-PROJECT.md addendum**: per-project configuration surface; gains the
   findings→memory section.
 - **Findings→memory contract**: the documented findings-artifact shape +
@@ -297,8 +366,10 @@ no callback/hook execution code is added.
 
 ### Measurable Outcomes
 
-- **SC-001**: 100% of invariant tokens are defined in exactly one file, all in
-  `chorus-core` (invariant-resolution check passes with zero dangling tokens).
+- **SC-001**: 100% of invariant tokens are defined in exactly one file; every
+  `I`/`D`/`S8–S10` token resides in `chorus-core` and `S1–S7` reside in
+  `chorus-sdlc` referencing core's `I1–I9` (FC1 passes with zero dangling tokens
+  and zero `I`/`D`/`S8–S10` definitions outside core — the residence check, FR-008a).
 - **SC-002**: Neither `chorus-review` nor `chorus-sdlc` contains any reference
   resolving into the other (no-fat-sibling-import check passes), and the
   lifecycle gate completes with the review skill absent.
@@ -310,9 +381,15 @@ no callback/hook execution code is added.
 - **SC-005**: The packaging-manifest sync check passes — manifest skill/agent
   arrays match disk and the stated advisor count matches the nine-lens roster.
 - **SC-006**: A project can declare a findings→memory policy in
-  `CHORUS-PROJECT.md` with zero callback/hook code present in the feature.
-- **SC-007**: Invoking a sibling with `chorus-core` absent fails loudly rather
-  than degrading silently.
+  `CHORUS-PROJECT.md` with zero callback/hook code present in the feature; AND the
+  contract specifies the secret pre-filter as a deny-default obligation with a
+  named detector and an audit line, recorded as a hard precondition on the deferred
+  callback (FR-010a) — verified by a documented negative case (a secret-shaped
+  excerpt would be dropped+audited), not merely by "no callback code exists."
+- **SC-007**: Invoking a sibling with `chorus-core` absent **fails loudly via the
+  sibling-side guard** (FR-002a) — naming the missing skill and the recovery action
+  — rather than degrading silently. (The core-side self-check cannot satisfy this
+  alone, since an absent core's router never runs.)
 
 ## Assumptions
 
