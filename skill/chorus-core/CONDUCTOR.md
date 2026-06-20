@@ -343,7 +343,7 @@ a contract across the boundary.
 ### Contract: agent-memory layout
 
 Per-lens persisted understanding lives at
-`~/.claude/agent-memory/<persona-name>/`. A persona writes its understanding
+`.claude/agent-memory/<persona-name>/`. A persona writes its understanding
 record there; the orchestrator reads any new file there after a dispatch (a
 persona's actual report may be written to memory and only summarized inline).
 This layout is the convention a future memory-update skill reads and writes.
@@ -385,7 +385,7 @@ from a chorus round's artifact:
 ### Agent-memory layout (the write targets)
 
 The callback's write targets are the agent-memory layout and two-tier memory
-model named above: `~/.claude/agent-memory/<persona>/` records (the index) and
+model named above: `.claude/agent-memory/<persona>/` records (the index) and
 the `CHORUS-PROJECT.md` "Project understanding" section (the authoritative
 base). A project declares **targets** and **policy** for the flow in its
 `CHORUS-PROJECT.md` findings→memory section (template carries it).

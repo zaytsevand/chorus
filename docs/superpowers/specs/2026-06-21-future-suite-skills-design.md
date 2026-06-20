@@ -22,7 +22,7 @@ existing sibling (`CONDUCTOR.md:320-361`, the Published-Language seams):
 | Future skill | Consumes core contract | Contract location |
 |---|---|---|
 | `chorus-viewpoint-extraction` | extract-stage record (`file:line`-anchored, `source:`-tagged) | `CONDUCTOR.md:328-341`; mechanic in `GATE-PRIMITIVE.md:25-51` |
-| `chorus-setup` | agent-memory layout (`~/.claude/agent-memory/<persona>/`) | `CONDUCTOR.md:343-349`; mechanic in `EXPLORATORY-PHASE.md:82-104` |
+| `chorus-setup` | agent-memory layout (`.claude/agent-memory/<persona>/`) | `CONDUCTOR.md:343-349`; mechanic in `EXPLORATORY-PHASE.md:82-104` |
 | `chorus-memory-update` | two-tier memory model (addendum = base, records cache) | `CONDUCTOR.md:351-361`; mechanic in `EXPLORATORY-PHASE.md:82-148` |
 
 The contracts already record load-bearing reality, so each skill is a *peel*, not
@@ -130,7 +130,7 @@ discipline (`GATE-PRIMITIVE.md:48-51`). It does not consume the memory contracts
 ## Skill 2 — `chorus-setup`
 
 **One-line purpose:** Bootstrap the per-persona agent-memory layout
-(`~/.claude/agent-memory/<persona>/`) after the suite is installed, so the first
+(`.claude/agent-memory/<persona>/`) after the suite is installed, so the first
 chorus round on a fresh machine reads a real (if empty-but-valid) memory tree
 instead of cold-starting it implicitly.
 
@@ -140,7 +140,7 @@ There is **no extraction of behavior** here — there is no setup code today. Wh
 formalizes is a *convention* currently assumed, not bootstrapped:
 
 1. **The agent-memory layout convention** — `CONDUCTOR.md:343-349` (the named
-   contract) and the mechanic `EXPLORATORY-PHASE.md:89-91` (`~/.claude/agent-memory/<persona>/`,
+   contract) and the mechanic `EXPLORATORY-PHASE.md:89-91` (`.claude/agent-memory/<persona>/`,
    "references, inferences, gaps, and cached project-wide facts").
 2. **The Phase-1 memory-recovery assumption** — `chorus-review/SKILL.md:389-393`
    ("some personas… write their actual report to `.claude/agent-memory/<persona-name>/`…
@@ -193,12 +193,12 @@ section (`EXPLORATORY-PHASE.md:83-87`) and the per-persona record dirs.
   skill. A *skill* is justified only if bootstrap needs persona-driven content
   (e.g. each persona writes its own initial baseline) — otherwise it is install
   plumbing wearing a skill costume.
-- **Cross-project memory pollution.** `~/.claude/agent-memory/<persona>/` is
-  **global, not per-project** (`EXPLORATORY-PHASE.md:89-91`), while the addendum is
-  per-project. A naive bootstrap that wipes/recreates the global dir would clobber
-  another project's cached facts. Setup must be additive and project-aware at the
-  record level (the per-project split is `EXPLORATORY-PHASE.md:90-91`,
-  "project-scoped part and feature/spec deltas").
+- **Cross-project memory pollution — resolved by project-scoped memory.** Personas
+  are now configured `memory: project`, so each lens writes to the per-repo
+  `.claude/agent-memory/<persona>/` rather than a shared global dir — the addendum
+  and the memory are now both per-project, removing the clobber risk a global dir
+  posed. Setup still must be additive at the record level (the per-project split is
+  `EXPLORATORY-PHASE.md:90-91`, "project-scoped part and feature/spec deltas").
 
 ---
 
