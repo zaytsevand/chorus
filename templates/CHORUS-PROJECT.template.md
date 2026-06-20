@@ -1,18 +1,16 @@
 # Chorus Project Addendum — `<your-project-name>`
 
-This file feeds the global `chorus` skill with project-specific facts.
+This file feeds the global `chorus-review` skill with project-specific facts.
 The skill itself is generic; this addendum carries everything that would
 otherwise be hard-coded for this repo.
 
 Read by the orchestrator at Phase 0 of every chorus round.
 
-<!-- Copy-safe preamble (comment-wrapped so a scaffolded copy reads correctly —
-007 family G / F7): To use this template, copy it to
-`docs/reviews/CHORUS-PROJECT.md` in your project and fill in the sections below.
-Sections (2), (3), and (5) are required before the chorus can launch. Sections
-(1), (4), and (6) can be inferred from your project layout / `CLAUDE.md` /
-governance docs if you leave them empty, but filling them in speeds up every
-round. (`chorus learn` can scaffold this file for you — say "chorus learn".) -->
+Copy this template to `docs/reviews/CHORUS-PROJECT.md` in your project and
+fill in the sections below. Sections (2), (3), and (5) are required before
+the chorus can launch. Sections (1), (4), and (6) can be inferred from your
+project layout / `CLAUDE.md` / governance docs if you leave them empty, but
+filling them in speeds up every round.
 
 ## 1. Project summary
 
@@ -108,7 +106,7 @@ so the next round knows which baseline to load.
 ## 7. Project understanding
 
 > Operator-confirmed, project-wide facts gathered by the advisor **exploratory
-> phase** (`skill/chorus/EXPLORATORY-PHASE.md`). This section is the
+> phase** (`skill/chorus-core/EXPLORATORY-PHASE.md`). This section is the
 > **authoritative system of record** for these facts — advisors reference it (and
 > may cache from it, reconciling on change) rather than re-asking. Each entry was
 > **accepted by you**: advisors propose additions, you accept or edit them.
@@ -136,6 +134,39 @@ group = not yet gathered (an open gap, surfaced — not silently "n/a").
 - Core domain / ubiquitous-language pointers: `<… or → reference>`
 
 <!-- add topic groups as lenses confirm facts; one line per fact -->
+
+## 8. Findings → memory (designed seam — callback not yet implemented)
+
+Declare how chorus findings flow into durable memory. This is a **configuration
+contract**: the consuming callback is a designed seam documented in
+`skill/chorus-core/CONDUCTOR.md` ("Findings → memory contract") and is **not yet
+implemented** — filling this section records policy a future callback will honor.
+
+### Targets — where findings flow
+
+- **Per-persona memory records**: `~/.claude/agent-memory/<persona>/` — the index
+  of locators each lens caches (never the evidentiary endpoint).
+- **Project understanding** (section 7 above) — the authoritative base for
+  operator-accepted, project-wide facts.
+- (Add any project-specific target, e.g. a team memory surface or wiki.)
+
+### Policy
+
+- **Scope routing**: `lens-specific` findings → the asking lens's record
+  (auto); `project-wide` findings → section 7 **only with operator acceptance**.
+- **Durable-only rule**: store a **locator + ≤~2-sentence hint**, never a full
+  finding body. Memory is an index, not a copy.
+- **Secret pre-filter (REQUIRED — deny-default)**: every excerpt written to a
+  durable target is **dropped unless it passes** a secret filter — a named
+  detector class (credential-shaped / high-entropy tokens, key prefixes,
+  `.env`/secret-file paths, AND structured private facts: internal hostnames,
+  personal/customer names, ticket IDs) — and **every drop is audited** (visible,
+  not silent). The full obligation is the contract in
+  `skill/chorus-core/CONDUCTOR.md` (FR-010a); the future callback inherits it as
+  a hard precondition.
+
+Leave defaults if you have no project-specific override; the contract's
+deny-default secret filter applies regardless.
 
 ## Maintenance
 

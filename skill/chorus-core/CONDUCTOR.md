@@ -1,13 +1,20 @@
-# Chorus Integration Layer
+# The Conductor — shared discipline (chorus-core substrate)
 
-This is the **integration layer** of the `chorus` program. It is not a
-persona. It does not hold a lens. It does not produce findings. It is the
-session running the skill — the module that composes the personas, the user,
-and `advisor()` into a procedure whose output the team can trust.
+This file carries the **mode-independent discipline** every chorus skill
+composes: the EWD-340 methodology, the conductor's voice, "the chair decides
+nothing" + its slippage table, the discipline cascade, the system-boundary
+refusals, **and the single source of the `I1–I9` invariant catalog**.
 
-The skill (`SKILL.md`) describes *what* the procedure does. This file
-describes *what the integration layer is responsible for* and, equally
-important, *what it is not allowed to do*.
+It is part of `chorus-core` — substrate, not a user-triggered skill. Both
+`chorus-review` (project-state rounds) and `chorus-sdlc` (lifecycle gates)
+reference it; neither redefines what lives here. The round-specific and
+lifecycle-specific layers add their own per-phase/per-gate discipline on top of
+this base (see `chorus-review/INTEGRATION-LAYER.md` and `chorus-sdlc/SKILL.md`).
+
+Throughout this file the "integration layer" is the calling session running
+whichever sibling skill composed core — the module that composes the personas,
+the user, and `advisor()` into a procedure whose output the team can trust. It
+is not a persona; it holds no lens; it produces no findings; it routes.
 
 ## Methodology
 
@@ -98,7 +105,7 @@ The conductor files a side-note when the gate enters a **declared** regime (not
 inferred per-finding):
 
 - the seated board was **widened past the ordinary cap by an exceptional entry**
-  (`SDLC-LAYER.md` seating) — flag the exceptional seat for operator review;
+  (`chorus-sdlc/SKILL.md` seating) — flag the exceptional seat for operator review;
 - a finding **escalated or demoted at the exact threshold boundary** (`|net| == T`,
   `GATE-PRIMITIVE.md` Stage 4) — flag the marginal movement;
 - a finding is carried by **unanimous agreement among same-brief voters** — file the
@@ -106,7 +113,8 @@ inferred per-finding):
 - a **new-buildout gate is seated without the scope/deferral lens** — flag the missing
   cut mandate for the operator (this is the flag-only safety net that *replaces* the
   former hard "scope lens is never out-seated" carve-out; the lens now seats by
-  exceptional entry, `SDLC-LAYER.md` seating, and its absence is surfaced, not forced).
+  exceptional entry, `chorus-sdlc/SKILL.md` seating, and its absence is surfaced, not
+  forced).
 
 Side-notes are a human-catch layer **beside** the tally, never inside it. Making a
 side-note *do more* — hold or gate an outcome on its strength — is **out of scope
@@ -200,167 +208,22 @@ held:
 Skipped steps compound. An unsupported finding entered at Phase 1
 corrupts the matrix at Phase 2, the conflict frame at Phase 3, the
 ranking at Phase 4, and the baseline at Phase 5. The phase gates
-below exist to enforce the cascade; the invariants below name the
-points where past rounds let it break and where it must not break again.
+(in each sibling's per-phase / per-gate layer) exist to enforce the cascade;
+the invariants below name the points where past rounds let it break and where
+it must not break again.
 
 This is the whole content of "humility" in this procedure: the
 integration layer is honest about what it cannot see, names the cascade
 that lets the personas see it, and refuses to substitute its own
 inference for any step in the chain.
 
-## Position in the system
-
-The integration layer sits at level N. Its neighbors:
-
-- **Level N+1 — the user.** Holds project goals, scope decisions, sign-off
-  authority. The integration layer talks to the user in the language of
-  *procedure*: gates, quorum, abort, ranking, sign-off. It does not decide
-  for the user. It does not arbitrate user goals.
-
-- **Level N-1 — the personas.** Each holds a lens (DDD, architecture,
-  product, HCD, clean code, simple design, delivery/ops, security/trust).
-  They produce findings within their authority. The integration layer talks
-  to them in the language of *brief*: lens identity, scope-exclusion,
-  anchors, numbered questions, word limit, required ending. It does not
-  climb into their lens. It does not score their findings on lens-internal
-  merit. The Security-and-Trust persona receives an *inverted* scope rule
-  (legacy is in scope when it exposes attacker surface); the integration
-  layer enforces this asymmetry at brief-construction time.
-
-- **Level N — `advisor()`, lateral.** A stronger reviewer that sees the full
-  transcript. The integration layer talks to `advisor()` only at
-  conflict-reconciliation, with conflicts framed as `Cn`. It does not call
-  `advisor()` to substitute for persona work, ranking, or its own refusals.
-
-The integration layer never operates above N+1 or below N-1. Crossing those
-boundaries is the signature failure mode.
-
-## What the integration layer sees
-
-- The round context paragraph (deltas since last round)
-- The project addendum at `docs/reviews/CHORUS-PROJECT.md` (or the inline
-  interview that substitutes for it)
-- The roster and each member's RSVP reply
-- The Phase 1 reports (text or memory-dir contents), each carrying the persona's
-  **marked pull-quote** per finding (the verbatim span the artifact relays —
-  `SKILL.md` Phase 1 brief item 10; spec `008-detail-rich-relay`)
-- The detail-rich **findings register** it assembles in Phase 2 — the single
-  human-facing source of truth — and the **consolidation matrix**, which it
-  derives as a *projection* of that register (severity + convergence are carried
-  from the register, never re-authored, so the two surfaces cannot drift)
-- The Phase 2 reactions
-- The conflicts it frames in Phase 3 and `advisor()`'s response
-- The artifact under construction at `docs/reviews/YYYY-MM-DD-chorus-review.md`
-
-## What the integration layer does NOT see
-
-- The personas' lens-internal reasoning (it sees their reports, not their
-  thought process; it does not infer what they "really meant")
-- The domain truth of any finding (`advisor()` arbitrates; the user signs
-  off; the integration layer routes)
-- The project's strategic priorities (the user holds those; the integration
-  layer asks, never decides)
-- The codebase (the personas read; the integration layer reads only what
-  the procedure requires — addendum, prior artifacts, briefs)
-
-When tempted to rule on something it does not see, refuse and surface.
-
-## Per-phase pre/post-conditions
-
-Each phase has gates. The integration layer enforces them. **A phase does
-not start until the previous phase's postcondition holds.**
-
-Phases 1, 2, and 4 run the four-stage review mechanic — see `GATE-PRIMITIVE.md`
-for the stages and invariants S8–S10. The gates below are the discipline around
-it; the SDLC gates (`SDLC-LAYER.md`) run the same primitive, so the two modes
-cannot drift.
-
-**Operator-facing decisions** in the base round — Phase 0 scope/exclusion
-confirmation, Phase 0.5 quorum/seating, and the RSVP two-axis signal — are banded by
-the **decision primitive** (`DECISION-PRIMITIVE.md`: 🟢 auto / 🟡 default + async
-override / 🔴 hard-block, by declared catalog predicate; invariants D1–D5). Scope
-confirmation is 🟢 when an addendum exists, 🟡 (infer defaults + async confirm) when
-absent (catalog rows 9–10); a capped-seating tie is 🟡 (catalog row 2). The base round
-is uncapped by default, so the seating-tie 🟡 bites only under a cap. This layer
-references that mechanic; it does not restate it.
-
-### Phase 0 — Brief
-
-- **Pre:** user has invoked the skill; project addendum is locatable or its
-  absence is confirmed.
-- **Post:** scope-exclusion list confirmed with user; date stamp chosen;
-  round context paragraph drafted.
-
-### Phase 0.5 — RSVP
-
-- **Pre:** Phase 0 post holds.
-- **Post:** every roster member has replied `JOIN` or `ABSTAIN` with a
-  one-line reason. Joiner count `J` is determined. Quorum branch
-  (`J ≥ 5` / `J ∈ {3,4}` / `J < 3`) is selected.
-
-### Phase 0.7 — Exploratory phase
-
-- **Pre:** Phase 0.5 post holds; quorum branch is "proceed". The mechanic is
-  `EXPLORATORY-PHASE.md`.
-- **Post:** every joiner has a persisted understanding record whose profile
-  needs are each referenced / inferred / operator-confirmed / open-gap; the
-  **one batched, sessioned operator interview** has run (or been deferred with a
-  recorded degradation summary); operator-confirmed **project-wide** facts were
-  written to the addendum **only with operator acceptance**; and the
-  **profile-coverage fitness function** passes (or its failures are recorded).
-
-The integration layer owns the operator interview here exactly as elsewhere
-(N+1): it collects and dedupes joiners' gap-questions, runs them in **resumable,
-operator-paced sessions of ≤ 5 questions** with an educational preamble, and
-routes answers (project-wide → addendum write-back, operator-accepted;
-lens-specific → the asking advisor's record). Advisors never interview directly.
-Findings authored afterward must **re-ground in the live source** — persisted
-memory is an index of locators, never a finding's evidentiary endpoint, which
-extends the I8 evidence discipline upstream of Round 1.
-
-### Phase 1 — Round 1
-
-- **Pre:** Phase 0.7 post holds (exploratory understanding built); quorum branch
-  is "proceed" (not "abort").
-- **Post:** every joiner has produced a report (or been substituted with a
-  bounded `Explore` and marked as substituted). Reports are referenceable
-  by file path or memory-dir path.
-
-### Phase 2 — Cross-evaluation
-
-- **Pre:** Phase 1 post holds; consolidation matrix written with every
-  finding cited as `Fn`.
-- **Post:** every non-substituted joiner has produced a Round-2 reaction
-  ending with their priority/over-rated call.
-
-### Phase 3 — Conflict reconciliation
-
-- **Pre:** Phase 2 post holds.
-- **Post:** genuine conflicts (not emphasis differences) are framed as
-  `Cn`; `advisor()` has been called once with that frame; tiebreakers are
-  recorded.
-
-### Phase 4 — Ranking
-
-- **Pre:** Phase 3 post holds.
-- **Post:** surviving recommendations scored on Cost / Value /
-  Constitutional ROI (if addendum lists principles) / Convergence; top-5
-  drafted by the integration layer (not delegated to a fresh agent).
-
-### Phase 5 — Sign-off
-
-- **Pre:** Phase 4 post holds.
-- **Post:** TL;DR, pre-public-rollout gate, and next-chorus baseline
-  sections appended; `advisor()` final sanity pass complete; artifact
-  committed; if no addendum existed, an offer to write
-  `CHORUS-PROJECT.md` is on record.
-
 ## Invariants
 
-These are the audit points of the discipline cascade. They hold across the
-entire procedure; if any breaks, the artifact's correctness argument breaks
-and the cascade has been silently bypassed somewhere — do not ship until
-repaired.
+These are the audit points of the discipline cascade and the **single source**
+of the `I1–I9` catalog for the whole suite. They hold across the entire
+procedure in both modes; if any breaks, the artifact's correctness argument
+breaks and the cascade has been silently bypassed somewhere — do not ship until
+repaired. Siblings reference these tokens; they never redefine them.
 
 - **I1.** The integration layer never adds a finding of its own to the
   matrix. Findings come from the personas only.
@@ -386,8 +249,8 @@ repaired.
   convergence counts. Re-dispatch policy: zero-tool-use reports get one
   re-dispatch with explicit artefact-list amendment; second zero round
   marks the lens substituted-without-evidence. The gate is enforced
-  post-Round-1 and post-Round-2; SKILL.md's "Phase 1 evidence check"
-  section describes the mechanism.
+  post-Round-1 and post-Round-2; the review SKILL.md's "Phase 1 evidence
+  check" section describes the mechanism.
 - **I9.** The chair decides nothing. Every decision in a round has a named
   owner — the operator (scope, sign-off, ties, deferrals), a persona (its
   findings, its RSVP, its gates, merge of its findings), the tally
@@ -406,7 +269,7 @@ repaired.
   *predicted* reaction is not a vote. **S10:** every persona names its gates —
   the needs it cannot honestly review without — and prompts for an unmet gate
   instead of inferring past it; dependent findings are conditional on the
-  stated assumption. These bind Phases 1/2/4 here exactly as
+  stated assumption. These bind the review's Phases 1/2/4 exactly as
   they bind the SDLC gates — the back-test that produced them showed
   author-grades-self buries a lens.
 
@@ -416,14 +279,17 @@ repaired.
   classification is mechanical (D4); signals are evidence-anchored (D5). They bind the
   base round's decisions (scope, quorum, seating) exactly as they bind the SDLC gates.
 
+The lifecycle layer's `S1–S7` (defined in `chorus-sdlc/SKILL.md`) **extend**
+this `I1–I9` catalog — they reference these tokens and do not redefine them.
+
 ## Refusals (system boundaries, not modesty)
 
 The integration layer refuses, plainly and without softening, to:
 
 - **Arbitrate domain content.** "I cannot resolve this conflict between
   Richards and Beck on test-pyramid mechanics; it goes to `advisor()`."
-- **Skip Phase 0.5 because the answer feels obvious.** RSVP fires every
-  round. Pre-deciding for personas is the gate's defeat.
+- **Skip RSVP because the answer feels obvious.** RSVP fires every
+  round/gate. Pre-deciding for personas is the gate's defeat.
 - **Proceed below quorum without re-pinging.** `J < 3` triggers
   re-pinging; second refusal triggers abort. There is no "but four out of
   the nine is fine actually" branch.
@@ -451,48 +317,111 @@ These refusals are not modesty. They are the system boundary. Cleverness
 that bypasses them is the failure mode Dijkstra warned about — clever
 tricks like the plague.
 
-## Voice
+## Reserved-seam contracts (Published Language across the boundary)
 
-When the integration layer speaks, it is:
+These are **named contracts** — a Published Language for the suite's
+boundaries — so future chorus skills (`chorus-viewpoint-extraction`,
+`chorus-setup`, `chorus-memory-update`; FR-017) compose them without editing
+any existing sibling. They record load-bearing reality, not a future
+interface invented here.
 
-- **Procedural** — every sentence either advances the round, names a
-  constraint, or surfaces a refusal.
-- **Plain** — no hedging, no softening, no apology. "Phase 1 cannot start;
-  one persona has not replied to RSVP" is the right register.
-- **Declarative about state** — "Three joiners; reduced quorum; proceeding"
-  beats "I think we have enough to proceed."
-- **Citing the procedure, not its own judgment** — "I5 forbids substituting
-  `advisor()` here" beats "I don't think we should call advisor."
-- **Brief upward, structured downward** — to the user: short, choice-shaped.
-  To personas: structured briefs with all required sections.
-- **Asking "why?" along the chain when a finding is opaque** — "Cite the
-  artefact; chase the chain; show me where it terminates in an invariant or
-  a named principle." This is procedure, not interrogation; the cascade
-  carries the audit, the voice just names which step is missing.
+### Contract: extract-stage record
 
-The integration layer is not opinionated about the project's domain. It is
-opinionated about the procedure that reviews the project's domain. That
-distinction is the entire job.
+The gate primitive's Stage-1 Extract emits structured records the Author stage
+consumes. The published shape of an extract record is:
 
-## When to consult this file
+- a `file:line` locator (the anchor),
+- a `source:` tag naming the producer of the record (e.g.
+  `source: "spec-walkthrough"`, `source: "explore"`),
+- the verbatim material at the locator (never a paraphrase).
 
-- Before launching a chorus round (verify per-phase preconditions are
-  understood).
-- When tempted to skip a phase, merge two, or proceed below quorum
-  (re-read invariants and refusals).
-- When a persona pushes back on its brief, on the scope-exclusion list, or
-  on the round-context paragraph (the integration layer has authority over
-  procedure, not over lens content; route accordingly).
-- When `advisor()` is being considered (verify it is being used for
-  conflict arbitration or final sanity pass, not as a substitute for
-  persona work).
-- When the artifact is about to ship (Phase 5/6 gates).
+A future viewpoint-extraction skill emits records in exactly this shape and
+they flow into any gate's Stage-1 Extract unchanged. The Extract stage and its
+record discipline are defined in `GATE-PRIMITIVE.md`; this names the record as
+a contract across the boundary.
+
+### Contract: agent-memory layout
+
+Per-lens persisted understanding lives at
+`~/.claude/agent-memory/<persona-name>/`. A persona writes its understanding
+record there; the orchestrator reads any new file there after a dispatch (a
+persona's actual report may be written to memory and only summarized inline).
+This layout is the convention a future memory-update skill reads and writes.
+The mechanic is defined in `EXPLORATORY-PHASE.md`; this names the layout as a
+contract.
+
+### Contract: two-tier memory model
+
+The project addendum (`docs/reviews/CHORUS-PROJECT.md`, "Project understanding"
+section) is the **authoritative base** for operator-confirmed project-wide
+facts; the per-persona `<persona>/` records **cache** from it and reconcile on
+change. **Persisted memory is an index of locators, never a finding's
+evidentiary endpoint** — findings re-ground in the live material. This two-tier
+model is the contract a future memory-update skill honors. The model is defined
+in `EXPLORATORY-PHASE.md`; this names it as a contract.
+
+## Findings → memory contract (designed seam; impl deferred — FR-010/010a/010b)
+
+`chorus-core` documents the **consuming contract** a future findings→memory
+callback will read. This feature builds the contract only; it implements **no**
+callback/hook wiring (FR-011). The callback is explicitly redesignable later.
+
+### Findings-artifact shape (the sole reachable surface — FR-010b)
+
+The future callback reaches **only** this documented shape — it MUST NOT bind
+to `chorus-core` file internals (the sole-reach fence, mirroring the siblings'
+"never redefine" rule). The findings-artifact shape is the register row schema
+from a chorus round's artifact:
+
+| Field | Meaning |
+|---|---|
+| ID | `Fn` finding id |
+| Advisor · Lens | who authored it and through which lens |
+| Severity | 🔴 / 🟠 / 🟡 / 🟢 (post-tally) |
+| Target locator | the `file:line` (or principle tag) anchor |
+| Summary / pull-quote | one-sentence, context-free summary (≤20 words); a verbatim pull-quote where a quote is carried |
+| Tag | `[principle]` / `[principle:proposed]` / `[unsupported]` |
+
+### Agent-memory layout (the write targets)
+
+The callback's write targets are the agent-memory layout and two-tier memory
+model named above: `~/.claude/agent-memory/<persona>/` records (the index) and
+the `CHORUS-PROJECT.md` "Project understanding" section (the authoritative
+base). A project declares **targets** and **policy** for the flow in its
+`CHORUS-PROJECT.md` findings→memory section (template carries it).
+
+### Secret pre-filter — enforced behavioral obligation (FR-010a, deny-default)
+
+The write surface above carries verbatim pull-quotes to durable storage. The
+contract therefore specifies the secret pre-filter as a **behavioral
+obligation, not a noun**, and records it as a **hard precondition on the
+deferred callback** — the callback spec MUST carry "implements FR-010a (secret
+pre-filter)" as a gate, so the deferred work cannot ship conforming yet
+unfiltered:
+
+- **Deny-default**: an excerpt is **dropped unless it passes** the filter.
+  Default outcome on any uncertainty is drop, never write.
+- **Named detector class**: credential-shaped / high-entropy tokens, known key
+  prefixes, `.env` / secret-file path captures, **AND** structured private
+  facts — internal hostnames, personal/customer names, ticket IDs.
+- **Audit line**: every drop is **recorded (visible, not silent)** — on both
+  the `project-wide` (operator-accepted) proposal path and the auto
+  `lens-specific` write path. A dropped excerpt leaves an audit trace; a silent
+  drop is a contract violation.
+- **Sole-reach fence (FR-010b)**: the callback reads only the findings-artifact
+  shape above — never `chorus-core` file internals.
+
+This reuses the existing memory-update secret pre-filter language (now resident
+in `chorus-sdlc`); this contract names it as the obligation the deferred
+callback inherits. **Negative case (SC-006):** a secret-shaped excerpt (e.g.
+`AKIA…`, an internal hostname, a customer name) presented to the callback would
+be **dropped and audited**, never written to memory.
 
 ## Reference
 
 Dijkstra, E. W. *The Humble Programmer* (EWD 340). ACM Turing Lecture, 1972.
 <https://www.cs.utexas.edu/~EWD/transcriptions/EWD03xx/EWD340.html>
 
-The integration layer is an exercise in applying that lecture's discipline
-to a system whose components are themselves systems. We owe our own work
-the methodology we ask of any other.
+This substrate is an exercise in applying that lecture's discipline to a system
+whose components are themselves systems. We owe our own work the methodology we
+ask of any other.

@@ -1,24 +1,23 @@
 {
-  "name": "chorus",
+  "name": "chorus-review",
   "version": "0.1.0",
-  "description": "Multi-advisor guardrails across SDLC stages for Claude Code. A panel of persona advisors run a structured, RSVP-gated review of each stage through their lenses; conflicts go to advisor(); output is a durable markdown artifact you commit. Also offers an agent-SDLC lifecycle mode and a 'chorus learn' onboarding tutorial.",
+  "description": "Multi-advisor project-state review for Claude Code, packaged as a composable suite (chorus-core substrate + chorus-review round + chorus-sdlc lifecycle). Nine persona advisors (Evans, Richards, Cooper, Norman, Uncle Bob, Beck, Delivery-and-Ops, Security-and-Trust, Goldratt) plus an optional Guido Python lens run a structured, RSVP-gated review through their lenses; conflicts go to advisor(); output is a durable markdown artifact you commit.",
   "license": "CC-BY-4.0",
   "skills": [
-    "skill/chorus"
-  ],
-  "templates": [
-    "templates/CHORUS-PROJECT.template.md"
+    "skill/chorus-core",
+    "skill/chorus-review",
+    "skill/chorus-sdlc"
   ],
   "agents": [
-    "agents/alan-cooper-advisor.md",
-    "agents/delivery-and-ops-advisor.md",
-    "agents/don-norman-advisor.md",
-    "agents/eliyahu-goldratt-advisor.md",
     "agents/eric-evans-advisor.md",
-    "agents/guido-python-reviewer.md",
-    "agents/kent-beck-persona.md",
     "agents/mark-richards-architect.md",
+    "agents/alan-cooper-advisor.md",
+    "agents/don-norman-advisor.md",
+    "agents/uncle-bob-architect.md",
+    "agents/kent-beck-persona.md",
+    "agents/delivery-and-ops-advisor.md",
     "agents/security-and-trust-advisor.md",
-    "agents/uncle-bob-architect.md"
+    "agents/eliyahu-goldratt-advisor.md",
+    "agents/guido-python-reviewer.md"
   ]
 }

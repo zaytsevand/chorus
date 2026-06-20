@@ -1,70 +1,81 @@
 ---
-name: chorus
-description: Multi-advisor guardrails across SDLC stages (Evans/Richards/Cooper/Norman/Uncle Bob/Beck/Delivery-and-Ops/security/Goldratt): a panel reviews each stage through their lenses with per-round RSVP self-selection, cross-evaluation, conflict reconciliation, and ranked recommendations. Use when the user asks for a chorus, a project-state review, or to "spawn the regular chorus." Produces a durable artifact at docs/reviews/YYYY-MM-DD-chorus-review.md. Also supports an agent-SDLC lifecycle mode ("run the agent-SDLC on feature 0NN") that interleaves scoped chorus gates with the speckit cycle — see SDLC-LAYER.md — and a "chorus learn" tutorial mode (trigger: "chorus learn" / "/chorus learn"), an interactive staged onboarding that teaches setup and both review modes — see LEARN.md.
+name: chorus-review
+description: Multi-advisor project state review (Evans/Richards/Cooper/Norman/Uncle Bob/Beck/Delivery-and-Ops/security/Goldratt) with per-round RSVP self-selection, cross-evaluation, conflict reconciliation, and ranked recommendations. Use when the user asks for a chorus, a project-state review, or to "spawn the regular chorus." Produces a durable artifact at docs/reviews/YYYY-MM-DD-chorus-review.md. REQUIRED composition: chorus-core (shared substrate). For the agent-SDLC lifecycle mode use the chorus-sdlc skill.
 ---
 
-# Chorus — repeatable procedure
+# Chorus Review — repeatable procedure
 
-A multi-lens guardrail you can drop onto any SDLC stage — **most often a spec or
-a feature's design, occasionally a full-codebase sweep.** A panel of persona
-lenses reviews the stage; each round produces a durable artifact future rounds
-baseline against, rather than re-derive.
+A multi-lens review of whatever you point it at — **most often a spec or a
+feature's design, occasionally a full-codebase sweep.** Each round produces a
+durable artifact future rounds baseline against, rather than re-derive.
 
 This skill is project-agnostic. Project-specific facts (exclusions, topology,
 security data-surface, baseline references) come from an optional per-project
 addendum — see "Project addendum" below.
 
+## REQUIRED: chorus-core — substrate guard (run BEFORE anything else)
+
+This skill composes the shared substrate skill **`chorus-core`**. Before relying
+on **any** core mechanic — the four-stage gate (`GATE-PRIMITIVE.md`), the
+decision banding (`DECISION-PRIMITIVE.md`), the exploratory phase
+(`EXPLORATORY-PHASE.md`), or the conductor discipline + `I1–I9` invariant
+catalog (`CONDUCTOR.md`) — the calling session MUST assert that the `chorus-core`
+skill directory is reachable (its four files are present).
+
+The skill loader does **not** enforce the `REQUIRED:` marker (it is advisory), so
+this assertion is the real enforcement. **If `chorus-core` is not reachable, STOP
+and fail loudly** — do not improvise the missing mechanics, do not degrade
+silently. Emit:
+
+> **chorus-core is missing.** `chorus-review` requires the shared substrate skill
+> `chorus-core`, which is not reachable. This means a broken or partial install of
+> the chorus suite — the shared mechanics (the four-stage gate, decision banding,
+> exploratory phase, and the `I1–I9` invariant catalog) cannot be loaded, so the
+> round cannot run honestly. **Recovery:** re-install the chorus suite
+> (`./install.sh`), or check that `chorus-core` was published/copied under its
+> expected name, then retry.
+
+When `chorus-core` is reachable, its router (`chorus-core/SKILL.md`) runs its own
+reachability self-check over the four files (defense-in-depth for the
+file-missing case).
+
 **Before Phase 0, the calling session MUST `Read` the companion file
-`INTEGRATION-LAYER.md` in this skill directory.** It defines the integration
-layer (the calling session itself) — its position in the system, per-phase
-pre/post-conditions, invariants, and refusals. The procedure here describes
-*what* the chorus does; the integration-layer file describes *who runs it
-and what they are not allowed to do*. Both are load-bearing.
+`INTEGRATION-LAYER.md` in this skill directory.** It defines the round-specific
+integration layer (the calling session itself) — its position in the system,
+per-phase pre/post-conditions, and sees/does-not-see. The procedure here
+describes *what* the chorus does; the integration-layer file describes *who runs
+it during a round and what they are not allowed to do*. Both are load-bearing.
+The mode-independent discipline — conductor voice, the discipline cascade, the
+refusals, and the **`I1–I9` invariant catalog** — lives in
+**`chorus-core/CONDUCTOR.md`**.
 
 The mechanic of a single review — the four stages **extract → author → vote →
-tally** — is defined once in `GATE-PRIMITIVE.md`; Phases 1/2/4 below run it
-(this file does not restate the mechanic). For the agent-SDLC lifecycle mode,
-read `SDLC-LAYER.md` as well.
+tally** — is defined once in `chorus-core/GATE-PRIMITIVE.md`; Phases 1/2/4 below
+run it (this file does not restate the mechanic).
 
 Before findings are authored, participating advisors build a persisted,
 lens-specific understanding of the target — the **exploratory phase**, defined
-once in `EXPLORATORY-PHASE.md` (Phase 0.7 below). Both review modes run it; this
-file does not restate it.
+once in `chorus-core/EXPLORATORY-PHASE.md` (Phase 0.7 below); this file does not
+restate it.
 
 When the chorus must involve the operator — seating a capped panel, blocking on a
 🔴, confirming scope — the decision is banded by the **decision primitive**, defined
-once in `DECISION-PRIMITIVE.md`: 🟢 auto-resolve, 🟡 proceed-with-recorded-default +
-async override, 🔴 hard-block + instant ask, by declared catalog predicate (never
-orchestrator inference). It makes the workflow **self-unblocking yet balanced** — it
-runs forward, stopping the operator only for 🔴. Both review modes reference it;
-this file does not restate it.
-
-## Three modes
-
-The chorus has three modes — two *review* modes built on the same gate primitive
-(`GATE-PRIMITIVE.md`), plus a navigational tutorial:
-
-- **Project-state round** — a multi-lens review of a scope you choose: most
-  often a spec or a feature's design, occasionally the whole codebase (the
-  periodic full sweep). Trigger: "spawn the chorus." Output:
-  `docs/reviews/YYYY-MM-DD-chorus-review.md`.
-- **Agent-SDLC** (lifecycle) — gates the speckit cycle for one feature with
-  design, plan/tasks, and implementation reviews. Trigger: "run the agent-SDLC
-  on feature 0NN." Driven by `SDLC-LAYER.md`; output:
-  `specs/<feature>/agent-sdlc-log.md`. Read `SDLC-LAYER.md` before running it.
-- **`chorus learn`** (tutorial) — an interactive staged onboarding that teaches
-  setup and both review modes via the AskUserQuestion tool, mutating nothing
-  except one opt-in scaffold. Trigger: "chorus learn" / `/chorus learn`. Defined
-  once in `LEARN.md` (this file carries only its registration). The two review
-  modes are gated; the tutorial is navigational.
+once in `chorus-core/DECISION-PRIMITIVE.md`: 🟢 auto-resolve, 🟡
+proceed-with-recorded-default + async override, 🔴 hard-block + instant ask, by
+declared catalog predicate (never orchestrator inference). It makes the workflow
+**self-unblocking yet balanced** — it runs forward, stopping the operator only for
+🔴. This file references it; it does not restate it.
 
 ## When to use
 
 - **Reviewing a spec or a feature's design** across multiple lenses — the common
-  case. Say "spawn the chorus" pointed at the spec, or "run the agent-SDLC on
-  feature 0NN" for the gated lifecycle (see `SDLC-LAYER.md`).
+  case. Say "spawn the chorus" pointed at the spec.
 - **A full-codebase sweep** for periodic project-state review — the occasional
   case; quarterly or after a major release.
+
+(For the gated speckit lifecycle — "run the agent-SDLC on feature 0NN" — use the
+sibling skill **`chorus-sdlc`**, which composes the same `chorus-core` substrate
+independently of this skill.)
 
 Don't use for:
 - Single-lens questions (just spawn the relevant persona agent directly)
@@ -82,29 +93,6 @@ If present, the orchestrator reads it before Phase 0 and uses its contents to
 fill the project-specific slots in the procedure. If absent, the orchestrator
 asks the user inline at Phase 0 and offers to write the file at the end of
 the round.
-
-**Phase-0 note — the scaffolded-but-unfilled addendum (FR-014).** The `chorus
-learn` tutorial can scaffold this addendum (see `LEARN.md` S2), producing a file
-that bears a **SCAFFOLDED marker** on its first content line and carries sections
-2/3/5 flagged `<!-- TO FILL -->`. A marker-bearing addendum is **structure, not
-facts**, and both of its consumers MUST treat it so:
-
-- the **Phase-0 orchestrator** confirms the flagged sections with the operator
-  (as if those sections were absent but pre-structured) and never consumes their
-  placeholder text as operator-confirmed project facts;
-- the **per-advisor exploratory cache** (`EXPLORATORY-PHASE.md`) caches a
-  marker-bearing addendum's content as structure only — never as
-  operator-confirmed facts.
-
-As defense-in-depth, both consumers also treat any section still bearing a
-`<!-- TO FILL -->` flag (or visibly templated `<placeholder>` text) as unfilled
-structure **even if the marker is absent** — so a marker accidentally stripped
-before the sections are filled cannot silently promote placeholder text to
-operator-confirmed facts (Gate C SEC-1).
-
-Removing the marker is the operator's "this is now real" signal. The tutorial's
-end-of-round addendum offer (Phase 5 — Sign-off) and this scaffold are the two
-creation paths; the template is the single source of structure for both (F22).
 
 The addendum should contain:
 
@@ -242,17 +230,17 @@ agent receives a short, self-contained brief:
 2. The round-context paragraph
 3. The scope-exclusion list (verbatim, as in Phase 1 below)
 4. RSVP instructions: reply in ≤80 words with `JOIN`, `ABSTAIN`, or an
-   **exceptional entry**, plus the **two-axis signal** (`DECISION-PRIMITIVE.md` §RSVP
-   signal) — **applicability** (cite ≥1 concrete round-context delta your lens touches;
+   **exceptional entry**, plus the **two-axis signal** (`chorus-core/DECISION-PRIMITIVE.md`
+   §RSVP signal) — **applicability** (cite ≥1 concrete round-context delta your lens touches;
    no citable delta → ABSTAIN) and **expected stakes** (🟢/🟡/🔴-potential + a one-line
    hook) — and a one-sentence reason. (This replaces the old relevance 0–3 score, which
-   degenerated to all-3s; seating ties on it are now a self-unblocking 🟡, not an
-   operator ask.) An **exceptional entry** is a JOIN that asks for a seat *beyond* the
-   ordinary cap by **citing a concrete uncovered delta no seated ordinary lens covers**;
-   it is evidence-gated and rare (an un-anchored exceptional claim is refused), confers a
-   **voice not weight**, and is seated per the cap + exceptional-entry rule defined once
-   in `SDLC-LAYER.md` (seating). The base round is uncapped by default, so exceptional
-   entry matters chiefly where a cap applies (the SDLC gates).
+   degenerated to all-3s; seating ties on it are now a self-unblocking 🟡, not an operator
+   ask.) An **exceptional entry** is a JOIN that asks for a seat *beyond* the ordinary cap by
+   **citing a concrete uncovered delta no seated ordinary lens covers**; it is evidence-gated
+   and rare (an un-anchored exceptional claim is refused), confers a **voice not weight**, and
+   is seated per the cap + exceptional-entry rule defined once in the **`chorus-sdlc`**
+   sibling skill (its seating section). The base round is uncapped by default, so
+   exceptional entry matters chiefly where a cap applies (the SDLC gates).
 
 Cost: ~7 small parallel calls, ~30s wall time, ~3K tokens total. Cheap
 relative to a saved Phase 1 round.
@@ -290,7 +278,7 @@ context paragraph may not be surfacing relevant deltas honestly.
 ### Phase 0.7 — Exploratory phase (joiners build understanding)
 
 Between RSVP and Round 1, each joiner runs the **exploratory phase** — defined
-once in `EXPLORATORY-PHASE.md`, run cheapest-subset-first. In brief: load the
+once in `chorus-core/EXPLORATORY-PHASE.md`, run cheapest-subset-first. In brief: load the
 lens's `Information needs (exploratory phase)` profile → reuse the prior record +
 compute deltas / stale refs → harvest **reference-first, addendum-first** (record
 locators, not copies) → bounded, operator-budget-controlled analysis for what's
@@ -305,7 +293,7 @@ findings are authored.
 This **supersedes the per-round cold read**: Round 1 (the Author stage below) is
 produced *from* the persisted understanding. Persisted memory is an **index of
 locators, never a finding's evidentiary endpoint** — findings re-ground in the
-live material. Abstainers do not run the phase. See `EXPLORATORY-PHASE.md` for the
+live material. Abstainers do not run the phase. See `chorus-core/EXPLORATORY-PHASE.md` for the
 full mechanic, the two-tier memory (the addendum is the authoritative base; records
 may cache it), and staleness/reconciliation rules.
 
@@ -317,7 +305,7 @@ conversation). Abstainers are skipped entirely — do not brief them, do not
 include their findings as `[no comment]` rows; just record their RSVP reply
 in the round roster (see Phase 0.5).
 
-Round 1 is **stages 1–2 of the gate primitive** (`GATE-PRIMITIVE.md`): an
+Round 1 is **stages 1–2 of the gate primitive** (`chorus-core/GATE-PRIMITIVE.md`): an
 optional read-only Extract pass (a bounded `Explore`) may pre-build structured
 `file:line`-anchored records the personas author from, then each persona
 authors findings **uncapped** (stage 2). The Extract pass is invisible to the
@@ -429,7 +417,7 @@ Round-1 report and verifies:
    distinguish evidence-grounded findings from declarative or unsupported ones at
    a glance.
 
-The gate is enforced by I8 in `INTEGRATION-LAYER.md`. The integration layer
+The gate is enforced by I8 in `chorus-core/CONDUCTOR.md`. The integration layer
 never accepts a report whose project-specific findings lack `file:line` or
 a principle tag.
 
@@ -499,7 +487,7 @@ no original report to react with). Each gets:
    (CONFIRM — you agree at the proposed severity), or **over-rated** (OVER-RATE —
    should demote)?" CONFIRM is agreement, not escalation: use it when you'd rank the
    fix highly but the author's severity is right. Only PRIORITIZE moves a finding up
-   (`GATE-PRIMITIVE.md` stage 3; spec `009-confirm-vote-tally`).
+   (`chorus-core/GATE-PRIMITIVE.md` stage 3; spec `009-confirm-vote-tally`).
 6. **Convergence note (per agreement)** — "For any finding you converge with,
    mark **one short sentence in your own words** as your agreement note (same
    `PULL-QUOTE:`-style mark as Round 1). This is relayed verbatim under the
@@ -510,14 +498,14 @@ Word limit: 500–600.
 Phase 2 is **stage 3 (Vote)** of the gate primitive: PRIORITIZE / CONFIRM /
 OVER-RATE are the votes. After the reactions arrive, finalize each finding's severity
 with the primitive's **deterministic stage-4 tally** — defined once in
-`GATE-PRIMITIVE.md` (Stage 4): `net = P − O` over non-author voters (CONFIRM excluded),
-compared against the **board-scaled threshold** defined there (it scales with the
-non-author voter count `N` and reduces to the prior `±2` at the standard 5-seat board). The convergence count used for ranking is `P + C` (all
-agreement) — so a finding many lenses CONFIRM still ranks highly while honestly holding
-its severity. The old "two converging lenses earn 🔴" rule is amended: two **under-rated**
-(PRIORITIZE) claims escalate; mere agreement (CONFIRM) holds (spec
-`009-confirm-vote-tally`, closing issue #13). Severity is arithmetic over real votes —
-never the orchestrator's judgment (S9).
+`chorus-core/GATE-PRIMITIVE.md` (Stage 4): `net = P − O` over non-author voters (CONFIRM
+excluded), compared against the **board-scaled threshold** defined there (it scales with
+the non-author voter count `N` and reduces to the prior `±2` at the standard 5-seat
+board). The convergence count used for ranking is `P + C` (all agreement) — so a finding
+many lenses CONFIRM still ranks highly while honestly holding its severity. The old "two
+converging lenses earn 🔴" rule is amended: two **under-rated** (PRIORITIZE) claims
+escalate; mere agreement (CONFIRM) holds (spec `009-confirm-vote-tally`, closing issue
+#13). Severity is arithmetic over real votes — never the orchestrator's judgment (S9).
 
 After Round 2 reactions arrive, append a `### Round 2 brief` subsection to the
 artifact (2–4 sentences): which findings were sharpened, which were pushed back

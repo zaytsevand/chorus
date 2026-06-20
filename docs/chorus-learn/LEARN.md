@@ -1,3 +1,4 @@
+<!-- Carried from the pre-suite monolith; not yet wired into the suite (FR-018 follow-up). -->
 # `chorus learn` — the guided onboarding tutorial
 
 This file is the **single canonical definition** of the `chorus learn` mode
