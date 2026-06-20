@@ -1,8 +1,8 @@
 # Chorus Decision Primitive
 
 This is the **single canonical definition** of how the chorus decides *when to involve
-the operator*. Both the base round (`INTEGRATION-LAYER.md`) and the SDLC gates
-(`SDLC-LAYER.md`) route their operator-facing decisions through *this* mechanic. There is
+the operator*. Both the base round (`chorus-review/INTEGRATION-LAYER.md`) and the SDLC gates
+(`chorus-sdlc/SKILL.md`) route their operator-facing decisions through *this* mechanic. There is
 exactly one copy; neither layer restates it.
 
 The discipline reframes operator involvement after Fowler's *Fragments* (2026-04-29):
@@ -168,7 +168,7 @@ Bind every decision — both modes. Extend I1–I8 (integration) and S1–S9 (li
 
 ## Adoption note
 
-`INTEGRATION-LAYER.md` (base round) and `SDLC-LAYER.md` (gates A/B/C) **reference this
+`chorus-review/INTEGRATION-LAYER.md` (base round) and `chorus-sdlc/SKILL.md` (gates A/B/C) **reference this
 file** for the mechanic; they do not restate it. The 🟢/🟡/🔴 band table, the catalog, and
 D1–D5 live here, once, so the two modes cannot drift. Any change to bands, the signal, the
 record, the catalog, or the self-heal loop happens here.

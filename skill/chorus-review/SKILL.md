@@ -1,6 +1,6 @@
 ---
 name: chorus-review
-description: Multi-advisor project state review (Evans/Richards/Cooper/Norman/Uncle Bob/Beck/Delivery-and-Ops/security/Goldratt) with per-round RSVP self-selection, cross-evaluation, conflict reconciliation, and ranked recommendations. Use when the user asks for a chorus, a project-state review, or to "spawn the regular chorus." Produces a durable artifact at docs/reviews/YYYY-MM-DD-chorus-review.md. Also supports an agent-SDLC lifecycle mode ("run the agent-SDLC on feature 0NN") that interleaves scoped chorus gates with the speckit cycle — see SDLC-LAYER.md.
+description: Multi-advisor project state review (Evans/Richards/Cooper/Norman/Uncle Bob/Beck/Delivery-and-Ops/security/Goldratt) with per-round RSVP self-selection, cross-evaluation, conflict reconciliation, and ranked recommendations. Use when the user asks for a chorus, a project-state review, or to "spawn the regular chorus." Produces a durable artifact at docs/reviews/YYYY-MM-DD-chorus-review.md. REQUIRED composition: chorus-core (shared substrate). For the agent-SDLC lifecycle mode use the chorus-sdlc skill.
 ---
 
 # Chorus Review — repeatable procedure
@@ -13,51 +13,69 @@ This skill is project-agnostic. Project-specific facts (exclusions, topology,
 security data-surface, baseline references) come from an optional per-project
 addendum — see "Project addendum" below.
 
+## REQUIRED: chorus-core — substrate guard (run BEFORE anything else)
+
+This skill composes the shared substrate skill **`chorus-core`**. Before relying
+on **any** core mechanic — the four-stage gate (`GATE-PRIMITIVE.md`), the
+decision banding (`DECISION-PRIMITIVE.md`), the exploratory phase
+(`EXPLORATORY-PHASE.md`), or the conductor discipline + `I1–I9` invariant
+catalog (`CONDUCTOR.md`) — the calling session MUST assert that the `chorus-core`
+skill directory is reachable (its four files are present).
+
+The skill loader does **not** enforce the `REQUIRED:` marker (it is advisory), so
+this assertion is the real enforcement. **If `chorus-core` is not reachable, STOP
+and fail loudly** — do not improvise the missing mechanics, do not degrade
+silently. Emit:
+
+> **chorus-core is missing.** `chorus-review` requires the shared substrate skill
+> `chorus-core`, which is not reachable. This means a broken or partial install of
+> the chorus suite — the shared mechanics (the four-stage gate, decision banding,
+> exploratory phase, and the `I1–I9` invariant catalog) cannot be loaded, so the
+> round cannot run honestly. **Recovery:** re-install the chorus suite
+> (`./install.sh`), or check that `chorus-core` was published/copied under its
+> expected name, then retry.
+
+When `chorus-core` is reachable, its router (`chorus-core/SKILL.md`) runs its own
+reachability self-check over the four files (defense-in-depth for the
+file-missing case).
+
 **Before Phase 0, the calling session MUST `Read` the companion file
-`INTEGRATION-LAYER.md` in this skill directory.** It defines the integration
-layer (the calling session itself) — its position in the system, per-phase
-pre/post-conditions, invariants, and refusals. The procedure here describes
-*what* the chorus does; the integration-layer file describes *who runs it
-and what they are not allowed to do*. Both are load-bearing.
+`INTEGRATION-LAYER.md` in this skill directory.** It defines the round-specific
+integration layer (the calling session itself) — its position in the system,
+per-phase pre/post-conditions, and sees/does-not-see. The procedure here
+describes *what* the chorus does; the integration-layer file describes *who runs
+it during a round and what they are not allowed to do*. Both are load-bearing.
+The mode-independent discipline — conductor voice, the discipline cascade, the
+refusals, and the **`I1–I9` invariant catalog** — lives in
+**`chorus-core/CONDUCTOR.md`**.
 
 The mechanic of a single review — the four stages **extract → author → vote →
-tally** — is defined once in `GATE-PRIMITIVE.md`; Phases 1/2/4 below run it
-(this file does not restate the mechanic). For the agent-SDLC lifecycle mode,
-read `SDLC-LAYER.md` as well.
+tally** — is defined once in `chorus-core/GATE-PRIMITIVE.md`; Phases 1/2/4 below
+run it (this file does not restate the mechanic).
 
 Before findings are authored, participating advisors build a persisted,
 lens-specific understanding of the target — the **exploratory phase**, defined
-once in `EXPLORATORY-PHASE.md` (Phase 0.7 below). Both modes run it; this file
-does not restate it.
+once in `chorus-core/EXPLORATORY-PHASE.md` (Phase 0.7 below); this file does not
+restate it.
 
 When the chorus must involve the operator — seating a capped panel, blocking on a
 🔴, confirming scope — the decision is banded by the **decision primitive**, defined
-once in `DECISION-PRIMITIVE.md`: 🟢 auto-resolve, 🟡 proceed-with-recorded-default +
-async override, 🔴 hard-block + instant ask, by declared catalog predicate (never
-orchestrator inference). It makes the workflow **self-unblocking yet balanced** — it
-runs forward, stopping the operator only for 🔴. Both modes reference it; this file
-does not restate it.
-
-## Two modes
-
-Both modes are built on the same gate primitive (`GATE-PRIMITIVE.md`):
-
-- **Project-state round** — a multi-lens review of a scope you choose: most
-  often a spec or a feature's design, occasionally the whole codebase (the
-  periodic full sweep). Trigger: "spawn the chorus." Output:
-  `docs/reviews/YYYY-MM-DD-chorus-review.md`.
-- **Agent-SDLC** (lifecycle) — gates the speckit cycle for one feature with
-  design, plan/tasks, and implementation reviews. Trigger: "run the agent-SDLC
-  on feature 0NN." Driven by `SDLC-LAYER.md`; output:
-  `specs/<feature>/agent-sdlc-log.md`. Read `SDLC-LAYER.md` before running it.
+once in `chorus-core/DECISION-PRIMITIVE.md`: 🟢 auto-resolve, 🟡
+proceed-with-recorded-default + async override, 🔴 hard-block + instant ask, by
+declared catalog predicate (never orchestrator inference). It makes the workflow
+**self-unblocking yet balanced** — it runs forward, stopping the operator only for
+🔴. This file references it; it does not restate it.
 
 ## When to use
 
 - **Reviewing a spec or a feature's design** across multiple lenses — the common
-  case. Say "spawn the chorus" pointed at the spec, or "run the agent-SDLC on
-  feature 0NN" for the gated lifecycle (see `SDLC-LAYER.md`).
+  case. Say "spawn the chorus" pointed at the spec.
 - **A full-codebase sweep** for periodic project-state review — the occasional
   case; quarterly or after a major release.
+
+(For the gated speckit lifecycle — "run the agent-SDLC on feature 0NN" — use the
+sibling skill **`chorus-sdlc`**, which composes the same `chorus-core` substrate
+independently of this skill.)
 
 Don't use for:
 - Single-lens questions (just spawn the relevant persona agent directly)
@@ -212,7 +230,7 @@ agent receives a short, self-contained brief:
 2. The round-context paragraph
 3. The scope-exclusion list (verbatim, as in Phase 1 below)
 4. RSVP instructions: reply in ≤80 words with `JOIN` or `ABSTAIN`, plus the
-   **two-axis signal** (`DECISION-PRIMITIVE.md` §RSVP signal) — **applicability**
+   **two-axis signal** (`chorus-core/DECISION-PRIMITIVE.md` §RSVP signal) — **applicability**
    (cite ≥1 concrete round-context delta your lens touches; no citable delta →
    ABSTAIN) and **expected stakes** (🟢/🟡/🔴-potential + a one-line hook) — and a
    one-sentence reason. (This replaces the old relevance 0–3 score, which degenerated
@@ -254,7 +272,7 @@ context paragraph may not be surfacing relevant deltas honestly.
 ### Phase 0.7 — Exploratory phase (joiners build understanding)
 
 Between RSVP and Round 1, each joiner runs the **exploratory phase** — defined
-once in `EXPLORATORY-PHASE.md`, run cheapest-subset-first. In brief: load the
+once in `chorus-core/EXPLORATORY-PHASE.md`, run cheapest-subset-first. In brief: load the
 lens's `Information needs (exploratory phase)` profile → reuse the prior record +
 compute deltas / stale refs → harvest **reference-first, addendum-first** (record
 locators, not copies) → bounded, operator-budget-controlled analysis for what's
@@ -269,7 +287,7 @@ findings are authored.
 This **supersedes the per-round cold read**: Round 1 (the Author stage below) is
 produced *from* the persisted understanding. Persisted memory is an **index of
 locators, never a finding's evidentiary endpoint** — findings re-ground in the
-live material. Abstainers do not run the phase. See `EXPLORATORY-PHASE.md` for the
+live material. Abstainers do not run the phase. See `chorus-core/EXPLORATORY-PHASE.md` for the
 full mechanic, the two-tier memory (the addendum is the authoritative base; records
 may cache it), and staleness/reconciliation rules.
 
@@ -281,7 +299,7 @@ conversation). Abstainers are skipped entirely — do not brief them, do not
 include their findings as `[no comment]` rows; just record their RSVP reply
 in the round roster (see Phase 0.5).
 
-Round 1 is **stages 1–2 of the gate primitive** (`GATE-PRIMITIVE.md`): an
+Round 1 is **stages 1–2 of the gate primitive** (`chorus-core/GATE-PRIMITIVE.md`): an
 optional read-only Extract pass (a bounded `Explore`) may pre-build structured
 `file:line`-anchored records the personas author from, then each persona
 authors findings **uncapped** (stage 2). The Extract pass is invisible to the
@@ -381,7 +399,7 @@ Round-1 report and verifies:
    distinguish evidence-grounded findings from declarative or unsupported
    ones at a glance.
 
-The gate is enforced by I8 in `INTEGRATION-LAYER.md`. The integration layer
+The gate is enforced by I8 in `chorus-core/CONDUCTOR.md`. The integration layer
 never accepts a report whose project-specific findings lack `file:line` or
 a principle tag.
 
@@ -437,7 +455,7 @@ Word limit: 500–600.
 
 Phase 2 is **stage 3 (Vote)** of the gate primitive: PRIORITIZE / OVER-RATE are
 the votes. After the reactions arrive, finalize each finding's severity with the
-primitive's **deterministic stage-4 tally** (`GATE-PRIMITIVE.md`): among
+primitive's **deterministic stage-4 tally** (`chorus-core/GATE-PRIMITIVE.md`): among
 non-author voters, `net = P − O`; `net ≥ +2` escalates one level, `net ≤ −2`
 demotes one level, otherwise hold. The long-standing "two converging lenses earn
 🔴" rule *is* this tally (a convergent PRIORITIZE escalation). Severity is

@@ -1,8 +1,8 @@
 # Chorus Gate Primitive
 
 This is the **single canonical definition** of how a chorus conducts one review.
-Both the periodic project-state round (`INTEGRATION-LAYER.md`, Phases 1/2/4) and
-the per-feature SDLC gates (`SDLC-LAYER.md`, Gates A/B/C) run *this* mechanic.
+Both the periodic project-state round (`chorus-review/INTEGRATION-LAYER.md`, Phases 1/2/4) and
+the per-feature SDLC gates (`chorus-sdlc/SKILL.md`, Gates A/B/C) run *this* mechanic.
 There is exactly one copy; neither layer restates it.
 
 A review is four **separable, specialized stages**, each with a distinct actor
@@ -26,7 +26,7 @@ flowchart TD
 
 - **Actor**: read-only `Explore` / general-purpose agents, in parallel.
 - **Input**: the review corpus (for the base round, the artefacts named in the
-  brief; for an SDLC gate, the gate's corpus per `SDLC-LAYER.md`).
+  brief; for an SDLC gate, the gate's corpus per `chorus-sdlc/SKILL.md`).
 - **Output**: structured **extract records** — one factual observation each:
 
   ```
@@ -48,7 +48,7 @@ flowchart TD
   records with `source: "spec-walkthrough"`. It is **not authoritative** — a
   persona must author a record into a finding for it to face the vote; any
   DRIFT/SURPRISE no persona claims is logged as an unclaimed record (visible,
-  non-gating). See `SDLC-LAYER.md`.
+  non-gating). See `chorus-sdlc/SKILL.md`.
 
 ## Stage 2 — Author
 
@@ -146,10 +146,10 @@ integration layer’s I1–I9.
 
 ## Adoption note
 
-`INTEGRATION-LAYER.md` (base round Phases 1/2/4) and `SDLC-LAYER.md` (gates
+`chorus-review/INTEGRATION-LAYER.md` (base round Phases 1/2/4) and `chorus-sdlc/SKILL.md` (gates
 A/B/C) **reference this file** for the mechanic; they do not restate it. Any
 change to extract/author/vote/tally happens here, once, so the two modes cannot
-drift. The lifecycle-specific invariants S1–S7 live in `SDLC-LAYER.md`; the
+drift. The lifecycle-specific invariants S1–S7 live in `chorus-sdlc/SKILL.md`; the
 gate-primitive invariants S8–S10 live here because they bind both modes.
 
 ## Provenance

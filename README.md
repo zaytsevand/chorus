@@ -19,28 +19,35 @@ An optional **Guido** (Python) language lens joins only on rounds with Python in
 scope. Conflicts go to `advisor()`. Output is a durable markdown artifact you
 commit; the most recent artifact is the next round's baseline.
 
-## Two modes
+## The suite — three skills over one substrate
 
-The skill runs in two modes, both built on the same four-stage gate primitive
-(`skill/chorus-review/GATE-PRIMITIVE.md`: extract → uncapped author → real
-adversarial vote → deterministic tally):
+The chorus is packaged as a **composable suite** of three skills. The shared
+mechanics live once in a substrate skill; the two operator-facing modes compose
+it by name and never depend on each other:
 
-- **Project-state round** — a multi-lens review of a scope you choose: most
-  often a spec or a feature's design, occasionally the whole codebase (the
-  periodic full sweep). Trigger: **"spawn the chorus."** Output:
+- **`chorus-core`** — substrate (not invoked directly). The four-stage gate
+  primitive (`skill/chorus-core/GATE-PRIMITIVE.md`: extract → uncapped author →
+  real adversarial vote → deterministic tally), the decision primitive
+  (`DECISION-PRIMITIVE.md`), the exploratory phase (`EXPLORATORY-PHASE.md`), and
+  the conductor discipline + the single `I1–I9` invariant catalog
+  (`CONDUCTOR.md`). It also documents the **reserved seams** (extract-stage
+  record, agent-memory layout, two-tier memory model) and the **findings→memory
+  contract** future skills compose.
+- **`chorus-review`** — the **project-state round**: a multi-lens review of a
+  scope you choose (most often a spec or a feature's design; occasionally the
+  whole codebase). Trigger: **"spawn the chorus."** Output:
   `docs/reviews/YYYY-MM-DD-chorus-review.md`.
-- **Agent-SDLC** (lifecycle) — runs three scoped chorus gates over a single
-  feature as it moves through plan → tasks → implement (design review after
-  `plan`, plan/tasks review after `tasks`, implementation review after
-  `implement`). It reviews an existing spec; it does not require you to author
-  one first. Each gate is RSVP-scoped,
-  capped at five lenses, and blocks the pipeline only on an unresolved 🔴.
-  Trigger: **"run the agent-SDLC on feature 0NN."** Driven by
-  `skill/chorus-review/SDLC-LAYER.md`; output:
-  `specs/<feature>/agent-sdlc-log.md`.
+- **`chorus-sdlc`** — the **agent-SDLC lifecycle**: three scoped chorus gates
+  over a single feature as it moves through plan → tasks → implement (design
+  review after `plan`, plan/tasks review after `tasks`, implementation review
+  after `implement`). Each gate is RSVP-scoped, capped at five lenses, and blocks
+  the pipeline only on an unresolved 🔴. Trigger: **"run the agent-SDLC on
+  feature 0NN."** Output: `specs/<feature>/agent-sdlc-log.md`.
 
-The gate primitive is shared so the two modes cannot drift. The rest of this
-README describes the project-state round.
+Both modes run the **same** gate primitive from `chorus-core`, so they cannot
+drift. Each sibling declares `REQUIRED: chorus-core` and carries a sibling-side
+guard that fails loudly if the substrate is absent. The rest of this README
+describes the project-state round (`chorus-review`).
 
 ## Why
 
@@ -163,7 +170,7 @@ reference-first over a **two-tier memory** — the operator-owned
 per-advisor records that may cache from it. Persisted memory is an index of
 locators, never a finding's evidentiary endpoint — findings re-ground in the live
 material. The mechanic lives in
-[`skill/chorus-review/EXPLORATORY-PHASE.md`](skill/chorus-review/EXPLORATORY-PHASE.md).
+[`skill/chorus-core/EXPLORATORY-PHASE.md`](skill/chorus-core/EXPLORATORY-PHASE.md).
 
 ## Principles
 
@@ -243,11 +250,29 @@ cd chorus-review
 ./install.sh
 ```
 
-This copies the skill into `~/.claude/skills/chorus-review/` and its
-persona agents into `~/.claude/agents/`. Existing same-named files are
-preserved unless you pass `--force`.
+This iterates over `skill/*/` and copies all three suite skills
+(`chorus-core`, `chorus-review`, `chorus-sdlc`) into `~/.claude/skills/<name>/`
+and the persona agents into `~/.claude/agents/`. Existing same-named agent files
+are preserved unless you pass `--force`.
 
 Override the target with `CLAUDE_HOME=/path/to/claude ./install.sh`.
+
+#### Upgrading from the pre-suite single skill (REQUIRED manual step — F6 waiver)
+
+The pre-split install put all files in one `chorus-review/` dir. `install.sh`
+does **not** prune stale files (the installer-prune fix was waived in favor of a
+documented manual step). A copy-only re-install would leave orphaned files
+(`SDLC-LAYER.md`, the primitives, the old `SKILL.md`) that **double-define the
+`I1–I9` catalog** in the live dir. Before re-installing the suite, delete the old
+single-skill dir:
+
+```sh
+rm -rf ~/.claude/skills/chorus-review   # remove the pre-suite single-skill install
+./install.sh                            # then install the suite fresh
+```
+
+This is the operator-accepted mitigation; the repo source is unaffected (the
+invariant-resolution fitness check runs on source).
 
 ### Plugin (Claude Code plugin manifest)
 
@@ -255,13 +280,20 @@ The repo ships a `plugin.json` so it can be loaded via Claude Code's plugin
 mechanism. See your Claude Code version's plugin-installation docs for the
 exact incantation; the manifest at the root is the canonical entry point.
 
+> **Naming reconciliation (recorded, not yet actioned — FR-016).** The review
+> skill is published in some environments under the trigger name `chorus` while
+> its source skill dir is `chorus-review`. This mismatch is **recorded as an
+> explicit reconciliation task**; it is **not** silently renamed here. Resolve it
+> deliberately (decide the canonical published name, then align source + manifest
+> + docs in one change) rather than letting the two drift.
+
 ### Uninstall
 
 ```sh
 ./uninstall.sh
 ```
 
-Removes only the skill dir and its persona agent files. Your per-project
+Removes the three suite skill dirs and the persona agent files. Your per-project
 addenda and chorus artifacts under `docs/reviews/` are left untouched.
 
 ## Run a round

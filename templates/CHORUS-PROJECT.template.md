@@ -106,7 +106,7 @@ so the next round knows which baseline to load.
 ## 7. Project understanding
 
 > Operator-confirmed, project-wide facts gathered by the advisor **exploratory
-> phase** (`skill/chorus-review/EXPLORATORY-PHASE.md`). This section is the
+> phase** (`skill/chorus-core/EXPLORATORY-PHASE.md`). This section is the
 > **authoritative system of record** for these facts — advisors reference it (and
 > may cache from it, reconciling on change) rather than re-asking. Each entry was
 > **accepted by you**: advisors propose additions, you accept or edit them.
@@ -134,6 +134,39 @@ group = not yet gathered (an open gap, surfaced — not silently "n/a").
 - Core domain / ubiquitous-language pointers: `<… or → reference>`
 
 <!-- add topic groups as lenses confirm facts; one line per fact -->
+
+## 8. Findings → memory (designed seam — callback not yet implemented)
+
+Declare how chorus findings flow into durable memory. This is a **configuration
+contract**: the consuming callback is a designed seam documented in
+`skill/chorus-core/CONDUCTOR.md` ("Findings → memory contract") and is **not yet
+implemented** — filling this section records policy a future callback will honor.
+
+### Targets — where findings flow
+
+- **Per-persona memory records**: `~/.claude/agent-memory/<persona>/` — the index
+  of locators each lens caches (never the evidentiary endpoint).
+- **Project understanding** (section 7 above) — the authoritative base for
+  operator-accepted, project-wide facts.
+- (Add any project-specific target, e.g. a team memory surface or wiki.)
+
+### Policy
+
+- **Scope routing**: `lens-specific` findings → the asking lens's record
+  (auto); `project-wide` findings → section 7 **only with operator acceptance**.
+- **Durable-only rule**: store a **locator + ≤~2-sentence hint**, never a full
+  finding body. Memory is an index, not a copy.
+- **Secret pre-filter (REQUIRED — deny-default)**: every excerpt written to a
+  durable target is **dropped unless it passes** a secret filter — a named
+  detector class (credential-shaped / high-entropy tokens, key prefixes,
+  `.env`/secret-file paths, AND structured private facts: internal hostnames,
+  personal/customer names, ticket IDs) — and **every drop is audited** (visible,
+  not silent). The full obligation is the contract in
+  `skill/chorus-core/CONDUCTOR.md` (FR-010a); the future callback inherits it as
+  a hard precondition.
+
+Leave defaults if you have no project-specific override; the contract's
+deny-default secret filter applies regardless.
 
 ## Maintenance
 

@@ -1,10 +1,12 @@
 {
   "name": "chorus-review",
   "version": "0.1.0",
-  "description": "Multi-advisor project-state review for Claude Code. Seven persona advisors plus a security agent run a structured, RSVP-gated review through their lenses; conflicts go to advisor(); output is a durable markdown artifact you commit.",
+  "description": "Multi-advisor project-state review for Claude Code, packaged as a composable suite (chorus-core substrate + chorus-review round + chorus-sdlc lifecycle). Nine persona advisors (Evans, Richards, Cooper, Norman, Uncle Bob, Beck, Delivery-and-Ops, Security-and-Trust, Goldratt) plus an optional Guido Python lens run a structured, RSVP-gated review through their lenses; conflicts go to advisor(); output is a durable markdown artifact you commit.",
   "license": "CC-BY-4.0",
   "skills": [
-    "skill/chorus-review"
+    "skill/chorus-core",
+    "skill/chorus-review",
+    "skill/chorus-sdlc"
   ],
   "agents": [
     "agents/eric-evans-advisor.md",
@@ -13,6 +15,9 @@
     "agents/don-norman-advisor.md",
     "agents/uncle-bob-architect.md",
     "agents/kent-beck-persona.md",
-    "agents/delivery-and-ops-advisor.md"
+    "agents/delivery-and-ops-advisor.md",
+    "agents/security-and-trust-advisor.md",
+    "agents/eliyahu-goldratt-advisor.md",
+    "agents/guido-python-reviewer.md"
   ]
 }

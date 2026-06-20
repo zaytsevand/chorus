@@ -3,8 +3,8 @@
 The **single canonical definition** of how a participating advisor builds and
 persists a lens-specific *understanding* of the review target **before** it
 authors findings. Both modes reference this file: the project-state round
-(`INTEGRATION-LAYER.md`) runs it between Phase 0.5 (RSVP) and Phase 1 (Round 1);
-the SDLC gates (`SDLC-LAYER.md`) run it before a gate's Author stage
+(`chorus-review/INTEGRATION-LAYER.md`) runs it between Phase 0.5 (RSVP) and Phase 1 (Round 1);
+the SDLC gates (`chorus-sdlc/SKILL.md`) run it before a gate's Author stage
 (`GATE-PRIMITIVE.md` stage 2). There is exactly one copy; neither layer restates
 the mechanic.
 
@@ -261,7 +261,7 @@ SC-007 / SC-008.
 
 ## Adoption note
 
-`INTEGRATION-LAYER.md` (base round) and `SDLC-LAYER.md` (gates A/B/C) **reference
+`chorus-review/INTEGRATION-LAYER.md` (base round) and `chorus-sdlc/SKILL.md` (gates A/B/C) **reference
 this file** for the mechanic; they do not restate it. Any change to the phase
 happens here, once, so the two modes cannot drift.
 
