@@ -251,7 +251,7 @@ It reuses the exploratory phase's write-back contract and invents **no new write
 (Principle I):
 
 - **Dispatch, never synthesize (S1/S9).** The orchestrator **dispatches each seated persona**
-  to update **its own** `~/.claude/agent-memory/<persona>/` record; it authors no record and
+  to update **its own** `.claude/agent-memory/<persona>/` record; it authors no record and
   synthesizes no learning. Each lens distills **only its own contributions to this run's ledger**
   (its findings-register rows + its understanding record) — a re-read of its own prior output, not
   a fresh harvest. (The cheaper "orchestrator distills the whole ledger in one pass" alternative is

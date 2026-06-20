@@ -86,7 +86,7 @@ operator-controlled (FR-019).
   in full each round. It gains a structured **"Project understanding"** section
   (schema in `specs/004-advisor-exploratory-phase/contracts/addendum-project-understanding.md`).
 - **Lens layer = per-advisor record** in the advisor's memory
-  (`~/.claude/agent-memory/<persona>/`) — references (incl. into the addendum),
+  (`.claude/agent-memory/<persona>/`) — references (incl. into the addendum),
   inferences, gaps, and **cached** project-wide facts; split into a
   project-scoped part and feature/spec deltas (FR-014/FR-016).
 

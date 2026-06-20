@@ -190,9 +190,11 @@ Each persona carries these as their own concerns in their own voice — see
 the agent files under [`agents/`](agents/). Optional language lenses carry the
 same three concerns in their language's grain — e.g. Guido (Python): an unsigned
 type-hint contract, a mutable-default side effect, an idiom claim no type or test
-can pin (`agents/guido-python-reviewer.md`). When two lenses converge on the
-same concern from different angles in a chorus round, the finding earns
-🔴 severity.
+can pin (`agents/guido-python-reviewer.md`). When two lenses independently judge a
+finding **under-rated** (the `PRIORITIZE` vote) in a chorus round, it escalates one
+severity level. Mere agreement at the proposed severity (the `CONFIRM` vote) counts as
+convergence for *ranking* but does not escalate — so popular polish stays polish.
+(Vote vocabulary `PRIORITIZE` / `CONFIRM` / `OVER-RATE`; see `skill/chorus-core/GATE-PRIMITIVE.md`.)
 
 Projects with stronger or more-specific principles (layer rules, language
 mandates, infrastructure constraints) declare them in section 4 of

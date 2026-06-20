@@ -144,7 +144,7 @@ implemented** — filling this section records policy a future callback will hon
 
 ### Targets — where findings flow
 
-- **Per-persona memory records**: `~/.claude/agent-memory/<persona>/` — the index
+- **Per-persona memory records**: `.claude/agent-memory/<persona>/` — the index
   of locators each lens caches (never the evidentiary endpoint).
 - **Project understanding** (section 7 above) — the authoritative base for
   operator-accepted, project-wide facts.

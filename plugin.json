@@ -6,7 +6,8 @@
   "skills": [
     "skill/chorus-core",
     "skill/chorus-review",
-    "skill/chorus-sdlc"
+    "skill/chorus-sdlc",
+    "skill/chorus-learn"
   ],
   "agents": [
     "agents/eric-evans-advisor.md",
