@@ -85,7 +85,7 @@ not start until the previous phase's postcondition holds** (I4, defined in
 `chorus-core/CONDUCTOR.md`).
 
 Phases 1, 2, and 4 run the four-stage review mechanic — see
-`chorus-core/GATE-PRIMITIVE.md` for the stages and invariants S8–S10. The gates
+`chorus-core/GATE-PRIMITIVE.md` for the stages and invariants S8–S11. The gates
 below are the discipline around it; the SDLC gates run the same primitive (in the
 lifecycle sibling), so the two modes cannot drift.
 
@@ -146,11 +146,13 @@ extends the I8 evidence discipline upstream of Round 1.
 
 - **Pre:** Phase 1 post holds; the detail-rich **findings register** is written
   (every finding's verbatim pull-quote relayed), and the **consolidation matrix**
-  is written as a projection of it with every finding cited as `Fn`.
+  is written as a projection of it with every finding cited as `Fn`. Any open
+  `NEED_INFO` flags from Phase 1 are routed for resolution before vote dispatch.
 - **Post:** every non-substituted joiner has produced a Round-2 reaction
-  ending with its three-way call (PRIORITIZE / CONFIRM / OVER-RATE), and any
-  convergence note it marked is relayed verbatim under the finding's register
-  entry.
+  ending with its four-way call (PRIORITIZE / CONFIRM / OVER-RATE / NEED_INFO),
+  and any convergence note it marked is relayed verbatim under the finding's
+  register entry. Every open `NEED_INFO` is resolved (peer or operator provision,
+  S11) before stage-4 tally runs.
 
 ### Phase 3 — Conflict reconciliation
 
