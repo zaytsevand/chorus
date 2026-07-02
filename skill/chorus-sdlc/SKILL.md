@@ -196,13 +196,16 @@ A post-tally gating 🔴 is a **decision** banded by `chorus-core/DECISION-PRIMI
   bound is the escalation trigger). It just stops asking the operator to push the
   incorporate button each cycle.
 
-### Vote dispatch (S8/S9)
+### Vote dispatch (S8/S9/S11)
 
 When the gate reaches stage 3, the orchestrator dispatches the vote to the
 seated personas **excluding each finding's author** for that finding (S8). Votes
 are real dispatches; the orchestrator never predicts, infers, or synthesizes a
-vote or a grade (S9). The gating 🔴 set is the output of the deterministic stage-4
-tally over those real votes — not an orchestrator opinion. (S8/S9 are defined in
+vote or a grade (S9). Voters declare `confidence_on_hand` per finding; **`low` →
+`NEED_INFO` is mandatory** (not a hedged CONFIRM/PRIORITIZE/OVER-RATE). Open
+`NEED_INFO` blocks tally until resolved through peer provision or operator
+provision (S11 — defined in `chorus-core/GATE-PRIMITIVE.md`). The gating 🔴 set is the output of the deterministic stage-4
+tally over those real votes — not an orchestrator opinion. (S8/S9/S11 are defined in
 `chorus-core/GATE-PRIMITIVE.md`.)
 
 ### Incorporation loop
@@ -251,7 +254,7 @@ It reuses the exploratory phase's write-back contract and invents **no new write
 (Principle I):
 
 - **Dispatch, never synthesize (S1/S9).** The orchestrator **dispatches each seated persona**
-  to update **its own** `.claude/agent-memory/<persona>/` record; it authors no record and
+  to update **its own** `.agents/agent-memory/<persona>/` record; it authors no record and
   synthesizes no learning. Each lens distills **only its own contributions to this run's ledger**
   (its findings-register rows + its understanding record) — a re-read of its own prior output, not
   a fresh harvest. (The cheaper "orchestrator distills the whole ledger in one pass" alternative is
@@ -294,7 +297,7 @@ end-of-run self-audit gains the check "orchestrator authored no record / synthes
 
 These **extend** the core-resident `I1–I9` catalog (defined once in
 `chorus-core/CONDUCTOR.md`) — they reference those tokens and do not redefine
-them. S8/S9/S10 are gate-primitive-level and live in
+them. S8/S9/S10/S11 are gate-primitive-level and live in
 `chorus-core/GATE-PRIMITIVE.md`; the lifecycle tokens `S1–S7` are defined here.
 
 - **S1.** The orchestrator authors no spec/plan/tasks/code itself; every artefact
@@ -351,6 +354,7 @@ is in `chorus-core/CONDUCTOR.md`; these are the lifecycle-specific ones):
 - **Pass a 🔴 silently** or override the operator on ambers (S4).
 - **Synthesize a vote** or let an author grade its own finding (S8/S9, via the
   primitive).
+- **Invent remediation or reformulate** a finding with open `NEED_INFO` (S11).
 - **Hand-patch a downstream artefact** instead of clarifying the spec (S5).
 - **Loop forever.** Three uncleared cycles escalate (S7).
 - **Treat a fixed viewpoint as authoritative.** `spec-walkthrough` is an input,

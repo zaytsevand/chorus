@@ -378,6 +378,16 @@ Required brief sections per agent:
     `008-detail-rich-relay`, FR-002): the integration layer **selects nothing** —
     it relays the span you marked. A finding with no marked pull-quote is routed
     back to you; the conductor never excerpts or paraphrases one for you.
+11. **`NEED_INFO` flag + confidence axis (per finding)** — "Declare `confidence_on_hand`
+    (`high` or `low`) for each finding — how much you trust the information currently
+    on hand. **`low` → `NEED_INFO` is mandatory**; do not publish a confident finding
+    on thin evidence. Also raise `NEED_INFO` when you cannot decisively determine
+    remediation or are unsure about the finding's formulation. Set `NEED_INFO: true`,
+    declare `confidence_on_hand: low` when that is the trigger, and state
+    `need_info_reason` in one sentence. Do not invent remediation or reformulate past
+    the gap — honesty is the output (`chorus-core/GATE-PRIMITIVE.md`, S11). The
+    orchestrator routes resolution (peer provision or operator provision); the finding
+    does not tally until the flag clears."
 
 **Persona-agent failure mode (hung-on-enumeration pattern):** if an agent goes
 silent for >5 minutes with a substantial transcript already written, it has
@@ -387,7 +397,7 @@ hung on "enumerate everything" mode. Kill it. Substitute with a bounded
 the doc that the lens was substituted, not delivered.
 
 **Memory recovery:** some personas (notably Evans) tend to write their actual
-report to `.claude/agent-memory/<persona-name>/` and return only a summary.
+report to `.agents/agent-memory/<persona-name>/` and return only a summary.
 After each agent completes, check that path and `Read` any new memory files —
 those ARE the report content.
 
@@ -431,11 +441,15 @@ matrix** that is a *projection* of it (spec `008-detail-rich-relay`).
 entry carries enough that an operator who has **not** read the Round-1 reports can
 understand it from the entry alone (FR-004/FR-007):
 
-| ID | Advisor · Lens | Severity | Target (locator) | Pull-quote (verbatim — the persona's own words) |
-|----|----------------|----------|------------------|--------------------------------------------------|
-| F1 | Evans · DDD | 🔴 | `webapp/data/models.py:42` | "The Order aggregate has no root to enforce its invariants — it can be persisted in a state the domain forbids." |
-| … | | | | |
+| ID | Advisor · Lens | Severity | Target (locator) | Pull-quote (verbatim — the persona's own words) | confidence_on_hand | need_info · reason |
+|----|----------------|----------|------------------|--------------------------------------------------|--------------------|--------------------|
+| F1 | Evans · DDD | 🔴 | `webapp/data/models.py:42` | "The Order aggregate has no root to enforce its invariants — it can be persisted in a state the domain forbids." | high | — |
+| … | | | | | | |
 
+- The **confidence_on_hand** (`high` / `low`) and **need_info · reason** cells carry
+  the persona's declared S11 state (`chorus-core/GATE-PRIMITIVE.md`). A row with
+  `need_info: true` is **excluded from the tally** until resolved; the register shows
+  it as held, not graded.
 - The **Pull-quote** cell is the persona-marked span (Phase-1 brief item 10),
   lifted **verbatim** and attributed — never a conductor paraphrase and never a
   conductor-chosen excerpt (this is the I6 / "speak in a persona's voice" refusal,
@@ -482,12 +496,18 @@ no original report to react with). Each gets:
    introduced in Round 2 carry `[principle:proposed]`. The same
    evidence-check gate that ran post-Round-1 runs post-Round-2: unsupported
    project-specific assertions are demoted, not registered as findings.
-5. **End with the three-way call** (one per finding you have a view on): "is this
-   finding **under-rated** (PRIORITIZE — should escalate), **correctly rated**
-   (CONFIRM — you agree at the proposed severity), or **over-rated** (OVER-RATE —
-   should demote)?" CONFIRM is agreement, not escalation: use it when you'd rank the
-   fix highly but the author's severity is right. Only PRIORITIZE moves a finding up
-   (`chorus-core/GATE-PRIMITIVE.md` stage 3; spec `009-confirm-vote-tally`).
+5. **End with the four-way call** (one per finding you have a view on): first declare
+   `confidence_on_hand` (`high` or `low`) for the information on hand, then vote —
+   is this finding **under-rated** (PRIORITIZE — should escalate), **correctly rated**
+   (CONFIRM — you agree at the proposed severity), **over-rated** (OVER-RATE —
+   should demote), or **information-gapped** (NEED_INFO — `confidence_on_hand: low`,
+   or formulation/remediation path unclear)? **`low` confidence → `NEED_INFO` is
+   mandatory** — do not CONFIRM with hedges. CONFIRM is agreement, not escalation:
+   use it when you'd rank the fix highly but the author's severity is right. Only
+   PRIORITIZE moves a finding up (`chorus-core/GATE-PRIMITIVE.md` stage 3; spec
+   `009-confirm-vote-tally`). NEED_INFO raises the flag on the finding and excludes
+   it from tally until resolved per S11 (peer provision or operator provision — the
+   orchestrator routes, never invents).
 6. **Convergence note (per agreement)** — "For any finding you converge with,
    mark **one short sentence in your own words** as your agreement note (same
    `PULL-QUOTE:`-style mark as Round 1). This is relayed verbatim under the
@@ -496,7 +516,9 @@ no original report to react with). Each gets:
 Word limit: 500–600.
 
 Phase 2 is **stage 3 (Vote)** of the gate primitive: PRIORITIZE / CONFIRM /
-OVER-RATE are the votes. After the reactions arrive, finalize each finding's severity
+OVER-RATE / NEED_INFO are the votes. Findings with open `NEED_INFO` enter the
+resolution cycle (`chorus-core/GATE-PRIMITIVE.md`) before tally. After reactions
+arrive and every open `NEED_INFO` is resolved, finalize each remaining finding's severity
 with the primitive's **deterministic stage-4 tally** — defined once in
 `chorus-core/GATE-PRIMITIVE.md` (Stage 4): `net = P − O` over non-author voters (CONFIRM
 excluded), compared against the **board-scaled threshold** defined there (it scales with
@@ -605,7 +627,7 @@ roster like any other abstention.
 |---|---|---|
 | Persona agent silent >5 min with large transcript | "Enumerate everything" mode | Kill, substitute with bounded `Explore` scan |
 | Findings dominated by legacy code | No exclusion gate | Phase 0 scope confirmation |
-| Reports return summaries only, no content | Agent wrote to its memory dir | Check `.claude/agent-memory/<persona>/`, `Read` any new files |
+| Reports return summaries only, no content | Agent wrote to its memory dir | Check `.agents/agent-memory/<persona>/`, `Read` any new files |
 | Agent opined without reading (project-specific claims with no `file:line` and not principle-grounded) | Brief did not mandate artefact-chain following, OR persona reasoned purely from training | Re-dispatch once with explicit "Read these artefacts first: …" amendment. Existing principles the persona invokes MUST cite where established (constitution clause, prior chorus finding, doc); new principles tag `[principle:proposed]`. Pure unsupported claims about the project get demoted to `[unsupported]` and excluded from the matrix. |
 | Phase 2 takes longer than Phase 1 | Briefs too open-ended | Tighter numbered questions, finding-IDs listed explicitly |
 | Conflicts unresolved after Phase 2 | Lens-vs-lens disagreement won't self-resolve | Single `advisor()` call beats another round |

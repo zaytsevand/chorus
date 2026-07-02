@@ -29,7 +29,7 @@ section() { printf '\n=== %s ===\n' "$1"; }
 # (bold token followed by a number then a period or word boundary), as used in
 # the catalog blocks. A "reference" is any other mention.
 def_regex_I='^\s*-?\s*\*\*I[1-9]\.'
-def_regex_S='^\s*-?\s*\*\*S(8|9|10)\b'
+def_regex_S='^\s*-?\s*\*\*S(8|9|10|11)\b'
 def_regex_D='^\s*-?\s*\*\*D[1-5]\b'
 
 # ---------------------------------------------------------------------------
@@ -38,11 +38,11 @@ def_regex_D='^\s*-?\s*\*\*D[1-5]\b'
 section "FC1 — invariant-resolution + residence (FR-008/FR-008a)"
 fc1=0
 
-# 1a. RESIDENCE: no I / D / S8–S10 *definition* outside chorus-core.
+# 1a. RESIDENCE: no I / D / S8–S11 *definition* outside chorus-core.
 for re in "$def_regex_I" "$def_regex_S" "$def_regex_D"; do
   hits="$(grep -rnE "$re" "$SKILL_DIR" 2>/dev/null | grep -v "^$CORE/" || true)"
   if [[ -n "$hits" ]]; then
-    note "RESIDENCE VIOLATION: I/D/S8–S10 token defined outside chorus-core:"
+    note "RESIDENCE VIOLATION: I/D/S8–S11 token defined outside chorus-core:"
     printf '%s\n' "$hits" | sed 's/^/    /'
     fc1=1
   fi
@@ -70,13 +70,13 @@ else
 fi
 # Same composition assertion for chorus-review (references I/S/D tokens).
 if ! grep -rqE 'REQUIRED:\s*chorus-core' "$REVIEW" 2>/dev/null; then
-  if grep -rqE '\b(I[1-9]|S(8|9|10)|D[1-5])\b' "$REVIEW" 2>/dev/null; then
+  if grep -rqE '\b(I[1-9]|S(8|9|10|11)|D[1-5])\b' "$REVIEW" 2>/dev/null; then
     note "RESOLUTION VIOLATION: chorus-review references core tokens but does not declare REQUIRED: chorus-core"
     fc1=1
   fi
 fi
 
-# 1d. NO-DANGLING: every I / D / S8–S10 token *referenced* anywhere in the suite
+# 1d. NO-DANGLING: every I / D / S8–S11 token *referenced* anywhere in the suite
 #     MUST have a definition line present in chorus-core. Catches the
 #     missing-CONDUCTOR (catalog deleted) case at the source level — a reference
 #     whose single definition is gone is a dangling token (FR-008).
@@ -94,7 +94,7 @@ for n in 1 2 3 4 5; do
     def_present "\*\*D$n\b" || { note "DANGLING TOKEN: D$n is referenced but has no definition in chorus-core"; fc1=1; }
   fi
 done
-for n in 8 9 10; do
+for n in 8 9 10 11; do
   if grep -rqE "\bS$n\b" "$SKILL_DIR" 2>/dev/null; then
     def_present "\*\*S$n\b" || { note "DANGLING TOKEN: S$n is referenced but has no definition in chorus-core"; fc1=1; }
   fi
@@ -111,11 +111,11 @@ done
 for n in 1 2 3 4 5; do
   def_present "\*\*D$n\b" || { note "CATALOG-INCOMPLETE: D$n has no definition in chorus-core"; fc1=1; }
 done
-for n in 8 9 10; do
+for n in 8 9 10 11; do
   def_present "\*\*S$n\b" || { note "CATALOG-INCOMPLETE: S$n has no definition in chorus-core"; fc1=1; }
 done
 
-if [[ $fc1 -eq 0 ]]; then note "PASS — full I/D/S8–S10 catalog present & defined in chorus-core; S1–S7 in chorus-sdlc; references resolve via composition; no dangling/incomplete tokens."; fi
+if [[ $fc1 -eq 0 ]]; then note "PASS — full I/D/S8–S11 catalog present & defined in chorus-core; S1–S7 in chorus-sdlc; references resolve via composition; no dangling/incomplete tokens."; fi
 [[ $fc1 -ne 0 ]] && fail=1
 
 # ---------------------------------------------------------------------------

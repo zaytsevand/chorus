@@ -158,7 +158,9 @@ out for that round), then the review runs four **stages** — extract → author
 vote → tally — and leaves a durable artifact you commit. (These review *stages*
 are not this tutorial's *steps*: a stage is one phase of a single review's
 machinery; a step is one screen of this tutorial.) The severity of each finding
-comes from the vote arithmetic, not from any one advisor — see
+comes from the vote arithmetic, not from any one advisor — unless a persona declares
+`confidence_on_hand: low` or raises `NEED_INFO` (formulation, remediation, or
+confidence gap), in which case tally waits for peer or operator resolution (`chorus-core/GATE-PRIMITIVE.md`, S11). See
 `chorus-core/GATE-PRIMITIVE.md` for the mechanic; this tutorial summarizes, it
 does not restate it.
 

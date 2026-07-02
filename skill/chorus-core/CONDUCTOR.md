@@ -136,6 +136,8 @@ it must not make.**
 | "This 🟡 is cheap to fold in" | a scope decision during incorporation | the spec runner via clarify; the operator's recorded default |
 | "The panel clearly means…" | speaking for a lens; inference is not a report | re-read the report; if silent, ask the persona |
 | "I'll summarize the vote as…" | synthesizing a vote (S9) | the tally arithmetic, verbatim |
+| "I'll guess the remediation for NEED_INFO" | resolving an information gap by invention (S11) | peer provision or operator provision; the orchestrator routes |
+| "I'll CONFIRM with hedges" | low-confidence severity vote dressed as agreement (S11) | declare `confidence_on_hand: low` and vote `NEED_INFO` |
 | "I'll summarize this finding as…" | restating a lens in the conductor's voice (I6) | the persona's **marked pull-quote**, relayed verbatim |
 | "I'll pick the best line from the report" | conductor excerpting — selecting a span is restating-lite | the persona marks its own pull-quote; route back if unmarked |
 | "Given the findings, the verdict is…" | judgment added to gating | post-tally 🔴 set, arithmetic only |
@@ -261,7 +263,7 @@ repaired. Siblings reference these tokens; they never redefine them.
   are catalogued in "The chair decides nothing" above. Permitted
   first-person verbs: *halt, route, refuse, record, count.*
 
-- **S8 / S9 / S10 (gate-primitive invariants — defined in `GATE-PRIMITIVE.md`).**
+- **S8 / S9 / S10 / S11 (gate-primitive invariants — defined in `GATE-PRIMITIVE.md`).**
   A review's stages are separated. **S8:** the author of a finding is never its
   grader — the Phase-2 vote is dispatched to *other* lenses (an author never
   votes on its own finding). **S9:** the integration layer never synthesizes a
@@ -269,9 +271,12 @@ repaired. Siblings reference these tokens; they never redefine them.
   *predicted* reaction is not a vote. **S10:** every persona names its gates —
   the needs it cannot honestly review without — and prompts for an unmet gate
   instead of inferring past it; dependent findings are conditional on the
-  stated assumption. These bind the review's Phases 1/2/4 exactly as
-  they bind the SDLC gates — the back-test that produced them showed
-  author-grades-self buries a lens.
+  stated assumption.   **S11:** when any persona raises `NEED_INFO` on a finding (at proposition or vote),
+  the orchestrator routes resolution through peer provision or operator provision only
+  — it never invents remediation or reformulates the finding; **`confidence_on_hand:
+  low` mandates `NEED_INFO`**; open `NEED_INFO` blocks tally until resolved.
+  These bind the review's Phases 1/2/4 exactly as they bind the SDLC gates —
+  the back-test that produced them showed author-grades-self buries a lens.
 
 - **D1–D5 (decision-primitive invariants — defined in `DECISION-PRIMITIVE.md`).**
   Operator-facing decisions are banded by a declared predicate, never inference (D1);
@@ -343,7 +348,7 @@ a contract across the boundary.
 ### Contract: agent-memory layout
 
 Per-lens persisted understanding lives at
-`.claude/agent-memory/<persona-name>/`. A persona writes its understanding
+`.agents/agent-memory/<persona-name>/`. A persona writes its understanding
 record there; the orchestrator reads any new file there after a dispatch (a
 persona's actual report may be written to memory and only summarized inline).
 This layout is the convention a future memory-update skill reads and writes.
@@ -381,11 +386,12 @@ from a chorus round's artifact:
 | Target locator | the `file:line` (or principle tag) anchor |
 | Summary / pull-quote | one-sentence, context-free summary (≤20 words); a verbatim pull-quote where a quote is carried |
 | Tag | `[principle]` / `[principle:proposed]` / `[unsupported]` |
+| need_info | per-finding flag (`need_info` + `need_info_reason` + `confidence_on_hand` + raiser) — when set, blocks tally until resolved per S11 |
 
 ### Agent-memory layout (the write targets)
 
 The callback's write targets are the agent-memory layout and two-tier memory
-model named above: `.claude/agent-memory/<persona>/` records (the index) and
+model named above: `.agents/agent-memory/<persona>/` records (the index) and
 the `CHORUS-PROJECT.md` "Project understanding" section (the authoritative
 base). A project declares **targets** and **policy** for the flow in its
 `CHORUS-PROJECT.md` findings→memory section (template carries it).

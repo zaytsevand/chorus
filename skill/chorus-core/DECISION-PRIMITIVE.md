@@ -151,6 +151,7 @@ rows 5/8/11 declare no auto-default; every 🟡 row names an override — gates 
 | 9 | Phase 0 scope/exclusion — addendum present | 🟢 | addendum file exists | deterministic |
 | 10 | Phase 0 scope/exclusion — addendum absent | 🟡 | no addendum | infer defaults + async confirm |
 | 11 | Final feature sign-off / 🔴 waiver | 🔴 | always | high-stakes — **no auto-default** |
+| 12 | `NEED_INFO` resolution routing | 🟡 | open `NEED_INFO` on a finding (including mandatory `confidence_on_hand: low`); peer path when another seated persona can supply the gap, else operator path | peer reply or operator context is recorded; author revises or confirms; reversible until tally |
 
 ## Invariants (D1–D5)
 

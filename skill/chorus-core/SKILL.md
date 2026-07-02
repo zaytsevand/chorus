@@ -43,16 +43,16 @@ Read the file whose mechanic you need; do not read all four eagerly.
 
 | File | What it defines | Tokens it owns |
 |---|---|---|
-| `GATE-PRIMITIVE.md` | the four-stage review mechanic (extract → uncapped author → real vote → deterministic tally) | `S8–S10` |
+| `GATE-PRIMITIVE.md` | the four-stage review mechanic (extract → uncapped author → real vote → deterministic tally) + `NEED_INFO` resolution | `S8–S11` |
 | `DECISION-PRIMITIVE.md` | operator-facing decision banding (🟢 auto / 🟡 default+async override / 🔴 hard-block), by declared catalog predicate | `D1–D5` |
 | `EXPLORATORY-PHASE.md` | per-lens persisted understanding; reference-first harvest; two-tier memory | — |
 | `CONDUCTOR.md` | EWD-340 methodology; conductor voice; "the chair decides nothing" + slippage table; discipline cascade; system-boundary refusals; **the single `I1–I9` invariant catalog**; reserved-seam + findings→memory contracts | `I1–I9` (single source) |
 
 ## Invariant residence (the single-source rule)
 
-`chorus-core` is the **single home** of `I1–I9` (CONDUCTOR.md), `S8–S10`
+`chorus-core` is the **single home** of `I1–I9` (CONDUCTOR.md), `S8–S11`
 (GATE-PRIMITIVE.md), and `D1–D5` (DECISION-PRIMITIVE.md). No suite skill may
-**define** any `I` / `D` / `S8–S10` token outside this directory; siblings only
+**define** any `I` / `D` / `S8–S11` token outside this directory; siblings only
 **reference** them via composition. The sole tokens permitted to live outside
 core are the lifecycle `S1–S7` (defined in `chorus-sdlc/SKILL.md`), and only as
 references that extend core's `I1–I9`. `scripts/check-suite-integrity.sh` FC1
