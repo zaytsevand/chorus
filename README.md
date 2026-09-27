@@ -282,8 +282,7 @@ version of this matrix — heatmap, radar, and per-axis breakdown — is at
 
 ## Install
 
-The suite is named **chorus**. (The repository is still
-`zaytsevand/chorus-review`; it will be renamed to `chorus`.) Both channels below
+The suite is named **chorus**. Both channels below
 deliver the same four skills (`chorus-core`, `chorus-review`, `chorus-sdlc`,
 `chorus-learn`, including their subfolders such as the addendum template) and
 the ten persona agents.
@@ -291,8 +290,8 @@ the ten persona agents.
 ### Clone + script
 
 ```sh
-git clone https://github.com/<your-org>/chorus-review.git
-cd chorus-review
+git clone https://github.com/zaytsevand/chorus.git
+cd chorus
 ./install.sh
 ```
 
