@@ -17,12 +17,12 @@
     {
       "id": "F1",
       "lens": "DDD",
-      "locator": "/home/az/code/zaytsevand/coryphaeus/SKILL.md:102",
+      "locator": "coryphaeus/SKILL.md:102",
       "claim": "'escalated' inverts across the seam. Chorus: a 🔴 decision must have resolution 'escalated', a hard block. Brief: bearing 'escalated' means a decision that does not block the goal, and rule 4 maps a chorus 🟡 to it. sdlc-log adds a third sense (loop bound reached). Rule 1's glossary translates tally, gate, lens, held, park and frame, but not the one word that flips.",
       "evidence": [
         {
           "kind": "file_line",
-          "ref": "/home/az/code/zaytsevand/coryphaeus/schema/decision.schema.json:107",
+          "ref": "coryphaeus/schema/decision.schema.json:107",
           "note": "band 🔴 forces resolution 'escalated'."
         },
         {
@@ -32,7 +32,7 @@
         },
         {
           "kind": "file_line",
-          "ref": "/home/az/code/zaytsevand/coryphaeus/schema/sdlc-log.schema.json:121",
+          "ref": "coryphaeus/schema/sdlc-log.schema.json:121",
           "note": "gate result 'escalated' is a third meaning."
         }
       ],
@@ -45,17 +45,17 @@
     {
       "id": "F2",
       "lens": "DDD",
-      "locator": "/home/az/code/zaytsevand/coryphaeus/schema/common.schema.json:232-239",
+      "locator": "coryphaeus/schema/common.schema.json:232-239",
       "claim": "In one matrix row, status 'held' means an open NEED_INFO, not counted in N. Movement 'hold' and 'agreed: held with CONFIRM votes' mean counted, |net| under T, severity unmoved. GATE-PRIMITIVE uses both senses within a few lines. These are the two states the Core most needs to keep apart.",
       "evidence": [
         {
           "kind": "file_line",
-          "ref": "/home/az/code/zaytsevand/chorus/.worktrees/suite-review/skill/chorus-core/GATE-PRIMITIVE.md:223-228",
+          "ref": "skill/chorus-core/GATE-PRIMITIVE.md:223-228",
           "note": "'hold author-proposed severity' and 'a finding held by CONFIRM' are the tally sense."
         },
         {
           "kind": "file_line",
-          "ref": "/home/az/code/zaytsevand/chorus/.worktrees/suite-review/skill/chorus-review/SKILL.md:322",
+          "ref": "skill/chorus-review/SKILL.md:322",
           "note": "'shown held, not graded' is the NEED_INFO sense."
         }
       ],
@@ -68,22 +68,22 @@
     {
       "id": "F3",
       "lens": "DDD",
-      "locator": "/home/az/code/zaytsevand/coryphaeus/schema/common.schema.json:147",
+      "locator": "coryphaeus/schema/common.schema.json:147",
       "claim": "ruling_ref carries three identities: ruling (R-n), brief entry (Q-n, reused as entry_ref) and operator reference. It accepts two spellings, bare 'R-3' and prefixed 'suite-review/R-3'. Ruling and brief ids are bare. Validator and renderer read '#' consistently, but the local lookup is an exact match, so a prefixed id never resolves. Remote refs are never dereferenced, so a prefixed id that matches nothing passes silently. The standing rulings prescribe the prefixed form.",
       "evidence": [
         {
           "kind": "file_line",
-          "ref": "/home/az/code/zaytsevand/coryphaeus/bin/validate.mjs:222-229",
+          "ref": "coryphaeus/bin/validate.mjs:222-229",
           "note": "'#' is resolved by exact id; a Q-n in ruling_ref only warns; remote records are not opened."
         },
         {
           "kind": "file_line",
-          "ref": "/home/az/code/zaytsevand/coryphaeus/schema/ruling.schema.json:11",
+          "ref": "coryphaeus/schema/ruling.schema.json:11",
           "note": "ruling ids are bare R-n."
         },
         {
           "kind": "file_line",
-          "ref": "/home/az/code/zaytsevand/chorus/.worktrees/suite-review/docs/reviews/pr32/standing-rulings.md:3",
+          "ref": "docs/reviews/pr32/standing-rulings.md:3",
           "note": "citers are told to write suite-review/R-3."
         }
       ],
@@ -95,17 +95,17 @@
     {
       "id": "F4",
       "lens": "DDD",
-      "locator": "/home/az/code/zaytsevand/coryphaeus/schema/decision.schema.json:5",
+      "locator": "coryphaeus/schema/decision.schema.json:5",
       "claim": "The decision and ruling shapes conform to the brief ('aligned', 'same meanings', 'field-for-field'). That is Conformist, and rightly so: the brief is upstream. It is not a Shared Kernel, since the chorus cannot change it. But the relationship is never named, and nothing guards it: no test or validator step loads the brief's schema, so upstream drift goes unnoticed.",
       "evidence": [
         {
           "kind": "file_line",
-          "ref": "/home/az/code/zaytsevand/coryphaeus/schema/decision.schema.json:86",
+          "ref": "coryphaeus/schema/decision.schema.json:86",
           "note": "status 'same meanings as a problem-brief entry's status', asserted, not checked."
         },
         {
           "kind": "file_line",
-          "ref": "/home/az/code/zaytsevand/coryphaeus/schema/ruling.schema.json:5",
+          "ref": "coryphaeus/schema/ruling.schema.json:5",
           "note": "ruling declared field-for-field the brief's."
         }
       ],
@@ -118,12 +118,12 @@
     {
       "id": "F5",
       "lens": "DDD",
-      "locator": "/home/az/code/zaytsevand/coryphaeus/SKILL.md:83-109",
+      "locator": "coryphaeus/SKILL.md:83-109",
       "claim": "Outbound, the rules are a real Anti-Corruption Layer: plain language, count before grouping, recommendation from the vote. Inbound, they cover only 'operator rules' and say nothing about a replaced ruling, a superseded entry, or a reopened entry, so the chorus ref can cite a dead ruling. Outbound, bearingReason and rolledUp have no source field, so 'mechanical' overstates it.",
       "evidence": [
         {
           "kind": "file_line",
-          "ref": "/home/az/code/zaytsevand/coryphaeus/schema/ruling.schema.json:18-19",
+          "ref": "coryphaeus/schema/ruling.schema.json:18-19",
           "note": "rulings can be replaced; no chorus rule follows."
         },
         {
@@ -140,12 +140,12 @@
     {
       "id": "F6",
       "lens": "DDD",
-      "locator": "/home/az/code/zaytsevand/chorus/.worktrees/suite-review/skill/chorus-core/GATE-PRIMITIVE.md:237",
+      "locator": "skill/chorus-core/GATE-PRIMITIVE.md:237",
       "claim": "The Core has one prose owner (Stage 4, six settled cases) and one executable pin (the validator, bound by role per Q-15). That is right, but nothing says which wins on disagreement, and the validator also enforces a brief-derived rule (recommended option first). Recommendation: rename the F1 and F2 terms at source; scope ruling_ref to rulings with one id spelling; write inbound translation for replaced and superseded; declare the brief upstream with a drift check; state that canon wins over validator.",
       "evidence": [
         {
           "kind": "file_line",
-          "ref": "/home/az/code/zaytsevand/coryphaeus/bin/validate.mjs:238",
+          "ref": "coryphaeus/bin/validate.mjs:238",
           "note": "brief-entry ordering enforced inside the decision check."
         }
       ],

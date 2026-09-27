@@ -18,8 +18,8 @@
       "claim": "The Stage-4 rule has two authors in two repos: GATE-PRIMITIVE prose and coryphaeus tally(). Q-14 aligned them once, but nothing fails when they drift again, because the tests hand-copy cases. Ruling: SANCTIONED DIVERGENCE, since the repo boundary is deliberate. GATE-PRIMITIVE owns the rule and tally() implements it. The price is a parity test: a machine-readable case table in GATE-PRIMITIVE that a coryphaeus test loads from the installed chorus-core, failing on any mismatch.",
       "evidence": [
         { "kind": "file_line", "ref": "skill/chorus-core/GATE-PRIMITIVE.md:207-240", "note": "The rule and six settled cases, in prose." },
-        { "kind": "file_line", "ref": "/home/az/code/zaytsevand/coryphaeus/bin/validate.mjs:172-183", "note": "tally() re-authors the same arithmetic." },
-        { "kind": "file_line", "ref": "/home/az/code/zaytsevand/coryphaeus/test/validate.test.mjs:39-43", "note": "Cases copied by hand; GATE-PRIMITIVE is never read." },
+        { "kind": "file_line", "ref": "coryphaeus/bin/validate.mjs:172-183", "note": "tally() re-authors the same arithmetic." },
+        { "kind": "file_line", "ref": "coryphaeus/test/validate.test.mjs:39-43", "note": "Cases copied by hand; GATE-PRIMITIVE is never read." },
         { "kind": "file_line", "ref": ".specify/memory/constitution.md:87", "note": "A tally rule appearing outside its canon doc is named as the smell." }
       ],
       "proposed_severity": "🔴",
@@ -36,7 +36,7 @@
       "evidence": [
         { "kind": "file_line", "ref": "skill/chorus-core/CONDUCTOR.md:274" },
         { "kind": "file_line", "ref": "skill/chorus-core/CONDUCTOR.md:278" },
-        { "kind": "file_line", "ref": "/home/az/code/zaytsevand/coryphaeus/SKILL.md:53-61", "note": "Its column is labelled Default (nothing bound) but it lists the bindings." }
+        { "kind": "file_line", "ref": "coryphaeus/SKILL.md:53-61", "note": "Its column is labelled Default (nothing bound) but it lists the bindings." }
       ],
       "proposed_severity": "🟡",
       "pull_quote": "The port contract is written twice and already reads two ways.",
@@ -50,7 +50,7 @@
       "claim": "Two texts decide what happens to a reply that fails validation. The chorus says ABSTAIN with no retry, and coryphaeus says send it back once. That policy belongs to the chorus, and the binding should not re-decide it. Ruling: CONSOLIDATE into the record-validator row of CONDUCTOR, carrying whatever A4 settles, and delete the policy sentence from coryphaeus.",
       "evidence": [
         { "kind": "file_line", "ref": "skill/chorus-review/SKILL.md:159-172" },
-        { "kind": "file_line", "ref": "/home/az/code/zaytsevand/coryphaeus/SKILL.md:42-44" }
+        { "kind": "file_line", "ref": "coryphaeus/SKILL.md:42-44" }
       ],
       "proposed_severity": "🟡",
       "pull_quote": "The provider is re-deciding a rule the chorus owns.",
@@ -61,12 +61,12 @@
     {
       "id": "F4",
       "lens": "architecture",
-      "locator": "/home/az/code/zaytsevand/coryphaeus/schema/finding-report.schema.json",
+      "locator": "coryphaeus/schema/finding-report.schema.json",
       "claim": "The cross-repo contract has no version. Every schema pins schema_version const '1', but the chorus canon names no expected version, and coryphaeus has no version, tag or remote. On a breaking schema change every reply fails, counts as ABSTAIN, and the round aborts on quorum. That is loud by accident, and the root cause sits buried in roster reasons. The port contract should state the schema major it expects, and the validator should report a mismatch as its own error.",
       "evidence": [
-        { "kind": "file_line", "ref": "/home/az/code/zaytsevand/coryphaeus/schema/finding-report.schema.json:11", "note": "schema_version const '1'." },
+        { "kind": "file_line", "ref": "coryphaeus/schema/finding-report.schema.json:11", "note": "schema_version const '1'." },
         { "kind": "file_line", "ref": "skill/chorus-core/CONDUCTOR.md:274", "note": "'the bound schema', with no version." },
-        { "kind": "file_line", "ref": "/home/az/code/zaytsevand/coryphaeus/install.sh:1-26", "note": "Plain copy, nothing versioned." }
+        { "kind": "file_line", "ref": "coryphaeus/install.sh:1-26", "note": "Plain copy, nothing versioned." }
       ],
       "proposed_severity": "🟡",
       "pull_quote": "A schema bump would read as ten abstentions, not as a version mismatch.",
@@ -122,7 +122,7 @@
       "claim": "Cost profile against A2. Conformance is bought properly, with code (R-3). Simplicity and portability pay: a Node runtime, two repos, two install channels. Evolvability pays through contract coupling: a tally change now means a lockstep edit across two repos with no tooling to make lockstep safe. Recommendation: accept the profile, but only with F1's parity test and F4's version check in the same change. Without them the conformance gain decays into drift.",
       "evidence": [
         { "kind": "file_line", "ref": "skill/chorus-core/CONDUCTOR.md:266-282" },
-        { "kind": "file_line", "ref": "/home/az/code/zaytsevand/coryphaeus/SKILL.md:29-37" }
+        { "kind": "file_line", "ref": "coryphaeus/SKILL.md:29-37" }
       ],
       "proposed_severity": "🟡",
       "pull_quote": "The right trade, as long as the drift alarms ship with it.",

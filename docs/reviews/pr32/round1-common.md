@@ -4,8 +4,8 @@ You are one of 5 advisors in a chorus review (Richards, Security-and-Trust, Evan
 Round context: docs/reviews/pr32/round-context.md. Out of scope (except for Security): specs/, tests/parity/,
 older docs/reviews/*; the boundary with them is in scope, their internals are not.
 
-Target: chorus PR #32 at /home/az/code/zaytsevand/chorus/.worktrees/suite-review (diff: git -C <path> diff main...HEAD)
-and coryphaeus at /home/az/code/zaytsevand/coryphaeus. Mode: design review of the approach and seams.
+Target: chorus PR #32 at the chorus repository (diff: git -C <path> diff main...HEAD)
+and coryphaeus at the coryphaeus repository. Mode: design review of the approach and seams.
 
 Working assumptions (operator questions queued in the operator's brief, not yet answered; state which finding
 depends on which in `conditional_on`):

@@ -33,7 +33,7 @@ Joiners: 9. Quorum: proceed. Seating decision: phase0-5-seating-1.
 | F1 | mark-richards-architect · architecture | 🔴 | `skill/chorus-core/GATE-PRIMITIVE.md:207-240` | "Two authors of the vote rule, and no alarm when they disagree." | high | — | true |
 | F2 | mark-richards-architect · architecture | 🟡 | `skill/chorus-core/CONDUCTOR.md:270-278` | "The port contract is written twice and already reads two ways." | high | — | true |
 | F3 | mark-richards-architect · architecture | 🟡 | `skill/chorus-review/SKILL.md:159-172` | "The provider is re-deciding a rule the chorus owns." | high | — | true |
-| F4 | mark-richards-architect · architecture | 🟡 | `/home/az/code/zaytsevand/coryphaeus/schema/finding-report.schema.json` | "A schema bump would read as ten abstentions, not as a version mismatch." | high | — | true |
+| F4 | mark-richards-architect · architecture | 🟡 | `coryphaeus/schema/finding-report.schema.json` | "A schema bump would read as ten abstentions, not as a version mismatch." | high | — | true |
 | F5 | mark-richards-architect · architecture | 🟡 | `.github/workflows/integrity.yml:1-25` | "The rule-checking program itself goes unchecked." | high | — | true |
 | F6 | mark-richards-architect · architecture | 🟢 | `.specify/memory/constitution.md:321-324` | "The direction is right today, and nothing keeps it right tomorrow." | high | — | true |
 | F7 | mark-richards-architect · architecture | 🟢 | `.claude-plugin/plugin.json:4-8` | "The manifest describes the previous version of the suite." | high | — | true |
@@ -42,15 +42,15 @@ Joiners: 9. Quorum: proceed. Seating decision: phase0-5-seating-1.
 | F10 | security-and-trust-advisor · security | 🟡 | `skill/chorus-core/CONDUCTOR.md:406-427` | "A filter that never ran now reads as zero drops." | high | — | true |
 | F11 | security-and-trust-advisor · security | 🟡 | `skill/chorus-core/CONDUCTOR.md:274` | "A missing validator fails quietly or blames the wrong party." | high | — | true |
 | F12 | security-and-trust-advisor · security | 🟢 | `install.sh:95-103` | "The two delete paths guard differently, and the weak one sets the rule." | high | — | true |
-| F13 | security-and-trust-advisor · security | 🟢 | `/home/az/code/zaytsevand/coryphaeus/bin/render.mjs:23` | "Valid JSON is not trusted content." | high | — | true |
+| F13 | security-and-trust-advisor · security | 🟢 | `coryphaeus/bin/render.mjs:23` | "Valid JSON is not trusted content." | high | — | true |
 | F14 | security-and-trust-advisor · security | 🟢 | `.github/workflows/integrity.yml:3-9` | "This CI has no secrets to leak, and that is correct." | high | — | true |
 | F15 | security-and-trust-advisor · security | 🟡 | `skill/chorus-core/DECISION-PRIMITIVE.md:235-237` | "The safety net catches the safer case and misses the worse one." | high | — | true |
-| F16 | eric-evans-advisor · ddd | 🟡 | `/home/az/code/zaytsevand/coryphaeus/SKILL.md:102` | "In the chorus 'escalated' means blocked; in the brief it means not blocking, and the glossary skips the one word that flips." | high | — | true |
-| F17 | eric-evans-advisor · ddd | 🟡 | `/home/az/code/zaytsevand/coryphaeus/schema/common.schema.json:232-239` | "One row can say held and hold, and they mean uncounted and counted-but-unmoved." | high | — | true |
-| F18 | eric-evans-advisor · ddd | 🟡 | `/home/az/code/zaytsevand/coryphaeus/schema/common.schema.json:147` | "The citation key has two spellings, and the reader matches only one of them, locally, and none remotely." | high | — | true |
-| F19 | eric-evans-advisor · ddd | 🟡 | `/home/az/code/zaytsevand/coryphaeus/schema/decision.schema.json:5` | "The chorus conforms to the brief, which is right, but nobody wrote it down or checks it." | high | — | true |
-| F20 | eric-evans-advisor · ddd | 🟡 | `/home/az/code/zaytsevand/coryphaeus/SKILL.md:83-109` | "The layer translates outbound well; inbound it only knows the day the operator says yes." | high | — | true |
-| F21 | eric-evans-advisor · ddd | 🟢 | `/home/az/code/zaytsevand/chorus/.worktrees/suite-review/skill/chorus-core/GATE-PRIMITIVE.md:237` | "The Core has one author and one enforcer; say which one wins, and keep the brief's rules out of it." | high | — | true |
+| F16 | eric-evans-advisor · ddd | 🟡 | `coryphaeus/SKILL.md:102` | "In the chorus 'escalated' means blocked; in the brief it means not blocking, and the glossary skips the one word that flips." | high | — | true |
+| F17 | eric-evans-advisor · ddd | 🟡 | `coryphaeus/schema/common.schema.json:232-239` | "One row can say held and hold, and they mean uncounted and counted-but-unmoved." | high | — | true |
+| F18 | eric-evans-advisor · ddd | 🟡 | `coryphaeus/schema/common.schema.json:147` | "The citation key has two spellings, and the reader matches only one of them, locally, and none remotely." | high | — | true |
+| F19 | eric-evans-advisor · ddd | 🟡 | `coryphaeus/schema/decision.schema.json:5` | "The chorus conforms to the brief, which is right, but nobody wrote it down or checks it." | high | — | true |
+| F20 | eric-evans-advisor · ddd | 🟡 | `coryphaeus/SKILL.md:83-109` | "The layer translates outbound well; inbound it only knows the day the operator says yes." | high | — | true |
+| F21 | eric-evans-advisor · ddd | 🟢 | `skill/chorus-core/GATE-PRIMITIVE.md:237` | "The Core has one author and one enforcer; say which one wins, and keep the brief's rules out of it." | high | — | true |
 | F22 | alan-cooper-advisor · user goals | 🟡 | `skill/chorus-review/SKILL.md:159-172` | "A seat can disappear mid-round and the operator finds out only from the record." | high | — | true |
 | F23 | alan-cooper-advisor · user goals | 🟡 | `skill/chorus-core/CONDUCTOR.md:274` | "The record promises to say 'unvalidated' and has no place to say it." | high | — | true |
 | F24 | alan-cooper-advisor · user goals | 🟡 | `install.sh:79-81` | "Dogfooding a release can leave last month's personas installed." | high | — | true |
@@ -65,14 +65,14 @@ Joiners: 9. Quorum: proceed. Seating decision: phase0-5-seating-1.
 | F33 | don-norman-advisor · human-centred design | 🟢 | `coryphaeus/bin/validate.mjs:536-540` | "Broken JSON is answered with a usage message, which points the fixer the wrong way." | high | — | true |
 | F34 | don-norman-advisor · human-centred design | 🟡 | `skill/chorus-review/SKILL.md:383-387` | "Unresolved for the operator is only a record, not a question the operator is asked." | high | — | true |
 | R2-1 | mark-richards-architect · architecture | 🟡 | `skill/chorus-core/CONDUCTOR.md:268` | "Nothing says how a port gets bound, so nothing can report it." | high | — | false [ungraded] |
-| R2-2 | mark-richards-architect · architecture | 🟡 | `/home/az/code/zaytsevand/coryphaeus/schema/ruling.schema.json:5` | "The ruling shape is copied field for field, and nothing notices when the original moves." | high | — | false [ungraded] |
-| R2-3 | security-and-trust-advisor · security | 🟡 | `/home/az/code/zaytsevand/coryphaeus/bin/validate.mjs:204-225` | "The operator's authority is cited by id, and nobody checks the id." | high | — | false [ungraded] |
+| R2-2 | mark-richards-architect · architecture | 🟡 | `coryphaeus/schema/ruling.schema.json:5` | "The ruling shape is copied field for field, and nothing notices when the original moves." | high | — | false [ungraded] |
+| R2-3 | security-and-trust-advisor · security | 🟡 | `coryphaeus/bin/validate.mjs:204-225` | "The operator's authority is cited by id, and nobody checks the id." | high | — | false [ungraded] |
 | R2-4 | security-and-trust-advisor · security | 🟢 | `install.sh:78-84` | "The chorus trusts the persona's name, not its text." | high | — | false [ungraded] |
-| R2-5 | eric-evans-advisor · ddd | 🟡 | `/home/az/code/zaytsevand/coryphaeus/SKILL.md:53` | "'Unbound' covers two states, and the round actually has three." | high | — | false [ungraded] |
+| R2-5 | eric-evans-advisor · ddd | 🟡 | `coryphaeus/SKILL.md:53` | "'Unbound' covers two states, and the round actually has three." | high | — | false [ungraded] |
 | R2-6 | alan-cooper-advisor · user goals | 🟡 | `install.sh:120-121` | "The installer tells the user to commit the file the next round does not read." | high | — | false [ungraded] |
 | R2-7 | alan-cooper-advisor · user goals | 🟡 | `skill/chorus-review/SKILL.md:220-223` | "The abort's advice is to wait, and waiting does not fix a broken validator." | high | — | false [ungraded] |
 | R2-8 | don-norman-advisor · human-centred design | 🟡 | `install.sh:79-81` | "Every agent file says 'keep', whether it is current or stale." | high | — | false [ungraded] |
-| R2-9 | don-norman-advisor · human-centred design | 🟡 | `/home/az/code/zaytsevand/coryphaeus/schema/common.schema.json:171` | "A single version mismatch is shown as five personas failing separately." | high | — | false [ungraded] |
+| R2-9 | don-norman-advisor · human-centred design | 🟡 | `coryphaeus/schema/common.schema.json:171` | "A single version mismatch is shown as five personas failing separately." | high | — | false [ungraded] |
 
 Converging lenses, in their own words:
 
@@ -192,9 +192,9 @@ No genuine conflicts this round; phase skipped.
    Cost low · Value: Turns recorded failures into questions the operator can answer; stops seats and conflicts vanishing silently. · Convergence 3
 2. **F10** 🔴 — "A filter that never ran now reads as zero drops." `skill/chorus-core/CONDUCTOR.md:406-427`
    Cost low · Value: A filter that never ran stops looking like a clean pass. · Convergence 3
-3. **F18** 🔴 — "The citation key has two spellings, and the reader matches only one of them, locally, and none remotely." `/home/az/code/zaytsevand/coryphaeus/schema/common.schema.json:147`
+3. **F18** 🔴 — "The citation key has two spellings, and the reader matches only one of them, locally, and none remotely." `coryphaeus/schema/common.schema.json:147`
    Cost medium · Value: Ruling references resolve in one spelling; operator answers found by lookup are real. · Convergence 2
-4. **F4** 🟡 — "A schema bump would read as ten abstentions, not as a version mismatch." `/home/az/code/zaytsevand/coryphaeus/schema/finding-report.schema.json`
+4. **F4** 🟡 — "A schema bump would read as ten abstentions, not as a version mismatch." `coryphaeus/schema/finding-report.schema.json`
    Cost medium · Value: A schema change fails as a version mismatch instead of five malformed seats and a quorum abort. · Convergence 4
 5. **F23** 🟡 — "The record promises to say 'unvalidated' and has no place to say it." `skill/chorus-core/CONDUCTOR.md:274`
    Cost low · Value: The operator learns before the round which ports are bound and what runs unvalidated. · Convergence 4
@@ -208,8 +208,8 @@ None.
 - **F1** 🔴 — "Two authors of the vote rule, and no alarm when they disagree." `skill/chorus-core/GATE-PRIMITIVE.md:207-240` (P 0 · C 0 · O 1)
 - **F8** 🟡 — "The right trade, as long as the drift alarms ship with it." `skill/chorus-core/CONDUCTOR.md:266-282` (P 0 · C 1 · O 0)
 - **F15** 🟡 — "The safety net catches the safer case and misses the worse one." `skill/chorus-core/DECISION-PRIMITIVE.md:235-237` (P 0 · C 1 · O 0)
-- **F19** 🟡 — "The chorus conforms to the brief, which is right, but nobody wrote it down or checks it." `/home/az/code/zaytsevand/coryphaeus/schema/decision.schema.json:5` (P 0 · C 1 · O 0)
-- **F21** 🟢 — "The Core has one author and one enforcer; say which one wins, and keep the brief's rules out of it." `/home/az/code/zaytsevand/chorus/.worktrees/suite-review/skill/chorus-core/GATE-PRIMITIVE.md:237` (P 1 · C 0 · O 0)
+- **F19** 🟡 — "The chorus conforms to the brief, which is right, but nobody wrote it down or checks it." `coryphaeus/schema/decision.schema.json:5` (P 0 · C 1 · O 0)
+- **F21** 🟢 — "The Core has one author and one enforcer; say which one wins, and keep the brief's rules out of it." `skill/chorus-core/GATE-PRIMITIVE.md:237` (P 1 · C 0 · O 0)
 - **F27** 🟡 — "The deferral check still fires, but nobody is assigned to write the strip." `skill/chorus-core/DECISION-PRIMITIVE.md:179,226` (P 0 · C 1 · O 0)
 
 ## 8. Next-chorus baseline

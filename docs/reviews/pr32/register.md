@@ -18,7 +18,7 @@
 - Conditional on: A4: one retry, then fail loudly
 
 ## F4 🟡 — mark-richards-architect (r1/richards.json#F4)
-- Locator: `/home/az/code/zaytsevand/coryphaeus/schema/finding-report.schema.json`
+- Locator: `coryphaeus/schema/finding-report.schema.json`
 - PULL-QUOTE (mark-richards-architect): "A schema bump would read as ten abstentions, not as a version mismatch."
 - Claim: The cross-repo contract has no version. Every schema pins schema_version const '1', but the chorus canon names no expected version, and coryphaeus has no version, tag or remote. On a breaking schema change every reply fails, counts as ABSTAIN, and the round aborts on quorum. That is loud by accident, and the root cause sits buried in roster reasons. The port contract should state the schema major it expects, and the validator should report a mismatch as its own error.
 - Conditional on: A1 and A4
@@ -68,7 +68,7 @@
 - Claim: The prune loop deletes paths read from the old manifest with no absolute-path or '..' guard, and uninstall.sh has that guard. It crosses no boundary today: anyone who can write the manifest can already write ~/.claude hooks. The weaker of the two copies is still the one that sets the effective rule.
 
 ## F13 🟢 — security-and-trust-advisor (r1/security.json#F5)
-- Locator: `/home/az/code/zaytsevand/coryphaeus/bin/render.mjs:23`
+- Locator: `coryphaeus/bin/render.mjs:23`
 - PULL-QUOTE (security-and-trust-advisor): "Valid JSON is not trusted content."
 - Claim: Agent-authored strings go into the markdown raw. Only table cells escape '|' and newlines. GitHub and VS Code sanitise HTML in markdown, so for a private operator the risk is not worth an escaping layer. The real point is that validation checks the shape of a reply, not whether its content can be trusted.
 - Conditional on: A1 solo operator
@@ -85,35 +85,35 @@
 - Claim: The trust-boundary column survived the move (line 201), and row 12 is still 🔴. But once the mandate is gone, the only route to a security lens is self-selection plus a side-note that fires only when enforcement is server-bound. A completed row naming edge enforcement, the more dangerous case, triggers nothing. Recommendation: fire the side-note on any cross-user deferral when no security lens is seated. For F1, recover memory files as recall only. For F2, render a missing count as 'not run'. For F3, have the conductor run the validator on a known-good example first.
 
 ## F16 🟡 — eric-evans-advisor (r1/evans.json#F1)
-- Locator: `/home/az/code/zaytsevand/coryphaeus/SKILL.md:102`
+- Locator: `coryphaeus/SKILL.md:102`
 - PULL-QUOTE (eric-evans-advisor): "In the chorus 'escalated' means blocked; in the brief it means not blocking, and the glossary skips the one word that flips."
 - Claim: 'escalated' inverts across the seam. Chorus: a 🔴 decision must have resolution 'escalated', a hard block. Brief: bearing 'escalated' means a decision that does not block the goal, and rule 4 maps a chorus 🟡 to it. sdlc-log adds a third sense (loop bound reached). Rule 1's glossary translates tally, gate, lens, held, park and frame, but not the one word that flips.
 - Conditional on: A3: the decision contract is Core
 
 ## F17 🟡 — eric-evans-advisor (r1/evans.json#F2)
-- Locator: `/home/az/code/zaytsevand/coryphaeus/schema/common.schema.json:232-239`
+- Locator: `coryphaeus/schema/common.schema.json:232-239`
 - PULL-QUOTE (eric-evans-advisor): "One row can say held and hold, and they mean uncounted and counted-but-unmoved."
 - Claim: In one matrix row, status 'held' means an open NEED_INFO, not counted in N. Movement 'hold' and 'agreed: held with CONFIRM votes' mean counted, |net| under T, severity unmoved. GATE-PRIMITIVE uses both senses within a few lines. These are the two states the Core most needs to keep apart.
 - Conditional on: A3: vote counting is Core
 
 ## F18 🟡 — eric-evans-advisor (r1/evans.json#F3)
-- Locator: `/home/az/code/zaytsevand/coryphaeus/schema/common.schema.json:147`
+- Locator: `coryphaeus/schema/common.schema.json:147`
 - PULL-QUOTE (eric-evans-advisor): "The citation key has two spellings, and the reader matches only one of them, locally, and none remotely."
 - Claim: ruling_ref carries three identities: ruling (R-n), brief entry (Q-n, reused as entry_ref) and operator reference. It accepts two spellings, bare 'R-3' and prefixed 'suite-review/R-3'. Ruling and brief ids are bare. Validator and renderer read '#' consistently, but the local lookup is an exact match, so a prefixed id never resolves. Remote refs are never dereferenced, so a prefixed id that matches nothing passes silently. The standing rulings prescribe the prefixed form.
 
 ## F19 🟡 — eric-evans-advisor (r1/evans.json#F4)
-- Locator: `/home/az/code/zaytsevand/coryphaeus/schema/decision.schema.json:5`
+- Locator: `coryphaeus/schema/decision.schema.json:5`
 - PULL-QUOTE (eric-evans-advisor): "The chorus conforms to the brief, which is right, but nobody wrote it down or checks it."
 - Claim: The decision and ruling shapes conform to the brief ('aligned', 'same meanings', 'field-for-field'). That is Conformist, and rightly so: the brief is upstream. It is not a Shared Kernel, since the chorus cannot change it. But the relationship is never named, and nothing guards it: no test or validator step loads the brief's schema, so upstream drift goes unnoticed.
 - Conditional on: A2: evolvability ranks second
 
 ## F20 🟡 — eric-evans-advisor (r1/evans.json#F5)
-- Locator: `/home/az/code/zaytsevand/coryphaeus/SKILL.md:83-109`
+- Locator: `coryphaeus/SKILL.md:83-109`
 - PULL-QUOTE (eric-evans-advisor): "The layer translates outbound well; inbound it only knows the day the operator says yes."
 - Claim: Outbound, the rules are a real Anti-Corruption Layer: plain language, count before grouping, recommendation from the vote. Inbound, they cover only 'operator rules' and say nothing about a replaced ruling, a superseded entry, or a reopened entry, so the chorus ref can cite a dead ruling. Outbound, bearingReason and rolledUp have no source field, so 'mechanical' overstates it.
 
 ## F21 🟢 — eric-evans-advisor (r1/evans.json#F6)
-- Locator: `/home/az/code/zaytsevand/chorus/.worktrees/suite-review/skill/chorus-core/GATE-PRIMITIVE.md:237`
+- Locator: `skill/chorus-core/GATE-PRIMITIVE.md:237`
 - PULL-QUOTE (eric-evans-advisor): "The Core has one author and one enforcer; say which one wins, and keep the brief's rules out of it."
 - Claim: The Core has one prose owner (Stage 4, six settled cases) and one executable pin (the validator, bound by role per Q-15). That is right, but nothing says which wins on disagreement, and the validator also enforces a brief-derived rule (recommended option first). Recommendation: rename the F1 and F2 terms at source; scope ruling_ref to rulings with one id spelling; write inbound translation for replaced and superseded; declare the brief upstream with a drift check; state that canon wins over validator.
 - Conditional on: A3: vote counting is Core

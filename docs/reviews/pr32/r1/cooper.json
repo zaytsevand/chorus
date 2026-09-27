@@ -21,7 +21,7 @@
       "claim": "Counting a rejected reply as ABSTAIN helps the conductor, which gets one rule with no branches. The operator pays for it: a seat drops out, quorum can fall, and the only recovery is reading the roster after the round is over. Nothing tells the operator during the round and there is no way to re-dispatch. The two texts also disagree: coryphaeus sends the reply back once, chorus-review does not.",
       "evidence": [
         { "kind": "file_line", "ref": "skill/chorus-review/SKILL.md:159-163", "note": "One failure rule: rejected output counts as ABSTAIN, reason written to the roster, no retry mentioned." },
-        { "kind": "file_line", "ref": "/home/az/code/zaytsevand/coryphaeus/SKILL.md:42-44", "note": "An invalid reply goes back to the persona once, then counts as ABSTAIN." }
+        { "kind": "file_line", "ref": "coryphaeus/SKILL.md:42-44", "note": "An invalid reply goes back to the persona once, then counts as ABSTAIN." }
       ],
       "proposed_severity": "🟡",
       "pull_quote": "A seat can disappear mid-round and the operator finds out only from the record.",
@@ -37,7 +37,7 @@
       "evidence": [
         { "kind": "file_line", "ref": "skill/chorus-core/CONDUCTOR.md:268-276", "note": "Unbound defaults: 'unvalidated', 'unrendered'; 'the round record says so'." },
         { "kind": "file_line", "ref": "skill/chorus-review/SKILL.md:176-196", "note": "Phase 0 post-conditions: scope, date and round context; nothing about port bindings." },
-        { "kind": "file_line", "ref": "/home/az/code/zaytsevand/coryphaeus/schema/review-record.schema.json:8", "note": "The required fields include no binding or validation status." }
+        { "kind": "file_line", "ref": "coryphaeus/schema/review-record.schema.json:8", "note": "The required fields include no binding or validation status." }
       ],
       "proposed_severity": "🟡",
       "pull_quote": "The record promises to say 'unvalidated' and has no place to say it.",
@@ -80,7 +80,7 @@
       "claim": "Neither the chorus installer nor its README mentions coryphaeus or Node. An outside installer gets only the unvalidated, hand-written defaults and nothing points them to the program that makes the record trustworthy.",
       "evidence": [
         { "kind": "file_line", "ref": "install.sh:113-118", "note": "'Next:' steps mention the addendum and 'spawn the chorus' only." },
-        { "kind": "file_line", "ref": "/home/az/code/zaytsevand/coryphaeus/install.sh:14", "note": "Only warns when Node is missing." }
+        { "kind": "file_line", "ref": "coryphaeus/install.sh:14", "note": "Only warns when Node is missing." }
       ],
       "proposed_severity": "🟢",
       "pull_quote": "The installer never mentions the validator the whole redesign rests on.",
@@ -109,7 +109,7 @@
       "claim": "The JSON is for the tooling and the rendered page is for the operator, and that split is right. The register is 'the single human-facing source of truth', and the roster shows each failure-rule abstention with a typed reason. The page is enough for someone who never opens the JSON, except that it cannot say whether the round was validated. Recommendation: add a required bindings block (port, bound or default, and the default's consequence) to review-record, print it in page section 2, and have Phase 0 announce unbound ports before the RSVP.",
       "evidence": [
         { "kind": "file_line", "ref": "skill/chorus-review/SKILL.md:423-433", "note": "Page order: roster with abstainers and reasons." },
-        { "kind": "file_line", "ref": "/home/az/code/zaytsevand/coryphaeus/schema/common.schema.json:170-171", "note": "rsvp_row failure enum." }
+        { "kind": "file_line", "ref": "coryphaeus/schema/common.schema.json:170-171", "note": "rsvp_row failure enum." }
       ],
       "proposed_severity": "🟢",
       "pull_quote": "The page serves the operator well, except it cannot say whether the round was validated.",

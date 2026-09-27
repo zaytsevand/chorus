@@ -31,8 +31,8 @@
       "locator": "skill/chorus-core/CONDUCTOR.md:406-427",
       "claim": "The secret pre-filter's only evidence is secret_drops, an integer the conductor reports about itself. render.mjs prints a missing value as 0, so a filter that never ran looks like a clean pass. The 'no runtime' justification is stale under constitution 2.0.0. Review-mode persona memory writes, which are committed, are never routed through the filter.",
       "evidence": [
-        { "kind": "file_line", "ref": "/home/az/code/zaytsevand/coryphaeus/bin/render.mjs:189", "note": "secret_drops ?? 0" },
-        { "kind": "file_line", "ref": "/home/az/code/zaytsevand/coryphaeus/schema/sdlc-log.schema.json:154", "note": "Optional integer, self-reported." },
+        { "kind": "file_line", "ref": "coryphaeus/bin/render.mjs:189", "note": "secret_drops ?? 0" },
+        { "kind": "file_line", "ref": "coryphaeus/schema/sdlc-log.schema.json:154", "note": "Optional integer, self-reported." },
         { "kind": "file_line", "ref": "skill/chorus-core/CONDUCTOR.md:424-426", "note": "'No runtime: the skill has none'." },
         { "kind": "file_line", "ref": ".specify/memory/constitution.md:306-309", "note": "Programs now live outside the canon." }
       ],
@@ -48,8 +48,8 @@
       "locator": "skill/chorus-core/CONDUCTOR.md:274",
       "claim": "The validator's default is fail-open ('the round runs, unvalidated'). Nothing pins which coryphaeus version the chorus canon expects. coryphaeus is local-only, with no remote and no CI, and its installer only warns when node is missing. A node-missing exit of 127 falls outside the 0/1/2 contract, so the conductor either reads it as unbound, and the round runs silently unvalidated, or counts every reply as ABSTAIN and blames the personas.",
       "evidence": [
-        { "kind": "file_line", "ref": "/home/az/code/zaytsevand/coryphaeus/install.sh:14", "note": "Missing node is only a warning." },
-        { "kind": "file_line", "ref": "/home/az/code/zaytsevand/coryphaeus/bin/validate.mjs:540", "note": "Exit contract is 0/1/2 only." },
+        { "kind": "file_line", "ref": "coryphaeus/install.sh:14", "note": "Missing node is only a warning." },
+        { "kind": "file_line", "ref": "coryphaeus/bin/validate.mjs:540", "note": "Exit contract is 0/1/2 only." },
         { "kind": "file_line", "ref": "skill/chorus-review/SKILL.md:159-163", "note": "Every failure is treated as ABSTAIN." }
       ],
       "proposed_severity": "🟡",
@@ -75,10 +75,10 @@
     {
       "id": "F5",
       "lens": "security",
-      "locator": "/home/az/code/zaytsevand/coryphaeus/bin/render.mjs:23",
+      "locator": "coryphaeus/bin/render.mjs:23",
       "claim": "Agent-authored strings go into the markdown raw. Only table cells escape '|' and newlines. GitHub and VS Code sanitise HTML in markdown, so for a private operator the risk is not worth an escaping layer. The real point is that validation checks the shape of a reply, not whether its content can be trusted.",
       "evidence": [
-        { "kind": "file_line", "ref": "/home/az/code/zaytsevand/coryphaeus/bin/render.mjs:40-56" }
+        { "kind": "file_line", "ref": "coryphaeus/bin/render.mjs:40-56" }
       ],
       "proposed_severity": "🟢",
       "pull_quote": "Valid JSON is not trusted content.",

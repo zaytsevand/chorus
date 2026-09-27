@@ -3,8 +3,8 @@
 Mode: design review of the PR's approach and seams, not a line-by-line diff review.
 
 Target: chorus PR #32 (https://github.com/zaytsevand/chorus/pull/32, branch suite-review/integration,
-worktree /home/az/code/zaytsevand/chorus/.worktrees/suite-review; ~40 files, +1.4k/-2.2k vs main 29e6e16)
-and the new root-skill repo coryphaeus (/home/az/code/zaytsevand/coryphaeus, local, 63 node tests).
+worktree the chorus repository; ~40 files, +1.4k/-2.2k vs main 29e6e16)
+and the new root-skill repo coryphaeus (the coryphaeus repository, local, 63 node tests).
 
 Concrete deltas since the last chorus:
 1. chorus-core/CONDUCTOR.md § Ports: seven declared ports (decision sink, ruling lookup, record validator,

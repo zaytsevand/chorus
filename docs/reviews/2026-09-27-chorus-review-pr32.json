@@ -21,12 +21,12 @@
     },
     {
      "kind": "file_line",
-     "ref": "/home/az/code/zaytsevand/coryphaeus/bin/validate.mjs:172-183",
+     "ref": "coryphaeus/bin/validate.mjs:172-183",
      "note": "tally() re-authors the same arithmetic."
     },
     {
      "kind": "file_line",
-     "ref": "/home/az/code/zaytsevand/coryphaeus/test/validate.test.mjs:39-43",
+     "ref": "coryphaeus/test/validate.test.mjs:39-43",
      "note": "Cases copied by hand; GATE-PRIMITIVE is never read."
     },
     {
@@ -57,7 +57,7 @@
     },
     {
      "kind": "file_line",
-     "ref": "/home/az/code/zaytsevand/coryphaeus/SKILL.md:53-61",
+     "ref": "coryphaeus/SKILL.md:53-61",
      "note": "Its column is labelled Default (nothing bound) but it lists the bindings."
     }
    ],
@@ -93,7 +93,7 @@
     },
     {
      "kind": "file_line",
-     "ref": "/home/az/code/zaytsevand/coryphaeus/SKILL.md:42-44"
+     "ref": "coryphaeus/SKILL.md:42-44"
     }
    ],
    "confidence_on_hand": "high",
@@ -115,12 +115,12 @@
    "author": "mark-richards-architect",
    "lens": "architecture",
    "authored_severity": "🟡",
-   "locator": "/home/az/code/zaytsevand/coryphaeus/schema/finding-report.schema.json",
+   "locator": "coryphaeus/schema/finding-report.schema.json",
    "pull_quote": "A schema bump would read as ten abstentions, not as a version mismatch.",
    "evidence": [
     {
      "kind": "file_line",
-     "ref": "/home/az/code/zaytsevand/coryphaeus/schema/finding-report.schema.json:11",
+     "ref": "coryphaeus/schema/finding-report.schema.json:11",
      "note": "schema_version const '1'."
     },
     {
@@ -130,7 +130,7 @@
     },
     {
      "kind": "file_line",
-     "ref": "/home/az/code/zaytsevand/coryphaeus/install.sh:1-26",
+     "ref": "coryphaeus/install.sh:1-26",
      "note": "Plain copy, nothing versioned."
     }
    ],
@@ -237,7 +237,7 @@
     },
     {
      "kind": "file_line",
-     "ref": "/home/az/code/zaytsevand/coryphaeus/SKILL.md:29-37"
+     "ref": "coryphaeus/SKILL.md:29-37"
     }
    ],
    "confidence_on_hand": "high",
@@ -288,12 +288,12 @@
    "evidence": [
     {
      "kind": "file_line",
-     "ref": "/home/az/code/zaytsevand/coryphaeus/bin/render.mjs:189",
+     "ref": "coryphaeus/bin/render.mjs:189",
      "note": "secret_drops ?? 0"
     },
     {
      "kind": "file_line",
-     "ref": "/home/az/code/zaytsevand/coryphaeus/schema/sdlc-log.schema.json:154",
+     "ref": "coryphaeus/schema/sdlc-log.schema.json:154",
      "note": "Optional integer, self-reported."
     },
     {
@@ -327,12 +327,12 @@
    "evidence": [
     {
      "kind": "file_line",
-     "ref": "/home/az/code/zaytsevand/coryphaeus/install.sh:14",
+     "ref": "coryphaeus/install.sh:14",
      "note": "Missing node is only a warning."
     },
     {
      "kind": "file_line",
-     "ref": "/home/az/code/zaytsevand/coryphaeus/bin/validate.mjs:540",
+     "ref": "coryphaeus/bin/validate.mjs:540",
      "note": "Exit contract is 0/1/2 only."
     },
     {
@@ -382,12 +382,12 @@
    "author": "security-and-trust-advisor",
    "lens": "security",
    "authored_severity": "🟢",
-   "locator": "/home/az/code/zaytsevand/coryphaeus/bin/render.mjs:23",
+   "locator": "coryphaeus/bin/render.mjs:23",
    "pull_quote": "Valid JSON is not trusted content.",
    "evidence": [
     {
      "kind": "file_line",
-     "ref": "/home/az/code/zaytsevand/coryphaeus/bin/render.mjs:40-56"
+     "ref": "coryphaeus/bin/render.mjs:40-56"
     }
    ],
    "confidence_on_hand": "high",
@@ -443,12 +443,12 @@
    "author": "eric-evans-advisor",
    "lens": "ddd",
    "authored_severity": "🟡",
-   "locator": "/home/az/code/zaytsevand/coryphaeus/SKILL.md:102",
+   "locator": "coryphaeus/SKILL.md:102",
    "pull_quote": "In the chorus 'escalated' means blocked; in the brief it means not blocking, and the glossary skips the one word that flips.",
    "evidence": [
     {
      "kind": "file_line",
-     "ref": "/home/az/code/zaytsevand/coryphaeus/schema/decision.schema.json:107",
+     "ref": "coryphaeus/schema/decision.schema.json:107",
      "note": "band 🔴 forces resolution 'escalated'."
     },
     {
@@ -458,7 +458,7 @@
     },
     {
      "kind": "file_line",
-     "ref": "/home/az/code/zaytsevand/coryphaeus/schema/sdlc-log.schema.json:121",
+     "ref": "coryphaeus/schema/sdlc-log.schema.json:121",
      "note": "gate result 'escalated' is a third meaning."
     }
    ],
@@ -471,17 +471,17 @@
    "author": "eric-evans-advisor",
    "lens": "ddd",
    "authored_severity": "🟡",
-   "locator": "/home/az/code/zaytsevand/coryphaeus/schema/common.schema.json:232-239",
+   "locator": "coryphaeus/schema/common.schema.json:232-239",
    "pull_quote": "One row can say held and hold, and they mean uncounted and counted-but-unmoved.",
    "evidence": [
     {
      "kind": "file_line",
-     "ref": "/home/az/code/zaytsevand/chorus/.worktrees/suite-review/skill/chorus-core/GATE-PRIMITIVE.md:223-228",
+     "ref": "skill/chorus-core/GATE-PRIMITIVE.md:223-228",
      "note": "'hold author-proposed severity' and 'a finding held by CONFIRM' are the tally sense."
     },
     {
      "kind": "file_line",
-     "ref": "/home/az/code/zaytsevand/chorus/.worktrees/suite-review/skill/chorus-review/SKILL.md:322",
+     "ref": "skill/chorus-review/SKILL.md:322",
      "note": "'shown held, not graded' is the NEED_INFO sense."
     }
    ],
@@ -500,22 +500,22 @@
    "author": "eric-evans-advisor",
    "lens": "ddd",
    "authored_severity": "🟡",
-   "locator": "/home/az/code/zaytsevand/coryphaeus/schema/common.schema.json:147",
+   "locator": "coryphaeus/schema/common.schema.json:147",
    "pull_quote": "The citation key has two spellings, and the reader matches only one of them, locally, and none remotely.",
    "evidence": [
     {
      "kind": "file_line",
-     "ref": "/home/az/code/zaytsevand/coryphaeus/bin/validate.mjs:222-229",
+     "ref": "coryphaeus/bin/validate.mjs:222-229",
      "note": "'#' is resolved by exact id; a Q-n in ruling_ref only warns; remote records are not opened."
     },
     {
      "kind": "file_line",
-     "ref": "/home/az/code/zaytsevand/coryphaeus/schema/ruling.schema.json:11",
+     "ref": "coryphaeus/schema/ruling.schema.json:11",
      "note": "ruling ids are bare R-n."
     },
     {
      "kind": "file_line",
-     "ref": "/home/az/code/zaytsevand/chorus/.worktrees/suite-review/docs/reviews/pr32/standing-rulings.md:3",
+     "ref": "docs/reviews/pr32/standing-rulings.md:3",
      "note": "citers are told to write suite-review/R-3."
     }
    ],
@@ -534,17 +534,17 @@
    "author": "eric-evans-advisor",
    "lens": "ddd",
    "authored_severity": "🟡",
-   "locator": "/home/az/code/zaytsevand/coryphaeus/schema/decision.schema.json:5",
+   "locator": "coryphaeus/schema/decision.schema.json:5",
    "pull_quote": "The chorus conforms to the brief, which is right, but nobody wrote it down or checks it.",
    "evidence": [
     {
      "kind": "file_line",
-     "ref": "/home/az/code/zaytsevand/coryphaeus/schema/decision.schema.json:86",
+     "ref": "coryphaeus/schema/decision.schema.json:86",
      "note": "status 'same meanings as a problem-brief entry's status', asserted, not checked."
     },
     {
      "kind": "file_line",
-     "ref": "/home/az/code/zaytsevand/coryphaeus/schema/ruling.schema.json:5",
+     "ref": "coryphaeus/schema/ruling.schema.json:5",
      "note": "ruling declared field-for-field the brief's."
     }
    ],
@@ -563,12 +563,12 @@
    "author": "eric-evans-advisor",
    "lens": "ddd",
    "authored_severity": "🟡",
-   "locator": "/home/az/code/zaytsevand/coryphaeus/SKILL.md:83-109",
+   "locator": "coryphaeus/SKILL.md:83-109",
    "pull_quote": "The layer translates outbound well; inbound it only knows the day the operator says yes.",
    "evidence": [
     {
      "kind": "file_line",
-     "ref": "/home/az/code/zaytsevand/coryphaeus/schema/ruling.schema.json:18-19",
+     "ref": "coryphaeus/schema/ruling.schema.json:18-19",
      "note": "rulings can be replaced; no chorus rule follows."
     },
     {
@@ -586,12 +586,12 @@
    "author": "eric-evans-advisor",
    "lens": "ddd",
    "authored_severity": "🟢",
-   "locator": "/home/az/code/zaytsevand/chorus/.worktrees/suite-review/skill/chorus-core/GATE-PRIMITIVE.md:237",
+   "locator": "skill/chorus-core/GATE-PRIMITIVE.md:237",
    "pull_quote": "The Core has one author and one enforcer; say which one wins, and keep the brief's rules out of it.",
    "evidence": [
     {
      "kind": "file_line",
-     "ref": "/home/az/code/zaytsevand/coryphaeus/bin/validate.mjs:238",
+     "ref": "coryphaeus/bin/validate.mjs:238",
      "note": "brief-entry ordering enforced inside the decision check."
     }
    ],
@@ -620,7 +620,7 @@
     },
     {
      "kind": "file_line",
-     "ref": "/home/az/code/zaytsevand/coryphaeus/SKILL.md:42-44",
+     "ref": "coryphaeus/SKILL.md:42-44",
      "note": "An invalid reply goes back to the persona once, then counts as ABSTAIN."
     }
    ],
@@ -654,7 +654,7 @@
     },
     {
      "kind": "file_line",
-     "ref": "/home/az/code/zaytsevand/coryphaeus/schema/review-record.schema.json:8",
+     "ref": "coryphaeus/schema/review-record.schema.json:8",
      "note": "The required fields include no binding or validation status."
     }
    ],
@@ -742,7 +742,7 @@
     },
     {
      "kind": "file_line",
-     "ref": "/home/az/code/zaytsevand/coryphaeus/install.sh:14",
+     "ref": "coryphaeus/install.sh:14",
      "note": "Only warns when Node is missing."
     }
    ],
@@ -788,7 +788,7 @@
     },
     {
      "kind": "file_line",
-     "ref": "/home/az/code/zaytsevand/coryphaeus/schema/common.schema.json:170-171",
+     "ref": "coryphaeus/schema/common.schema.json:170-171",
      "note": "rsvp_row failure enum."
     }
    ],
@@ -997,7 +997,7 @@
     },
     {
      "kind": "file_line",
-     "ref": "/home/az/code/zaytsevand/coryphaeus/SKILL.md:1-10",
+     "ref": "coryphaeus/SKILL.md:1-10",
      "note": "Binding reaches the session only through the skill description."
     }
    ],
@@ -1011,12 +1011,12 @@
    "author": "mark-richards-architect",
    "lens": "architecture",
    "authored_severity": "🟡",
-   "locator": "/home/az/code/zaytsevand/coryphaeus/schema/ruling.schema.json:5",
+   "locator": "coryphaeus/schema/ruling.schema.json:5",
    "pull_quote": "The ruling shape is copied field for field, and nothing notices when the original moves.",
    "evidence": [
     {
      "kind": "file_line",
-     "ref": "/home/az/code/zaytsevand/coryphaeus/schema/ruling.schema.json:5-11"
+     "ref": "coryphaeus/schema/ruling.schema.json:5-11"
     },
     {
      "kind": "file_line",
@@ -1024,7 +1024,7 @@
     },
     {
      "kind": "file_line",
-     "ref": "/home/az/code/zaytsevand/coryphaeus/test/validate.test.mjs:120",
+     "ref": "coryphaeus/test/validate.test.mjs:120",
      "note": "The only ruling test, and it never loads the brief schema."
     }
    ],
@@ -1038,12 +1038,12 @@
    "author": "security-and-trust-advisor",
    "lens": "security",
    "authored_severity": "🟡",
-   "locator": "/home/az/code/zaytsevand/coryphaeus/bin/validate.mjs:204-225",
+   "locator": "coryphaeus/bin/validate.mjs:204-225",
    "pull_quote": "The operator's authority is cited by id, and nobody checks the id.",
    "evidence": [
     {
      "kind": "file_line",
-     "ref": "/home/az/code/zaytsevand/coryphaeus/bin/validate.mjs:204-225"
+     "ref": "coryphaeus/bin/validate.mjs:204-225"
     },
     {
      "kind": "file_line",
@@ -1082,17 +1082,17 @@
    "author": "eric-evans-advisor",
    "lens": "ddd",
    "authored_severity": "🟡",
-   "locator": "/home/az/code/zaytsevand/coryphaeus/SKILL.md:53",
+   "locator": "coryphaeus/SKILL.md:53",
    "pull_quote": "'Unbound' covers two states, and the round actually has three.",
    "evidence": [
     {
      "kind": "file_line",
-     "ref": "/home/az/code/zaytsevand/chorus/.worktrees/suite-review/skill/chorus-core/CONDUCTOR.md:270-278",
+     "ref": "skill/chorus-core/CONDUCTOR.md:270-278",
      "note": "'Default when unbound' means no root at all."
     },
     {
      "kind": "file_line",
-     "ref": "/home/az/code/zaytsevand/coryphaeus/SKILL.md:53",
+     "ref": "coryphaeus/SKILL.md:53",
      "note": "'Default (nothing bound)' beside a separate Binding column means root present, provider absent."
     }
    ],
@@ -1141,7 +1141,7 @@
     },
     {
      "kind": "file_line",
-     "ref": "/home/az/code/zaytsevand/coryphaeus/SKILL.md:39-40",
+     "ref": "coryphaeus/SKILL.md:39-40",
      "note": "The kinds list has no abstained record."
     }
    ],
@@ -1174,17 +1174,17 @@
    "author": "don-norman-advisor",
    "lens": "human-centred design",
    "authored_severity": "🟡",
-   "locator": "/home/az/code/zaytsevand/coryphaeus/schema/common.schema.json:171",
+   "locator": "coryphaeus/schema/common.schema.json:171",
    "pull_quote": "A single version mismatch is shown as five personas failing separately.",
    "evidence": [
     {
      "kind": "file_line",
-     "ref": "/home/az/code/zaytsevand/coryphaeus/schema/common.schema.json:171",
+     "ref": "coryphaeus/schema/common.schema.json:171",
      "note": "failure enum: not-installed, silent, past-budget, malformed, over-length, no-evidence"
     },
     {
      "kind": "file_line",
-     "ref": "/home/az/code/zaytsevand/coryphaeus/bin/render.mjs:84",
+     "ref": "coryphaeus/bin/render.mjs:84",
      "note": "reason rendered per row only"
     }
    ],
@@ -1909,7 +1909,7 @@
    "rank": 3,
    "finding": "F18",
    "pull_quote": "The citation key has two spellings, and the reader matches only one of them, locally, and none remotely.",
-   "locator": "/home/az/code/zaytsevand/coryphaeus/schema/common.schema.json:147",
+   "locator": "coryphaeus/schema/common.schema.json:147",
    "final_severity": "🔴",
    "cost": "medium",
    "value": "Ruling references resolve in one spelling; operator answers found by lookup are real.",
@@ -1919,7 +1919,7 @@
    "rank": 4,
    "finding": "F4",
    "pull_quote": "A schema bump would read as ten abstentions, not as a version mismatch.",
-   "locator": "/home/az/code/zaytsevand/coryphaeus/schema/finding-report.schema.json",
+   "locator": "coryphaeus/schema/finding-report.schema.json",
    "final_severity": "🟡",
    "cost": "medium",
    "value": "A schema change fails as a version mismatch instead of five malformed seats and a quorum abort.",

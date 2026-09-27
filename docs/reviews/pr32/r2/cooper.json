@@ -54,7 +54,7 @@
       "claim": "Given F4 and F11, a schema or Node failure makes every reply fail. Quorum then aborts into a hand-written chorus-abstained.md that has no schema kind, and the only advice is 'revisit at next cadence'. The next cadence fails the same way. The abort should name the cause when every failure shares one reason, and hand the operator the fix.",
       "evidence": [
         { "kind": "file_line", "ref": "skill/chorus-review/SKILL.md:220-223" },
-        { "kind": "file_line", "ref": "/home/az/code/zaytsevand/coryphaeus/SKILL.md:39-40", "note": "The kinds list has no abstained record." }
+        { "kind": "file_line", "ref": "coryphaeus/SKILL.md:39-40", "note": "The kinds list has no abstained record." }
       ],
       "proposed_severity": "🟡",
       "pull_quote": "The abort's advice is to wait, and waiting does not fix a broken validator.",

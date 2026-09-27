@@ -9,7 +9,7 @@
   "own_findings": ["F16", "F17", "F18", "F19", "F20", "F21"],
   "votes": [
     { "finding": "F1", "confidence_on_hand": "high", "vote": "OVER-RATE", "reason": "Drift between the prose and tally() surfaces loudly as rejected records (coryphaeus/bin/validate.mjs:300 errors on any mismatch). It is not silent, so 🟡 fits better than a gate." },
-    { "finding": "F2", "confidence_on_hand": "high", "vote": "CONFIRM", "reason": "The two tables diverge. My derive R2-1 argues they answer two different questions under one word.", "evidence": [{ "kind": "file_line", "ref": "/home/az/code/zaytsevand/coryphaeus/SKILL.md:53" }], "pull_quote": "The port table exists twice and means two things by 'unbound'." },
+    { "finding": "F2", "confidence_on_hand": "high", "vote": "CONFIRM", "reason": "The two tables diverge. My derive R2-1 argues they answer two different questions under one word.", "evidence": [{ "kind": "file_line", "ref": "coryphaeus/SKILL.md:53" }], "pull_quote": "The port table exists twice and means two things by 'unbound'." },
     { "finding": "F3", "confidence_on_hand": "high", "vote": "CONFIRM", "reason": "Reply policy is chorus language; a binding should not restate it." },
     { "finding": "F4", "confidence_on_hand": "high", "vote": "CONFIRM", "reason": "An unversioned Published Language across two repos turns a contract change into apparent silence." },
     { "finding": "F6", "confidence_on_hand": "high", "vote": "CONFIRM", "reason": "The direction matches R-1; the rating is right." },
@@ -26,11 +26,11 @@
     {
       "id": "R2-1",
       "lens": "DDD",
-      "locator": "/home/az/code/zaytsevand/coryphaeus/SKILL.md:53",
+      "locator": "coryphaeus/SKILL.md:53",
       "claim": "F2 and F31 read the two port tables as disagreeing. They are really answering different questions under one word. CONDUCTOR's 'unbound' means no composition root at all. coryphaeus's 'Default (nothing bound)' means the root is present but no provider, such as the brief, is bound: validate.mjs and local_rulings exist only because coryphaeus is there. So the round has three states: no root, root only, and root plus provider. The language names two of them, and the record names none. Name the three binding levels once, in CONDUCTOR, and let coryphaeus's column cite the middle one.",
       "evidence": [
-        { "kind": "file_line", "ref": "/home/az/code/zaytsevand/chorus/.worktrees/suite-review/skill/chorus-core/CONDUCTOR.md:270-278", "note": "'Default when unbound' means no root at all." },
-        { "kind": "file_line", "ref": "/home/az/code/zaytsevand/coryphaeus/SKILL.md:53", "note": "'Default (nothing bound)' beside a separate Binding column means root present, provider absent." }
+        { "kind": "file_line", "ref": "skill/chorus-core/CONDUCTOR.md:270-278", "note": "'Default when unbound' means no root at all." },
+        { "kind": "file_line", "ref": "coryphaeus/SKILL.md:53", "note": "'Default (nothing bound)' beside a separate Binding column means root present, provider absent." }
       ],
       "proposed_severity": "🟡",
       "pull_quote": "'Unbound' covers two states, and the round actually has three.",
