@@ -101,7 +101,7 @@ lives.
 
 Every gate runs the four-stage primitive (`chorus-core/GATE-PRIMITIVE.md`:
 extract → uncapped author → real vote → deterministic tally). The lifecycle layer
-adds seating, gating, incorporation, and bound.
+adds per-gate RSVP, gating, incorporation, and bound.
 
 **Operator-facing decisions** in this layer — seating, block-on-🔴, gate sign-off —
 are banded by the **decision primitive** (`chorus-core/DECISION-PRIMITIVE.md`: 🟢
@@ -117,96 +117,25 @@ operator only for 🔴.
   gate never carries to another (S2). Goldratt may abstain on a code
   review yet join the design gate; a language lens abstains when its language is
   not in scope.
-- Each JOIN reply carries the **two-axis signal** (`chorus-core/DECISION-PRIMITIVE.md`
-  §RSVP signal): **applicability** (≥1 cited round-context delta the lens touches; an
-  un-cited JOIN is not-applicable) and **expected stakes** (🟢/🟡/🔴-potential + a
-  hook). This replaces the old single relevance 0–3 score, which degenerated to
-  all-3s.
-- **Ordinary seating** is a *decision* banded by `chorus-core/DECISION-PRIMITIVE.md`
-  (catalog rows 1–2): the cap is **5 ordinary (JOIN) seats**. `3 ≤ J ≤ 5` → seat all.
-  `J ≥ 6` → sort by (applicability, then expected stakes); a **strict** order at the
-  5th seat is 🟢 (auto-seat). A **tie** spanning the 5th seat is **🟡** — seat a recorded
-  default panel and queue it for async override, **never an operator interruption** (this
-  is the seating tie that parked feature 005 tried, and failed, to resolve mechanically;
-  as a 🟡 it self-unblocks). `J < 3` → re-ping once; abort the gate honestly on the second
-  failure. The orchestrator still never judges lens merit (S3/D1) — it sorts
-  persona-supplied evidence and applies a declared band.
-- **Exceptional entry** (uncapped, rare): a lens may enter *beyond* the 5 ordinary seats
-  via an **exceptional-reasoning entry** — an RSVP answer that **cites a concrete
-  round-context delta no seated ordinary lens covers**. The bar is **evidence, not an
-  adjudicator**: the cited delta is held to the same rule as any RSVP signal — an
-  un-anchored "I'm exceptional" claim is **refused** (I8/D5); distinct entries must cite
-  **distinct** uncovered deltas (duplicate-delta claims do not each earn a seat, which
-  self-limits packing). **No actor approves** the entry (self-selection preserved — no
-  operator-pin, no mandate); a lens that cannot articulate an uncovered delta has not
-  demonstrated value, and not seating it is the bar working, not exclusion. An
-  exceptional seat confers a **voice, not weight** — its vote counts exactly as an
-  ordinary seat's (severity stays arithmetic, `chorus-core/GATE-PRIMITIVE.md` Stage 4).
-  Seated board size = `min(roster, min(5, |ordinary JOIN|) + |exceptional|)`; the board
-  never exceeds the roster. Exceptional entries (with cited deltas) and the
-  ordinary/exceptional split are recorded in the ledger. Because the exceptional path is
-  always open, the ordinary cap keeps boards small and legible without ever *truly*
-  excluding articulated value.
-- **Mandate guardrail**: when the cap forces an ordinary out-seat, "covered by a seated
-  lens" is judged by **mandate, not by overlapping findings** — one shared finding does
-  not transfer a lens's role.
-- **The scope/deferral lens secures its seat by exceptional entry, not a bespoke
-  mandate.** A new buildout always presents an uncovered **scope/deferral delta** (the
-  cut — no other lens holds that mandate), so the scope/deferral lens (Goldratt)
-  **exceptional-enters** by citing it and, being uncapped, is never out-seated by the
-  cap — the same evidence-gated path any lens uses, not a hard carve-out. This replaces
-  the former "Goldratt is never out-seated on a new buildout" rule: the carve-out existed
-  because the *cap* could force the scope lens out (issue #6 — a 2026-06-11 gate
-  out-seated it as "covered", and the operator had to perform the cut by hand);
-  uncapped exceptional entry removes that root cause for every lens, so the special-case
-  is retired. **Safety net** (not a mandate): if a **new-buildout gate is seated without
-  the scope/deferral lens**, the conductor files a side-note for the operator
-  (`chorus-core/CONDUCTOR.md` § Side-notes) — flag-only, never an auto-seat.
+- **Seating** — the two-axis signal, the cap of five ordinary seats, exceptional
+  entry, and the no-mandate rule — is `chorus-core/DECISION-PRIMITIVE.md` § Seating.
+- **Scope/deferral lens on a new buildout.** A new buildout always presents an
+  uncovered scope/deferral delta (the cut), which the scope/deferral lens cites to
+  exceptional-enter like any lens. If a **new-buildout gate is seated without the
+  scope/deferral lens**, the conductor files a flag-only side-note for the operator
+  (`chorus-core/CONDUCTOR.md` § Side-notes) — never an auto-seat.
 
 Expected (not enforced) attendance: **Gate A** — product, architecture,
-delivery-and-ops, security, + Goldratt (scope/defer); **Cooper mandatory** when
-the corpus defers cross-user value, shared reuse, or trust promotion
-(`chorus-core/DEFERRAL-CHECKLIST.md`, project addendum §12). **Gates B/C** —
+delivery-and-ops, security, + Goldratt (scope/defer). **Gates B/C** —
 architecture, domain, language lens (if code in scope), delivery-and-ops,
 security. **Gate A's seated panel runs the premise pass first** (§ Gate A —
 premise pass), before its within-frame review.
 
-### Gate A corpus checks (value-first — before Author stage)
-
-The orchestrator verifies the gate corpus **before** seated lenses author findings:
-
-1. **Outcome & Stage-1 proof** present in `spec.md` (not placeholder)
-2. **plan.md** includes **Principle XI side-effect inventory** when the spec names
-   queue polling, GET queue endpoints, or scheduler/fill jobs
-   (`chorus-core/CONSTITUTION-PREVIEW.md`)
-3. Every **DEFERRED** capability has a complete row in the spec's deferral checklist
-   (`chorus-core/DEFERRAL-CHECKLIST.md`)
-4. **Cooper** is seated when any deferral row is cross-user / reuse (no ABSTAIN)
-5. **F-UV (user-value strip)** — when a deferral table or DEFERRED FR is present,
-   the gate corpus or ledger MUST include an F-UV finding from **Cooper** (preferred)
-   or an equivalent author entry with: named outcome, v1 outcome after deferrals,
-   dimensions table (Full/Partial/None), estimated value ratio, and threshold
-   comparison (`agents/alan-cooper-advisor.md` template). Missing F-UV is
-   🟠-potential (delivery theater) until filled.
-
-Missing (1)–(3) is gating 🔴-potential for Goldratt (FR-before-verdict) and may
-block incorporation until the spec is corrected via `/speckit-clarify`. Missing (5)
-is 🟠-potential until Cooper (or ledger author) files the strip.
-
-### Gate B design checks (value-first)
-
-- Trust / promotion / cross-user fields in `data-model.md` or OpenAPI require a
-  **non-deferred** parent FR that consumes them; otherwise 🔴 anti-theater
-- Queue/poll designs must match the plan XI inventory (no undeclared GET writes)
-
-### Incorporation rules (deferral checklist)
-
-When incorporation resolves a deferral or anti-theater finding:
-
-1. Revise **`spec.md` first** — add or complete deferral-checklist rows (S5)
-2. Regenerate `plan.md` / `data-model.md` via `/speckit-plan` — remove dormant trust
-   columns if parent FR stays DEFERRED
-3. Re-seat **Cooper** on cross-user/reuse deferrals before re-running Gate A
+**Value-first corpus.** Gates A and B review against the constitution preview
+(`chorus-core/GATE-PRIMITIVE.md` § Constitution preview) and the deferral checklist
+(`chorus-core/DECISION-PRIMITIVE.md` § Deferral checklist). The seated lenses check
+the corpus against them and author what they find; the orchestrator neither checks
+content nor pre-grades it.
 
 ### Exploratory phase (per gate)
 
@@ -268,7 +197,7 @@ model-generated):
 "what we tried" entry carries a **lens + one of §1's four attack forms** plus the
 RT-1..RT-6 outcomes — the evidence shape of a real finding. A bare or boilerplate
 `sound` does not satisfy it: a pass that did **not genuinely attack** the premise is
-a **failed pass, re-run** (bounded **N = 3**, the self-heal **Loop bound**/S7 below,
+a **failed pass, re-run** (bounded **N = 3**, the self-heal loop bound/S7,
 then escalate to the operator, `chorus-core/DECISION-PRIMITIVE.md` 🔴).
 
 **5 · Outcome is the existing tally.** The outcome is the **existing deterministic
@@ -293,33 +222,19 @@ feature directory is required, and no speckit lifecycle is entered.
 
 ### Block on 🔴 — via the self-heal loop
 
-A post-tally gating 🔴 is a **decision** banded by `chorus-core/DECISION-PRIMITIVE.md`
-(catalog row 5, the self-heal loop):
-
-- While `cycle < 3` it is a **🟡 decision**: the orchestrator **auto-runs the
-  incorporation cascade and re-runs the gate** (the re-run tally is the verifying
-  sensor — "verify before you ask"), emitting an `in-progress` DecisionRecord **before
-  each next cycle** so an in-flight self-heal reads as progress, not runaway.
-- It **escalates to a 🔴 operator ask** at `cycle == 3` without clearing, **or** when a
-  **waiver** of a real concern is the only path. A waiver is never applied
-  automatically; 🔴 never auto-proceeds (D2).
-- 🟡/🟢 findings are recorded; the operator proceeds at will. N+1 holds sign-off (S4).
-- This stays inside the existing guarantees: **S4** (the 🔴 is *resolved and verified*,
-  never passed silently), **S5** (spec-sourced incorporation), **S7** (the 3-cycle
-  bound is the escalation trigger). It just stops asking the operator to push the
-  incorporate button each cycle.
+A post-tally gating 🔴 runs the **self-heal loop** (`chorus-core/DECISION-PRIMITIVE.md`
+§ The self-heal loop, catalog row 5): a 🟡 auto-incorporate + re-run while
+`cycle < 3`; a 🔴 operator ask at the bound or when only a waiver remains (D2).
+🟡/🟢 findings are recorded; the operator proceeds at will. N+1 holds sign-off (S4).
+The loop is bounded at **N = 3 cycles** (S7).
 
 ### Vote dispatch (S8/S9/S11)
 
-When the gate reaches stage 3, the orchestrator dispatches the vote to the
-seated personas **excluding each finding's author** for that finding (S8). Votes
-are real dispatches; the orchestrator never predicts, infers, or synthesizes a
-vote or a grade (S9). Voters declare `confidence_on_hand` per finding; **`low` →
-`NEED_INFO` is mandatory** (not a hedged CONFIRM/PRIORITIZE/OVER-RATE). Open
-`NEED_INFO` blocks tally until resolved through peer provision or operator
-provision (S11 — defined in `chorus-core/GATE-PRIMITIVE.md`). The gating 🔴 set is the output of the deterministic stage-4
-tally over those real votes — not an orchestrator opinion. (S8/S9/S11 are defined in
-`chorus-core/GATE-PRIMITIVE.md`.)
+At stage 3 the orchestrator dispatches the vote to the seated personas **excluding
+each finding's author** (S8), never synthesizes a vote (S9), and routes open
+`NEED_INFO` through peer or operator provision before tally (S11) — all per
+`chorus-core/GATE-PRIMITIVE.md`. The gating 🔴 set is the deterministic stage-4
+tally over those real votes.
 
 ### Incorporation loop
 
@@ -332,26 +247,19 @@ downstream artefact (S5):
 - **Gate C**: a direct code fix for a code defect, or `/speckit-clarify` →
   re-implement when the finding is a spec gap.
 
-After each pass the gate **re-runs** (a fresh RSVP + primitive cycle).
-
-### Loop bound
-
-Each gate's incorporation loop is bounded at **N = 3 cycles**. After the third
-cycle without clearing its 🔴, the orchestrator **stops and escalates to the
-operator** rather than looping indefinitely (S7).
+Deferral and anti-theater findings incorporate per `chorus-core/DECISION-PRIMITIVE.md`
+§ Deferral checklist. After each pass the gate **re-runs** (a fresh RSVP + primitive
+cycle).
 
 ### Fixed viewpoint — `spec-walkthrough` (Gate C)
 
 At **Gate C** the orchestrator invokes the installed skill headless —
 `Skill(skill: "spec-walkthrough", args: "<NNN> headless")` — and ingests the
-returned digest (handle-keyed traceability matrix, DRIFT/SURPRISE list, GAP
-count) as stage-1 extract records with `source: "spec-walkthrough"`. It is **not
-gospel** (FR-018): each item must be authored into a finding by a persona to face
-the vote, a persona may contradict it, and any DRIFT/SURPRISE no persona claims
-is logged as an unclaimed record (visible, non-gating). Gate B invokes it only
-when substantial pre-existing code is in scope to reconcile against. (Its job is
-spec↔code reconciliation, so it is empty on a greenfield pre-implementation
-gate.)
+returned digest (traceability matrix, DRIFT/SURPRISE list, GAP count) as stage-1
+extract records with `source: "spec-walkthrough"`, under the fixed-viewpoint rule of
+`chorus-core/GATE-PRIMITIVE.md` Stage 1 (an input, not authoritative — FR-018).
+Gate B invokes it only when substantial pre-existing code is in scope to reconcile
+against.
 
 ### Memory update phase (sign-off)
 
@@ -367,7 +275,7 @@ It reuses the exploratory phase's write-back contract and invents **no new write
 (Principle I):
 
 - **Dispatch, never synthesize (S1/S9).** The orchestrator **dispatches each seated persona**
-  to update **its own** `.agents/agent-memory/<persona>/` record; it authors no record and
+  to update **its own** `.claude/agent-memory/<persona>/` record; it authors no record and
   synthesizes no learning. Each lens distills **only its own contributions to this run's ledger**
   (its findings-register rows + its understanding record) — a re-read of its own prior output, not
   a fresh harvest. (The cheaper "orchestrator distills the whole ledger in one pass" alternative is
@@ -376,16 +284,9 @@ It reuses the exploratory phase's write-back contract and invents **no new write
   locator into a live source **and** (b) generalizes beyond this run's spec delta. Persisted text is
   a **locator + ≤~2-sentence hint**, never a standalone verdict ("memory is an index, never the
   endpoint").
-- **Secret pre-filter first (010 FR-007).** An **agent-applied, ledger-audited** deny-filter runs on
-  **every** candidate fact **before** any record write or proposal, independent of the operator-confirm.
-  Its detector class is **two-part**: credential-shaped secrets (high-entropy tokens, known
-  credential/key prefixes, `.env`/secret-file path captures) **and** structured private project facts
-  (internal hostnames, personal/customer names, ticket IDs — the constitution's boundary is broader
-  than credentials, and low-entropy private prose sails past an entropy check). Matches are dropped and
-  flagged in the ledger on **both** paths (the `project-wide` proposal path **and** the auto
-  `lens-specific` write path). The secrets boundary is absolute and does not ride on the confirm —
-  but because the skill has **no runtime**, this is **persona-applied discipline made verifiable by the
-  ledger drop-record**, not a "mechanical" runtime pass; the ledger audit, not the label, is the guard.
+- **Secret pre-filter first (010 FR-007).** Every candidate fact passes the secret pre-filter
+  (`chorus-core/CONDUCTOR.md` § Secret pre-filter) before any record write or proposal, on **both**
+  paths; drops are recorded in the ledger.
 - **Scope routing, banded by `chorus-core/DECISION-PRIMITIVE.md`.**
   - **`lens-specific` facts → mechanically-decidable → 🟢 auto.** Each persona writes them to its own
     record (the exploratory-phase fact, written at sign-off).
@@ -417,18 +318,10 @@ them. S8/S9/S10/S11 are gate-primitive-level and live in
   change traces to a speckit phase-runner. (Extends I1.)
 - **S2.** RSVP fires independently at each gate; no JOIN/ABSTAIN carries across
   gates. (Extends I2.)
-- **S3.** No **ordinary** panel exceeds 5; ordinary overflow is seated by the
-  persona-declared two-axis signal (`chorus-core/DECISION-PRIMITIVE.md`), banded as a
-  decision: a strict sort auto-seats (🟢), a tie at the cap seats a recorded default +
-  async override (🟡) — never an operator interruption, never orchestrator lens-merit
-  judgment (D1). **Exceptional entries** are additive and uncapped but **evidence-anchored**
-  (cite an uncovered delta or be refused, I8/D5; distinct deltas; no adjudicator); the board
-  never exceeds the roster, and an exceptional seat is a voice, not weight. Out-seat coverage
-  is judged by mandate, never by overlapping findings; the scope/deferral lens secures
-  its seat by **exceptional entry** (the always-uncovered cut delta on a new buildout),
-  not a bespoke carve-out, and a new-buildout gate seated without it is **side-noted**,
-  not auto-seated. (Extends I2; the decision discipline is
-  `chorus-core/DECISION-PRIMITIVE.md`, D1–D5.)
+- **S3.** Every gate panel is seated per `chorus-core/DECISION-PRIMITIVE.md` § Seating —
+  no ordinary panel exceeds 5, exceptional entries are evidence-anchored, no lens is
+  seated by mandate; a new-buildout gate seated without the scope/deferral lens is
+  **side-noted**, not auto-seated. (Extends I2; D1–D5.)
 - **S4.** No gate passes with an open 🔴; each 🔴 is resolved or waived with
   recorded rationale. (Extends I7.)
 - **S5.** Incorporation revises the spec and regenerates downstream artefacts via
@@ -451,7 +344,7 @@ DecisionRecords (default, runner-up, sensor evidence, override + cost — see
 `chorus-core/DECISION-PRIMITIVE.md`), a **`## Memory update (sign-off)`** section
 (per-persona write-back counts, the proposed `project-wide` diff or its locator, the
 operator accept/reject/deferred decision, the pending-proposals list, and any
-secret-filter drops — spec 010 FR-008), and the end-of-run **S1–S9 self-audit
+secret-filter drops — spec 010 FR-008), and the end-of-run **S1–S11 self-audit
 checklist** (each item marked pass with a pointer to its evidence row). The ledger is
 **not** placed under `docs/reviews/` — that directory is for periodic project-state
 rounds. (Full schema: `specs/003-agent-sdlc-workflow/contracts/sdlc-ledger.md`;
@@ -487,9 +380,9 @@ is in `chorus-core/CONDUCTOR.md`; these are the lifecycle-specific ones):
 - Before running an SDLC round ("run the agent-SDLC on feature 0NN").
 - When a gate halts and incorporation is owed (re-read block-on-🔴 and the
   incorporation cascade).
-- When seating a gate panel (RSVP cap-5 rule + exceptional-entry path).
+- When seating a gate panel (`chorus-core/DECISION-PRIMITIVE.md` § Seating).
 - When tempted to author an artefact, synthesize a vote, or skip a gate (re-read
-  the refusals and S1–S9).
+  the refusals and S1–S11).
 
 ## Provenance
 
