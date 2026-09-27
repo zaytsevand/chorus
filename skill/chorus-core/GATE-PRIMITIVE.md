@@ -183,7 +183,7 @@ finding with `need_info: true` is resolved through **exactly one** of:
 | **Operator provision** | the gap requires project/operator knowledge no seated persona can supply | orchestrator routes a **live framed ask** to the Operator/User | operator context is recorded; the author **revises or confirms** the finding; the flag clears |
 
 The orchestrator picks **one** path per resolution attempt — not both, not a
-synthetic blend. If peer provision fails to close the gap, escalate to operator
+synthetic blend. If peer provision fails to close the gap, route to operator
 provision on the **next** resolution attempt (a second routing, not a parallel
 ask).
 
@@ -220,23 +220,25 @@ flowchart TD
   |---|---|
   | `net ≥ T` | escalate one level (🟢→🟡→🔴, capped at 🔴) |
   | `net ≤ −T` | demote one level (🔴→🟡→🟢, 🟢→drop) |
-  | `\|net\| < T` | hold author-proposed severity |
+  | `\|net\| < T` | **unmoved**: the author-proposed severity stands |
 
   - At a full board of 5 (`N = 4`), `T = floor(4/2) = 2`. The floor `T ≥ 1` holds for
     any voted finding; a tally **MUST NOT** run at `N < 2`.
-  - `net = 0` (all-abstain, or all-CONFIRM, or balanced) holds; an all-abstain
-    finding is marked **unvoted** (non-gating, surfaced). A finding held by CONFIRM
-    is **agreed-at-severity**, not unvoted — it has real votes, they just don't move it.
+  - *Unmoved* means counted, severity kept. It is not *held*, which means NEED_INFO
+    is open and the finding is not counted at all.
+  - `net = 0` (all-abstain, or all-CONFIRM, or balanced) leaves it unmoved; an all-abstain
+    finding is marked **unvoted** (non-gating, surfaced). A finding left unmoved with CONFIRM
+    votes is **agreed-at-severity**, not unvoted — it has real votes, they just don't move it.
   - Movement is **one level per tally**, regardless of margin (a 4–0 OVER-RATE
     demotes 🔴→🟡, not to nothing — the finding survives in the record).
   - A finding is **gating** iff its post-tally severity is 🔴 — full stop. No
     additional judgment clause: the vote is the confirmation.
   - **Convergence count** (for Phase-4 ranking) is `P + C` — all agreement, used to
     *rank*, never to *escalate*. Severity escalation counts only `P`: a finding many
-    lenses agree on can rank in the top-5 while honestly holding at 🟡.
+    lenses agree on can rank in the top-5 while honestly staying at 🟡.
   - **Settled cases** (the record validator enforces them):
-    1. `N = P + C + O` exactly: a lens that abstains on, is absent from, or holds the
-       finding with NEED_INFO is not counted.
+    1. `N = P + C + O` exactly: a lens that abstains on, is absent from, or raised NEED_INFO on the
+       finding is not counted.
     2. Any `CONFIRM` with `|net| < T` is agreed-at-severity, even when `P` and `O`
        cancel (e.g. 2/1/1).
     3. Findings grouped by one locator are tallied per author entry; grouping is for

@@ -105,7 +105,7 @@ inferred per-finding):
 
 - the seated board was **widened past the ordinary cap by an exceptional entry**
   (`DECISION-PRIMITIVE.md` § Seating) — flag the exceptional seat for operator review;
-- a finding **escalated or demoted at the exact threshold boundary** (`|net| == T`,
+- a finding **moved up or down at the exact threshold boundary** (`|net| == T`,
   `GATE-PRIMITIVE.md` Stage 4) — flag the marginal movement;
 - a finding is carried by **unanimous agreement among same-brief voters** — file the
   "one datum, not five" caution;
@@ -271,13 +271,14 @@ What the chorus needs from outside. A composition root may bind each port; unbou
 |---|---|---|
 | decision sink | takes a decision record; returns the choice and a ruling reference, or deferred | ask in chat; keep the answer locally and return its local reference |
 | ruling lookup | before any operator ask (catalog rows that ask the operator, NEED_INFO to the operator, gate interview questions), find a standing ruling; a fitting one resolves the ask 🟢 and is cited | none |
-| record validator | validates every persona reply and every chorus record against the bound schema before it is counted or published; a failing persona reply counts as ABSTAIN with the validator's reason logged | none; the round runs and its record says "unvalidated" |
+| record validator | validates every persona reply and every chorus record against the bound schema before it is counted or published; a failing persona reply gets one retry, then counts as ABSTAIN with the validator's reason logged | none; the round runs and its record says "unvalidated" |
 | record renderer / publisher | the durable record is JSON; its markdown page is rendered from it, never hand-written | commit the JSON; write the markdown by hand, marked "unrendered" |
 | arbiter | resolves framed conflicts (I5) | `advisor()`; if unavailable, record the conflict unresolved for the operator |
 | fixed viewpoint | the spec-walkthrough lens chorus-sdlc runs at its gates | skipped, and the skip logged |
 | memory recall | prior findings and rulings for the target | none |
 
 - **Consult before raising.** No operator ask leaves the chorus until the ruling lookup has been consulted.
+- **Recover quietly.** A failed persona reply gets one automatic retry; a missing optional tool falls back to its port's default. Both are recorded in the round record's bindings (the provider behind each port, or `default`, and each recovery), never asked live. An operator question leaves the chorus only when the round cannot reach a valid result alone: quorum fails, or a lost seat leaves a 🔴 finding without enough voters to count it.
 - **Cite, don't copy.** A decision resolved through the bound sink enters the chorus record only as a reference (answer id + where it lives); operator rulings are never restated in chorus records; vote arithmetic lives only in chorus records.
 
 ## Refusals (system boundaries, not modesty)

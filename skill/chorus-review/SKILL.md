@@ -156,19 +156,24 @@ abstains, no separate security pass runs; the abstention is recorded.
   (defaults: RSVP 3 min, exploratory 15 min, Round 1 15 min, Round 2 10 min,
   operator-overridable). It applies to every dispatch, Round 2 included. A
   dispatch past its budget is stopped.
-- **One failure rule.** A persona that is not installed, silent, past budget, or
-  returns malformed, over-length, or validator-rejected output **counts as ABSTAIN, with the reason
-  recorded in the roster**. There is no substitute lens. Quorum (≥3) is
-  re-evaluated after the Phase 1 evidence check; below it, the round aborts as in
-  Phase 0.5.
+- **One failure rule.** A persona that is silent, past budget, or returns
+  malformed, over-length, or validator-rejected output gets **one automatic
+  retry** with the reason. If the retry fails too, or the persona is not
+  installed, it **counts as ABSTAIN, with the reason recorded in the roster**.
+  There is no substitute lens. A missing optional tool falls back to its port's
+  recorded default. Retries, fallbacks and abstentions go in the record's
+  bindings and are never asked live. The operator is asked only when the round
+  cannot reach a valid result alone: quorum (≥3) fails, re-evaluated after the
+  Phase 1 evidence check (the round then aborts as in Phase 0.5), or a lost seat
+  leaves a 🔴 finding without enough voters to count it.
 - **Memory recovery.** Some personas write their report to
   `.claude/agent-memory/<persona-name>/` and return a summary; after each
   dispatch, `Read` any new files there — they are the report.
 - **Output format.** Each persona returns JSON of the kind its phase names —
   `rsvp` (Phase 0.5), `finding-report` (Phase 1, and Round-2 derives),
   `vote-report` (Phase 2) — checked by the bound record validator
-  (`chorus-core/CONDUCTOR.md` § Ports) before it counts; a failing reply counts
-  as ABSTAIN under the rule above, the validator's reason recorded. Field shapes
+  (`chorus-core/CONDUCTOR.md` § Ports) before it counts; a failing reply is
+  retried once, then counts as ABSTAIN, under the rule above. Field shapes
   are the bound schema's, not restated here.
 
 ## The procedure
@@ -292,9 +297,10 @@ Brief sections per joiner (continued via `SendMessage`):
 
 #### Phase 1 evidence check (gate before the register; I8)
 
-1. **Tool-use count > 0.** A zero-tool-use report is re-dispatched once with
+1. **Tool-use count > 0.** A zero-tool-use report gets its one retry with
    "Read these artefacts first: …". A second zero-tool-use report counts as
-   ABSTAIN (reason: no evidence); none of its findings are registered.
+   ABSTAIN (reason: no evidence); none of its findings are registered. Both are
+   recorded as recoveries.
 2. **Project-specific findings carry `file:line` or a principle tag.** Otherwise
    they become `[unsupported]` rows: visible, but outside the matrix, the vote,
    and convergence.
@@ -421,7 +427,8 @@ the sibling `.md` page — **commit both.** On a collision, suffix `-N` (N = 2, 
 The most recent artifact is the next round's primary baseline. Older markdown-only
 records stay as they are.
 
-The rendered page's order:
+The rendered page's order (after the header, the bindings: which provider
+served each port, and every retry, fallback and abstention by failure):
 
 1. **TL;DR** — 3 sentences: what the chorus found, what the top five
    prioritizes, and which 🔴 findings block public rollout (tracked as a unit

@@ -104,14 +104,15 @@ DecisionRecord {
   point         : which decision
   band          : 🟢 | 🟡 | 🔴
   sensor: { signal, evidence, reading }      // the rule that fired + its anchors + outcome
-  resolution    : auto-resolved | default-applied | in-progress | escalated
+  resolution    : auto-resolved | default-applied | in-progress | hard-block
   chosen        : the selected option
   alternatives  : the runner-up(s) weighed
   override      : <how to reverse + cost>    // 🟡 only
 }
 ```
 
-`in-progress` represents the transient 🟡-while-cycling state of a self-heal in flight (so
+`hard-block` is a 🔴 the workflow cannot pass until the operator rules (not `escalated`:
+a decision sink may use that word for a decision that does not block). `in-progress` represents the transient 🟡-while-cycling state of a self-heal in flight (so
 a live decision is representable, not only its rest-states).
 
 ## Review surfaces (render by band)
@@ -142,14 +143,14 @@ flowchart TD
     v -->|yes| done[proceed]
     v -->|no| cyc[cycle++]
     cyc --> c
-    c -->|no, cycle == 3| ask[🔴: ask operator — escalate or waive]
+    c -->|no, cycle == 3| ask[🔴 hard-block: operator rules or waives]
     f -.->|waiver is the only path| ask
 ```
 
 - The **re-run gate is the verifying sensor** — "verify before you ask."
 - The cycle counter is **per-gate-invocation** (not per-finding-identity), so a finding
   that mutates each cycle still hits the bound.
-- Escalate to a 🔴 ask at `cycle == 3` **or** when a waiver of a real concern is the only
+- Raise a 🔴 hard-block at `cycle == 3` **or** when a waiver of a real concern is the only
   path. A waiver is **never** applied automatically.
 - This stays inside the existing gate guarantees: **S4** (a 🔴 is *resolved and verified*,
   never passed silently), **S5** (spec-sourced incorporation, no hand-patching), **S7**

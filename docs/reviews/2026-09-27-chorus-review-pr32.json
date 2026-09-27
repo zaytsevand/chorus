@@ -5,6 +5,16 @@
  "target": "chorus PR #32 and coryphaeus",
  "mode": "pr-design",
  "round_context": "Design review of chorus PR #32 (branch suite-review/integration; about 40 files, +1.4k/−2.2k against main) and the new coryphaeus repository. Deltas: seven declared ports in CONDUCTOR; persona replies and records as JSON checked by coryphaeus's validator; mandates removed and the cap of five on every board; seating and the deferral checklist moved into DECISION-PRIMITIVE; three-level severity and six settled vote-count cases; the review procedure rewritten with INTEGRATION-LAYER folded in; persona files reworked; plugin packaging, install manifest, integrity checks and CI; coryphaeus schemas, validator, renderer and port bindings. Out of scope: specs/, tests/parity/, older reviews.",
+ "bindings": {
+  "ports": [
+   { "port": "decision-sink", "provider": "problem-brief" },
+   { "port": "ruling-lookup", "provider": "problem-brief" },
+   { "port": "record-validator", "provider": "coryphaeus" },
+   { "port": "record-renderer", "provider": "coryphaeus" },
+   { "port": "memory-recall", "provider": "default" }
+  ],
+  "recoveries": []
+ },
  "register": [
   {
    "id": "F1",
@@ -2099,7 +2109,7 @@
      }
     }
    ],
-   "resolution": "escalated",
+   "resolution": "hard-block",
    "status": "decided",
    "entry_ref": {
     "id": "Q-23",

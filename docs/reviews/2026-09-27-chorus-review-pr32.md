@@ -5,6 +5,10 @@
 
 **Round context.** Design review of chorus PR #32 (branch suite-review/integration; about 40 files, +1.4k/−2.2k against main) and the new coryphaeus repository. Deltas: seven declared ports in CONDUCTOR; persona replies and records as JSON checked by coryphaeus's validator; mandates removed and the cap of five on every board; seating and the deferral checklist moved into DECISION-PRIMITIVE; three-level severity and six settled vote-count cases; the review procedure rewritten with INTEGRATION-LAYER folded in; persona files reworked; plugin packaging, install manifest, integrity checks and CI; coryphaeus schemas, validator, renderer and port bindings. Out of scope: specs/, tests/parity/, older reviews.
 
+**Bindings.** decision-sink: problem-brief · ruling-lookup: problem-brief · record-validator: coryphaeus · record-renderer: coryphaeus · memory-recall: default
+
+**Recovered without asking.** none
+
 ## 1. TL;DR
 
 Five reviewers raised 34 findings and 9 derived ones on PR 32 and coryphaeus; the seams hold in direction, but the contract between the two repositories is unversioned, operator-facing failures are recorded without reaching the operator, and several rules have two authors. The top five: route unresolved conflicts and dropped seats to the operator (F34), make the secret filter prove it ran (F10), fix ruling references that cannot resolve (F18), version the schema contract (F4), and announce unbound ports before the round (F23). Three findings ended at 🔴 (F34, F10, F18); six findings had one voter each and are recorded as minority reports (F1, F8, F15, F19, F21, F27), which keep their authored severity without gating.
@@ -241,7 +245,7 @@ Six findings (F1, F8, F15, F19, F21, F27) received exactly one non-author vote. 
 
 - **Point**: Tally of a finding with fewer than two voters (unlisted)
 - **Sensor**: validator: a tally must not run at N < 2 → unlisted decision point, band forced to 🔴 (docs/reviews/pr32/draft-record.json: Six tally rows rejected.)
-- **Resolution**: escalated · **Status**: decided
+- **Resolution**: hard-block · **Status**: decided
 - **Default** — Add a "minority report" status: keeps its severity, does not block, listed apart (`minority-report`): One status in Stage 4, the schema and the validator; the six findings keep their authored severity and are listed separately. *Cost*: A line in Stage 4, one enum value, one validator branch and a test.
 - Re-ask the other seated reviewers to vote on those six (`reask-voters`): Get N to two or more before counting. *Cost*: One short dispatch per reviewer.
 - **Chosen**: `minority-report` on 2026-09-27 — Operator: "Add a minority report status" (brief Q-23).

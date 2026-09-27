@@ -62,7 +62,7 @@ The SDLC orchestrator sits one level above the round orchestrator.
 
 - **Level N+1 — the operator.** Holds project goals, scope decisions, sign-off.
   The orchestrator talks to the operator in the language of *procedure*: phase,
-  gate, 🔴, waiver, escalation. It never decides for the operator.
+  gate, 🔴, waiver, hard-block. It never decides for the operator.
 - **Level N — the speckit phase-runners and the gates.** The orchestrator invokes
   `/speckit-specify | clarify | plan | tasks | implement` to produce artefacts,
   and convenes gates to review them. It authors **nothing** itself.
@@ -104,7 +104,8 @@ extract → uncapped author → real vote → deterministic tally). The lifecycl
 adds per-gate RSVP, gating, incorporation, and bound. Each persona returns JSON of
 the kind its stage names — `rsvp`, `finding-report`, `vote-report` — checked by the
 bound record validator (`chorus-core/CONDUCTOR.md` § Ports) before it counts; a
-failing reply counts as ABSTAIN with the validator's reason in the ledger.
+failing reply gets one automatic retry, then counts as ABSTAIN with the validator's
+reason in the ledger (`CONDUCTOR.md` § Ports: recover quietly).
 
 **Operator-facing decisions** in this layer — seating, block-on-🔴, gate sign-off —
 are banded by the **decision primitive** (`chorus-core/DECISION-PRIMITIVE.md`: 🟢
@@ -201,7 +202,7 @@ model-generated):
 RT-1..RT-6 outcomes — the evidence shape of a real finding. A bare or boilerplate
 `sound` does not satisfy it: a pass that did **not genuinely attack** the premise is
 a **failed pass, re-run** (bounded **N = 3**, the self-heal loop bound/S7,
-then escalate to the operator, `chorus-core/DECISION-PRIMITIVE.md` 🔴).
+then a 🔴 hard-block for the operator, `chorus-core/DECISION-PRIMITIVE.md`).
 
 **5 · Outcome is the existing tally.** The outcome is the **existing deterministic
 Stage-4 tally** (`chorus-core/GATE-PRIMITIVE.md`) over the **premise-tagged**
@@ -333,8 +334,8 @@ them. S8/S9/S10/S11 are gate-primitive-level and live in
   I1/I6.)
 - **S6.** Every counted finding satisfies the I8 evidence gate (file:line or a
   principle tag); the rest are demoted and excluded from the tally. (Extends I8.)
-- **S7.** No gate loop runs past 3 cycles; the third uncleared cycle escalates to
-  the operator.
+- **S7.** No gate loop runs past 3 cycles; the third uncleared cycle goes to the
+  operator as a 🔴 hard-block (gate result `bound-reached`: the loop bound was reached).
 
 ## The ledger
 
@@ -366,7 +367,7 @@ is in `chorus-core/CONDUCTOR.md`; these are the lifecycle-specific ones):
   primitive).
 - **Invent remediation or reformulate** a finding with open `NEED_INFO` (S11).
 - **Hand-patch a downstream artefact** instead of clarifying the spec (S5).
-- **Loop forever.** Three uncleared cycles escalate (S7).
+- **Loop forever.** Three uncleared cycles go to the operator (S7).
 - **Treat a fixed viewpoint as authoritative.** `spec-walkthrough` is an input,
   not a gate (FR-018).
 - **Auto-write the shared addendum, or author a persona's memory.** At sign-off the
