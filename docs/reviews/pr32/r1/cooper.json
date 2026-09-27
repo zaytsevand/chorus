@@ -1,0 +1,120 @@
+{
+  "kind": "finding-report",
+  "schema_version": "1",
+  "mode": "review",
+  "round": "2026-09-27",
+  "persona": "alan-cooper-advisor",
+  "lens": "adversarial product",
+  "tool_uses": 16,
+  "gate_questions": [
+    {
+      "need": "who the user is and how many",
+      "question": "Is chorus plus coryphaeus used only by you, or do outside people install the plugin today (suite-review/Q-19)?",
+      "assumption": "A1: the operator alone; outside installers are a declared future group"
+    }
+  ],
+  "findings": [
+    {
+      "id": "F1",
+      "lens": "adversarial product",
+      "locator": "skill/chorus-review/SKILL.md:159-172",
+      "claim": "Counting a rejected reply as ABSTAIN helps the conductor, which gets one rule with no branches. The operator pays for it: a seat drops out, quorum can fall, and the only recovery is reading the roster after the round is over. Nothing tells the operator during the round and there is no way to re-dispatch. The two texts also disagree: coryphaeus sends the reply back once, chorus-review does not.",
+      "evidence": [
+        { "kind": "file_line", "ref": "skill/chorus-review/SKILL.md:159-163", "note": "One failure rule: rejected output counts as ABSTAIN, reason written to the roster, no retry mentioned." },
+        { "kind": "file_line", "ref": "/home/az/code/zaytsevand/coryphaeus/SKILL.md:42-44", "note": "An invalid reply goes back to the persona once, then counts as ABSTAIN." }
+      ],
+      "proposed_severity": "🟡",
+      "pull_quote": "A seat can disappear mid-round and the operator finds out only from the record.",
+      "confidence_on_hand": "high",
+      "need_info": false,
+      "conditional_on": "A4: tell the operator live, one retry"
+    },
+    {
+      "id": "F2",
+      "lens": "adversarial product",
+      "locator": "skill/chorus-core/CONDUCTOR.md:274",
+      "claim": "With no validator bound, the round runs and 'its record says unvalidated'. But Phase 0 never checks which ports are bound, so the operator learns this only afterwards. The review-record schema also has no field for 'unvalidated' or 'unrendered', so the promise has nowhere to be kept.",
+      "evidence": [
+        { "kind": "file_line", "ref": "skill/chorus-core/CONDUCTOR.md:268-276", "note": "Unbound defaults: 'unvalidated', 'unrendered'; 'the round record says so'." },
+        { "kind": "file_line", "ref": "skill/chorus-review/SKILL.md:176-196", "note": "Phase 0 post-conditions: scope, date and round context; nothing about port bindings." },
+        { "kind": "file_line", "ref": "/home/az/code/zaytsevand/coryphaeus/schema/review-record.schema.json:8", "note": "The required fields include no binding or validation status." }
+      ],
+      "proposed_severity": "🟡",
+      "pull_quote": "The record promises to say 'unvalidated' and has no place to say it.",
+      "confidence_on_hand": "high",
+      "need_info": false
+    },
+    {
+      "id": "F3",
+      "lens": "adversarial product",
+      "locator": "install.sh:79-81",
+      "claim": "An agent file an earlier run of the installer wrote is kept as it is, not refreshed, unless --force is passed. The round-trip test never exercises an upgrade. Under R-7/Q-8 (a release is done once dogfooded), the operator can dogfood a release whose persona edits (delta 6) never reach the installed agents, and 'Installed: 0. Skipped: 10.' reads like a normal run.",
+      "evidence": [
+        { "kind": "file_line", "ref": "install.sh:78-85", "note": "The 'keep' branch: recorded in the manifest, not copied." },
+        { "kind": "file_line", "ref": "install.sh:9-11", "note": "The header's re-run promise, true only for skills." },
+        { "kind": "file_line", "ref": "scripts/test-install-roundtrip.sh:25-26", "note": "Re-run uses identical source; no stale-agent upgrade case." }
+      ],
+      "proposed_severity": "🟡",
+      "pull_quote": "Dogfooding a release can leave last month's personas installed.",
+      "confidence_on_hand": "high",
+      "need_info": false
+    },
+    {
+      "id": "F4",
+      "lens": "adversarial product",
+      "locator": "install.sh:13-16,87-89",
+      "claim": "The installer protects a customized agent file only when --force is not passed. With --force it overwrites the file without a backup and records it, so a later uninstall deletes it. The user's customization is gone twice, and nothing warns them before the first time.",
+      "evidence": [
+        { "kind": "file_line", "ref": "install.sh:87-89", "note": "cp -f, then recorded in the manifest." },
+        { "kind": "file_line", "ref": "uninstall.sh:36-38", "note": "Removes every recorded file." }
+      ],
+      "proposed_severity": "🟢",
+      "pull_quote": "--force destroys the very customization the installer says it protects.",
+      "confidence_on_hand": "high",
+      "need_info": false
+    },
+    {
+      "id": "F5",
+      "lens": "adversarial product",
+      "locator": "install.sh:109-121",
+      "claim": "Neither the chorus installer nor its README mentions coryphaeus or Node. An outside installer gets only the unvalidated, hand-written defaults and nothing points them to the program that makes the record trustworthy.",
+      "evidence": [
+        { "kind": "file_line", "ref": "install.sh:113-118", "note": "'Next:' steps mention the addendum and 'spawn the chorus' only." },
+        { "kind": "file_line", "ref": "/home/az/code/zaytsevand/coryphaeus/install.sh:14", "note": "Only warns when Node is missing." }
+      ],
+      "proposed_severity": "🟢",
+      "pull_quote": "The installer never mentions the validator the whole redesign rests on.",
+      "confidence_on_hand": "high",
+      "need_info": false,
+      "conditional_on": "A1: outside installers are a declared future group"
+    },
+    {
+      "id": "F6",
+      "lens": "adversarial product",
+      "locator": "skill/chorus-core/DECISION-PRIMITIVE.md:179,226",
+      "claim": "With the mandates gone, catalog rows 12 and 13 still fire because they key on what the corpus contains, not on who is seated. I credit that net. But only 'the product lens' authors the F-UV strip. If a tie at the cap out-seats Cooper, as nearly happened this round, row 13 asks for a strip nobody is assigned to write. Exceptional entry may also be refused, because Goldratt's role covers deferral.",
+      "evidence": [
+        { "kind": "file_line", "ref": "skill/chorus-core/DECISION-PRIMITIVE.md:179", "note": "Row 13: recorded default 'strip requested', no author." },
+        { "kind": "file_line", "ref": "skill/chorus-core/DECISION-PRIMITIVE.md:79-95", "note": "Exceptional entry needs a delta no seated lens covers; coverage is judged by role." }
+      ],
+      "proposed_severity": "🟡",
+      "pull_quote": "The deferral check still fires, but nobody is assigned to write the strip.",
+      "confidence_on_hand": "high",
+      "need_info": false
+    },
+    {
+      "id": "F7",
+      "lens": "adversarial product",
+      "locator": "skill/chorus-review/SKILL.md:314-316,423-433",
+      "claim": "The JSON is for the tooling and the rendered page is for the operator, and that split is right. The register is 'the single human-facing source of truth', and the roster shows each failure-rule abstention with a typed reason. The page is enough for someone who never opens the JSON, except that it cannot say whether the round was validated. Recommendation: add a required bindings block (port, bound or default, and the default's consequence) to review-record, print it in page section 2, and have Phase 0 announce unbound ports before the RSVP.",
+      "evidence": [
+        { "kind": "file_line", "ref": "skill/chorus-review/SKILL.md:423-433", "note": "Page order: roster with abstainers and reasons." },
+        { "kind": "file_line", "ref": "/home/az/code/zaytsevand/coryphaeus/schema/common.schema.json:170-171", "note": "rsvp_row failure enum." }
+      ],
+      "proposed_severity": "🟢",
+      "pull_quote": "The page serves the operator well, except it cannot say whether the round was validated.",
+      "confidence_on_hand": "high",
+      "need_info": false
+    }
+  ]
+}

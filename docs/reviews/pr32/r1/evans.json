@@ -1,0 +1,159 @@
+{
+  "kind": "finding-report",
+  "schema_version": "1",
+  "mode": "review",
+  "round": "2026-09-27",
+  "persona": "eric-evans-advisor",
+  "lens": "DDD",
+  "tool_uses": 16,
+  "gate_questions": [
+    {
+      "need": "the Core Domain",
+      "question": "Is the Core the vote counting and the decision contract (Q-21)?",
+      "assumption": "A3: yes, vote counting plus the decision contract is the Core"
+    }
+  ],
+  "findings": [
+    {
+      "id": "F1",
+      "lens": "DDD",
+      "locator": "/home/az/code/zaytsevand/coryphaeus/SKILL.md:102",
+      "claim": "'escalated' inverts across the seam. Chorus: a 🔴 decision must have resolution 'escalated', a hard block. Brief: bearing 'escalated' means a decision that does not block the goal, and rule 4 maps a chorus 🟡 to it. sdlc-log adds a third sense (loop bound reached). Rule 1's glossary translates tally, gate, lens, held, park and frame, but not the one word that flips.",
+      "evidence": [
+        {
+          "kind": "file_line",
+          "ref": "/home/az/code/zaytsevand/coryphaeus/schema/decision.schema.json:107",
+          "note": "band 🔴 forces resolution 'escalated'."
+        },
+        {
+          "kind": "file_line",
+          "ref": "/home/az/.claude/skills/problem-brief/schema/problem-brief.schema.json:260",
+          "note": "brief bearing 'escalated' is defined as not standing in the goal's way."
+        },
+        {
+          "kind": "file_line",
+          "ref": "/home/az/code/zaytsevand/coryphaeus/schema/sdlc-log.schema.json:121",
+          "note": "gate result 'escalated' is a third meaning."
+        }
+      ],
+      "proposed_severity": "🟡",
+      "pull_quote": "In the chorus 'escalated' means blocked; in the brief it means not blocking, and the glossary skips the one word that flips.",
+      "confidence_on_hand": "high",
+      "need_info": false,
+      "conditional_on": "A3: the decision contract is Core"
+    },
+    {
+      "id": "F2",
+      "lens": "DDD",
+      "locator": "/home/az/code/zaytsevand/coryphaeus/schema/common.schema.json:232-239",
+      "claim": "In one matrix row, status 'held' means an open NEED_INFO, not counted in N. Movement 'hold' and 'agreed: held with CONFIRM votes' mean counted, |net| under T, severity unmoved. GATE-PRIMITIVE uses both senses within a few lines. These are the two states the Core most needs to keep apart.",
+      "evidence": [
+        {
+          "kind": "file_line",
+          "ref": "/home/az/code/zaytsevand/chorus/.worktrees/suite-review/skill/chorus-core/GATE-PRIMITIVE.md:223-228",
+          "note": "'hold author-proposed severity' and 'a finding held by CONFIRM' are the tally sense."
+        },
+        {
+          "kind": "file_line",
+          "ref": "/home/az/code/zaytsevand/chorus/.worktrees/suite-review/skill/chorus-review/SKILL.md:322",
+          "note": "'shown held, not graded' is the NEED_INFO sense."
+        }
+      ],
+      "proposed_severity": "🟡",
+      "pull_quote": "One row can say held and hold, and they mean uncounted and counted-but-unmoved.",
+      "confidence_on_hand": "high",
+      "need_info": false,
+      "conditional_on": "A3: vote counting is Core"
+    },
+    {
+      "id": "F3",
+      "lens": "DDD",
+      "locator": "/home/az/code/zaytsevand/coryphaeus/schema/common.schema.json:147",
+      "claim": "ruling_ref carries three identities: ruling (R-n), brief entry (Q-n, reused as entry_ref) and operator reference. It accepts two spellings, bare 'R-3' and prefixed 'suite-review/R-3'. Ruling and brief ids are bare. Validator and renderer read '#' consistently, but the local lookup is an exact match, so a prefixed id never resolves. Remote refs are never dereferenced, so a prefixed id that matches nothing passes silently. The standing rulings prescribe the prefixed form.",
+      "evidence": [
+        {
+          "kind": "file_line",
+          "ref": "/home/az/code/zaytsevand/coryphaeus/bin/validate.mjs:222-229",
+          "note": "'#' is resolved by exact id; a Q-n in ruling_ref only warns; remote records are not opened."
+        },
+        {
+          "kind": "file_line",
+          "ref": "/home/az/code/zaytsevand/coryphaeus/schema/ruling.schema.json:11",
+          "note": "ruling ids are bare R-n."
+        },
+        {
+          "kind": "file_line",
+          "ref": "/home/az/code/zaytsevand/chorus/.worktrees/suite-review/docs/reviews/pr32/standing-rulings.md:3",
+          "note": "citers are told to write suite-review/R-3."
+        }
+      ],
+      "proposed_severity": "🟡",
+      "pull_quote": "The citation key has two spellings, and the reader matches only one of them, locally, and none remotely.",
+      "confidence_on_hand": "high",
+      "need_info": false
+    },
+    {
+      "id": "F4",
+      "lens": "DDD",
+      "locator": "/home/az/code/zaytsevand/coryphaeus/schema/decision.schema.json:5",
+      "claim": "The decision and ruling shapes conform to the brief ('aligned', 'same meanings', 'field-for-field'). That is Conformist, and rightly so: the brief is upstream. It is not a Shared Kernel, since the chorus cannot change it. But the relationship is never named, and nothing guards it: no test or validator step loads the brief's schema, so upstream drift goes unnoticed.",
+      "evidence": [
+        {
+          "kind": "file_line",
+          "ref": "/home/az/code/zaytsevand/coryphaeus/schema/decision.schema.json:86",
+          "note": "status 'same meanings as a problem-brief entry's status', asserted, not checked."
+        },
+        {
+          "kind": "file_line",
+          "ref": "/home/az/code/zaytsevand/coryphaeus/schema/ruling.schema.json:5",
+          "note": "ruling declared field-for-field the brief's."
+        }
+      ],
+      "proposed_severity": "🟡",
+      "pull_quote": "The chorus conforms to the brief, which is right, but nobody wrote it down or checks it.",
+      "confidence_on_hand": "high",
+      "need_info": false,
+      "conditional_on": "A2: evolvability ranks second"
+    },
+    {
+      "id": "F5",
+      "lens": "DDD",
+      "locator": "/home/az/code/zaytsevand/coryphaeus/SKILL.md:83-109",
+      "claim": "Outbound, the rules are a real Anti-Corruption Layer: plain language, count before grouping, recommendation from the vote. Inbound, they cover only 'operator rules' and say nothing about a replaced ruling, a superseded entry, or a reopened entry, so the chorus ref can cite a dead ruling. Outbound, bearingReason and rolledUp have no source field, so 'mechanical' overstates it.",
+      "evidence": [
+        {
+          "kind": "file_line",
+          "ref": "/home/az/code/zaytsevand/coryphaeus/schema/ruling.schema.json:18-19",
+          "note": "rulings can be replaced; no chorus rule follows."
+        },
+        {
+          "kind": "file_line",
+          "ref": "/home/az/.claude/skills/problem-brief/schema/problem-brief.schema.json:254",
+          "note": "brief entries reopen under the same id and can be superseded."
+        }
+      ],
+      "proposed_severity": "🟡",
+      "pull_quote": "The layer translates outbound well; inbound it only knows the day the operator says yes.",
+      "confidence_on_hand": "high",
+      "need_info": false
+    },
+    {
+      "id": "F6",
+      "lens": "DDD",
+      "locator": "/home/az/code/zaytsevand/chorus/.worktrees/suite-review/skill/chorus-core/GATE-PRIMITIVE.md:237",
+      "claim": "The Core has one prose owner (Stage 4, six settled cases) and one executable pin (the validator, bound by role per Q-15). That is right, but nothing says which wins on disagreement, and the validator also enforces a brief-derived rule (recommended option first). Recommendation: rename the F1 and F2 terms at source; scope ruling_ref to rulings with one id spelling; write inbound translation for replaced and superseded; declare the brief upstream with a drift check; state that canon wins over validator.",
+      "evidence": [
+        {
+          "kind": "file_line",
+          "ref": "/home/az/code/zaytsevand/coryphaeus/bin/validate.mjs:238",
+          "note": "brief-entry ordering enforced inside the decision check."
+        }
+      ],
+      "proposed_severity": "🟢",
+      "pull_quote": "The Core has one author and one enforcer; say which one wins, and keep the brief's rules out of it.",
+      "confidence_on_hand": "high",
+      "need_info": false,
+      "conditional_on": "A3: vote counting is Core"
+    }
+  ]
+}
