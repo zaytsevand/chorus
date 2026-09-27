@@ -244,7 +244,7 @@ artefact drift — the very divergence the chorus exists to catch.
 non-compliant, converging the artefact toward the spec is not the drift this principle
 forbids — it is allowed, recorded as a deliberate, operator-authorized departure from
 canonical regeneration (observed at 007 gates B and C). The 2026-09 suite review was
-applied the same way, as an operator-authorised departure recorded in `docs/briefs/suite-review`.
+applied the same way, as an operator-authorised departure recorded in the operator's decision brief for that review (rulings R-1 to R-10).
 
 **Watch for.** A quietly-edited `quickstart.md`/`tasks.md` that makes a gate pass without
 a spec change or a recorded rationale; the orchestrator writing a spec section itself.
