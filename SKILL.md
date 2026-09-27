@@ -1,5 +1,5 @@
 ---
-name: composite-root
+name: coryphaeus
 description: >-
   Binds the chorus suite to its providers (problem-brief by default) without
   either knowing the other. Owns the shared JSON schema for all chorus data and
@@ -28,8 +28,8 @@ both. It owns four things:
 
 ## Finding the tools
 
-`<root>` is the installed skill directory: `.claude/skills/composite-root` in
-the project if present, else `~/.claude/skills/composite-root`.
+`<root>` is the installed skill directory: `.claude/skills/coryphaeus` in
+the project if present, else `~/.claude/skills/coryphaeus`.
 
 ```
 node <root>/bin/validate.mjs <kind> <file.json> [--json]   # 0 valid · 1 invalid · 2 usage

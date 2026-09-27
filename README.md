@@ -1,4 +1,4 @@
-# composite-root
+# coryphaeus
 
 A small skill that sits above the chorus review suite and problem-brief so that
 neither has to know the other. It holds:
@@ -17,7 +17,7 @@ neither has to know the other. It holds:
 node bin/validate.mjs review-record examples/review-record.valid.json
 node bin/render.mjs review-record examples/review-record.valid.json review.md
 node --test test/*.test.mjs
-./install.sh            # copies into ${CLAUDE_HOME:-~/.claude}/skills/composite-root
+./install.sh            # copies into ${CLAUDE_HOME:-~/.claude}/skills/coryphaeus
 ```
 
 Requires Node 18 or later. No npm dependencies.
