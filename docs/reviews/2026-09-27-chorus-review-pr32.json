@@ -4,7 +4,7 @@
  "date": "2026-09-27",
  "target": "chorus PR #32 and coryphaeus",
  "mode": "pr-design",
- "round_context": "# Round context — chorus review of PR #32 + coryphaeus (2026-09-27)\n\nMode: design review of the PR's approach and seams, not a line-by-line diff review.\n\nTarget: chorus PR #32 (https://github.com/zaytsevand/chorus/pull/32, branch suite-review/integration,\nworktree /home/az/code/zaytsevand/chorus/.worktrees/suite-review; ~40 files, +1.4k/-2.2k vs main 29e6e16)\nand the new root-skill repo coryphaeus (/home/az/code/zaytsevand/coryphaeus, local, 63 node tests).",
+ "round_context": "Design review of chorus PR #32 (branch suite-review/integration; about 40 files, +1.4k/−2.2k against main) and the new coryphaeus repository. Deltas: seven declared ports in CONDUCTOR; persona replies and records as JSON checked by coryphaeus's validator; mandates removed and the cap of five on every board; seating and the deferral checklist moved into DECISION-PRIMITIVE; three-level severity and six settled vote-count cases; the review procedure rewritten with INTEGRATION-LAYER folded in; persona files reworked; plugin packaging, install manifest, integrity checks and CI; coryphaeus schemas, validator, renderer and port bindings. Out of scope: specs/, tests/parity/, older reviews.",
  "register": [
   {
    "id": "F1",
@@ -1198,17 +1198,12 @@
   {
    "finding": "F1",
    "authored_severity": "🔴",
-   "status": "graded",
+   "status": "minority-report",
    "n": 1,
    "p": 0,
    "c": 0,
    "o": 1,
-   "net": -1,
-   "threshold": 1,
-   "movement": "demote",
-   "final_severity": "🟡",
-   "convergence": 0,
-   "gating": false
+   "final_severity": "🔴"
   },
   {
    "finding": "F2",
@@ -1303,17 +1298,12 @@
   {
    "finding": "F8",
    "authored_severity": "🟡",
-   "status": "graded",
+   "status": "minority-report",
    "n": 1,
    "p": 0,
    "c": 1,
    "o": 0,
-   "net": 0,
-   "threshold": 1,
-   "movement": "agreed",
-   "final_severity": "🟡",
-   "convergence": 1,
-   "gating": false
+   "final_severity": "🟡"
   },
   {
    "finding": "F9",
@@ -1408,17 +1398,12 @@
   {
    "finding": "F15",
    "authored_severity": "🟡",
-   "status": "graded",
+   "status": "minority-report",
    "n": 1,
    "p": 0,
    "c": 1,
    "o": 0,
-   "net": 0,
-   "threshold": 1,
-   "movement": "agreed",
-   "final_severity": "🟡",
-   "convergence": 1,
-   "gating": false
+   "final_severity": "🟡"
   },
   {
    "finding": "F16",
@@ -1468,17 +1453,12 @@
   {
    "finding": "F19",
    "authored_severity": "🟡",
-   "status": "graded",
+   "status": "minority-report",
    "n": 1,
    "p": 0,
    "c": 1,
    "o": 0,
-   "net": 0,
-   "threshold": 1,
-   "movement": "agreed",
-   "final_severity": "🟡",
-   "convergence": 1,
-   "gating": false
+   "final_severity": "🟡"
   },
   {
    "finding": "F20",
@@ -1498,17 +1478,12 @@
   {
    "finding": "F21",
    "authored_severity": "🟢",
-   "status": "graded",
+   "status": "minority-report",
    "n": 1,
    "p": 1,
    "c": 0,
    "o": 0,
-   "net": 1,
-   "threshold": 1,
-   "movement": "escalate",
-   "final_severity": "🟡",
-   "convergence": 1,
-   "gating": false
+   "final_severity": "🟢"
   },
   {
    "finding": "F22",
@@ -1588,17 +1563,12 @@
   {
    "finding": "F27",
    "authored_severity": "🟡",
-   "status": "graded",
+   "status": "minority-report",
    "n": 1,
    "p": 0,
    "c": 1,
    "o": 0,
-   "net": 0,
-   "threshold": 1,
-   "movement": "agreed",
-   "final_severity": "🟡",
-   "convergence": 1,
-   "gating": false
+   "final_severity": "🟡"
   },
   {
    "finding": "F28",
@@ -1912,7 +1882,7 @@
  "tldr": [
   "Five reviewers raised 34 findings and 9 derived ones on PR 32 and coryphaeus; the seams hold in direction, but the contract between the two repositories is unversioned, operator-facing failures are recorded without reaching the operator, and several rules have two authors.",
   "The top five: route unresolved conflicts and dropped seats to the operator (F34), make the secret filter prove it ran (F10), fix ruling references that cannot resolve (F18), version the schema contract (F4), and announce unbound ports before the round (F23).",
-  "Three findings ended at 🔴 (F34, F10, F18); six findings got only one vote each, which the canon forbids counting without saying what they become, so the record cannot validate until that is ruled."
+  "Three findings ended at 🔴 (F34, F10, F18); six findings had one voter each and are recorded as minority reports (F1, F8, F15, F19, F21, F27), which keep their authored severity without gating."
  ],
  "top_five": [
   {
@@ -2110,8 +2080,8 @@
    ],
    "solutions": [
     {
-     "id": "below-quorum-status",
-     "label": "Add a status \"below quorum\": keeps authored severity, non-gating, surfaced",
+     "id": "minority-report",
+     "label": "Add a \"minority report\" status: keeps its severity, does not block, listed apart",
      "recommended": true,
      "reversible": true,
      "summary": "One status in Stage 4, the schema and the validator; the six findings keep their authored severity and are listed separately.",
@@ -2130,8 +2100,17 @@
     }
    ],
    "resolution": "escalated",
-   "status": "open",
+   "status": "decided",
    "entry_ref": {
+    "id": "Q-23",
+    "record": "docs/briefs/suite-review/brief.json"
+   },
+   "decision": {
+    "chose": "minority-report",
+    "date": "2026-09-27",
+    "note": "Operator: \"Add a minority report status\" (brief Q-23)."
+   },
+   "ruling_ref": {
     "id": "Q-23",
     "record": "docs/briefs/suite-review/brief.json"
    }

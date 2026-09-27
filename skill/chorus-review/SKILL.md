@@ -369,7 +369,7 @@ arithmetic over real votes, never the orchestrator's judgment (S9).
 
 **Consolidation matrix** — produced **after the count**, a projection of the
 register plus the tally (fields: the bound schema's `review-record` matrix); it
-re-authors nothing. Status is `graded`, `held`, `ungraded` (`R2-`), or `unvoted`.
+re-authors nothing. Status is `graded`, `held`, `ungraded` (`R2-`), `minority-report` (one voter), or `unvoted`.
 
 ### Phase 3 — Conflict reconciliation
 
@@ -397,7 +397,8 @@ Score findings on **Cost** (low / medium / high), **Value** (risk reduced +
 friction removed + decisions unblocked), **Constitutional ROI** (only if the
 addendum lists principles), and **Convergence** (`P + C` from the matrix). A
 finding whose `NEED_INFO` is still open at ranking is listed as **held** and
-**excluded from the top five**; the round does not stall on it. `R2-` findings
+**excluded from the top five**; the round does not stall on it. Minority reports are
+listed apart and excluded too. `R2-` findings
 carry "[ungraded]" wherever they appear. `advisor()` may sanity-check a
 non-obvious ordering (optional).
 
@@ -430,7 +431,7 @@ The rendered page's order:
 4. **Consolidation matrix** — with the tally columns.
 5. **Conflicts** — `Cn` entries.
 6. **Top five.**
-7. **Held findings** — open `NEED_INFO` with reasons.
+7. **Held findings and minority reports** — open `NEED_INFO` with reasons; one-voter findings, uncounted.
 8. **Next-chorus baseline** — what the next round should assume closed or
    in progress vs re-evaluate.
 

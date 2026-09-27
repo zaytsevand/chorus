@@ -246,6 +246,9 @@ flowchart TD
     5. Reply caps are upper bounds only; lifecycle gates set none.
     6. A 🔴 incorporated in cycle *k* is resolved in *k*; the proof is cycle *k+1*'s
        re-run, recorded as a new ledger entry (the ledger stays append-only).
+    7. A finding with exactly one non-author voter is a **minority report**: not
+       tallied, keeps its authored severity, never gating, listed apart and out of the
+       top five. (`N = 0` stays unvoted.)
 - **Success criterion**: arithmetic only — no judgment added. Identical votes at an
   identical `N` always yield identical severities; there are **no tally ties**, and no
   seat's vote is re-weighted (severity is presence-blind — entry buys a voice, not
