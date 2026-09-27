@@ -113,9 +113,13 @@ export function renderReviewRecord(d) {
     L.push(`${t.rank}. **${t.finding}**${ungraded} ${t.final_severity} — ${quote(t.pull_quote)} \`${t.locator}\``,
       `   Cost ${t.cost} · Value: ${t.value}${t.constitutional_roi ? ` · Constitutional ROI: ${t.constitutional_roi}` : ""} · Convergence ${t.convergence}${t.arbiter_note ? ` · ${t.arbiter_note}` : ""}`);
   }
-  L.push("", "## 7. Held findings", "");
+  L.push("", "## 7. Held findings and minority reports", "");
   if (!d.held.length) L.push("None.");
   for (const h of d.held) L.push(`- **${h.finding}** (route: ${h.route}${h.decision_ref ? `, ${h.decision_ref}` : ""}): ${h.reasons.map((r) => `${r.raiser} — ${r.reason}`).join("; ")}`);
+  const minority = d.tally.filter((t) => t.status === "minority-report");
+  L.push("", "**Minority reports** (one voter each; not counted, never gating, authored severity kept):", "");
+  if (!minority.length) L.push("None.");
+  for (const t of minority) { const e = d.register.find((x) => x.id === t.finding); L.push(`- **${t.finding}** ${t.authored_severity} — ${e ? `${quote(e.pull_quote)} \`${e.locator}\`` : ""} (P ${t.p} · C ${t.c} · O ${t.o})`); }
   L.push("", "## 8. Next-chorus baseline", "");
   const list = (title, xs) => L.push(`**${title}**: ${xs.length ? xs.join("; ") : "none"}`, "");
   list("Assume closed", d.baseline.assume_closed);

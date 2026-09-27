@@ -291,12 +291,20 @@ class Semantics {
       for (const k of ["p", "c", "o", "net"]) if (r[k] !== undefined) this.err(p, `an ungraded finding carries no vote count ("${k}")`);
       return;
     }
+    if (r.status === "minority-report") {
+      const { n, p: P, c: C, o: O } = r;
+      if ([n, P, C, O].every(Number.isInteger) && (n !== 1 || P + C + O !== 1)) this.err(p, `a minority report has exactly one voter (N = ${n}, P + C + O = ${P + C + O})`, "GATE-PRIMITIVE.md § Stage 4, settled case 7");
+      if (r.final_severity !== undefined && r.final_severity !== e.authored_severity) this.err(p, "a minority report keeps its author's severity", `final_severity must be ${e.authored_severity}`);
+      if (r.gating === true) this.err(p, "a minority report never gates");
+      for (const k of ["net", "threshold", "movement", "convergence"]) if (r[k] !== undefined) this.err(p, `a minority report is not counted ("${k}")`);
+      return;
+    }
     const { n, p: P, c: C, o: O } = r;
     if (![n, P, C, O].every(Number.isInteger)) return; // schema reports it
     if (P + C + O !== n) this.err(p, `N = ${n}, but P + C + O = ${P + C + O}`, "N counts exactly the non-author voters on this finding: N = P + C + O (GATE-PRIMITIVE.md § Stage 4, settled case 1)");
     if (seated && n > seated.size - 1) this.err(p, `N = ${n} exceeds the seated non-author personas (${seated.size - 1})`, "S8: the author never votes on its own finding");
     const want = tally(r.authored_severity, n, P, C, O);
-    if (want.status === "graded" && n < 2) this.err(p, `a tally must not run at N < 2 (N = ${n})`, "GATE-PRIMITIVE.md § Stage 4");
+    if (want.status === "graded" && n < 2) this.err(p, `a tally must not run at N < 2 (N = ${n})`, n === 1 ? "set status minority-report (GATE-PRIMITIVE.md § Stage 4, settled case 7)" : "GATE-PRIMITIVE.md § Stage 4");
     if (r.status !== want.status) this.err(p, `status is ${r.status}, but ${P + C + O === 0 ? "no votes were cast (unvoted)" : "votes were cast (graded)"}`, `set status ${want.status}`);
     for (const k of ["net", "threshold", "movement", "final_severity", "convergence", "gating"]) {
       if (r[k] !== undefined && r[k] !== want[k]) {
@@ -421,6 +429,7 @@ function checkReviewRecord(d, s) {
   });
 
   const heldRows = new Set([...rows.values()].filter((r) => r.status === "held").map((r) => r.finding));
+  const minorityRows = new Set([...rows.values()].filter((r) => r.status === "minority-report").map((r) => r.finding));
   s.unique(d.top_five, "finding", "top_five", "top-five finding");
   s.unique(d.top_five, "rank", "top_five", "rank");
   (d.top_five ?? []).forEach((t, i) => {
@@ -429,6 +438,7 @@ function checkReviewRecord(d, s) {
     const e = byId.get(t.finding), r = rows.get(t.finding);
     if (!e) return s.err(p, `"${t.finding}" is not in the register`, "each top-five entry traces to its register entry");
     if (heldRows.has(t.finding) || e.need_info) s.err(p, `"${t.finding}" is held (NEED_INFO open) and must be excluded from the top five`, "list it under held instead");
+    if (minorityRows.has(t.finding)) s.err(p, `"${t.finding}" is a minority report and must be excluded from the top five`, "it is listed apart, after held findings");
     if (e.unsupported) s.err(p, `"${t.finding}" is unsupported and cannot be ranked`);
     if (t.pull_quote !== e.pull_quote) s.err(join2(p, "pull_quote"), "differs from the register's pull-quote", "copy the persona's span verbatim (I6)");
     if (t.locator !== e.locator) s.err(join2(p, "locator"), "differs from the register's locator");

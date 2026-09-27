@@ -229,7 +229,7 @@
       "properties": {
         "finding": { "$ref": "#/$defs/finding_id", "description": "The register entry this row counts." },
         "authored_severity": { "$ref": "#/$defs/severity", "description": "Copied from the register." },
-        "status": { "type": "string", "enum": ["graded", "held", "ungraded", "unvoted"], "description": "graded: counted. held: NEED_INFO open, not counted. ungraded: R2- derived. unvoted: every voter abstained." },
+        "status": { "type": "string", "enum": ["graded", "held", "ungraded", "unvoted", "minority-report"], "description": "graded: counted. held: NEED_INFO open, not counted. ungraded: R2- derived. unvoted: every voter abstained. minority-report: exactly one non-author voter; not counted, keeps its authored severity, never gating, listed apart and out of the top five." },
         "n": { "type": "integer", "minimum": 0, "description": "N: the count of non-author voters on the finding (GATE-PRIMITIVE.md Stage 4). A tally must not run at N < 2." },
         "p": { "type": "integer", "minimum": 0, "description": "PRIORITIZE count among non-author voters." },
         "c": { "type": "integer", "minimum": 0, "description": "CONFIRM count among non-author voters." },
@@ -245,7 +245,9 @@
         { "if": { "properties": { "status": { "enum": ["graded", "unvoted"] } }, "required": ["status"] },
           "then": { "required": ["n", "p", "c", "o", "net", "threshold", "movement", "final_severity", "convergence", "gating"] } },
         { "if": { "properties": { "status": { "const": "ungraded" } }, "required": ["status"] },
-          "then": { "required": ["final_severity"] } }
+          "then": { "required": ["final_severity"] } },
+        { "if": { "properties": { "status": { "const": "minority-report" } }, "required": ["status"] },
+          "then": { "required": ["n", "p", "c", "o", "final_severity"] } }
       ]
     },
     "extract_record": {

@@ -192,3 +192,12 @@ test("cli: --json output", () => {
   assert.equal(out.valid, false);
   assert.ok(out.errors.length > 0);
 });
+
+/* ── minority report (GATE-PRIMITIVE § Stage 4, settled case 7) ───────────── */
+
+const minority = (d, id) => { const r = row(d, id); for (const k of ["net", "threshold", "movement", "convergence", "gating"]) delete r[k]; Object.assign(r, { status: "minority-report", n: 1, p: 0, c: 1, o: 0, final_severity: r.authored_severity }); return r; };
+test("a one-voter finding is valid as a minority report", () => { const d = rr(); minority(d, "F3"); assert.equal(validate("review-record", d).valid, true); });
+test("a graded row at N = 1 points to minority-report", () => { const d = rr(); Object.assign(row(d, "F3"), { n: 1, p: 0, c: 1, o: 0, net: 0, threshold: 1, movement: "agreed", convergence: 1 }); const r = validate("review-record", d); assert.equal(r.valid, false); assert.ok(r.errors.some((e) => /N < 2/.test(e.message) && /minority-report/.test(e.hint))); });
+test("a minority report has exactly one voter", () => { const d = rr(); Object.assign(minority(d, "F3"), { n: 2, c: 2 }); expectError("review-record", d, /exactly one voter/); });
+test("a minority report keeps its author's severity", () => { const d = rr(); minority(d, "F3").final_severity = "🔴"; expectError("review-record", d, /keeps its author's severity/); });
+test("a minority report is excluded from the top five", () => { const d = rr(); minority(d, "F2"); expectError("review-record", d, /minority report and must be excluded from the top five/); });
