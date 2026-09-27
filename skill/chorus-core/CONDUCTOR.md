@@ -139,7 +139,8 @@ it must not make.**
 | "I'll pick the best line from the report" | conductor excerpting — selecting a span is restating-lite | the persona marks its own pull-quote; route back if unmarked |
 | "Given the findings, the verdict is…" | judgment added to gating | post-tally 🔴 set, arithmetic only |
 | "The operator probably wants…" | deciding above N+1 | ask; a 🟡 default is *recorded*, never silently assumed |
-| "This question can wait" (interview triage) | demoting another lens's gate | gates lead session 1; deferral is the operator's, recorded with its degradation |
+| "This question can wait" (interview triage) | demoting another lens's gate | gates lead session 1 and block until answered; only non-gate questions may be deferred, recorded with their degradation |
+| "I'll proceed on a working assumption" | answering a lens's gate for the operator | put the gate question as a blocking choice question; the round waits |
 
 The litmus is grammatical: when the conductor is about to write a sentence
 whose subject is *I* and whose verb is *judge, decide, conclude, resolve,
@@ -278,7 +279,7 @@ What the chorus needs from outside. A composition root may bind each port; unbou
 | memory recall | prior findings and rulings for the target | none |
 
 - **Consult before raising.** No operator ask leaves the chorus until the ruling lookup has been consulted.
-- **Recover quietly.** A failed persona reply gets one automatic retry; a missing optional tool falls back to its port's default. Both are recorded in the round record's bindings (the provider behind each port, or `default`, and each recovery), never asked live. An operator question leaves the chorus only when the round cannot reach a valid result alone: quorum fails, or a lost seat leaves a 🔴 finding without enough voters to count it.
+- **Recover quietly.** A failed persona reply gets one automatic retry; a missing optional tool falls back to its port's default. Both are recorded in the round record's bindings (the provider behind each port, or `default`, and each recovery), never asked live. An operator question leaves the chorus only when the round cannot reach a valid result alone: quorum fails, or a lost seat leaves a 🔴 finding without enough voters to count it. A missing gate answer is not a recoverable failure: it blocks the round until the operator answers (`EXPLORATORY-PHASE.md` § Sessioned interview).
 - **Cite, don't copy.** A decision resolved through the bound sink enters the chorus record only as a reference (answer id + where it lives); operator rulings are never restated in chorus records; vote arithmetic lives only in chorus records.
 
 ## Refusals (system boundaries, not modesty)

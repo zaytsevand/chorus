@@ -78,11 +78,10 @@ flowchart TD
   `file:line` and no principle tag (such a finding is demoted to
   `[unsupported]` per I8 and excluded from the tally); **author past an unmet
   gate** — when one of the persona's declared gates is unanswered, the honest
-  output is the question itself, with any dependent findings marked
-  **conditional on the stated assumption** rather than graded as if the answer
-  were known (S10). An unmet exploratory `[gate]` is an **S10 frame gap, not a
-  per-finding S11 flag**: the persona leads with the gate question, or marks
-  dependent findings conditional on the stated assumption — it does **not** raise
+  output is the question itself, and the round waits for the answer; no
+  dependent finding is authored on an assumed answer (S10). An unmet
+  exploratory `[gate]` is an **S10 frame gap, not a per-finding S11 flag**: the
+  persona returns the gate question and stops. It does **not** raise
   `need_info` on a finding as a substitute for a missing frame (that boundary is
   the routing rule; S11 owns only gaps that remain once the frame is sufficient).
 
@@ -127,8 +126,8 @@ sufficient** but *this specific finding* cannot honestly proceed. Raising it is
 
 Its boundary with S10 is settled at the two seams that own each case, so no separate
 routing table is needed: an unmet exploratory **`[gate]`** is a frame gap resolved by
-S10 at Stage 2 (the persona leads with the gate question, dependent findings
-conditional on the stated assumption); `need_info` is only for gaps that **remain on
+S10 before Stage 2 (the persona returns the gate question and the round waits);
+`need_info` is only for gaps that **remain on
 a specific finding once the frame is sufficient**. Do not use `need_info` to bypass an
 open S10 gate — resolve the frame first, then raise S11 for what is left.
 
@@ -282,8 +281,8 @@ integration layer’s I1–I9.
   it cannot honestly review without (`[gate]` entries in its profile,
   `EXPLORATORY-PHASE.md`) — and **prompts for an unmet gate instead of inferring
   past it**. A gate resolves only as *referenced* or *operator-confirmed*; while
-  it is open, the persona leads with the question and marks dependent findings
-  conditional on the stated assumption. The later stages cannot catch a
+  it is open, the persona returns the question and the round waits; no working
+  assumption stands in for the answer. The later stages cannot catch a
   wrong-bar review — every vote asks "is this severe *within the frame*," so
   convergent PRIORITIZE amplifies an altitude error rather than correcting it.
   Honesty about the frame lives in each persona's own chain of thought, before

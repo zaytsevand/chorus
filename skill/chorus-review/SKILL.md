@@ -236,8 +236,9 @@ running suggests the round context is not surfacing its deltas honestly.
 - **Pre:** Phase 0.5 post holds; quorum branch is "proceed".
 - **Post:** every joiner has a persisted understanding record whose profile needs
   are each referenced / inferred / operator-confirmed / open-gap; the **one
-  batched, sessioned operator interview** has run (or was deferred with a
-  recorded degradation summary); project-wide facts were written to the addendum
+  batched, sessioned operator interview** has run, with every `[gate]` need
+  answered (an unanswered gate blocks the round; only non-gate gaps may be
+  deferred, with a recorded degradation summary); project-wide facts were written to the addendum
   **only with operator acceptance**; the **profile-coverage fitness function**
   passes (or its failures are recorded).
 

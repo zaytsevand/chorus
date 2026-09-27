@@ -151,8 +151,9 @@ and re-grounding findings in live material (persisted memory is an index, never 
 evidentiary endpoint). The **project base is reused across gates** — built once, each
 gate adds only feature/spec deltas — so Gates B and C do not re-derive the project
 context Gate A established. Gap-questions feed the orchestrator's **one batched,
-sessioned operator interview** (≤ 5 Q/session, re-entrant, operator-paced; a deferred
-session yields a verdict degradation summary); project-wide answers are written back
+sessioned operator interview** (≤ 5 Q/session, re-entrant, operator-paced; an unanswered
+`[gate]` blocks the gate, while a deferred non-gate question yields a verdict degradation
+summary); project-wide answers are written back
 to the addendum (operator-accepted). **Unmet `[gate]` needs lead session 1**: each
 seated lens prompts for the answers it has declared it cannot honestly review without
 (who the user is and how many, the grading bar, the characteristic ranking) before

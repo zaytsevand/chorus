@@ -195,9 +195,11 @@ The batched operator interview is **not** one wall of questions. It is:
 - **Gates-first** — unmet `[gate]` needs **lead session 1**, before any other
   gap. They are the cheapest questions with the largest blast radius: one answer
   (who the user is, what bar applies) can collapse or re-price whole clusters of
-  findings before they are authored. A deferred gate is named first in the
-  degradation summary, and the lens's dependent findings are authored as
-  **conditional on a stated assumption**, never as if the answer were known.
+  findings before they are authored. **An unanswered gate blocks the round**:
+  no finding is authored until every seated lens's gates are referenced or
+  operator-confirmed. Gate questions are put as blocking choice questions (the
+  decision sink's 🔴 ask), never replaced by a working assumption, and never
+  deferred. Missing context is not a recoverable failure: nothing routes around it.
 - **Sessions of ≤ 5 questions** each.
 - **Re-entrant** — the operator may **defer** a session and **resume** it later;
   session state (answered / deferred / pending) persists.
@@ -209,7 +211,7 @@ The batched operator interview is **not** one wall of questions. It is:
   resumed-context reminder** on later ones.
 
 **Degradation summary.** If the operator leaves the interview before it
-completes, the unanswered needs stay **open gaps** (provisional), and the round's
+completes, the unanswered **non-gate** needs stay **open gaps** (provisional), and the round's
 verdict carries an explicit **degradation summary** — how many gaps remain and
 which findings are affected — so a skipped interview is an *informed* trade-off,
 never a silent quality drop (FR-019/SC-009).
@@ -230,8 +232,9 @@ findings are authored:
    an entry in its understanding record, tagged `referenced` / `inferred` /
    `operator-confirmed` / `open-gap`. A profile item with **no** record entry is
    a detectable **coverage failure**, not a matter of interpretation. A
-   **`[gate]` need** tagged `inferred` is likewise a coverage failure — gates
-   admit only `referenced` / `operator-confirmed` / `open-gap` (S10).
+   **`[gate]` need** tagged `inferred` or `open-gap` is likewise a coverage
+   failure: gates admit only `referenced` / `operator-confirmed` (S10), and a
+   gate failure stops the round before Round 1.
 2. **Reconciliation** — every cached `project-wide` fact carries a reconciliation
    locator to the addendum.
 
