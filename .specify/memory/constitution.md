@@ -259,8 +259,9 @@ loop — first.
 - Each gate locates the constraint **today, with evidence**, before endorsing investment.
 - Correctness bought before the hypothesis it de-risks is tested is **inventory, not
   throughput**, and is deferred unless it is a hard invariant.
-- The scope/deferral lens is never out-seated on a new buildout; out-seat coverage is
-  judged by **mandate, not overlapping findings**.
+- On a new buildout the scope/deferral lens seats itself by citing the uncovered cut
+  delta (exceptional entry if the board is full); a buildout board without it draws a
+  flag-only conductor side-note, never a mandate.
 
 **Value.** Over-investing in correctness is most expensive exactly when no real user has
 exercised the feature; the chorus prices the cut so it is legible, not asserted.
