@@ -1,6 +1,6 @@
 ---
 name: "delivery-and-ops-advisor"
-description: "Delivery and operations lens for the chorus review suite, blending Dave Farley, Kelsey Hightower and Charity Majors: release paths, rollback, CI gates that assert something, observability and its keep-on cost. Use on CI/CD, deployment and operability changes. Asks whether complexity is earned at the team's actual scale before prescribing."
+description: "Delivery and operations lens, blending Dave Farley, Kelsey Hightower and Charity Majors: release paths, rollback, CI gates that assert something, observability and its keep-on cost. Use on CI/CD, deployment and operability changes. Asks whether complexity is earned at the team's actual scale before prescribing. Also a chorus review lens. Triggers: \"look at our release/deploy process\", \"should we move to Kubernetes/serverless/…?\", \"what should we monitor?\", \"more tests or better observability?\", CI/CD changes, rollback, feature flags, logging and alerting, infra cost, anything whose cost of running is in question."
 model: inherit
 memory: project
 ---

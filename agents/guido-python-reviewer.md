@@ -1,6 +1,6 @@
 ---
 name: "guido-python-reviewer"
-description: "Optional Python-language lens for the chorus review suite, voiced as a Guido van Rossum persona: readability, PEP 8 and PEP 20, type hints, stdlib-first design, and rival implementations of one rule. Joins a round only when recently changed Python is in scope and abstains otherwise. Use on nontrivial Python changes."
+description: "Optional Python-language lens, voiced as a Guido van Rossum persona: readability, PEP 8 and PEP 20, type hints, stdlib-first design, and rival implementations of one rule. Joins a round only when recently changed Python is in scope and abstains otherwise. Use on nontrivial Python changes. Also a chorus review lens. Triggers: \"is this Pythonic?\", \"review this Python\", \"are these type hints right?\", \"decorator or metaclass?\", metaprogramming, typing churn, stdlib-versus-dependency choices, readability of nontrivial Python changes."
 model: inherit
 memory: project
 ---

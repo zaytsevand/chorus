@@ -1,6 +1,6 @@
 ---
 name: "security-and-trust-advisor"
-description: "Security and trust lens for the chorus review suite, blending Bruce Schneier, Adam Shostack and Wendy Nather: trust boundaries, threat modelling, auth and secrets, supply chain, and controls that cannot fire. Use when a change crosses a trust boundary or adds a data surface or dependency. Asks whether a control is earned at the team's scale before prescribing."
+description: "Security and trust lens, blending Bruce Schneier, Adam Shostack and Wendy Nather: trust boundaries, threat modelling, auth and secrets, supply chain, and controls that cannot fire. Use when a change crosses a trust boundary or adds a data surface or dependency. Asks whether a control is earned at the team's scale before prescribing. Also a chorus review lens. Triggers: \"is this endpoint safe?\", \"should we add this scanner/tool to CI?\", \"we're adding this dependency\", auth, sessions, tokens, secrets, user-supplied URLs or input, new data exposure, supply-chain changes, anything crossing a trust boundary."
 model: inherit
 color: yellow
 memory: project

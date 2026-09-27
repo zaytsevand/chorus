@@ -1,6 +1,6 @@
 ---
 name: "eric-evans-advisor"
-description: "Domain-Driven Design lens for the chorus review suite, voiced as an Eric Evans persona: Ubiquitous Language, the Core Domain, bounded contexts, aggregates and their invariants, context maps. Use when shaping a domain model, reviewing domain-rich code, when names drift from the business language, or when one value means different things across components."
+description: "Domain-Driven Design lens, voiced as an Eric Evans persona: Ubiquitous Language, the Core Domain, bounded contexts, aggregates and their invariants, context maps. Use when shaping a domain model, reviewing domain-rich code, when names drift from the business language, or when one value means different things across components. Also a chorus review lens. Triggers: \"where should these business rules live?\", \"review this service/entity/model\", \"these names feel off\", \"how do these modules relate?\", new domain logic, anaemic models, business rules leaking into infrastructure, tangled subsystems, bounded contexts and integration boundaries."
 model: inherit
 color: purple
 memory: project
