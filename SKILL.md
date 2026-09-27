@@ -47,14 +47,14 @@ published. The renderer validates again and refuses invalid input.
 ## Ports
 
 The chorus declares what it needs from outside. Each port has a default that
-works when nothing is bound.
+works when nothing is bound. Where a provider stores answers is internal to its
+binding, never a chorus port (the chorus lists only what it needs).
 
 | Port | What the chorus needs | Default (nothing bound) | Binding |
 |---|---|---|---|
-| Decision sink | somewhere to put a 🟡 card or ask a 🔴 question | ask in chat; record the decision in the chorus record | a problem-brief entry (Q-n), written by the translation rules below |
+| Decision sink | somewhere to put a 🟡 card or ask a 🔴 question; returns a ruling reference | ask in chat; keep the answer in the record's `local_rulings`, return `record: "#"` | a problem-brief entry (Q-n), written by the translation rules below; the answer is kept in the brief's `rulings` and only the reference goes back |
 | Ruling lookup | standing operator answers, checked before asking | the record's own `local_rulings` and prior records | the brief's rulings (`R-n`), searched before any new question |
-| Ruling sink | where an operator answer is kept | `local_rulings` in the chorus record, cited as `record: "#"` | the brief's `rulings`; the chorus record keeps only a `ruling_ref` |
-| Record publisher | where the round's record lives | commit `<record>.json` plus the page from `render.mjs` | same; a brief links the page from its evidence |
+| Record renderer / publisher | where the round's record lives | commit `<record>.json` plus the page from `render.mjs` | same; a brief links the page from its evidence |
 | Record validator | a program that accepts or refuses a record | `bin/validate.mjs` (this skill) | — |
 | Arbiter | a ruling on a framed conflict | `advisor()`; absent → the conflict is recorded unresolved for the operator | — |
 | Fixed viewpoint | a spec-to-code digest at Gate C | `spec-walkthrough` headless; absent → skip and log | — |
@@ -65,8 +65,8 @@ the gate outcome), never silently.
 
 ## Who owns which fact
 
-- **Operator rulings** (answers, waivers, sign-offs, preferences) live in the
-  ruling sink. A chorus record cites them as `ruling_ref: {id, record}` and
+- **Operator rulings** (answers, waivers, sign-offs, preferences) live wherever the
+  decision sink's provider keeps them (the chorus never sees where). A chorus record cites them as `ruling_ref: {id, record}` and
   never restates them.
 - **Vote arithmetic** (seating, P/C/O, net, severities, cycles) lives only in the
   chorus record. A brief cites it and never re-decides it.
