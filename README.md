@@ -1,6 +1,6 @@
-# chorus-review
+# chorus
 
-A Claude Code skill that runs a structured multi-advisor review of **whatever
+A Claude Code skill suite that runs a structured multi-advisor review of **whatever
 you point it at** — most often a spec or a feature's design, occasionally a
 full-codebase sweep. Nine persona advisors, each reviewing the target through
 their lens:
@@ -19,11 +19,11 @@ An optional **Guido** (Python) language lens joins only on rounds with Python in
 scope. Conflicts go to `advisor()`. Output is a durable markdown artifact you
 commit; the most recent artifact is the next round's baseline.
 
-## The suite — three skills over one substrate
+## The suite — four skills over one substrate
 
-The chorus is packaged as a **composable suite** of three skills. The shared
-mechanics live once in a substrate skill; the two operator-facing modes compose
-it by name and never depend on each other:
+The chorus is packaged as a **composable suite** of four skills. The shared
+mechanics live once in a substrate skill; the two review modes compose it by
+name and never depend on each other, and a tutorial skill teaches both:
 
 - **`chorus-core`** — substrate (not invoked directly). The four-stage gate
   primitive (`skill/chorus-core/GATE-PRIMITIVE.md`: extract → uncapped author →
@@ -50,6 +50,10 @@ it by name and never depend on each other:
   substantive honest-null, defined once in `skill/chorus-sdlc/SKILL.md`
   (§ Gate A — premise pass); the same pass runs first inside every Gate A.
   Trigger: **"chorus challenge `<target>`."**
+- **`chorus-learn`** — a guided, staged **tutorial**: setup (the per-project
+  addendum, which it can scaffold on request from the template it ships at
+  `skill/chorus-learn/templates/CHORUS-PROJECT.template.md`) and both review
+  modes. Trigger: **"chorus learn."**
 
 Both modes run the **same** gate primitive from `chorus-core`, so they cannot
 drift. Each sibling declares `REQUIRED: chorus-core` and carries a sibling-side
@@ -79,7 +83,7 @@ Two design choices worth knowing about:
   a thin orchestrator with explicit refusals — it routes between personas,
   the user, and `advisor()`, but never holds a lens, never adds findings of
   its own, never substitutes `advisor()` for cognitive work. See
-  `skill/chorus-review/INTEGRATION-LAYER.md`.
+  `skill/chorus-core/CONDUCTOR.md`.
 
 ## Lifecycle of a review
 
@@ -168,7 +172,8 @@ between personas, the user, and `advisor()`, but never holds a lens, never
 adds findings of its own, and never substitutes `advisor()` for cognitive
 work. The invariants enforcing that — including the **I8 evidence gate** the
 diagram references — live in
-[`skill/chorus-review/INTEGRATION-LAYER.md`](skill/chorus-review/INTEGRATION-LAYER.md).
+[`skill/chorus-core/CONDUCTOR.md`](skill/chorus-core/CONDUCTOR.md); the round
+itself is [`skill/chorus-review/SKILL.md`](skill/chorus-review/SKILL.md).
 
 Before Round 1, participating advisors run the **exploratory phase**: each builds
 and persists a lens-specific understanding of the target, harvested
@@ -205,14 +210,14 @@ convergence for *ranking* but does not escalate — so popular polish stays poli
 
 Projects with stronger or more-specific principles (layer rules, language
 mandates, infrastructure constraints) declare them in section 4 of
-[`templates/CHORUS-PROJECT.template.md`](templates/CHORUS-PROJECT.template.md)
+[`skill/chorus-learn/templates/CHORUS-PROJECT.template.md`](skill/chorus-learn/templates/CHORUS-PROJECT.template.md)
 under "Constitutional / governance principles." Phase 4 ranking consumes
 that list under "Constitutional ROI."
 
 Findings cite either `file:line` (claims about the project's artefacts)
 or `[principle]` (claims grounded in a project-named principle the
 addendum carries). The I8 evidence gate refuses findings that do
-neither — see [`skill/chorus-review/INTEGRATION-LAYER.md`](skill/chorus-review/INTEGRATION-LAYER.md).
+neither — see [`skill/chorus-core/CONDUCTOR.md`](skill/chorus-core/CONDUCTOR.md).
 
 ## Lens coverage
 
@@ -249,9 +254,33 @@ own grain on top per language and aren't scored here. The live, interactive
 version of this matrix — heatmap, radar, and per-axis breakdown — is at
 [`docs/reviews/2026-06-05-chorus-coverage-map.html`](docs/reviews/2026-06-05-chorus-coverage-map.html).
 
+## Requirements
+
+**Hard:**
+
+- **speckit skills** (`speckit-plan`, `speckit-tasks`, `speckit-implement`, …)
+  for `chorus-sdlc` — its gates interleave with the speckit cycle.
+  `chorus-review` and `chorus-learn` do not need them.
+- **The `advisor()` tool** — conflict reconciliation (Phase 3) routes disputes
+  to it. Without it the chorus records each conflict, unresolved, for you to
+  rule on.
+
+**Optional:**
+
+- **spec-walkthrough** — run headless, its spec-to-code reconciliation digest
+  feeds the review (the fixed viewpoint at `chorus-sdlc` Gate C).
+- **memsearch** — recall of past-session context when the round context is
+  drafted; the project's own memory surface works too.
+
 ## Install
 
-### Canonical (clone + script)
+The suite is named **chorus**. (The repository is still
+`zaytsevand/chorus-review`; it will be renamed to `chorus`.) Both channels below
+deliver the same four skills (`chorus-core`, `chorus-review`, `chorus-sdlc`,
+`chorus-learn`, including their subfolders such as the addendum template) and
+the ten persona agents.
+
+### Clone + script
 
 ```sh
 git clone https://github.com/<your-org>/chorus-review.git
@@ -259,58 +288,49 @@ cd chorus-review
 ./install.sh
 ```
 
-This iterates over `skill/*/` and copies all three suite skills
-(`chorus-core`, `chorus-review`, `chorus-sdlc`) into `~/.claude/skills/<name>/`
-and the persona agents into `~/.claude/agents/`. Existing same-named agent files
-are preserved unless you pass `--force`.
+`install.sh` mirrors each `skill/<name>/` directory into
+`~/.claude/skills/<name>/` (replacing any earlier copy, so files removed
+upstream disappear) and copies the persona agents into `~/.claude/agents/`.
+Existing agent files it did not write are preserved unless you pass `--force`.
+Every file it writes is recorded in `~/.claude/.chorus-install-manifest`.
+Re-running it is safe and is also how you upgrade.
 
-Override the target with `CLAUDE_HOME=/path/to/claude ./install.sh`.
-
-#### Upgrading from the pre-suite single skill (REQUIRED manual step — F6 waiver)
-
-The pre-split install put all files in one `chorus-review/` dir. `install.sh`
-does **not** prune stale files (the installer-prune fix was waived in favor of a
-documented manual step). A copy-only re-install would leave orphaned files
-(`SDLC-LAYER.md`, the primitives, the old `SKILL.md`) that **double-define the
-`I1–I9` catalog** in the live dir. Before re-installing the suite, delete the old
-single-skill dir:
+**Per-project install** — install into one project's `.claude/` instead of your
+global config, by pointing `CLAUDE_HOME` at it (run from the project root):
 
 ```sh
-rm -rf ~/.claude/skills/chorus-review   # remove the pre-suite single-skill install
-./install.sh                            # then install the suite fresh
+CLAUDE_HOME=$PWD/.claude <repo>/install.sh
 ```
 
-This is the operator-accepted mitigation; the repo source is unaffected (the
-invariant-resolution fitness check runs on source).
+### Plugin
 
-### Plugin (Claude Code plugin manifest)
+The repo is a Claude Code plugin: the manifest is
+[`.claude-plugin/plugin.json`](.claude-plugin/plugin.json) (plugin name
+`chorus`; check it with `claude plugin validate <repo>`). Load it from a
+checkout for a session with:
 
-The repo ships a `plugin.json` so it can be loaded via Claude Code's plugin
-mechanism. See your Claude Code version's plugin-installation docs for the
-exact incantation; the manifest at the root is the canonical entry point.
-
-> **Naming reconciliation (recorded, not yet actioned — FR-016).** The review
-> skill is published in some environments under the trigger name `chorus` while
-> its source skill dir is `chorus-review`. This mismatch is **recorded as an
-> explicit reconciliation task**; it is **not** silently renamed here. Resolve it
-> deliberately (decide the canonical published name, then align source + manifest
-> + docs in one change) rather than letting the two drift.
+```sh
+claude --plugin-dir <repo>
+```
 
 ### Uninstall
 
 ```sh
-./uninstall.sh
+./uninstall.sh                              # global install
+CLAUDE_HOME=$PWD/.claude <repo>/uninstall.sh   # per-project install
 ```
 
-Removes the three suite skill dirs and the persona agent files. Your per-project
-addenda and chorus artifacts under `docs/reviews/` are left untouched.
+Removes exactly the files listed in the install manifest, then the manifest.
+Agent files `install.sh` skipped (because they already existed) are left alone,
+as are your per-project addenda and chorus artifacts under `docs/reviews/`.
 
 ## Run a round
 
-1. **Drop the template into your project:**
+1. **Set up the project addendum.** Say **"chorus learn"** and accept its
+   scaffold offer, or copy the template yourself:
 
    ```sh
-   cp ~/code/chorus-review/templates/CHORUS-PROJECT.template.md \
+   cp <repo>/skill/chorus-learn/templates/CHORUS-PROJECT.template.md \
       docs/reviews/CHORUS-PROJECT.md
    ```
 

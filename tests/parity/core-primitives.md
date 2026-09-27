@@ -1,16 +1,22 @@
 # Parity — core primitive moves (T009, FR-015 tier 1)
 
+> **Historical evidence of the 014 suite split** — a record of one run on branch `014-chorus-suite-decomposition` (pre-move HEAD `1081b97`, split commit `715e1c5`, squashed into `176311a` on main); paths describe that tree, and the current checks are `scripts/check-suite-integrity.sh`.
+
 **Tier 1: byte-identical moves** → structural-equivalence + reachability.
 (Per Gate A F11: a full behavioral scenario here re-proves what `diff` + FC1
 already cover, so the bar is structural equivalence + composition reachability.)
 
 ## Structural equivalence (the GREEN)
 
-Run (the exact command, reproducible):
+Run (the exact command at T009, with `HEAD` pinned to the commit it was then —
+`1081b97`, reachable via `origin/014-chorus-suite-decomposition`; the right-hand
+side was the T009 working tree, before the pointer fix below, which no commit
+preserves — against `715e1c5:skill/chorus-core/$f.md` the diff is exactly those
+pointer lines):
 
 ```bash
 for f in GATE-PRIMITIVE DECISION-PRIMITIVE EXPLORATORY-PHASE; do
-  git show HEAD:skill/chorus-review/$f.md | diff - skill/chorus-core/$f.md \
+  git show 1081b97:skill/chorus-review/$f.md | diff - skill/chorus-core/$f.md \
     && echo "IDENTICAL: $f.md"
 done
 ```

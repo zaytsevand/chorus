@@ -1,5 +1,7 @@
 # Parity — chorus-review project-state round (T014, FR-015 tier 2)
 
+> **Historical evidence of the 014 suite split** — a record of one run on branch `014-chorus-suite-decomposition` (pre-move HEAD `1081b97`, split commit `715e1c5`, squashed into `176311a` on main); paths describe that tree, and the current checks are `scripts/check-suite-integrity.sh`.
+
 **Tier 2: content-changed** (`SKILL.md` slimmed: "two modes" framing + SDLC
 pointer removed, `REQUIRED: chorus-core` + sibling guard added; `INTEGRATION-LAYER.md`
 slimmed to round-specific content, shared discipline + I1–I9 replaced by

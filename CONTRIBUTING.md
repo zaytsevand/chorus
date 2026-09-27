@@ -1,17 +1,20 @@
 # Contributing
 
-Thanks for considering a contribution.
+Thanks for considering a contribution to **chorus**, the multi-advisor review
+suite (four skills: `chorus-core`, `chorus-review`, `chorus-sdlc`,
+`chorus-learn`).
 
 ## What's in scope
 
-- **Skill prose** (`skill/chorus/SKILL.md`, `INTEGRATION-LAYER.md`) —
-  procedure refinements, phase-gate tightening, new failure-mode entries,
-  clearer briefs.
+- **Skill prose** (`skill/<name>/SKILL.md` and the files beside it, e.g.
+  `skill/chorus-core/GATE-PRIMITIVE.md`) — procedure refinements, phase-gate
+  tightening, new failure-mode entries, clearer briefs.
 - **Persona agents** (`agents/*.md`) — sharpening voice, fixing calibration
   notes, updating relationship sections.
-- **Templates** (`templates/CHORUS-PROJECT.template.md`) — better prompts in
+- **Templates** (`skill/chorus-learn/templates/CHORUS-PROJECT.template.md`, the
+  only copy; both install channels ship it with the skill) — better prompts in
   the fillable sections.
-- **Install scripts** (`install.sh`, `uninstall.sh`) and `plugin.json` —
+- **Packaging** (`install.sh`, `uninstall.sh`, `.claude-plugin/plugin.json`) —
   platform compatibility, idempotency fixes.
 
 ## What's out of scope
@@ -40,8 +43,21 @@ Before submitting, run:
 rg -i '<list of project-marker patterns you happen to know about>' .
 ```
 
-CI runs an equivalent check; PRs with project-specific markers will be
+Reviewers check for project-specific markers; PRs that carry them will be
 asked to scrub.
+
+## Checks
+
+```sh
+scripts/check-suite-integrity.sh     # FC1–FC5: invariants, sibling isolation,
+                                     # manifest (incl. claude plugin validate),
+                                     # references, stale content
+scripts/test-install-roundtrip.sh    # install -> verify -> uninstall -> verify
+```
+
+CI (`.github/workflows/integrity.yml`) runs both on every pull request and on
+pushes to `main`. The runner has no `claude` CLI, so CI skips
+`claude plugin validate`; run the integrity script locally before a release.
 
 ## Procedure for substantive changes
 
@@ -49,9 +65,25 @@ For anything beyond a typo or small clarity edit:
 
 1. Open an issue describing what you want to change and why.
 2. If the change affects the procedure (phases, gates, quorum, refusals),
-   read `INTEGRATION-LAYER.md` first — the invariants there are
-   load-bearing.
+   read `skill/chorus-core/CONDUCTOR.md` first — the invariant catalog there
+   (`I1–I9`) is load-bearing.
 3. PR with the diff and a short rationale.
+
+## Releasing
+
+A version is released only after it has been **dogfooded**:
+
+1. Merge to `main` with CI green, and run `scripts/check-suite-integrity.sh`
+   locally (it includes `claude plugin validate`).
+2. Install that version into the dogfooding project **the way a user would** —
+   through the plugin (`claude --plugin-dir <repo>`) or `install.sh`
+   (e.g. `CLAUDE_HOME=$PWD/.claude <repo>/install.sh` from the project root).
+3. Run one chorus round (or chorus-sdlc gate) on real work in that project.
+
+The version counts as released only once that round has run. Until then it is
+merged, not released. There is no symlink install mode and no installed-copy
+drift check: dogfooding through the real channel is what keeps the installed
+copy current and catches packaging breakage.
 
 ## License of contributions
 
