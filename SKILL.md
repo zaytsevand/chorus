@@ -20,7 +20,8 @@ both. It owns four things:
 2. **The validator** (`bin/validate.mjs`): a program, never a model reading
    JSON. It checks the schema plus what a schema cannot express: the Stage-4
    tally arithmetic, unique ids, ungraded R2- findings, held findings kept out
-   of the top five, word limits, and well-formed `ruling_ref`s.
+   of the top five, word limits, recorded recoveries, and each `ruling_ref`
+   followed into the record it names.
 3. **The renderers** (`bin/render.mjs`): the review page and the ledger page,
    rendered from validated JSON. The JSON is the record; the page is a view.
 4. **The bindings**: which provider serves each port the chorus declares, and
@@ -39,10 +40,25 @@ node <root>/bin/render.mjs   <review-record|sdlc-log> <file.json> <out.md>
 Kinds: `rsvp`, `finding-report`, `vote-report`, `review-record`, `sdlc-log`,
 `decision`, `ruling`.
 
-**When to run it.** Validate every persona reply before it is counted (an
-invalid reply is malformed output: it goes back to the persona once, then counts
-as ABSTAIN under the one failure rule). Validate every record before it is
-published. The renderer validates again and refuses invalid input.
+**When to run it.** Validate every persona reply before it is counted. An
+invalid reply gets exactly one automatic retry with the validator's reason; if
+the retry fails too, the persona counts as ABSTAIN under the one failure rule.
+Both are written to the record's `bindings.recoveries`, never asked live.
+Validate every record before it is published. The renderer validates again and
+refuses invalid input. There is no runtime version check between the chorus and
+this skill: releasing both through the real install channel covers version
+drift.
+
+**What reaches the operator.** Recoverable failures do not: the operator's
+attention is the scarcest thing in the loop. A retry, a fallback to a port's
+default and an abstention by failure are recorded and the round goes on. The operator is asked only when the round cannot reach a valid
+result alone: it stops for lack of reviewers (quorum), or a lost seat leaves a
+🔴 finding without enough voters to count it.
+
+A `ruling_ref` record path is read from the repository root. The validator opens
+a local record and checks the id is there: an id it does not hold is an error;
+an absent or unreadable record is a warning, so a private brief kept outside the
+repository does not break validation.
 
 ## Ports
 
@@ -60,8 +76,9 @@ binding, never a chorus port (the chorus lists only what it needs).
 | Fixed viewpoint | a spec-to-code digest at Gate C | `spec-walkthrough` headless; absent → skip and log | — |
 | Memory recall | earlier understanding before a round | `.claude/agent-memory/<persona>/` and the addendum; absent → skip and log | a memory-recall skill such as memsearch |
 
-A port that falls back to its default says so in the record (a side-note or
-the gate outcome), never silently.
+Each review record names the provider that served each port, or `default`, in
+its `bindings` block, shown once at the top of the page. A port that falls back
+to its default is a recorded recovery, never a question and never silent.
 
 ## Who owns which fact
 
@@ -92,18 +109,50 @@ over unchanged. `point`, `band`, `sensor`, `resolution`, `override` and
    reports. Chorus terms get their plain meaning first, with the term trailing
    as a pointer: tally → vote count, gate → review stage, lens → reviewer,
    held → waiting on information, park → set aside, frame → the question as
-   posed. The brief's banned coinages never reach the page.
+   posed. The brief's banned coinages never reach the page. Words the two sides
+   could read differently:
+   - **held** (tally status): NEED_INFO open, not counted.
+   - **unmoved** (tally movement, was `hold`): counted, but the vote left the
+     authored severity where it was.
+   - **hard-block** (decision resolution, was `escalated`): a 🔴 the chorus
+     cannot pass until the operator rules. In the brief this is
+     `bearing: blocks-goal`; the brief's `escalated` means the opposite (a real
+     decision that does not block), and the chorus never uses the word.
+   - **bound-reached** (gate result, was `escalated`): three cycles left a 🔴
+     uncleared, so it goes to the operator as a hard-block.
 2. **Count first, group second.** Group findings by root cause only after the
    vote count. The grouped entry lists every finding it absorbed in `rolledUp`,
    each with its id and final severity.
 3. **The recommendation comes from the vote.** The recommended option is the
    one the vote supports (the highest-convergence remedy, or the chorus default
    for a 🟡). The translation never picks its own favourite.
-4. **Bearing.** A 🔴 decision is `bearing: blocks-goal`; a 🟡 is `escalated`.
+4. **Bearing.** A 🔴 decision (`hard-block`) is `bearing: blocks-goal`; a 🟡
+   is `escalated` in the brief's sense.
 5. **Write the ids back.** Once the entry exists, set the chorus decision's
    `entry_ref` to `{id: "Q-n", record: "<brief.json>"}`. Once the operator rules,
    set `ruling_ref` to the brief's `R-n`, and move `status` and `decision` to
-   match. Re-validate the chorus record.
+   match. Re-validate the chorus record. Ids are written exactly as the brief
+   writes them (`R-4`, `Q-7`), never with a subject prefix: `record` already
+   says which brief.
+
+## Reading back from the brief
+
+What the brief does to an entry or ruling after publication comes back to the
+chorus record as follows. Chorus records are history: an old record is never
+rewritten to match; the next record, or the open decision, follows.
+
+- **Entry decided or complete.** Rule 5 above.
+- **Entry reopened** (set back to `open` under the same id with new evidence).
+  The chorus decision returns to `open`, loses its `decision` and `ruling_ref`,
+  and a 🔴 blocks again.
+- **Entry superseded** (the problem went away; nothing was carried out). The
+  chorus decision becomes `superseded`. It needs no ruling. A record citing the
+  entry as a ruling gets a validator warning.
+- **Ruling replaced** (`status: replaced`, `replacedBy: R-m`). New records cite
+  `R-m`. The validator warns on any citation of the replaced ruling and names
+  the ruling that holds now, following the chain. A decision settled by the old
+  ruling is checked against the new one; if the new ruling no longer supports
+  the choice, the decision reopens.
 
 A ruling moves between a brief and a chorus fallback record unchanged: the
 `ruling` schema is field-for-field the brief's.

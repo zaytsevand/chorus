@@ -71,7 +71,7 @@
         }
       }
     },
-    "resolution": { "type": "string", "enum": ["auto-resolved", "default-applied", "in-progress", "escalated"], "description": "DecisionRecord resolution. in-progress is a self-heal cycle in flight." },
+    "resolution": { "type": "string", "enum": ["auto-resolved", "default-applied", "in-progress", "hard-block"], "description": "DecisionRecord resolution. in-progress is a self-heal cycle in flight. hard-block: a 🔴 the chorus cannot pass until the operator rules (not the brief's bearing 'escalated', which means not blocking)." },
     "cycle": { "type": "integer", "minimum": 1, "maximum": 3, "description": "Self-heal only: cycle N of 3." },
     "override": {
       "type": "object",
@@ -104,7 +104,7 @@
     { "if": { "properties": { "band": { "const": "🟡" } }, "required": ["band"] },
       "then": { "required": ["override"], "properties": { "resolution": { "enum": ["default-applied", "in-progress"] } } } },
     { "if": { "properties": { "band": { "const": "🔴" } }, "required": ["band"] },
-      "then": { "properties": { "resolution": { "const": "escalated" }, "solutions": { "minItems": 2, "maxItems": 4 } } } },
+      "then": { "properties": { "resolution": { "const": "hard-block" }, "solutions": { "minItems": 2, "maxItems": 4 } } } },
     { "if": { "properties": { "band": { "const": "🟢" } }, "required": ["band"] },
       "then": { "properties": { "resolution": { "const": "auto-resolved" } } } }
   ]

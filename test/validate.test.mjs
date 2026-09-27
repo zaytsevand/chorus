@@ -1,6 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { readFileSync, readdirSync } from "node:fs";
+import { mkdirSync, mkdtempSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
 import { spawnSync } from "node:child_process";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -52,8 +53,8 @@ test("tally: T = max(1, floor(N/2)), one level per tally, symmetric", () => {
   assert.equal(agreed.convergence, 3);
   assert.equal(agreed.net, 0); // CONFIRM excluded from net
   assert.equal(tally("🟡", 3, 0, 0, 0).status, "unvoted");
-  assert.equal(tally("🟡", 4, 2, 1, 1).movement, "agreed"); // held with CONFIRM votes
-  assert.equal(tally("🟡", 4, 1, 0, 0).movement, "hold");
+  assert.equal(tally("🟡", 4, 2, 1, 1).movement, "agreed"); // unmoved, with CONFIRM votes
+  assert.equal(tally("🟡", 4, 1, 0, 0).movement, "unmoved");
 });
 
 /* ── arithmetic violations in a review record ───────────────────────────── */
@@ -145,7 +146,7 @@ test("third uncleared cycle must escalate (S7)", () => {
   d.status = "in-progress"; d.gates.splice(3, 0, g);
   expectError("sdlc-log", d, /third cycle left a 🔴 uncleared/);
 });
-test("escalation before the third cycle is refused", () => { const d = sl(); d.status = "halted-awaiting-operator"; d.gates[1].outcome = { result: "escalated" }; expectError("sdlc-log", d, /escalated before the third cycle/); });
+test("escalation before the third cycle is refused", () => { const d = sl(); d.status = "halted-awaiting-operator"; d.gates[1].outcome = { result: "bound-reached" }; expectError("sdlc-log", d, /bound-reached before the third cycle/); });
 test("cycles are consecutive", () => { const d = sl(); d.gates[2].cycle = 3; expectError("sdlc-log", d, /where cycle 2 was expected/); });
 test("waiver needs the operator's ruling_ref", () => { const d = sl(); d.gates[1].red_resolutions[0].disposition = "waived"; expectError("sdlc-log", d, /missing "ruling_ref"/); });
 
@@ -201,3 +202,99 @@ test("a graded row at N = 1 points to minority-report", () => { const d = rr(); 
 test("a minority report has exactly one voter", () => { const d = rr(); Object.assign(minority(d, "F3"), { n: 2, c: 2 }); expectError("review-record", d, /exactly one voter/); });
 test("a minority report keeps its author's severity", () => { const d = rr(); minority(d, "F3").final_severity = "🔴"; expectError("review-record", d, /keeps its author's severity/); });
 test("a minority report is excluded from the top five", () => { const d = rr(); minority(d, "F2"); expectError("review-record", d, /minority report and must be excluded from the top five/); });
+
+/* ── renamed words (Q-27): the old spellings are refused ─────────────────── */
+
+test("movement 'hold' is now 'unmoved'", () => {
+  const d = rr(); const r = d.tally.find((x) => x.movement === "agreed"); Object.assign(r, { movement: "hold" });
+  expectError("review-record", d, /"hold" is not allowed here/);
+});
+test("resolution 'escalated' is now 'hard-block'", () => { const d = load("decision.valid.json"); d.resolution = "escalated"; expectError("decision", d, /"escalated" is not allowed here/); });
+test("gate result 'escalated' is now 'bound-reached'", () => { const d = sl(); d.gates[1].outcome = { result: "escalated" }; expectError("sdlc-log", d, /"escalated" is not allowed here/); });
+
+/* ── ruling_ref: one spelling, followed into the record it names ─────────── */
+
+test("ruling_ref accepts one id spelling only", () => {
+  const d = rr(); d.rulings_cited[0].id = "order-export/R-3";
+  expectError("review-record", d, /rulings_cited\[0\] → id: "order-export\/R-3" is not the right shape/);
+});
+
+const repo = (brief) => {
+  const dir = mkdtempSync(join(tmpdir(), "coryphaeus-"));
+  mkdirSync(join(dir, ".git"));
+  mkdirSync(join(dir, "docs/briefs/order-export"), { recursive: true });
+  mkdirSync(join(dir, "docs/reviews"), { recursive: true });
+  writeFileSync(join(dir, "docs/briefs/order-export/brief.json"), JSON.stringify(brief));
+  return join(dir, "docs/reviews/2026-09-27-chorus-review.json");
+};
+const ruling = (id, extra = {}) => ({ id, created: "2026-09-27T09:00Z", updated: "2026-09-27T09:00Z", about: "Is the export size capped?", said: "Cap it at one million rows.", source: "chat", ...extra });
+const warned = (r, re) => r.warnings.some((w) => re.test(w.message));
+
+test("remote ruling_ref: the id is found in the brief", () => {
+  const file = repo({ rulings: [ruling("R-3")], decisions: [{ id: "Q-3" }] });
+  const r = validate("review-record", rr(), { file });
+  assert.equal(r.valid, true, messages(r));
+  assert.ok(!r.warnings.some((w) => /rulings_cited/.test(w.path)));
+});
+test("remote ruling_ref: an id the brief does not hold is refused", () => {
+  const file = repo({ rulings: [ruling("R-1")], decisions: [] });
+  const r = validate("review-record", rr(), { file });
+  assert.equal(r.valid, false);
+  assert.match(messages(r), /R-3 is not among the rulings in docs\/briefs\/order-export\/brief.json/);
+});
+test("remote ruling_ref: an absent record warns and does not crash", () => {
+  const dir = mkdtempSync(join(tmpdir(), "coryphaeus-")); mkdirSync(join(dir, ".git"));
+  const r = validate("review-record", rr(), { file: join(dir, "record.json") });
+  assert.equal(r.valid, true, messages(r));
+  assert.ok(warned(r, /docs\/briefs\/order-export\/brief.json is not here, so R-3 was not checked/));
+});
+test("remote ruling_ref: an unreadable record warns", () => {
+  const file = repo({}); writeFileSync(join(dirname(dirname(file)), "briefs/order-export/brief.json"), "{ not json");
+  const r = validate("review-record", rr(), { file });
+  assert.equal(r.valid, true, messages(r));
+  assert.ok(warned(r, /could not be read/));
+});
+test("citing a replaced ruling warns and names the one that holds now", () => {
+  const file = repo({ rulings: [ruling("R-3", { status: "replaced", replacedBy: "R-4" }), ruling("R-4", { status: "replaced", replacedBy: "R-5" }), ruling("R-5")], decisions: [{ id: "Q-3" }] });
+  const r = validate("review-record", rr(), { file });
+  assert.equal(r.valid, true, messages(r));
+  assert.ok(warned(r, /R-3 was replaced; R-5 holds now/));
+});
+test("a replaced local ruling warns too", () => {
+  const d = rr(); d.rulings_cited = [{ id: "R-1", record: "#" }];
+  d.local_rulings = [ruling("R-1", { status: "replaced", replacedBy: "R-2" }), ruling("R-2")];
+  const r = validate("review-record", d);
+  assert.equal(r.valid, true, messages(r));
+  assert.ok(warned(r, /R-1 was replaced; R-2 holds now/));
+});
+test("citing a superseded or open entry warns", () => {
+  const file = repo({ rulings: [], decisions: [{ id: "Q-2", status: "superseded" }, { id: "Q-3" }] });
+  const d = rr(); d.rulings_cited = [{ id: "Q-2", record: "docs/briefs/order-export/brief.json" }, { id: "Q-3", record: "docs/briefs/order-export/brief.json" }];
+  const r = validate("review-record", d, { file });
+  assert.equal(r.valid, true, messages(r));
+  assert.ok(warned(r, /Q-2 is superseded/));
+  assert.ok(warned(r, /Q-3 is still open/));
+});
+test("a superseded 🔴 decision needs no ruling", () => { const d = load("decision.valid.json"); delete d.ruling_ref; delete d.decision; d.status = "superseded"; const r = validate("decision", d); assert.equal(r.valid, true, messages(r)); });
+
+/* ── bindings: recover quietly, record it (Q-24) ─────────────────────────── */
+
+test("a review record states its bindings", () => { const d = rr(); delete d.bindings; expectError("review-record", d, /missing "bindings"/); });
+test("one automatic retry per persona and phase", () => {
+  const d = rr(); d.bindings.recoveries.push({ kind: "retry", subject: "kent-beck-persona", phase: "round-1", reason: "malformed again" });
+  expectError("review-record", d, /a second retry for "kent-beck-persona" in round-1/);
+});
+test("a fallback names a port served by default", () => {
+  const d = rr(); d.bindings.recoveries.push({ kind: "fallback", subject: "record-validator", reason: "missing" });
+  expectError("review-record", d, /fallback on "record-validator", which is not a port served by "default"/);
+});
+test("every failure-rule abstention is recorded", () => {
+  const d = rr(); d.bindings.recoveries = d.bindings.recoveries.filter((x) => x.kind !== "abstention");
+  expectError("review-record", d, /"guido-python-reviewer" counts as ABSTAIN under the failure rule but no recovery records it/);
+});
+test("an abstention recovery matches a failure on the roster", () => {
+  const d = rr(); d.bindings.recoveries.push({ kind: "abstention", subject: "kent-beck-persona", reason: "silent" });
+  expectError("review-record", d, /roster row names no failure/);
+});
+test("ports are listed once", () => { const d = rr(); d.bindings.ports.push({ port: "arbiter", provider: "default" }); expectError("review-record", d, /duplicate port "arbiter"/); });
+test("an unknown port is refused", () => { const d = rr(); d.bindings.ports.push({ port: "version-check", provider: "coryphaeus" }); expectError("review-record", d, /"version-check" is not allowed here/); });

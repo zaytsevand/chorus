@@ -617,7 +617,7 @@
   ],
   "rulings_cited": [
     {
-      "id": "spec-014/R-2",
+      "id": "R-2",
       "record": "specs/014-checkout-retry/brief/brief.json"
     }
   ]

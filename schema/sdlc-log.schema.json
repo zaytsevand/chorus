@@ -118,9 +118,9 @@
             "required": ["result"],
             "description": "How the gate execution ended.",
             "properties": {
-              "result": { "type": "string", "enum": ["pass", "halt", "escalated", "self-heal", "aborted"], "description": "pass: proceed. halt: awaiting operator. escalated: loop bound reached after 3 cycles. self-heal: 🟡 auto-incorporate and re-run. aborted: quorum failed." },
+              "result": { "type": "string", "enum": ["pass", "halt", "bound-reached", "self-heal", "aborted"], "description": "pass: proceed. halt: awaiting operator. bound-reached: the third cycle left a 🔴 uncleared; it goes to the operator as a hard-block (S7). self-heal: 🟡 auto-incorporate and re-run. aborted: quorum failed." },
               "next": { "type": "string", "description": "pass: the next phase." },
-              "awaiting": { "type": "array", "items": { "$ref": "common.schema.json#/$defs/finding_id" }, "description": "halt/escalated: the findings waiting on the operator." }
+              "awaiting": { "type": "array", "items": { "$ref": "common.schema.json#/$defs/finding_id" }, "description": "halt/bound-reached: the findings waiting on the operator." }
             }
           }
         }

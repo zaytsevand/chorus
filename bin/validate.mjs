@@ -5,6 +5,9 @@
  *
  *   node validate.mjs <kind> <file.json> [--json]
  *
+ *   A ruling_ref record path is read from the repository root (the nearest
+ *   folder above the file that holds .git). An absent record is a warning.
+ *
  *   kinds: rsvp, finding-report, vote-report, review-record, sdlc-log,
  *          decision, ruling
  *   exit:  0 valid · 1 invalid · 2 usage or unreadable input
@@ -15,15 +18,16 @@
  *      known ones and comes back as "did you mean".
  *   2. Rules a schema cannot express: the Stage-4 tally arithmetic
  *      (GATE-PRIMITIVE.md), unique ids, R2- findings ungraded, held findings out
- *      of the top five, word limits, cross-references, ruling_ref shape.
+ *      of the top five, word limits, cross-references, ruling_ref shape, and
+ *      each ruling_ref followed into the local record it names.
  *
  * A program, never a model reading the JSON. Zero dependencies; Node 18+.
  * Only the JSON Schema keywords the bundled schemas use are implemented; any
  * other keyword is reported, not silently ignored.
  */
 
-import { readFileSync, readdirSync, realpathSync } from "node:fs";
-import { dirname, join } from "node:path";
+import { existsSync, readFileSync, readdirSync, realpathSync } from "node:fs";
+import { dirname, isAbsolute, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
@@ -178,7 +182,7 @@ export function tally(authored, n, p, c, o) {
   if (voted === 0) movement = "unvoted";
   else if (net >= threshold) { movement = "escalate"; final = SEV[Math.min(2, SEV.indexOf(authored) + 1)]; }
   else if (net <= -threshold) { movement = "demote"; const i = SEV.indexOf(authored); final = i === 0 ? "dropped" : SEV[i - 1]; }
-  else movement = c > 0 ? "agreed" : "hold";
+  else movement = c > 0 ? "agreed" : "unmoved";
   return { net, threshold, final_severity: final, movement, convergence: p + c, gating: final === "🔴", status: voted === 0 ? "unvoted" : "graded" };
 }
 
@@ -186,8 +190,16 @@ function words(...texts) {
   return texts.flat(Infinity).filter((t) => typeof t === "string").join(" ").split(/\s+/).filter(Boolean).length;
 }
 
+/** The nearest folder at or above dir that holds .git, or null. */
+function repoRoot(dir) {
+  for (let d = resolve(dir); ; d = dirname(d)) {
+    if (existsSync(join(d, ".git"))) return d;
+    if (dirname(d) === d) return null;
+  }
+}
+
 class Semantics {
-  constructor() { this.errors = []; this.warnings = []; }
+  constructor(base) { this.errors = []; this.warnings = []; this.base = base ?? process.cwd(); this.opened = new Map(); }
   err(path, message, hint) { this.errors.push({ path: path || "(root)", message, hint }); }
   warn(path, message, hint) { this.warnings.push({ path: path || "(root)", message, hint }); }
 
@@ -201,32 +213,85 @@ class Semantics {
     });
   }
 
-  /** Every ruling_ref-shaped object: well-formed, and '#' must resolve locally. */
+  /** Every ruling_ref-shaped object: well-formed, and followed into the record it names. */
   rulingRefs(root) {
-    const local = new Set((root.local_rulings ?? []).map((r) => r.id));
+    const local = new Map((root.local_rulings ?? []).filter((r) => r?.id).map((r) => [r.id, r]));
     const visit = (node, path) => {
       if (Array.isArray(node)) return node.forEach((v, i) => visit(v, `${path}[${i}]`));
       if (!node || typeof node !== "object") return;
       for (const [k, v] of Object.entries(node)) {
         const p = join2(path, k);
-        if (["ruling_ref", "entry_ref", "operator_ref"].includes(k)) this.ruling(v, p, local);
-        else if (k === "rulings_cited" && Array.isArray(v)) v.forEach((r, i) => this.ruling(r, `${p}[${i}]`, local));
+        if (["ruling_ref", "entry_ref", "operator_ref"].includes(k)) this.ruling(v, p, local, k !== "entry_ref");
+        else if (k === "rulings_cited" && Array.isArray(v)) v.forEach((r, i) => this.ruling(r, `${p}[${i}]`, local, true));
         else if (k !== "local_rulings") visit(v, p);
       }
     };
     visit(root, "");
   }
 
-  ruling(ref, path, local) {
+  /** cites: the reference leans on the ruling's authority (entry_ref only says where a decision was published). */
+  ruling(ref, path, local, cites) {
     if (!ref || typeof ref !== "object" || typeof ref.id !== "string" || typeof ref.record !== "string") return; // schema reports it
     if (ref.record === "#") {
-      if (!local.has(ref.id)) this.err(path, `ruling_ref "${ref.id}" points at this record, which holds no such local ruling`, "add it to local_rulings, or point record at the brief that holds it");
-    } else if (!/^https?:\/\/\S+$/.test(ref.record) && !/\.json$/.test(ref.record)) {
+      const r = local.get(ref.id);
+      if (!r) this.err(path, `ruling_ref "${ref.id}" points at this record, which holds no such local ruling`, "add it to local_rulings, or point record at the brief that holds it");
+      else if (cites) this.replaced(r, local, path);
+    } else if (/^https?:\/\/\S+$/.test(ref.record)) {
+      this.warn(path, `${ref.id} is cited from a URL, which the validator does not open`, "cite a local JSON path to have the id checked");
+    } else if (!/\.json$/.test(ref.record)) {
       this.err(path, `ruling_ref record "${ref.record}" is not a JSON record path, a URL, or "#"`, "cite the brief's JSON file, e.g. docs/briefs/<subject>/brief.json");
+    } else {
+      const got = this.open(ref.record);
+      if (got.missing) this.warn(path, `${ref.record} is not here, so ${ref.id} was not checked`, `looked for ${got.missing}`);
+      else if (got.unreadable) this.warn(path, `${ref.record} could not be read, so ${ref.id} was not checked`, got.unreadable);
+      else this.lookup(ref, got.doc, path, cites);
     }
-    if (/^([a-z0-9-]+\/)?Q-/.test(ref.id) && path.endsWith("ruling_ref")) {
+    if (ref.id.startsWith("Q-") && path.endsWith("ruling_ref")) {
       this.warn(path, `ruling_ref cites an entry (${ref.id}) rather than a ruling`, "fine when the entry's decision is the ruling; prefer the R-n it produced");
     }
+  }
+
+  /** Read a cited record once per run. Relative paths start at the repository root. */
+  open(record) {
+    if (this.opened.has(record)) return this.opened.get(record);
+    const abs = isAbsolute(record) ? record : resolve(repoRoot(this.base) ?? this.base, record);
+    let got;
+    if (!existsSync(abs)) got = { missing: abs };
+    else {
+      try { got = { doc: JSON.parse(readFileSync(abs, "utf8")) }; } catch (e) { got = { unreadable: e.message }; }
+    }
+    this.opened.set(record, got);
+    return got;
+  }
+
+  /** R-n is looked up among the record's rulings (a brief's rulings, a chorus record's local_rulings); Q-n among a brief's entries. */
+  lookup(ref, doc, path, cites) {
+    const rulings = new Map([...(Array.isArray(doc.rulings) ? doc.rulings : []), ...(Array.isArray(doc.local_rulings) ? doc.local_rulings : [])]
+      .filter((r) => r?.id).map((r) => [r.id, r]));
+    if (ref.id.startsWith("R-")) {
+      const r = rulings.get(ref.id);
+      if (!r) this.err(path, `${ref.id} is not among the rulings in ${ref.record}`, "a citation that names nothing carries no authority; check the id");
+      else if (cites) this.replaced(r, rulings, path);
+      return;
+    }
+    const entry = (Array.isArray(doc.decisions) ? doc.decisions : []).find((e) => e?.id === ref.id);
+    if (!entry) return this.err(path, `${ref.id} is not among the entries in ${ref.record}`, "a citation that names nothing carries no authority; check the id");
+    if (!cites) return;
+    const status = entry.status ?? "open";
+    if (status === "superseded") this.warn(path, `${ref.id} is superseded in ${ref.record}: nothing was carried out, so it settles nothing`, "cite what overtook it, or drop the citation");
+    else if (status === "open") this.warn(path, `${ref.id} is still open in ${ref.record}, so it settles nothing yet`, "wait for the ruling, or cite a standing one");
+  }
+
+  /** A replaced ruling warns and names the ruling that holds now, following the chain. */
+  replaced(r, rulings, path) {
+    if (r.status !== "replaced") return;
+    let cur = r;
+    const seen = new Set([r.id]);
+    while (cur.status === "replaced" && cur.replacedBy && !seen.has(cur.replacedBy)) {
+      seen.add(cur.replacedBy);
+      cur = rulings.get(cur.replacedBy) ?? { id: cur.replacedBy };
+    }
+    this.warn(path, `${r.id} was replaced; ${cur.id} holds now`, `cite ${cur.id}, or say why ${r.id} still applies`);
   }
 
   decision(d, path) {
@@ -240,7 +305,7 @@ class Semantics {
     if (d.catalog_row === undefined && d.band && d.band !== "🔴") this.err(join2(path, "band"), `an unlisted decision point is ${d.band}, but no catalog row means 🔴`, "set catalog_row, or band 🔴 (DECISION-PRIMITIVE.md § The sensor)");
     if (d.decision && !sols.some((s) => s.id === d.decision.chose)) this.err(join2(path, "decision → chose"), `"${d.decision.chose}" is not one of this decision's solutions`, `use one of: ${sols.map((s) => s.id).join(", ")}`);
     if (d.resolution === "in-progress" && d.cycle === undefined) this.err(path, "an in-progress (self-heal) decision must say which cycle", "set cycle: N of 3");
-    if (d.band === "🔴" && d.status && d.status !== "open" && !d.ruling_ref) this.err(path, "a 🔴 decision that is no longer open must cite the operator's ruling", "add ruling_ref (only the operator settles a 🔴, D2)");
+    if (d.band === "🔴" && d.status && !["open", "superseded"].includes(d.status) && !d.ruling_ref) this.err(path, "a 🔴 decision that is no longer open must cite the operator's ruling", "add ruling_ref (only the operator settles a 🔴, D2)");
   }
 
   /** Register + tally for one board. seated: Set of seated personas, or null. */
@@ -311,7 +376,7 @@ class Semantics {
         const why = {
           net: "net = P − O (CONFIRM excluded)",
           threshold: "T = max(1, floor(N / 2))",
-          movement: "net ≥ T escalates, net ≤ −T demotes, otherwise holds (agreed when CONFIRM votes hold it)",
+          movement: "net ≥ T escalates, net ≤ −T demotes, otherwise unmoved (agreed when there are CONFIRM votes)",
           final_severity: `authored ${r.authored_severity}, net ${want.net}, T ${want.threshold}: one level at most`,
           convergence: "convergence = P + C",
           gating: "gating iff post-tally severity is 🔴",
@@ -460,6 +525,30 @@ function checkReviewRecord(d, s) {
   s.unique(d.appendix, "persona", "appendix", "appendix persona");
   for (const p of seated) if (!(d.appendix ?? []).some((a) => a.persona === p)) s.warn("appendix", `no report link for seated persona "${p}"`);
   s.unique(d.local_rulings, "id", "local_rulings", "ruling id");
+  checkBindings(d.bindings, d.roster, s);
+}
+
+/** Recoveries are recorded, one retry at most, and every failure-rule abstention appears. */
+function checkBindings(b, roster, s) {
+  if (!b || typeof b !== "object") return;
+  s.unique(b.ports, "port", "bindings → ports", "port");
+  const defaults = new Set((b.ports ?? []).filter((p) => p.provider === "default").map((p) => p.port));
+  const failed = new Set((roster ?? []).filter((r) => r.failure).map((r) => r.persona));
+  const retried = new Map(), abstained = new Set();
+  (b.recoveries ?? []).forEach((x, i) => {
+    const p = `bindings → recoveries[${i}]`;
+    if (x.kind === "fallback" && !defaults.has(x.subject)) s.err(p, `a fallback on "${x.subject}", which is not a port served by "default"`, "list the port under bindings → ports with provider default");
+    if (x.kind === "retry") {
+      const k = `${x.subject}@${x.phase ?? ""}`;
+      if (retried.has(k)) s.err(p, `a second retry for "${x.subject}"${x.phase ? ` in ${x.phase}` : ""}`, "one automatic retry, then the persona counts as ABSTAIN");
+      else retried.set(k, i);
+    }
+    if (x.kind === "abstention") {
+      abstained.add(x.subject);
+      if (!failed.has(x.subject)) s.err(p, `"${x.subject}" is recorded as abstaining by failure, but its roster row names no failure`, "set failure on the roster row");
+    }
+  });
+  for (const persona of failed) if (!abstained.has(persona)) s.err("bindings → recoveries", `"${persona}" counts as ABSTAIN under the failure rule but no recovery records it`, "add an abstention recovery; a failure is recorded, never silent");
 }
 
 function checkSdlcLog(d, s) {
@@ -492,8 +581,8 @@ function checkSdlcLog(d, s) {
     if (d.status === "complete") for (const f of gating) if (!["resolved", "waived"].includes(res.get(f))) s.err(join2(gp, "red_resolutions"), `gating 🔴 "${f}" has no resolved/waived row, yet the run is complete`, "S4: no gate passes with an open 🔴");
     const result = g.outcome?.result;
     if (result === "pass" && uncleared.length) s.err(join2(gp, "outcome"), `passes with open 🔴: ${uncleared.join(", ")}`, "S4");
-    if (g.cycle === 3 && uncleared.length && !["escalated", "halt"].includes(result)) s.err(join2(gp, "outcome"), "the third cycle left a 🔴 uncleared and did not escalate", "S7: record escalated");
-    if (result === "escalated" && g.cycle !== 3) s.err(join2(gp, "outcome"), "escalated before the third cycle", "S7: the bound is 3 cycles; a waiver-only path is a halt");
+    if (g.cycle === 3 && uncleared.length && !["bound-reached", "halt"].includes(result)) s.err(join2(gp, "outcome"), "the third cycle left a 🔴 uncleared and did not go to the operator", "S7: record bound-reached");
+    if (result === "bound-reached" && g.cycle !== 3) s.err(join2(gp, "outcome"), "bound-reached before the third cycle", "S7: the bound is 3 cycles; a waiver-only path is a halt");
     if (result === "self-heal" && g.cycle === 3) s.err(join2(gp, "outcome"), "no self-heal past the third cycle", "S7");
     for (const f of g.outcome?.awaiting ?? []) if (!byId.has(f)) s.err(join2(gp, "outcome → awaiting"), `"${f}" is not in this gate's register`);
   });
@@ -523,12 +612,15 @@ const SEMANTIC = {
   ruling: (d, s) => { if (d.replacedBy && d.replacedBy === d.id) s.err("replacedBy", "a ruling cannot replace itself"); },
 };
 
-/** Validate parsed data as <kind>. Returns { valid, errors, warnings }. */
-export function validate(kind, data) {
+/**
+ * Validate parsed data as <kind>. Returns { valid, errors, warnings }.
+ * opts.file: the record's path, so a ruling_ref record resolves from its repository root.
+ */
+export function validate(kind, data, opts = {}) {
   if (!KINDS.includes(kind)) throw new Error(`unknown kind "${kind}"`);
   const w = new SchemaWalker();
   w.check(data, schemas()[`${kind}.schema.json`], "", `${kind}.schema.json`);
-  const s = new Semantics();
+  const s = new Semantics(opts.file ? dirname(resolve(opts.file)) : undefined);
   // Semantic rules are written for the right shape. On a malformed record they
   // still run, so one pass reports as much as it can; if the shape is too broken
   // for them, the schema errors already explain why.
@@ -561,7 +653,7 @@ function main(argv) {
   }
   let data;
   try { data = JSON.parse(readFileSync(file, "utf8")); } catch (e) { usage(`cannot read ${file}: ${e.message}`); }
-  const r = validate(kind, data);
+  const r = validate(kind, data, { file });
   if (json) process.stdout.write(JSON.stringify({ kind, file, ...r }, null, 2) + "\n");
   else {
     const line = (x, tag) => `  ${tag} ${x.path}: ${x.message}${x.hint ? `\n      → ${x.hint}` : ""}`;

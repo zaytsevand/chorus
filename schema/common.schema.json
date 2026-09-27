@@ -144,13 +144,13 @@
       "properties": {
         "id": {
           "type": "string",
-          "pattern": "^([a-z0-9][a-z0-9-]*/)?[QR]-[0-9]+$",
-          "description": "The ruling's id in the record that holds it: R-n for a ruling, Q-n for a decided brief entry, optionally prefixed by the brief's subject, e.g. spec-215/R-4."
+          "pattern": "^[QR]-[0-9]+$",
+          "description": "The id exactly as the record that holds it writes it: R-n for a ruling, Q-n for a brief entry. One spelling only; record says which brief, so no subject prefix."
         },
         "record": {
           "type": "string",
           "minLength": 1,
-          "description": "Where the ruling lives: a path to a brief's JSON, a URL, or '#' for this record's own local_rulings (fallback when no ruling sink is bound)."
+          "description": "Where the ruling lives: a path to a brief's JSON (from the repository root), a URL, or '#' for this record's own local_rulings (fallback when no ruling sink is bound). The validator opens a local path and checks the id is there."
         }
       }
     },
@@ -168,7 +168,7 @@
         "hook": { "type": "string", "description": "Axis B's one-line evidence hook." },
         "uncovered_delta": { "type": "string", "minLength": 3, "description": "EXCEPTIONAL only: the delta no seated ordinary lens covers." },
         "reason": { "type": "string", "minLength": 3, "description": "One-line reason, or the failure-rule reason (not installed, silent, past budget, malformed, over-length, no evidence)." },
-        "failure": { "type": "string", "enum": ["not-installed", "silent", "past-budget", "malformed", "over-length", "no-evidence"], "description": "Set when the persona counts as ABSTAIN under the one failure rule." },
+        "failure": { "type": "string", "enum": ["not-installed", "silent", "past-budget", "malformed", "over-length", "no-evidence"], "description": "Set when the persona counts as ABSTAIN under the one failure rule, after its one automatic retry also failed (not-installed has no retry)." },
         "seated": { "type": "boolean", "description": "Whether the persona holds a seat on this board." },
         "seat": { "type": "string", "enum": ["ordinary", "exceptional"], "description": "Seat kind, when seated." }
       },
@@ -229,14 +229,14 @@
       "properties": {
         "finding": { "$ref": "#/$defs/finding_id", "description": "The register entry this row counts." },
         "authored_severity": { "$ref": "#/$defs/severity", "description": "Copied from the register." },
-        "status": { "type": "string", "enum": ["graded", "held", "ungraded", "unvoted", "minority-report"], "description": "graded: counted. held: NEED_INFO open, not counted. ungraded: R2- derived. unvoted: every voter abstained. minority-report: exactly one non-author voter; not counted, keeps its authored severity, never gating, listed apart and out of the top five." },
+        "status": { "type": "string", "enum": ["graded", "held", "ungraded", "unvoted", "minority-report"], "description": "graded: counted. held: NEED_INFO open, not counted (not movement unmoved, which is counted). ungraded: R2- derived. unvoted: every voter abstained. minority-report: exactly one non-author voter; not counted, keeps its authored severity, never gating, listed apart and out of the top five." },
         "n": { "type": "integer", "minimum": 0, "description": "N: the count of non-author voters on the finding (GATE-PRIMITIVE.md Stage 4). A tally must not run at N < 2." },
         "p": { "type": "integer", "minimum": 0, "description": "PRIORITIZE count among non-author voters." },
         "c": { "type": "integer", "minimum": 0, "description": "CONFIRM count among non-author voters." },
         "o": { "type": "integer", "minimum": 0, "description": "OVER-RATE count among non-author voters." },
         "net": { "type": "integer", "description": "net = P − O. CONFIRM is excluded." },
         "threshold": { "type": "integer", "minimum": 1, "description": "T = max(1, floor(N / 2))." },
-        "movement": { "type": "string", "enum": ["escalate", "demote", "hold", "agreed", "unvoted"], "description": "escalate: net ≥ T. demote: net ≤ −T. agreed: held with CONFIRM votes. hold: otherwise held. unvoted: all abstained." },
+        "movement": { "type": "string", "enum": ["escalate", "demote", "unmoved", "agreed", "unvoted"], "description": "escalate: net ≥ T, severity up one level. demote: net ≤ −T. agreed: unmoved, with CONFIRM votes. unmoved: counted, |net| < T, no CONFIRM; the authored severity stands. unvoted: all abstained." },
         "final_severity": { "$ref": "#/$defs/final_severity", "description": "Post-tally severity: authored severity moved at most one level." },
         "convergence": { "type": "integer", "minimum": 0, "description": "Convergence = P + C, used to rank, never to escalate." },
         "gating": { "type": "boolean", "description": "true iff final_severity is 🔴." }
@@ -262,6 +262,42 @@
         "raw_excerpt": { "type": "string", "description": "Verbatim quote." },
         "candidate_lens": { "type": "string", "minLength": 2, "description": "The lens this most concerns, or 'unassigned'." },
         "source": { "type": "string", "minLength": 2, "description": "'explore', 'spec-walkthrough', or another fixed-viewpoint tag." }
+      }
+    },
+    "bindings": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["ports", "recoveries"],
+      "description": "Which provider served each port, and every failure the round recovered from without asking the operator (chorus-review § One failure rule). Shown once at the top of the page.",
+      "properties": {
+        "ports": {
+          "type": "array",
+          "description": "One row per port the round used.",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["port", "provider"],
+            "properties": {
+              "port": { "type": "string", "enum": ["decision-sink", "ruling-lookup", "record-validator", "record-renderer", "arbiter", "fixed-viewpoint", "memory-recall"], "description": "The port, as CONDUCTOR.md § Ports names it." },
+              "provider": { "type": "string", "minLength": 1, "description": "What served it, e.g. problem-brief or coryphaeus, or 'default' when the port fell back to its recorded default." }
+            }
+          }
+        },
+        "recoveries": {
+          "type": "array",
+          "description": "Recovered failures, never asked live. Empty when nothing failed.",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["kind", "subject", "reason"],
+            "properties": {
+              "kind": { "type": "string", "enum": ["retry", "fallback", "abstention"], "description": "retry: a failed persona reply sent back once. fallback: a missing optional tool replaced by its port's default. abstention: a persona counted ABSTAIN because its retry also failed." },
+              "subject": { "type": "string", "minLength": 2, "description": "The persona (retry, abstention) or the port (fallback)." },
+              "phase": { "type": "string", "minLength": 2, "description": "Where it happened, e.g. rsvp, round-1, round-2." },
+              "reason": { "type": "string", "minLength": 3, "description": "What failed, in one line, e.g. the validator's reason." }
+            }
+          }
+        }
       }
     },
     "side_note": {

@@ -47,3 +47,11 @@ test("renderer cli writes a page", () => {
   assert.ok(readFileSync(out, "utf8").startsWith("# Agent-SDLC Ledger"));
   assert.equal(run("rsvp", "x", "y").status, 2);
 });
+
+test("review record shows bindings and recoveries once, at the top", () => {
+  const md = render("review-record", load("review-record.valid.json"));
+  assert.equal(md.split("**Bindings.**").length, 2);
+  assert.ok(md.indexOf("**Bindings.**") < md.indexOf("## 1. TL;DR"));
+  assert.match(md, /decision-sink: default · ruling-lookup: default · record-validator: coryphaeus/);
+  assert.match(md, /\*\*Recovered without asking\.\*\* retry — kent-beck-persona \(round-1\): /);
+});

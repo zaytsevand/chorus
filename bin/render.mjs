@@ -84,6 +84,14 @@ function rsvpTable(rows) {
       r.seated ? r.seat : "not seated", `${r.reason}${r.failure ? ` (failure rule: ${r.failure})` : ""}`]));
 }
 
+function bindingsBlock(b) {
+  const ports = b.ports.length ? b.ports.map((p) => `${p.port}: ${p.provider}`).join(" · ") : "none recorded";
+  const rec = b.recoveries.length
+    ? b.recoveries.map((x) => `${x.kind} — ${x.subject}${x.phase ? ` (${x.phase})` : ""}: ${x.reason}`).join("; ")
+    : "none";
+  return [`**Bindings.** ${ports}`, "", `**Recovered without asking.** ${rec}`].join("\n");
+}
+
 function sideNotes(list) {
   return list.map((n) => `- **${n.regime}**: ${n.note}${n.findings?.length ? ` (${n.findings.join(", ")})` : ""}`).join("\n");
 }
@@ -93,7 +101,7 @@ export function renderReviewRecord(d) {
   const L = [];
   L.push(`# Chorus review — ${d.date}`, "", `- **Target**: ${d.target}`, `- **Mode**: ${d.mode === "pr-design" ? "design review of the PR's approach, not a line-by-line diff review" : "project-state review"}`);
   if (d.baseline_ref) L.push(`- **Baseline**: ${d.baseline_ref}`);
-  L.push("", `**Round context.** ${d.round_context}`, "");
+  L.push("", `**Round context.** ${d.round_context}`, "", bindingsBlock(d.bindings), "");
   L.push("## 1. TL;DR", "", d.tldr.join(" "), "");
   L.push("## 2. Roster (this round)", "", rsvpTable(d.roster), "",
     `Joiners: ${d.quorum.joiners}. Quorum: ${d.quorum.branch}.${d.seating_decision ? ` Seating decision: ${d.seating_decision}.` : ""}`, "");
@@ -174,7 +182,7 @@ export function renderSdlcLog(d) {
     if (g.side_notes?.length) L.push("### Side-notes (flag-only)", "", sideNotes(g.side_notes), "");
     const o = g.outcome;
     const text = { pass: `pass → proceeding to ${o.next ?? "next phase"}`, halt: `halt → awaiting operator on ${(o.awaiting ?? []).join(", ")}`,
-      escalated: `escalated: loop bound reached after 3 cycles${o.awaiting?.length ? ` (${o.awaiting.join(", ")})` : ""}`,
+      "bound-reached": `bound reached after 3 cycles, 🔴 goes to the operator${o.awaiting?.length ? ` (${o.awaiting.join(", ")})` : ""}`,
       "self-heal": "self-heal → incorporating and re-running", aborted: "aborted: quorum not met" }[o.result];
     L.push("### Outcome", "", text, "");
   }
@@ -198,8 +206,8 @@ export function renderSdlcLog(d) {
   return L.join("\n");
 }
 
-export function render(kind, data) {
-  const r = validate(kind, data);
+export function render(kind, data, opts = {}) {
+  const r = validate(kind, data, opts);
   if (!r.valid) { const e = new Error("invalid input"); e.errors = r.errors; throw e; }
   return kind === "review-record" ? renderReviewRecord(data) : renderSdlcLog(data);
 }
@@ -212,7 +220,7 @@ function main(argv) {
   let data;
   try { data = JSON.parse(readFileSync(file, "utf8")); } catch (e) { usage(`cannot read ${file}: ${e.message}`); }
   try {
-    writeFileSync(out, render(kind, data));
+    writeFileSync(out, render(kind, data, { file }));
   } catch (e) {
     if (!e.errors) throw e;
     process.stderr.write(`${file}: refusing to render an invalid ${kind} — ${e.errors.length} error(s); run validate.mjs for details\n`);

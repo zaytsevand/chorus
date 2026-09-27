@@ -13,7 +13,7 @@ neither has to know the other. It holds:
   shared `decision` and `ruling` shapes.
 - `bin/validate.mjs`: a zero-dependency validator for the schema plus the rules a
   schema cannot express (tally arithmetic, ids, held and ungraded findings,
-  `ruling_ref` shape).
+  `ruling_ref` shape and lookup, recorded recoveries).
 - `bin/render.mjs`: renders a review record or a ledger to markdown, and refuses
   invalid input.
 - `SKILL.md`: the port bindings and the chorus-to-brief translation rules.

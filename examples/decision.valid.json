@@ -13,9 +13,9 @@
     { "id": "fix-first", "label": "Change the code to 30 seconds before shipping", "recommended": true, "reversible": true, "summary": "One constant changes and the gate re-runs; the spec stays true.", "cost": { "work": "One code change and a Gate C re-run." } },
     { "id": "waive", "label": "Ship as is and record the waiver", "reversible": true, "summary": "The feature ships now; the spec is corrected to 45 seconds afterwards.", "cost": { "work": "A spec edit later.", "risk": "The spec is wrong until then." } }
   ],
-  "resolution": "escalated",
+  "resolution": "hard-block",
   "status": "decided",
   "decision": { "chose": "fix-first", "date": "2026-09-26" },
-  "ruling_ref": { "id": "spec-014/R-4", "record": "specs/014-checkout-retry/brief/brief.json" },
-  "entry_ref": { "id": "spec-014/Q-7", "record": "specs/014-checkout-retry/brief/brief.json" }
+  "ruling_ref": { "id": "R-4", "record": "specs/014-checkout-retry/brief/brief.json" },
+  "entry_ref": { "id": "Q-7", "record": "specs/014-checkout-retry/brief/brief.json" }
 }

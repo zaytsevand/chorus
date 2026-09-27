@@ -5,6 +5,7 @@
   "target": "specs/012-order-export/spec.md",
   "mode": "project-state",
   "round_context": "Since the last round: the export job moved to the queue worker.",
+  "bindings": { "ports": [{ "port": "arbiter", "provider": "default" }], "recoveries": [{ "kind": "retry", "subject": "kent-beck-persona", "phase": "round-1", "reason": "malformed" }, { "kind": "retry", "subject": "kent-beck-persona", "phase": "round-1", "reason": "malformed again" }] },
   "tldr": ["The chorus found two problems.", "The top five ranks the held one first.", "Nothing blocks rollout."],
   "roster": [
     { "persona": "eric-evans-advisor", "lens": "DDD", "decision": "JOIN", "applies": ["order aggregate"], "expected": "🟡", "reason": "Aggregate.", "seated": true, "seat": "ordinary" },
@@ -17,7 +18,7 @@
     { "id": "F2", "author": "kent-beck-persona", "lens": "TDD", "authored_severity": "🟡", "locator": "src/export/csv.py:60", "pull_quote": "Backpressure is unclear.", "evidence": [{ "kind": "file_line", "ref": "src/export/csv.py:60" }], "confidence_on_hand": "low", "need_info": true, "need_info_reasons": [{ "raiser": "kent-beck-persona", "reason": "Export size is not specified." }], "graded": true }
   ],
   "tally": [
-    { "finding": "F1", "authored_severity": "🟡", "status": "graded", "n": 2, "p": 1, "c": 1, "o": 0, "net": 2, "threshold": 2, "movement": "hold", "final_severity": "🟡", "convergence": 1, "gating": false },
+    { "finding": "F1", "authored_severity": "🟡", "status": "graded", "n": 2, "p": 1, "c": 1, "o": 0, "net": 2, "threshold": 2, "movement": "unmoved", "final_severity": "🟡", "convergence": 1, "gating": false },
     { "finding": "F2", "authored_severity": "🟡", "status": "held" }
   ],
   "conflicts": [],

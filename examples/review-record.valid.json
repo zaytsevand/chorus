@@ -6,6 +6,21 @@
   "mode": "project-state",
   "round_context": "Since the last round: the order-export spec was drafted, the export job moved from cron to the queue worker, and the CSV writer gained a streaming path. No incidents.",
   "baseline_ref": "docs/reviews/2026-08-30-chorus-review.json",
+  "bindings": {
+    "ports": [
+      { "port": "decision-sink", "provider": "default" },
+      { "port": "ruling-lookup", "provider": "default" },
+      { "port": "record-validator", "provider": "coryphaeus" },
+      { "port": "record-renderer", "provider": "coryphaeus" },
+      { "port": "arbiter", "provider": "advisor()" },
+      { "port": "memory-recall", "provider": "default" }
+    ],
+    "recoveries": [
+      { "kind": "retry", "subject": "kent-beck-persona", "phase": "round-1", "reason": "the finding report failed the validator: findings[0] is missing pull_quote" },
+      { "kind": "fallback", "subject": "memory-recall", "reason": "no memory-recall skill installed; read .claude/agent-memory/ instead" },
+      { "kind": "abstention", "subject": "guido-python-reviewer", "phase": "rsvp", "reason": "not installed" }
+    ]
+  },
   "tldr": [
     "The chorus found that the order aggregate cannot enforce its own invariants, and that the export job's retry path is under-specified.",
     "The top five puts the aggregate root first, then the retry contract and the streaming writer's backpressure.",
