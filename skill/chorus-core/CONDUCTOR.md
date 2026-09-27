@@ -269,7 +269,7 @@ What the chorus needs from outside. A composition root may bind each port; unbou
 
 | Port | Contract | Default when unbound |
 |---|---|---|
-| decision sink | takes a decision record; returns an answer id + choice, or deferred | ask in chat; record the answer in the chorus record |
+| decision sink | takes a decision record; returns the choice and a ruling reference, or deferred | ask in chat; keep the answer locally and return its local reference |
 | ruling lookup | before any operator ask (catalog rows that ask the operator, NEED_INFO to the operator, gate interview questions), find a standing ruling; a fitting one resolves the ask 🟢 and is cited | none |
 | record validator | validates every persona reply and every chorus record against the bound schema before it is counted or published; a failing persona reply counts as ABSTAIN with the validator's reason logged | none; the round runs and its record says "unvalidated" |
 | record renderer / publisher | the durable record is JSON; its markdown page is rendered from it, never hand-written | commit the JSON; write the markdown by hand, marked "unrendered" |
