@@ -4,11 +4,12 @@ description: >-
   Multi-advisor project state review
   (Evans/Richards/Cooper/Norman/Uncle Bob/Beck/Delivery-and-Ops/security/Goldratt)
   with per-round RSVP self-selection, cross-evaluation, conflict reconciliation,
-  and ranked recommendations. Use when the user asks for a chorus, a
-  project-state review, or to "spawn the regular chorus." Produces a durable
-  artifact at docs/reviews/YYYY-MM-DD-chorus-review.md. REQUIRED composition:
-  chorus-core (shared substrate). For the agent-SDLC lifecycle mode use the
-  chorus-sdlc skill.
+  and ranked recommendations. Use when the user asks to "spawn the chorus" /
+  "spawn the regular chorus" or for a project-state review of a spec, design,
+  PR, or codebase. Not for chorus challenge mode or the agent-SDLC lifecycle
+  (use chorus-sdlc) or the chorus learn tutorial (use chorus-learn). Produces a
+  durable artifact at docs/reviews/YYYY-MM-DD-chorus-review.md. REQUIRED
+  composition: chorus-core (shared substrate).
 ---
 
 # Chorus Review — repeatable procedure
@@ -17,23 +18,20 @@ A multi-lens review of whatever you point it at — **most often a spec or a
 feature's design, occasionally a full-codebase sweep.** Each round produces a
 durable artifact future rounds baseline against, rather than re-derive.
 
-This skill is project-agnostic. Project-specific facts (exclusions, topology,
-security data-surface, baseline references) come from an optional per-project
-addendum — see "Project addendum" below.
+This skill is project-agnostic. Project-specific facts come from an optional
+per-project addendum (see "Project addendum").
 
 ## REQUIRED: chorus-core — substrate guard (run BEFORE anything else)
 
-This skill composes the shared substrate skill **`chorus-core`**. Before relying
-on **any** core mechanic — the four-stage gate (`GATE-PRIMITIVE.md`), the
-decision banding (`DECISION-PRIMITIVE.md`), the exploratory phase
-(`EXPLORATORY-PHASE.md`), or the conductor discipline + `I1–I9` invariant
-catalog (`CONDUCTOR.md`) — the calling session MUST assert that the `chorus-core`
-skill directory is reachable (its four files are present).
+This skill composes the shared substrate skill **`chorus-core`**: the four-stage
+gate (`GATE-PRIMITIVE.md`, stages **extract → author → vote → tally**, S8–S11),
+decision banding (`DECISION-PRIMITIVE.md`, D1–D5), the exploratory phase
+(`EXPLORATORY-PHASE.md`), and the conductor discipline + `I1–I9` invariant catalog
+(`CONDUCTOR.md`). This file cites those mechanics and does not restate them.
 
-The skill loader does **not** enforce the `REQUIRED:` marker (it is advisory), so
-this assertion is the real enforcement. **If `chorus-core` is not reachable, STOP
-and fail loudly** — do not improvise the missing mechanics, do not degrade
-silently. Emit:
+The loader does not enforce `REQUIRED:`, so the calling session MUST assert that
+the `chorus-core` directory and its four files are reachable. **If it is not,
+STOP and fail loudly** — do not improvise the missing mechanics. Emit:
 
 > **chorus-core is missing.** `chorus-review` requires the shared substrate skill
 > `chorus-core`, which is not reachable. This means a broken or partial install of
@@ -43,653 +41,410 @@ silently. Emit:
 > (`./install.sh`), or check that `chorus-core` was published/copied under its
 > expected name, then retry.
 
-When `chorus-core` is reachable, its router (`chorus-core/SKILL.md`) runs its own
-reachability self-check over the four files (defense-in-depth for the
-file-missing case).
+Operator-facing decisions (scope, seating, blocking on 🔴) are banded by the
+decision catalog in `chorus-core/DECISION-PRIMITIVE.md` (🟢 auto, 🟡 recorded
+default + async override, 🔴 hard-block), by declared predicate, never by
+orchestrator inference. Severity is three-level: 🔴 🟡 🟢.
 
-**Before Phase 0, the calling session MUST `Read` the companion file
-`INTEGRATION-LAYER.md` in this skill directory.** It defines the round-specific
-integration layer (the calling session itself) — its position in the system,
-per-phase pre/post-conditions, and sees/does-not-see. The procedure here
-describes *what* the chorus does; the integration-layer file describes *who runs
-it during a round and what they are not allowed to do*. Both are load-bearing.
-The mode-independent discipline — conductor voice, the discipline cascade, the
-refusals, and the **`I1–I9` invariant catalog** — lives in
-**`chorus-core/CONDUCTOR.md`**.
+## The conductor (who runs the round)
 
-The mechanic of a single review — the four stages **extract → author → vote →
-tally** — is defined once in `chorus-core/GATE-PRIMITIVE.md`; Phases 1/2/4 below
-run it (this file does not restate the mechanic).
+The calling session is the **integration layer**: not a persona, holds no lens,
+produces no findings. It sits between the user (N+1: goals, scope, sign-off) and
+the personas (N−1: findings within their lens), with `advisor()` lateral. It
+speaks to the user in procedure (gates, quorum, abort, ranking), to personas in
+briefs, and to `advisor()` only with framed conflicts. It sees the round context,
+the addendum, RSVP replies, reports, the register and matrix it assembles, and
+`advisor()`'s rulings; it does not see lens-internal reasoning, the domain truth
+of a finding, or the project's priorities, and it reads the codebase only as far
+as the procedure requires. When tempted to rule on what it does not see, it
+refuses and surfaces.
 
-Before findings are authored, participating advisors build a persisted,
-lens-specific understanding of the target — the **exploratory phase**, defined
-once in `chorus-core/EXPLORATORY-PHASE.md` (Phase 0.7 below); this file does not
-restate it.
-
-When the chorus must involve the operator — seating a capped panel, blocking on a
-🔴, confirming scope — the decision is banded by the **decision primitive**, defined
-once in `chorus-core/DECISION-PRIMITIVE.md`: 🟢 auto-resolve, 🟡
-proceed-with-recorded-default + async override, 🔴 hard-block + instant ask, by
-declared catalog predicate (never orchestrator inference). It makes the workflow
-**self-unblocking yet balanced** — it runs forward, stopping the operator only for
-🔴. This file references it; it does not restate it.
+Its voice is the EWD register defined in `chorus-core/CONDUCTOR.md`: procedural,
+plain, declarative about state, citing the procedure rather than its own
+judgment, with Dijkstra's dry side-notes as non-binding marginalia. Brief upward
+short and choice-shaped; brief downward complete; ask "why?" along the cascade
+("cite the artefact; chase the chain; show me where it terminates in an invariant
+or a named principle"). **A phase does not start until the previous phase's
+post-condition holds** (I4).
 
 ## When to use
 
 - **Reviewing a spec or a feature's design** across multiple lenses — the common
-  case. Say "spawn the chorus" pointed at the spec.
-- **A full-codebase sweep** for periodic project-state review — the occasional
-  case; quarterly or after a major release.
+  case ("spawn the chorus" pointed at the spec).
+- **A full-codebase sweep** — periodic, e.g. quarterly or after a major release.
 
-(For the gated speckit lifecycle — "run the agent-SDLC on feature 0NN" — use the
-sibling skill **`chorus-sdlc`**, which composes the same `chorus-core` substrate
-independently of this skill.)
-
-Don't use for:
-- Single-lens questions (just spawn the relevant persona agent directly)
-- Line-by-line review of a PR diff (use `superpowers:code-reviewer` or
-  `/ultrareview` — the chorus reviews specs and design, not diffs)
-- One-off architecture questions (use `mark-richards-architect` solo)
+For the gated speckit lifecycle, and for `chorus challenge`, use the sibling
+skill **`chorus-sdlc`**. Don't use for single-lens questions (spawn that persona
+directly), line-by-line diff review (`superpowers:code-reviewer` or
+`/ultrareview`), or one-off architecture questions (`mark-richards-architect`).
 
 ## PR design review (targeted mode)
 
-When the operator invokes **`/chorus-review the PR`** (or names a PR number/URL),
-run a **design review of the PR's approach and seams**, not a line-by-line diff
-review. Line-by-line diff review is a different tool's job; the chorus is here for
-whether the approach and its seams are right.
+On **`/chorus-review the PR`** (or a PR number/URL), run a **design review of the
+PR's approach and seams**, not a line-by-line diff review. Phase 0 adjustments:
 
-**Phase 0 adjustments:**
 - **Round context** — PR title/body, branch, files touched (+/−), governing specs
-  (whatever spec the PR cites, or an `Implements:`-style header in the code), linked
-  issues, and CI status. State explicitly: *"Mode: design review of the PR's
-  approach, not a line-by-line diff review."*
-- **Anchor surface** — the PR diff paths + their governing specs/contracts/tests.
-  Chase each `# Implements:` / spec reference to an invariant (constitution
-  principle, OpenAPI contract, or integration test).
-- **Artifact path** — `docs/reviews/YYYY-MM-DD-chorus-review-prNNN.md` (commit it).
-- **Exclusions** — unchanged from the project addendum; Security-and-Trust still
-  overrides on attacker surface.
+  (cited, or an `Implements:`-style header), linked issues, CI status. State:
+  *"Mode: design review of the PR's approach, not a line-by-line diff review."*
+- **Anchor surface** — the diff paths + their governing specs/contracts/tests;
+  chase each `# Implements:` / spec reference to an invariant.
+- **Artifact path** — `docs/reviews/YYYY-MM-DD-chorus-review-prNNN.md`.
+- **Exclusions** — unchanged; Security-and-Trust still overrides on attacker surface.
 
-**Emphasis when the operator asks for coding discipline / architecture / DDD:**
-seat Evans, Richards, Uncle Bob, Beck, and Guido (if Python touched) with briefs
-that weight seam placement, bounded-context honesty, SOLID, TDD evidence, and
-Python idiom — but still run the full RSVP roster unless the operator caps lenses.
+When the operator asks for coding discipline / architecture / DDD, **weight the
+briefs toward** Evans, Richards, Uncle Bob, Beck, and Guido (if Python touched) —
+seam placement, bounded-context honesty, SOLID, TDD evidence, Python idiom.
+Seating still follows the RSVP and the cap (Phase 0.5).
 
 ## Project addendum
 
-Each project that runs the chorus should provide a per-project addendum at:
+Each project may provide `docs/reviews/CHORUS-PROJECT.md`, read before Phase 0:
 
-    docs/reviews/CHORUS-PROJECT.md
-
-If present, the orchestrator reads it before Phase 0 and uses its contents to
-fill the project-specific slots in the procedure. If absent, the orchestrator
-asks the user inline at Phase 0 and offers to write the file at the end of
-the round.
-
-The addendum should contain:
-
-1. **Project summary** — 2–3 sentences. Topology (monolith / services / clients),
-   primary languages, where the constitutional or governance docs live (if any).
+1. **Project summary** — 2–3 sentences: topology, primary languages, where the
+   constitutional / governance docs live.
 2. **Default scope exclusions** — paths the chorus must not produce findings
-   about (legacy directories, runtime data dirs, generated code). One bullet
-   per path with a one-line justification.
-3. **Default anchor surface** — the actively-developed paths the chorus
-   *should* focus on (e.g., `webapp/`, `app/`, `specs/` for a layered repo).
-4. **Constitutional / governance principles** (if any) — numbered or named
-   principles the project anchors trade-offs against. Used by Phase 4 ranking
-   under "Constitutional ROI." If none exist, that ranking dimension is
-   skipped.
+   about (legacy, runtime data, generated code), each with a one-line reason.
+3. **Default anchor surface** — the actively-developed paths to focus on.
+4. **Constitutional / governance principles** (if any) — used by Phase 4's
+   Constitutional ROI; if none, that dimension is skipped.
 5. **Security data-surface checklist** — project-specific items (token storage,
-   PII flows, key exposure, log redaction, callback validation). Passed
-   verbatim to the Security-and-Trust persona's brief on top of its default
-   anchor list.
-6. **Baseline references** — paths to prior chorus artifacts the next round
-   should treat as already-accounted-for. The most recent artifact is the
+   PII flows, key exposure, log redaction, callback validation), passed verbatim
+   to Security-and-Trust.
+6. **Baseline references** — prior chorus artifacts; the most recent is the
    primary baseline.
-7. **Anchor-discovery procedure** — project-specific shape of the lightweight
-   procedure the orchestrator uses each round to build Phase 1's "existing
-   artefacts to re-examine first" list dynamically. Static anchor lists go
-   stale; a procedure stays current. Typical components:
-   - **Architecture doc** — the single index of truth-pointers (e.g.,
-     `docs/architecture.md`); the orchestrator reads it as the first anchor.
-   - **Spec head-scan** — instead of reading every spec fully, the orchestrator
-     does `head -n 20 specs/<NNN-slug>/spec.md` per relevant spec to know
-     what it covers. Specs are starting points; the head-scan is the cheapest
-     way to identify which spec(s) the round touches.
-   - **Memory recall** — `memsearch` or the project's memory recall surface,
-     for prior context on the round's deltas (what did the team learn last
-     time? what was deferred? what's a known fragile area?).
-   - **Spec-slug grep** — `rg "specs/0[0-9]+" --type <lang>` to find code
-     that references specs explicitly; each match is a pointer from code →
-     spec → invariant chain. Follow the chain; do not stop at the spec.
-   The output of the procedure IS the per-lens anchor list that Phase 1
-   section 4 of the brief consumes. Item 3 (Default anchor surface) gives
-   the static fallback when discovery yields nothing; item 7 is the dynamic
-   first move.
+7. **Anchor-discovery procedure** — how the orchestrator builds each lens's
+   anchor list per round: architecture doc first, spec head-scan
+   (`head -n 20 specs/<NNN-slug>/spec.md`), memory recall, spec-slug grep
+   (`rg "specs/0[0-9]+"`) followed code → spec → invariant. Item 3 is the static
+   fallback when discovery yields nothing.
 
-When an addendum is missing, the orchestrator MUST ask the user for items
-(2), (3), and (5) at minimum before launching agents. Items (1), (4), (6),
-(7) can be inferred from `CLAUDE.md` / `AGENTS.md` / repo layout if not
-provided.
+**Scope confirmation follows catalog rows 9–10 only.** Addendum present → 🟢:
+use its exclusions and anchors, no ask. Addendum absent → 🟡: infer defaults
+from `CLAUDE.md` / `AGENTS.md` / repo layout, record them, proceed, and confirm
+asynchronously with the operator; an override applies from the next dispatch.
 
-## Required scope-exclusion gate (run BEFORE spawning agents)
+## Scope exclusions in every brief
 
-Prior chorus rounds have been dominated by findings about legacy or
-out-of-investment code, crowding out signal from actively-developed surface.
-The exclusion gate prevents this.
+Bake the exclusion list into every persona brief except Security-and-Trust's:
 
-**Before launching any agents, the orchestrator MUST:**
+> **Out of scope for this review:** the following paths are legacy POC code,
+> runtime data directories, or generated code the team is not investing in. Do
+> not produce findings about them; redirect that energy to the active surface.
+>
+> [verbatim exclusion list with one-line justifications]
+>
+> The boundary between active code and these paths is in scope; their internals
+> are not.
 
-1. **Load the project addendum** (or ask the user inline if absent) for the
-   default exclusion list. Typical exclusions:
-   - Legacy directories the team has consciously labeled as tech debt
-   - Runtime data directories (no source code to review)
-   - Generated code (auto-generated headers / `# AUTO-GENERATED` markers)
-   - Anything `CLAUDE.md` or equivalent explicitly names as
-     "do not replicate; do not extend"
+**Security-and-Trust lens (scope override).** Security joins via RSVP like every
+other persona, but the general exclusion list does NOT apply to it: exfil risk
+does not care about tech-debt labels. Its brief omits the verbatim list and
+states instead that **legacy paths are in scope when they expose attacker
+surface**, the exclusion list applying only to non-security concerns; pass the
+addendum's item 5 verbatim on top of its default anchors (auth surfaces, trust
+boundaries, supply chain, secrets, egress, log redaction). Its findings take the
+next `Fn` IDs under the same severity scheme and evidence rule (I8). When it
+abstains, no separate security pass runs; the abstention is recorded.
 
-2. **Confirm the exclusion list with the user before launching.** Ask: "Which
-   legacy / POC paths should the chorus exclude? Default exclusions are X, Y, Z
-   — should I add or remove any?" One question, one answer, then launch.
+## Dispatch rules (all phases)
 
-3. **Bake the exclusion list into every agent brief.** Each persona agent's
-   prompt MUST include a section like:
-
-   > **Out of scope for this review:** the following paths are legacy POC code,
-   > runtime data directories, or generated code — the team has consciously
-   > labeled them as tech debt or non-source and is not currently investing in
-   > them. Do not produce findings about these paths; do not let them dominate
-   > your findings. If you would have ranked a legacy-only finding highly,
-   > redirect that energy to the actively-developed surface.
-   >
-   > [verbatim exclusion list with one-line justifications]
-   >
-   > Findings about the *active* code (per addendum's anchor surface) are in
-   > scope, including findings about how active code interacts with the legacy
-   > boundary (the boundary itself is in scope; the legacy module's internals
-   > are not).
-
-4. The Security-and-Trust persona has different scope rules — see
-   "Security-and-Trust lens" below. Security IS in scope on legacy paths
-   because exfil risk doesn't care about tech-debt labels.
+- **Continuity.** Dispatch each roster persona with the `Agent` tool (plain
+  dispatch, no Workflow). Continue each joiner with `SendMessage` through the
+  exploratory phase and Round 1 rather than spawning it cold each phase; every
+  brief is still self-contained in content.
+- **Wall-clock budget.** The round context states a wall-clock budget per phase
+  (defaults: RSVP 3 min, exploratory 15 min, Round 1 15 min, Round 2 10 min,
+  operator-overridable). It applies to every dispatch, Round 2 included. A
+  dispatch past its budget is stopped.
+- **One failure rule.** A persona that is not installed, silent, past budget, or
+  returns malformed or over-length output **counts as ABSTAIN, with the reason
+  recorded in the roster**. There is no substitute lens. Quorum (≥3) is
+  re-evaluated after the Phase 1 evidence check; below it, the round aborts as in
+  Phase 0.5.
+- **Memory recovery.** Some personas write their report to
+  `.claude/agent-memory/<persona-name>/` and return a summary; after each
+  dispatch, `Read` any new files there — they are the report.
+- **Output format.** Persona replies and chorus records are moving to
+  schema-validated JSON rendered to pages (the schema lands separately); until
+  it lands, use the prose formats below.
 
 ## The procedure
 
 ### Phase 0 — Brief
 
-- Load the project addendum (or interview the user inline if absent).
-- Confirm scope-exclusion list with the user (above).
-- Confirm any *additional* lenses to include or omit. Default chorus roster is nine:
-  - Evans (DDD), Richards (architecture), Cooper (adversarial product),
-    Norman (HCD), Uncle Bob (clean code/SOLID), Beck (TDD/simple design),
-    Delivery-and-Ops (CD discipline / operability / observability / cost),
-    Security-and-Trust (trust boundaries / threat modeling / security poverty line),
-    Goldratt (constraint & flow — deferral / opportunity cost / learning-loop throughput).
-  - Per-round participation is decided by the Phase 0.5 RSVP step;
-    the default *roster* is nine, the actual quorum each round may be smaller.
-- **Optional language lenses** — not part of the default nine; include one at Phase 0 when the
-  round's anchor surface is in its language, and let the Phase 0.5 RSVP drop it otherwise:
-  - Guido (Python — idiom, PEP 8/20, type-hint correctness, stdlib-first). Joins only when the
-    target has recently-changed Python; abstains on non-Python rounds.
-- Confirm date stamp for the artifact (`docs/reviews/YYYY-MM-DD-chorus-review.md`).
+- **Pre:** the user invoked the skill; the addendum is located or its absence
+  confirmed.
+- **Post:** scope banded per rows 9–10 (🟢 or 🟡-with-recorded-defaults); date
+  stamp chosen; round context drafted with phase budgets.
+
+The roster is the persona agents in `agents/`: Evans (DDD), Richards
+(architecture), Cooper (adversarial product), Norman (HCD), Uncle Bob (clean
+code/SOLID), Beck (TDD/simple design), Delivery-and-Ops (CD / operability /
+observability / cost), Security-and-Trust (trust boundaries / threat modeling),
+Goldratt (constraint & flow), and the **optional language lens** Guido (Python),
+included when the anchor surface has recently-changed Python and dropped by the
+RSVP otherwise.
+
+The **round context** is one paragraph of concrete since-last-chorus deltas:
+commits/PRs landed, specs created or completed, infra and release-path changes,
+incidents or user-visible events, anything excluded this round. It MUST name
+concrete deltas, not "general project state" — vague inputs produce performative
+joins.
 
 ### Phase 0.5 — RSVP (per-round self-selection)
 
-Between the brief and Round 1, each persona on the roster decides whether to
-weigh in on this round. Personas self-select; the orchestrator balances for
-quorum. The point is to avoid low-signal filler when the round's deltas don't
-touch a given lens, without letting the orchestrator pre-decide whose voice
+- **Pre:** Phase 0 post holds.
+- **Post:** every roster member has replied `JOIN`, **exceptional entry**, or
+  `ABSTAIN` with a one-line reason (or counts as ABSTAIN under the failure rule);
+  seating is resolved; joiner count `J` and the quorum branch are recorded.
+
+Dispatch all roster personas in parallel (`run_in_background: true`). Each brief:
+lens identity, the round context, the exclusion list (or Security's override),
+and RSVP instructions — reply in ≤80 words with `JOIN`, `ABSTAIN`, or an
+exceptional entry, plus the two-axis signal (`chorus-core/DECISION-PRIMITIVE.md`
+§ The RSVP signal): **applicability** (cite ≥1 concrete round-context delta; none
+→ ABSTAIN) and **expected stakes** (🟢/🟡/🔴-potential + one-line hook), with a
+one-sentence reason. The orchestrator counts; it never pre-decides whose voice
 matters.
 
-#### Inputs
+**Seating.** The round seats a cap of five, plus exceptional entry, per
+`chorus-core/DECISION-PRIMITIVE.md` § Seating (a tie at the cap is 🟡, catalog
+row 2). An exceptional entry cites a concrete uncovered delta no seated lens
+covers; it is evidence-gated, rare, and confers a voice, not weight.
 
-Orchestrator drafts a one-paragraph **round context** capturing the
-since-last-chorus delta:
-- commits and PRs landed
-- specs created or completed
-- infra changes (new IaC, deployment, release-path edits)
-- known incidents or user-visible events
-- anything the user has explicitly excluded this round
+**Quorum.**
+- **`J ≥ 3`** — proceed. The artifact records who abstained and why.
+- **`J < 3`** — re-ask **all** abstainers once, each with the same added context
+  paragraph. If still `J < 3`, **abort the chorus**: write
+  `docs/reviews/YYYY-MM-DD-chorus-abstained.md` with each lens's RSVP reply and
+  revisit at next cadence. Do not fake a chorus.
 
-This paragraph is the body of the RSVP prompt. It MUST contain concrete
-deltas, not "general project state" — vague inputs produce performative joins.
-
-#### Mechanism
-
-Dispatch all roster personas in parallel (`run_in_background: true`). Each
-agent receives a short, self-contained brief:
-1. Their lens identity
-2. The round-context paragraph
-3. The scope-exclusion list (verbatim, as in Phase 1 below)
-4. RSVP instructions: reply in ≤80 words with `JOIN`, `ABSTAIN`, or an
-   **exceptional entry**, plus the **two-axis signal** (`chorus-core/DECISION-PRIMITIVE.md`
-   §RSVP signal) — **applicability** (cite ≥1 concrete round-context delta your lens touches;
-   no citable delta → ABSTAIN) and **expected stakes** (🟢/🟡/🔴-potential + a one-line
-   hook) — and a one-sentence reason. (This replaces the old relevance 0–3 score, which
-   degenerated to all-3s; seating ties on it are now a self-unblocking 🟡, not an operator
-   ask.) An **exceptional entry** is a JOIN that asks for a seat *beyond* the ordinary cap by
-   **citing a concrete uncovered delta no seated ordinary lens covers**; it is evidence-gated
-   and rare (an un-anchored exceptional claim is refused), confers a **voice not weight**, and
-   is seated per the cap + exceptional-entry rule defined once in the **`chorus-sdlc`**
-   sibling skill (its seating section). The base round is uncapped by default, so
-   exceptional entry matters chiefly where a cap applies (the SDLC gates).
-
-Cost: ~7 small parallel calls, ~30s wall time, ~3K tokens total. Cheap
-relative to a saved Phase 1 round.
-
-#### Quorum rules
-
-Let `J` be the count of joiners.
-
-- **`J ≥ 5`** — proceed; full chorus.
-- **`J ∈ {3, 4}`** — proceed with reduced quorum. The artifact records which
-  lenses abstained and why.
-- **`J < 3`** — orchestrator picks the most-relevant abstainer(s) using the
-  round-context paragraph and re-pings them with one extra paragraph of
-  context (e.g., "the round includes the new release pipeline; your lens is
-  the only one likely to surface release-path risk"). If they still abstain,
-  **abort the chorus** for this round. Write
-  `docs/reviews/YYYY-MM-DD-chorus-abstained.md` containing each lens's RSVP
-  reply, and revisit at next cadence. Do not fake a chorus.
-
-**Why odd numbers (3, 5):** Phase 3 conflict reconciliation can produce
-lens-vs-lens splits. An odd quorum avoids 2-vs-2 deadlocks that force every
-conflict to `advisor()`.
-
-**Why agent-call, not heuristic:** the orchestrator pre-deciding which
-personas are relevant defeats the purpose of independent voices. RSVP cost
-is small relative to one persona's saved Phase 1 round.
-
-#### RSVP record
-
-Append the joiners/abstainers list (with one-line reasons) to the artifact
-under a `## Roster (this round)` heading. Future chorus rounds use this to
-detect drift — if a persona has abstained four rounds running, the round-
-context paragraph may not be surfacing relevant deltas honestly.
+**RSVP record.** Joiners, abstainers, and failure-rule abstentions go under
+`## Roster (this round)` with one-line reasons. A persona abstaining four rounds
+running suggests the round context is not surfacing its deltas honestly.
 
 ### Phase 0.7 — Exploratory phase (joiners build understanding)
 
-Between RSVP and Round 1, each joiner runs the **exploratory phase** — defined
-once in `chorus-core/EXPLORATORY-PHASE.md`, run cheapest-subset-first. In brief: load the
-lens's `Information needs (exploratory phase)` profile → reuse the prior record +
-compute deltas / stale refs → harvest **reference-first, addendum-first** (record
-locators, not copies) → bounded, operator-budget-controlled analysis for what's
-undocumented → emit gap-questions. The orchestrator then runs **one batched
-operator interview**, delivered in **resumable, operator-paced sessions of ≤ 5
-questions** (deferring a session leaves open gaps plus a verdict **degradation
-summary**); project-wide answers are written back to the addendum
-(operator-accepted), lens-specific answers to the asking advisor's record. A
-**profile-coverage fitness function** confirms every profile need resolved before
-findings are authored.
+- **Pre:** Phase 0.5 post holds; quorum branch is "proceed".
+- **Post:** every joiner has a persisted understanding record whose profile needs
+  are each referenced / inferred / operator-confirmed / open-gap; the **one
+  batched, sessioned operator interview** has run (or was deferred with a
+  recorded degradation summary); project-wide facts were written to the addendum
+  **only with operator acceptance**; the **profile-coverage fitness function**
+  passes (or its failures are recorded).
 
-This **supersedes the per-round cold read**: Round 1 (the Author stage below) is
-produced *from* the persisted understanding. Persisted memory is an **index of
-locators, never a finding's evidentiary endpoint** — findings re-ground in the
-live material. Abstainers do not run the phase. See `chorus-core/EXPLORATORY-PHASE.md` for the
-full mechanic, the two-tier memory (the addendum is the authoritative base; records
-may cache it), and staleness/reconciliation rules.
+The mechanic is `chorus-core/EXPLORATORY-PHASE.md`. The conductor owns the
+interview (N+1): it dedupes joiners' gap-questions and runs them in **resumable,
+operator-paced sessions of ≤ 5 questions**; advisors never interview directly.
+Round 1 is authored *from* the persisted understanding, but persisted memory is
+an **index of locators, never a finding's evidentiary endpoint** — findings
+re-ground in the live source (I8 upstream of Round 1). Abstainers skip this phase.
 
-### Phase 1 — Round 1 (parallel persona agents — joiners only)
+### Phase 1 — Round 1 (joiners only)
 
-Spawn all Phase-0.5 joiners in a single message, `run_in_background: true`.
-Each agent's brief must be **self-contained** (the agent doesn't see this
-conversation). Abstainers are skipped entirely — do not brief them, do not
-include their findings as `[no comment]` rows; just record their RSVP reply
-in the round roster (see Phase 0.5).
+- **Pre:** Phase 0.7 post holds; quorum branch is "proceed".
+- **Post:** every joiner has a report that passed the evidence check (or counts
+  as ABSTAIN), each finding carrying its **persona-marked pull-quote**; reports
+  are referenceable by file or memory-dir path; `J ≥ 3` re-checked.
 
-Round 1 is **stages 1–2 of the gate primitive** (`chorus-core/GATE-PRIMITIVE.md`): an
-optional read-only Extract pass (a bounded `Explore`) may pre-build structured
-`file:line`-anchored records the personas author from, then each persona
-authors findings **uncapped** (stage 2). The Extract pass is invisible to the
-operator and never assigns severity.
+Round 1 is **stages 1–2 of the gate primitive**: an optional read-only Extract
+pass (a bounded `Explore`) may pre-build `file:line`-anchored records, invisible
+to the operator and never assigning severity; then each joiner authors findings
+**uncapped**. Abstainers are not briefed and get no `[no comment]` rows.
 
-Required brief sections per agent:
+Brief sections per joiner (continued via `SendMessage`):
 
-1. **Lens identity** — "you are one of N advisors in a chorus review" (where
-   N is the joiner count).
-2. **Project topology** — pulled from the project addendum's "Project summary"
-   item; include constitution / governance doc location if any.
-3. **Scope-exclusion list** (verbatim, see above).
-4. **Existing artefacts to re-examine first** — the load-bearing brief
-   section. Artefacts come in many forms: code, tests, configs, dashboards,
-   SQL, runbooks, ADRs, specs, BDD scenarios, AsyncAPI/OpenAPI contracts.
-   **Specs are starting points, not endpoints** — every `specs/<NNN-slug>`
-   reference in the codebase is a pointer; follow it. Apply the why-why-why
-   mantra: **do not stop at any single artefact unless it is an invariant**
-   — an executable assertion (BDD, fitness function, architectural test) or
-   a principle stated in the project's constitution/governance doc. A spec
-   that has no executable assertion is intermediate; chase it down to the
-   test or principle it implements, OR surface the gap as the finding.
+1. **Lens identity** — "you are one of N advisors in a chorus review" (N = joiners).
+2. **Project topology** — addendum item 1, incl. governance doc location.
+3. **Scope-exclusion list** (verbatim) or Security's override.
+4. **Existing artefacts to re-examine first** — 4–8 paths per lens with
+   `file:line` targets, built by the addendum's item 7. Artefacts include code,
+   tests, configs, dashboards, SQL, runbooks, ADRs, specs, BDD scenarios,
+   contracts. **Specs are starting points, not endpoints**: **do not stop at any
+   single artefact unless it is an invariant** — an executable assertion or a
+   principle in the project's constitution. Ban *"read whatever seems relevant"*;
+   bake in *"chase this artefact until you hit an invariant or run out of
+   pointers."*
+5. **Prior position to challenge** *(optional)* — a prior consensus, stated
+   verbatim, to attack with code-grounded behavioural evidence. **Principles
+   (invariants) ARE load-bearing**, but **declared intentions are not
+   behaviour**: *"Attack declared intentions with behavioural evidence; respect
+   invariants by citing where they are enforced (or surface the absence of
+   enforcement as the finding)."*
+6. **Numbered questions** — 4–7, through that lens.
+7. **Word limit** — 500–700 words. It bounds prose per finding, not the number
+   of findings; do not pad or trim to a count.
+8. **Evidence rule and pull-quote** — every finding cites `file:line`, or carries
+   `[principle]` (existing; cite where established) or `[principle:proposed]`
+   (newly named). **Before you write a finding, you MUST have either followed the
+   artefact chain to an invariant or run out of pointers, OR tagged it.** For each
+   finding, mark **one short sentence in your own words** as its pull-quote, on a
+   line beginning `PULL-QUOTE:` with its locator. The conductor relays that span
+   verbatim and **selects nothing**.
+9. **`NEED_INFO` + confidence axis** — declare `confidence_on_hand` (`high`/`low`)
+   per finding; **`low` → `NEED_INFO` is mandatory**. Also raise it when
+   remediation or formulation is undecidable: `NEED_INFO: true` plus a one-sentence
+   `need_info_reason`. Do not invent past the gap (S11).
+10. **Required ending** — "End with [a recommendation, a finding, a persona name]."
 
-   Build the anchor list using the project addendum's item 7 (Anchor-
-   discovery procedure) — architecture doc, spec head-scan, memory recall,
-   spec-slug grep. Yields 4–8 specific paths per lens with `file:line`
-   targets where known. Mix artefact types where appropriate. The phrase
-   to ban is *"read whatever seems relevant"*; the phrase to bake in is
-   *"chase this artefact until you hit an invariant or run out of pointers."*
+#### Phase 1 evidence check (gate before the register; I8)
 
-   Section 4 closes with the mandate: **"Before you write a finding, you
-   MUST have either followed the artefact chain to an invariant or runs-
-   out-of-pointers, OR tagged your finding `[principle]` (existing,
-   cited) / `[principle:proposed]` (newly named)."**
-5. **Prior position to challenge** *(optional but high-leverage when
-   applicable)* — if a multi-turn design chat or a prior chorus has produced
-   a consensus, state it verbatim and direct the persona to attack it with
-   code-grounded behavioural evidence, not re-derive from principles.
+1. **Tool-use count > 0.** A zero-tool-use report is re-dispatched once with
+   "Read these artefacts first: …". A second zero-tool-use report counts as
+   ABSTAIN (reason: no evidence); none of its findings are registered.
+2. **Project-specific findings carry `file:line` or a principle tag.** Otherwise
+   they become `[unsupported]` rows: visible, but outside the matrix, the vote,
+   and convergence.
+3. **A pull-quote was marked.** If not, the finding is routed back to its persona;
+   the conductor never selects or authors a span.
 
-   Framing the persona must carry into Round 1: **principles (invariants)
-   ARE load-bearing** — they are the Platonic foundation the system is
-   built on; a lens-internal principle is not "just opinion." HOWEVER,
-   **declared intentions are not behaviour** — a documented invariant
-   that no executable assertion enforces is a claim, not a fact. Code is
-   the final truth on what the system actually does. The brief instructs:
-   *"Attack declared intentions with behavioural evidence; respect
-   invariants by citing where they are enforced (or surface the absence
-   of enforcement as the finding)."*
-6. **Numbered questions** — 4–7 questions through that lens.
-7. **Word limit** — 500–700 words. This bounds *prose density per finding*,
-   not the *number of findings*: authoring is **uncapped** (primitive stage 2).
-   Do not pad to a count, and do not trim findings to fit — let the count fall
-   where the evidence lands.
-8. **Evidence rule** — every finding either cites `file:line` (claims
-   about THIS project's artefacts) OR carries an explicit `[principle]`
-   tag (existing principle — MUST cite where established: constitution
-   clause, prior chorus finding, project doc) OR `[principle:proposed]`
-   tag (genuinely new principle being named for the first time).
-   Findings making project-specific claims without `file:line` and not
-   principle-grounded are unsupported and demoted at the Phase-1 evidence-
-   check gate (see below).
-9. **Required ending** — "End with [specific call-to-action: a
-   recommendation, a finding, a persona name]."
-10. **Pull-quote mark (per finding)** — "For each finding, mark **one short
-    sentence in your own words** as its pull-quote — the line that best
-    characterizes the finding as *you* see it — and give its evidence locator
-    (`file:line` or principle tag). Format the mark so the integration layer can
-    lift it verbatim, e.g. a line beginning `PULL-QUOTE:` directly under the
-    finding." This is the voice the artifact relays unedited (spec
-    `008-detail-rich-relay`, FR-002): the integration layer **selects nothing** —
-    it relays the span you marked. A finding with no marked pull-quote is routed
-    back to you; the conductor never excerpts or paraphrases one for you.
-11. **`NEED_INFO` flag + confidence axis (per finding)** — "Declare `confidence_on_hand`
-    (`high` or `low`) for each finding — how much you trust the information currently
-    on hand. **`low` → `NEED_INFO` is mandatory**; do not publish a confident finding
-    on thin evidence. Also raise `NEED_INFO` when you cannot decisively determine
-    remediation or are unsure about the finding's formulation. Set `NEED_INFO: true`,
-    declare `confidence_on_hand: low` when that is the trigger, and state
-    `need_info_reason` in one sentence. Do not invent remediation or reformulate past
-    the gap — honesty is the output (`chorus-core/GATE-PRIMITIVE.md`, S11). The
-    orchestrator routes resolution (peer provision or operator provision); the finding
-    does not tally until the flag clears."
+Then re-evaluate quorum.
 
-**Persona-agent failure mode (hung-on-enumeration pattern):** if an agent goes
-silent for >5 minutes with a substantial transcript already written, it has
-hung on "enumerate everything" mode. Kill it. Substitute with a bounded
-`Explore` agent that asks the same questions but with hard sampling rules
-("read no more than 15 files; pick 2 randomly; do not enumerate"). Mark in
-the doc that the lens was substituted, not delivered.
+### Phase 2 — Cross-evaluation (Vote and Tally)
 
-**Memory recovery:** some personas (notably Evans) tend to write their actual
-report to `.agents/agent-memory/<persona-name>/` and return only a summary.
-After each agent completes, check that path and `Read` any new memory files —
-those ARE the report content.
+- **Pre:** Phase 1 post holds; the findings register is written, every finding's
+  pull-quote relayed; Phase 1 `NEED_INFO` flags are routed for resolution and
+  still-open rows are marked held.
+- **Post:** every seated joiner that passed the evidence check has voted (or
+  counts as ABSTAIN); every flag is resolved or recorded open; the stage-4 count
+  has run; the consolidation matrix is written from the count.
 
-#### Phase 1 evidence check (gate before writing the register)
+**Findings register** — the **single human-facing source of truth**, written
+before the vote. An operator who has not read the reports must understand each
+entry alone:
 
-Before writing the findings register, the integration layer scans each
-Round-1 report and verifies:
+| ID | Advisor · Lens | Authored severity | Target (locator) | Pull-quote (verbatim) | confidence_on_hand | need_info · reason | graded |
+|----|----------------|-------------------|------------------|-----------------------|--------------------|--------------------|--------|
+| F1 | Evans · DDD | 🔴 | `webapp/data/models.py:42` | "The Order aggregate has no root to enforce its invariants." | high | — | true |
 
-1. **Tool-use count > 0** — the agent opened at least one artefact. Zero-
-   tool-use reports are re-dispatched ONCE with an explicit "Read these
-   artefacts first: …" amendment. A second zero-tool-use round → mark the
-   lens **substituted-without-evidence** in the artifact; do not register
-   findings from that lens.
+- The pull-quote cell is the persona's marked span, verbatim and attributed —
+  never a conductor paraphrase or excerpt (I6, mechanized); preserve any
+  `[principle]` / `[principle:proposed]` / `[unsupported]` tag.
+- A row with an open `NEED_INFO` is shown **held**, not graded; resolution goes
+  by the two S11 paths (peer or operator provision; the orchestrator routes and
+  never invents).
+- **Duplicates** are grouped under one entry **only when they cite the same
+  locator**; each author and each author's severity is kept on the entry.
+- Under each finding, list converging lenses, each with its **own** verbatim
+  Round-2 note: *which lenses and in whose words*, not a bare count.
 
-2. **Project-specific findings carry `file:line`.** Findings making claims
-   about THIS project without `file:line` and without a principle tag get
-   demoted to `[unsupported]` rows in the register — they appear with the
-   tag visible, do not enter the matrix, and do not contribute to
-   convergence counts. Pure `[principle]` findings (existing, cited) and
-   `[principle:proposed]` findings (newly named) are accepted as-is.
+**Round 2 dispatch** — one per seated joiner that passed the evidence check,
+within the Round 2 budget. Each brief carries:
 
-3. **A pull-quote was marked** (Phase-1 brief item 10). A finding whose persona
-   marked no pull-quote is routed back to that persona to mark one; the
-   integration layer never selects or authors a span itself. The register's
-   pull-quote cell preserves the `[principle]` / `[principle:proposed]` /
-   `[unsupported]` tag alongside the verbatim line so future readers can
-   distinguish evidence-grounded findings from declarative or unsupported ones at
-   a glance.
-
-The gate is enforced by I8 in `chorus-core/CONDUCTOR.md`. The integration layer
-never accepts a report whose project-specific findings lack `file:line` or
-a principle tag.
-
-### Phase 2 — Cross-evaluation (parallel reactions, one per joiner)
-
-Once all Round 1 reports are in, write a **findings register** — the **single
-human-facing source of truth** for every finding — followed by a **consolidation
-matrix** that is a *projection* of it (spec `008-detail-rich-relay`).
-
-**Findings register** — one entry per finding, written BEFORE the matrix. Each
-entry carries enough that an operator who has **not** read the Round-1 reports can
-understand it from the entry alone (FR-004/FR-007):
-
-| ID | Advisor · Lens | Severity | Target (locator) | Pull-quote (verbatim — the persona's own words) | confidence_on_hand | need_info · reason |
-|----|----------------|----------|------------------|--------------------------------------------------|--------------------|--------------------|
-| F1 | Evans · DDD | 🔴 | `webapp/data/models.py:42` | "The Order aggregate has no root to enforce its invariants — it can be persisted in a state the domain forbids." | high | — |
-| … | | | | | | |
-
-- The **confidence_on_hand** (`high` / `low`) and **need_info · reason** cells carry
-  the persona's declared S11 state (`chorus-core/GATE-PRIMITIVE.md`). A row with
-  `need_info: true` is **excluded from the tally** until resolved; the register shows
-  it as held, not graded.
-- The **Pull-quote** cell is the persona-marked span (Phase-1 brief item 10),
-  lifted **verbatim** and attributed — never a conductor paraphrase and never a
-  conductor-chosen excerpt (this is the I6 / "speak in a persona's voice" refusal,
-  mechanized). Preserve any `[principle]` / `[principle:proposed]` / `[unsupported]`
-  tag in the cell.
-- For each **convergent** finding, list the converging lenses directly under its
-  entry, each with its **own** one-line verbatim note (marked in Round 2, below) —
-  so "3 lenses converged" reads as *which three and in whose words*, not a bare
-  count:
-  > **Converging:** Richards · *"this is the same seam I flagged — the model leaks
-  > persistence concerns"*; Beck · *"agreed, and the duplication makes it worse"*.
-- A finding with no persona-marked pull-quote is routed back, not summarized by the
-  conductor (Phase-1 evidence check item 3).
-
-**Consolidation matrix** — a **derived projection** of the register for
-scoring/ranking, columns = `[ID, severity (🔴🟠🟡🟢), convergence count, lenses
-converged]`. Severity and the convergence set come **from the register entries** —
-the matrix re-authors nothing, so severity appears authoritatively in exactly one
-place and the two surfaces cannot drift (FR-007). Cite finding IDs `F1`, `F2`, …
-so they remain referenceable.
-
-After appending the matrix, add a `### Round 1 brief` subsection (3–5 sentences)
-summarizing the dominant themes across all findings — what the round found as a
-whole, not a per-finding list. This is the entry point for future readers.
-
-Then spawn one Round-2 agent per Phase-1 joiner (skip abstainers entirely;
-skip any persona whose Round 1 was substituted with a bounded `Explore` —
-no original report to react with). Each gets:
-
-1. **Pointer to the matrix** at the artifact path (they `Read` it).
-2. **Their Round 1 findings IDs** explicitly listed (so they don't react to
-   their own — S8: the author of a finding is never its grader).
-3. **Two tasks through their lens:**
-
-   **Task 1 — Triage.** For each finding you did not author, one call: `USABLE`
-   (real and actionable as stated) or `NOT USABLE` (wrong, out of scope, or too
-   vague to act on — give a `file:line` or a one-line reason).
-
-   **Task 2 — Derive (the round's primary output).** *Given what other lenses
-   reported, what does that imply **in your own territory** that you have not yet
-   examined?* Go and look, then report what you find.
-   - A derived finding is new ground **you** examined, not a second opinion on
-     someone else's. "Security found an unauthenticated write path, so I checked
-     whether the same handler leaks the identifier into user-facing copy" is a
-     derive. "I agree with Security" is not.
-   - Cite `file:line` for ground you read this round; the Round-1 evidence rule
-     applies unchanged.
-   - Name the finding you derived from.
-   - Derived findings enter the register with a `D` prefix (`D1`, `D2`, …), carry
-     their own authored severity, and are votable next round like any other.
-
-   Triage is a list. Derive gets the prose.
-
-   *Why the round is shaped this way, and what would falsify it:*
-   `docs/round2-derive-evidence.md`.
-4. **Evidence rule continues in Round 2.** Agreements, pushbacks, overreach
-   claims, and retractions that make project-specific assertions cite
-   `file:line`. "I read X.py:NN and confirm Bob's claim" is a citation.
-   "Bob is correct" with no file reference is `[principle]` at best
-   (existing, cited) or `[unsupported]` at worst. Genuinely new principles
-   introduced in Round 2 carry `[principle:proposed]`. The same
-   evidence-check gate that ran post-Round-1 runs post-Round-2: unsupported
-   project-specific assertions are demoted, not registered as findings.
-5. **End with the four-way call** — for **findings with fewer than three
-   independent Round-1 authors only**; the rest are auto-`CONFIRM`ed at their
-   authored severity (their author-declared `confidence_on_hand` and `need_info`
-   flag still stand, so a low-confidence finding is never laundered into a clean
-   auto-`CONFIRM`). One per such finding you have a view on: first declare
-   `confidence_on_hand` (`high` or `low`) for the information on hand, then vote —
-   is this finding **under-rated** (PRIORITIZE — should escalate), **correctly rated**
-   (CONFIRM — you agree at the proposed severity), **over-rated** (OVER-RATE —
-   should demote), or **information-gapped** (NEED_INFO — `confidence_on_hand: low`,
-   or formulation/remediation path unclear)? **`low` confidence → `NEED_INFO` is
-   mandatory** — do not CONFIRM with hedges. CONFIRM is agreement, not escalation:
-   use it when you'd rank the fix highly but the author's severity is right. Only
-   PRIORITIZE moves a finding up (`chorus-core/GATE-PRIMITIVE.md` stage 3; spec
-   `009-confirm-vote-tally`). NEED_INFO raises the flag on the finding and excludes
-   it from tally until resolved per S11 (peer provision or operator provision — the
-   orchestrator routes, never invents).
-6. **Convergence note (per agreement)** — "For any finding you converge with,
-   mark **one short sentence in your own words** as your agreement note (same
-   `PULL-QUOTE:`-style mark as Round 1). This is relayed verbatim under the
-   finding's register entry; the integration layer never writes it for you."
+1. **Pointer to the findings register** at the artifact path (with pull-quotes).
+2. **Their own finding IDs**, listed — they do not vote on them (S8: the author
+   of a finding is never its grader).
+3. **Vote** on every finding you did not author and have a view on. First declare
+   `confidence_on_hand`, then one of: **PRIORITIZE** (under-rated, escalate),
+   **CONFIRM** (correctly rated — agreement, not escalation), **OVER-RATE**
+   (over-rated, wrong, out of scope, or too vague to act on — give a `file:line`
+   or one-line reason), or **NEED_INFO** (information-gapped). **`low` confidence
+   → `NEED_INFO` is mandatory**; do not CONFIRM with hedges. Only PRIORITIZE
+   moves a finding up. Held rows are not voted until released.
+4. **Derive (the round's primary output).** *Given what other lenses reported,
+   what does that imply **in your own territory** that you have not yet
+   examined?* Go and look. A derived finding is new ground you examined, not a
+   second opinion ("I agree with Security" is not a derive). Name the finding you
+   derived from; cite `file:line` for ground read this round. Rationale and
+   falsifiers: `docs/round2-derive-evidence.md`.
+5. **Convergence note** — for each finding you converge with, one short sentence
+   in your own words, marked `PULL-QUOTE:`, relayed verbatim under that entry.
+6. **Evidence rule continues.** Votes and derives making project-specific claims
+   cite `file:line` ("I read X.py:NN and confirm" is a citation; "Bob is correct"
+   is `[unsupported]` at worst). The Phase 1 evidence check runs again on Round 2
+   output.
 
 Word limit: 500–600.
 
-Phase 2 is **stage 3 (Vote)** of the gate primitive: PRIORITIZE / CONFIRM /
-OVER-RATE / NEED_INFO are the votes. Findings with open `NEED_INFO` enter the
-resolution cycle (`chorus-core/GATE-PRIMITIVE.md`) before tally. After reactions
-arrive and every open `NEED_INFO` is resolved, finalize each remaining finding's severity
-with the primitive's **deterministic stage-4 tally** — defined once in
-`chorus-core/GATE-PRIMITIVE.md` (Stage 4): `net = P − O` over non-author voters (CONFIRM
-excluded), compared against the **board-scaled threshold** defined there (it scales with
-the non-author voter count `N` and reduces to the prior `±2` at the standard 5-seat
-board). The convergence count used for ranking is `P + C` (all agreement) — so a finding
-many lenses CONFIRM still ranks highly while honestly holding its severity. The old "two
-converging lenses earn 🔴" rule is amended: two **under-rated** (PRIORITIZE) claims
-escalate; mere agreement (CONFIRM) holds (spec `009-confirm-vote-tally`, closing issue
-#13). Severity is arithmetic over real votes — never the orchestrator's judgment (S9).
+**Derived findings** enter the register with the prefix **`R2-`** (`R2-1`,
+`R2-2`, …). They keep their author's severity and are marked **ungraded**
+(`graded: false`, shown as "[ungraded]") in the register, the matrix, and the
+ranking: no second lens has voted on them.
 
-After Round 2 reactions arrive, append a `### Round 2 brief` subsection to the
-artifact (2–4 sentences): which findings were sharpened, which were pushed back
-or retracted, and what net movement the round produced. One sentence per
-significant change is sufficient — future readers need to know what changed, not
-a full replay.
+**Count.** Route Round-2 `NEED_INFO` flags by S11, then run the **deterministic
+stage-4 tally** (`chorus-core/GATE-PRIMITIVE.md` § Stage 4) on every graded
+finding with its flag cleared: `net = P − O` over non-author voters (CONFIRM
+excluded), compared to the board-scaled threshold `T` defined there. Severity is
+arithmetic over real votes, never the orchestrator's judgment (S9).
+**Convergence = `P + C`**, computed after the count.
 
-### Phase 3 — Conflict reconciliation (one `advisor()` call)
+**Consolidation matrix** — produced **after the count**, a projection of the
+register plus the tally; it re-authors nothing:
 
-After Round 2 reactions arrive, identify *genuine* conflicts (not just
-emphasis differences). Frame each as `Cn`: which advisors disagree, what the
-disagreement is, what the user-visible outcome differs across.
+| ID | Authored severity | P | C | O | net | Final severity | Convergence (P + C) | Status |
+|----|-------------------|---|---|---|-----|----------------|---------------------|--------|
 
-State the conflicts in a brief and call `advisor()` (no parameters; it sees the
-full transcript). Advisor will return tiebreaker reasoning per conflict.
+`Status` is `graded`, `held` (flag open), `ungraded` (`R2-`), or `unvoted`.
 
-Single advisor pass beats another agent round here: conflicts converge faster
-when one stronger reviewer arbitrates than when multiple lenses re-litigate.
+### Phase 3 — Conflict reconciliation
 
-Append a `### Phase 3 brief` subsection to the artifact: one bullet per conflict
-(`C1`, `C2`, …) stating what was disputed, how it was resolved, and which finding
-ID carries the outcome. Future readers must be able to follow the reasoning chain
-from `Fn` in the top-5 back through to how any conflicts touching it were settled.
+- **Pre:** Phase 2 post holds.
+- **Post:** genuine conflicts are framed as `Cn` and each is resolved by an
+  `advisor()` ruling or recorded **unresolved for the operator**; skipped with a
+  one-line note when there are no conflicts.
+
+Identify *genuine* conflicts (not emphasis differences): which advisors disagree,
+over what, and how the user-visible outcome differs. If there are none, skip the
+phase. Otherwise state them in one brief and call `advisor()` once (it sees the
+full transcript). Its rulings **annotate the ranking and never change counted
+severity**. If `advisor()` is unavailable, record each conflict unresolved for the
+operator. The Conflicts section gives each `Cn` what was disputed, the ruling (or
+"unresolved"), and the finding IDs it touches.
 
 ### Phase 4 — Ranking
 
-Score surviving recommendations on:
+- **Pre:** Phase 3 post holds.
+- **Post:** a top five drafted by the conductor (not delegated to a fresh agent),
+  each entry resolved to its pull-quote and traced to its register entry; held
+  findings listed separately.
 
-- **Cost** — low / medium / high (LOC, sessions, dependencies)
-- **Value** — risk reduced + friction removed + decisions unblocked
-- **Constitutional ROI** *(only if the project addendum lists governance
-  principles)* — does the recommendation advance enforcement of those
-  principles, or paper over them? Skip this dimension entirely if the project
-  has no codified governance doc.
-- **Convergence** — how many lenses landed on it independently?
+Score findings on **Cost** (low / medium / high), **Value** (risk reduced +
+friction removed + decisions unblocked), **Constitutional ROI** (only if the
+addendum lists principles), and **Convergence** (`P + C` from the matrix). A
+finding whose `NEED_INFO` is still open at ranking is listed as **held** and
+**excluded from the top five**; the round does not stall on it. `R2-` findings
+carry "[ungraded]" wherever they appear. `advisor()` may sanity-check a
+non-obvious ordering (optional).
 
-Produce a top-5. Prefer drafting yourself rather than spawning yet another
-ranking agent — by Phase 4 the keystones are explicit and a fresh agent will
-mostly restate. Use `advisor()` for sanity-check after drafting if the
-ordering is non-obvious.
-
-Each top-5 entry MUST carry enough to be understood in place — its `Fn` anchor,
-the persona-marked pull-quote, and the locator — and MUST trace back to the
-finding's register entry (FR-008). An entry that is a bare `Fn` + score is a
-dead-end reference; resolve it to its pull-quote. Conflicts (`Cn`) in the Phase 3
-brief carry the same: enough detail to follow in place, traced to the findings
-they touch.
+Each top-five entry carries its ID, pull-quote, locator, and final severity, and
+traces to its register entry; a bare `Fn` + score is a dead end.
 
 ### Phase 5 — Sign-off
 
-Add three sections to the artifact before publishing:
+- **Pre:** Phase 4 post holds.
+- **Post:** the artifact is complete in skeleton order and committed; an optional
+  `advisor()` sanity pass is recorded if run; if no addendum existed, an offer to
+  write `docs/reviews/CHORUS-PROJECT.md` from the inferred and confirmed facts is
+  on record.
 
-1. **TL;DR / executive summary** at the top — 3 sentences: chorus found *what*,
-   top-5 prioritizes *X/Y/Z*, public rollout is blocked by *Fa/Fb/Fc* (if any).
-2. **Pre-public-rollout gate** subsection — any 🔴 findings that block ship,
-   tracked as a unit even if some are not in top-5.
-3. **Next-chorus baseline** section — what the next round should *assume*
-   closed/in-progress vs re-evaluate. Without this, the next chorus
-   re-derives everything.
+## Artifact
 
-Then call `advisor()` once for the final sanity pass.
+Path: `docs/reviews/YYYY-MM-DD-chorus-review.md` — **commit it.** On a filename
+collision, use `docs/reviews/YYYY-MM-DD-chorus-review-N.md` (N = 2, 3, …). The
+most recent artifact is the next round's primary baseline.
 
-If no project addendum exists, **also offer to write
-`docs/reviews/CHORUS-PROJECT.md`** distilling the answers the user gave at
-Phase 0 so the next round starts from a baseline, not from interview again.
+One ordered skeleton:
 
-## Security-and-Trust lens (scope override)
+1. **TL;DR** — 3 sentences: what the chorus found, what the top five
+   prioritizes, and which 🔴 findings block public rollout (tracked as a unit
+   even when outside the top five).
+2. **Roster (this round)** — joiners, seating, abstainers with reasons.
+3. **Findings register.**
+4. **Consolidation matrix** — with the tally columns.
+5. **Conflicts** — `Cn` entries.
+6. **Top five.**
+7. **Held findings** — open `NEED_INFO` with reasons.
+8. **Next-chorus baseline** — what the next round should assume closed or
+   in progress vs re-evaluate.
 
-The Security-and-Trust persona participates via RSVP like the other eight personas, but
-its scope rule is different: **the general scope-exclusion list does NOT
-apply to this lens**. Exfil risk does not care about tech-debt labels — a
-legacy module that touches credentials, runs in production, and is reachable
-from the network is in scope for Security-and-Trust regardless of whether the
-rest of the chorus excludes it.
+Appendix: each lens's report, or links to it (file or memory-dir path).
 
-This rule lives in the persona's brief (the agent file's "A note on legacy"
-section). The orchestrator's Phase 1 brief for Security-and-Trust must NOT
-include the scope-exclusion list verbatim the way it does for the other
-eight personas; instead, brief Security-and-Trust that **legacy paths are
-in scope when they expose attacker surface**, and that the general
-scope-exclusion list applies only to non-security concerns.
+## Failure modes not covered above
 
-The project addendum's section 5 (Security data-surface checklist) carries
-project-specific items the Security-and-Trust persona should layer on top of
-its default anchor list (auth surfaces, trust boundaries, supply chain,
-secrets, egress, log redaction). Pass that checklist verbatim in the brief.
-
-When Security-and-Trust RSVPs JOIN, its findings land in the matrix as the
-next available `Fn` IDs alongside the other personas — same severity scheme,
-same evidence rule (I8). When it ABSTAINS, no separate security pass runs;
-the round proceeds without security findings, recorded honestly in the round
-roster like any other abstention.
-
-## Failure modes (collected from prior runs)
-
-| Symptom | Cause | Fix |
-|---|---|---|
-| Persona agent silent >5 min with large transcript | "Enumerate everything" mode | Kill, substitute with bounded `Explore` scan |
-| Findings dominated by legacy code | No exclusion gate | Phase 0 scope confirmation |
-| Reports return summaries only, no content | Agent wrote to its memory dir | Check `.agents/agent-memory/<persona>/`, `Read` any new files |
-| Agent opined without reading (project-specific claims with no `file:line` and not principle-grounded) | Brief did not mandate artefact-chain following, OR persona reasoned purely from training | Re-dispatch once with explicit "Read these artefacts first: …" amendment. Existing principles the persona invokes MUST cite where established (constitution clause, prior chorus finding, doc); new principles tag `[principle:proposed]`. Pure unsupported claims about the project get demoted to `[unsupported]` and excluded from the matrix. |
-| Phase 2 takes longer than Phase 1 | Briefs too open-ended | Tighter numbered questions, finding-IDs listed explicitly |
-| Conflicts unresolved after Phase 2 | Lens-vs-lens disagreement won't self-resolve | Single `advisor()` call beats another round |
-| All personas join every round | RSVP became performative; round context too vague | Tighten round-context paragraph; require concrete deltas, not "general project state" |
-| Project-fact interview every round | Missing project addendum | Phase 5 offers to write `CHORUS-PROJECT.md` |
-| Artifact references Fn/Cn that have no description | Findings register omitted; matrix-only artifact | Phase 2 requires the detail-rich findings register (with persona-marked pull-quotes) before the matrix; the matrix is a projection of it |
-
-## Artifact path
-
-`docs/reviews/YYYY-MM-DD-chorus-review.md` — **commit it.** The point is the
-durable baseline. The most recent artifact in that directory is the next
-round's primary baseline reference.
+| Symptom | Fix |
+|---|---|
+| Findings dominated by legacy code | Scope exclusions in every brief (rows 9–10) |
+| All personas join every round | Tighten the round context: concrete deltas only |
+| Phase 2 takes longer than Phase 1 | Tighter numbered questions; own finding IDs listed explicitly |
+| Project-fact inference every round | Phase 5 offers to write `CHORUS-PROJECT.md` |
+| Artifact cites `Fn`/`Cn` with no description | Register (with pull-quotes) precedes the matrix; top five resolves to pull-quotes |
