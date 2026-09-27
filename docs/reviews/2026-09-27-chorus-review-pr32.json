@@ -453,7 +453,7 @@
     },
     {
      "kind": "file_line",
-     "ref": "/home/az/.claude/skills/problem-brief/schema/problem-brief.schema.json:260",
+     "ref": "~/.claude/skills/problem-brief/schema/problem-brief.schema.json:260",
      "note": "brief bearing 'escalated' is defined as not standing in the goal's way."
     },
     {
@@ -573,7 +573,7 @@
     },
     {
      "kind": "file_line",
-     "ref": "/home/az/.claude/skills/problem-brief/schema/problem-brief.schema.json:254",
+     "ref": "~/.claude/skills/problem-brief/schema/problem-brief.schema.json:254",
      "note": "brief entries reopen under the same id and can be superseded."
     }
    ],
@@ -1020,7 +1020,7 @@
     },
     {
      "kind": "file_line",
-     "ref": "/home/az/.claude/skills/problem-brief/schema/problem-brief.schema.json:791-800"
+     "ref": "~/.claude/skills/problem-brief/schema/problem-brief.schema.json:791-800"
     },
     {
      "kind": "file_line",

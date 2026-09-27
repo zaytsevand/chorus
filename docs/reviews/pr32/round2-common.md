@@ -17,7 +17,7 @@ Same working assumptions A1–A4 as Round 1 (round1-common.md).
 Word limit 500–600.
 
 Output: ONE JSON file of kind `vote-report` (schema_version "1", mode "review", round "2026-09-27") at
-docs/reviews/pr32/r2/<your-short-name>.json matching /home/az/.claude/skills/coryphaeus/examples/vote-report.valid.json
+docs/reviews/pr32/r2/<your-short-name>.json matching ~/.claude/skills/coryphaeus/examples/vote-report.valid.json
 (schema: .../schema/vote-report.schema.json). Check with:
   node ~/.claude/skills/coryphaeus/bin/validate.mjs vote-report <file>
 Reply with the path and ≤60 words. Budget 10 min.

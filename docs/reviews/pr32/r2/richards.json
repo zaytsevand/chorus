@@ -57,7 +57,7 @@
       "claim": "Given F19: the ruling shape has two authors, problem-brief's schema (line 791) and coryphaeus ruling.schema.json. Their required fields match today, and no test compares them. Ruling: SANCTIONED DIVERGENCE, since the root may depend on its members (R-1) but should not force the brief onto the chorus's release cadence. Owners: problem-brief upstream, coryphaeus conformist. The price is a coryphaeus parity test that loads the installed brief schema's ruling def and fails on a difference in fields or id pattern.",
       "evidence": [
         { "kind": "file_line", "ref": "coryphaeus/schema/ruling.schema.json:5-11" },
-        { "kind": "file_line", "ref": "/home/az/.claude/skills/problem-brief/schema/problem-brief.schema.json:791-800" },
+        { "kind": "file_line", "ref": "~/.claude/skills/problem-brief/schema/problem-brief.schema.json:791-800" },
         { "kind": "file_line", "ref": "coryphaeus/test/validate.test.mjs:120", "note": "The only ruling test, and it never loads the brief schema." }
       ],
       "proposed_severity": "🟡",

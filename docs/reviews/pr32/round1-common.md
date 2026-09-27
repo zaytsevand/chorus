@@ -28,8 +28,8 @@ Rules:
 - 500–700 words of prose across the report; the count of findings is not capped.
 
 Output: write ONE JSON file of kind `finding-report` (schema_version "1", mode "review", round "2026-09-27")
-to docs/reviews/pr32/r1/<your-short-name>.json, matching /home/az/.claude/skills/coryphaeus/examples/finding-report.valid.json
-(schema: /home/az/.claude/skills/coryphaeus/schema/finding-report.schema.json). Use finding ids F1, F2, ... (the
+to docs/reviews/pr32/r1/<your-short-name>.json, matching ~/.claude/skills/coryphaeus/examples/finding-report.valid.json
+(schema: ~/.claude/skills/coryphaeus/schema/finding-report.schema.json). Use finding ids F1, F2, ... (the
 conductor renumbers across lenses). You may check it with:
   node ~/.claude/skills/coryphaeus/bin/validate.mjs finding-report <file>
 A file that fails validation counts as ABSTAIN. Then reply with the file path and ≤80 words. End your report's last
