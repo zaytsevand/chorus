@@ -1,17 +1,23 @@
 <!--
 SYNC IMPACT REPORT
-Version change: 1.0.0 → 1.1.0
-Bump type: MINOR — Principle III's counter-force clause materially changes state:
-           the convergence-vs-escalation ambiguity (issue #13) is RESOLVED by a canon
-           fix (the CONFIRM vote value; spec 009-confirm-vote-tally). The caveat is
-           dropped and the TODO(TALLY_WART) is closed. No principle added or removed.
+Version change: 1.1.0 → 1.2.0
+Bump type: MINOR — Authoring Constraints rewritten to the actual layout (four skills
+           under skill/ + the agents/ roster; programs for validation and rendering live
+           outside the repo, bound through ports); a "Composition only through declared
+           ports" constraint and a "Records are data" Review Workflow rule added;
+           exceptional entry named beside the panel cap; one line under Principle VIII's
+           counter-force on the 2026-09 suite review; every (canon: …) citation moved to
+           the current file homes. No principle added, removed, or redefined.
+
+Prior (1.1.0) bump: MINOR — Principle III's counter-force clause changed state: the
+           convergence-vs-escalation ambiguity (issue #13) was resolved by the CONFIRM
+           vote value (spec 009-confirm-vote-tally); TODO(TALLY_WART) closed.
 
 Prior (1.0.0) bump: INITIAL RATIFICATION — backfilled the constitution from machinery
            that has governed the repo since feature 003 but was never written down.
            No principle is newly invented here; each is lifted from an existing
-           canon invariant (I1–I9 in INTEGRATION-LAYER.md, S1–S10 across
-           GATE-PRIMITIVE.md / SDLC-LAYER.md, the band table in
-           DECISION-PRIMITIVE.md) and given a uniform Rule / Value / Counter-force
+           canon invariant (I1–I9, S1–S10, the band table as they then stood) and
+           given a uniform Rule / Value / Counter-force
            / Watch-for shape applied uniformly across all principles.
 
 Form:
@@ -33,6 +39,8 @@ Templates updated:
   - .specify/templates/tasks-template.md ✅ "conformance check is a first-class
     task" reminder added (Principle V / the SC-008 pattern).
   - README.md ✅ already describes the machinery these principles formalize.
+  - @ 1.2.0: plan-template.md ✅ Authoring-constraints line updated; README.md ✅
+    Composition subsection added.
 
 Follow-up TODOs:
   - DONE(TALLY_WART) @ 1.1.0: the convergence-vs-escalation ambiguity (issue #13, #6
@@ -47,7 +55,7 @@ Follow-up TODOs:
 The chorus is a procedure for surfacing trade-offs across many lenses and routing
 each decision to its rightful owner. Its "code" is Markdown — personas, layers, and
 primitives. These principles are the invariants that keep the procedure trustworthy;
-they are derived from the canon docs under `skill/chorus/`, not invented here.
+they are derived from the canon docs under `skill/`, not invented here.
 
 Each principle has a **Rule** (MUST/SHOULD clauses, terse), a **Value** (what the
 rule defends), a **Counter-force** when not absolute (the relief valve that stops the
@@ -102,7 +110,7 @@ the tally — I can re-run the vote or you can overrule it").
 
 **Watch for.** A sentence whose subject is *I* and verb is *judge / decide / conclude /
 deem / choose*; "lens X is covered by lens Y"; "the panel clearly means…"; "I'll
-summarize the vote as…". *(canon: I9 + the decision-slippage table, INTEGRATION-LAYER.md)*
+summarize the vote as…". *(canon: I9 + the decision-slippage table, chorus-core/CONDUCTOR.md)*
 
 ---
 
@@ -175,7 +183,7 @@ demotion targets *unsupported project claims*, not principled reasoning.
 
 **Watch for.** A finding about this repo with no `file:line` and no principle tag; a
 verdict citing a memory record instead of the live file; a zero-tool-use report.
-*(canon: I8, INTEGRATION-LAYER.md; re-grounding, EXPLORATORY-PHASE.md)*
+*(canon: I8, chorus-core/CONDUCTOR.md; re-grounding, EXPLORATORY-PHASE.md)*
 
 ---
 
@@ -217,7 +225,7 @@ record that keeps the override honest.
 
 **Watch for.** A gate marked clear with an open 🔴; a verdict that reads green while a
 phase was aborted; a 🔴 downgraded by narration rather than a re-vote or a recorded
-waiver. *(canon: S4, SDLC-LAYER.md; I7, INTEGRATION-LAYER.md)*
+waiver. *(canon: S4, chorus-sdlc/SKILL.md; I7, chorus-core/CONDUCTOR.md)*
 
 ---
 
@@ -235,11 +243,12 @@ artefact drift — the very divergence the chorus exists to catch.
 **Counter-force.** When the spec is **already correct** and only a downstream artefact is
 non-compliant, converging the artefact toward the spec is not the drift this principle
 forbids — it is allowed, recorded as a deliberate, operator-authorized departure from
-canonical regeneration (observed at 007 gates B and C).
+canonical regeneration (observed at 007 gates B and C). The 2026-09 suite review was
+applied the same way, as an operator-authorised departure recorded in `docs/briefs/suite-review`.
 
 **Watch for.** A quietly-edited `quickstart.md`/`tasks.md` that makes a gate pass without
 a spec change or a recorded rationale; the orchestrator writing a spec section itself.
-*(canon: S1/S5, SDLC-LAYER.md)*
+*(canon: S1/S5, chorus-sdlc/SKILL.md)*
 
 ---
 
@@ -262,7 +271,7 @@ non-negotiable correctness, and only the former is on the table.
 
 **Watch for.** Robustness armoring a feature no user has run; a heal cycle that grows
 scope past the findings it closes; the cut seat out-seated as "covered." *(canon: the
-constraint-location gate + mandate guardrail, SDLC-LAYER.md / the Goldratt advisor)*
+constraint-location gate, the Goldratt advisor; seating, DECISION-PRIMITIVE.md § Seating)*
 
 ---
 
@@ -287,24 +296,31 @@ honest escalation is the balance against both infinite looping and premature giv
 
 **Watch for.** An artifact optimized at the procedure's expense; a round with no durable
 baseline; a heal loop past its bound; a verdict defended by narration instead of a gate
-trail. *(canon: I1–I7 + the Dijkstra posture, INTEGRATION-LAYER.md; S7, SDLC-LAYER.md)*
+trail. *(canon: I1–I7 + the Dijkstra posture, chorus-core/CONDUCTOR.md; S7, chorus-sdlc/SKILL.md)*
 
 ---
 
 ## Authoring Constraints
 
-- **Markdown-only, no runtime code.** The repo is Claude Code skill/prompt authoring; the
-  only executable surfaces are `install.sh` (deployment) and the conformance-check stanzas
-  in a feature's `quickstart.md`. A feature that proposes runtime code is out of shape.
-- **Mode of one skill, not many skills.** New capability is registered as a mode of the
-  `chorus` skill (e.g. "spawn the chorus" / "run the agent-SDLC" / "chorus learn"), not a
-  new skill — registered across every cold-start surface (`SKILL.md` mode list + YAML
-  frontmatter, `README.md`, `install.sh`).
-- **The canon layout is fixed.** Definitions live under `skill/chorus/`:
-  `SKILL.md` (procedure), `INTEGRATION-LAYER.md` (the conductor), `SDLC-LAYER.md`
-  (lifecycle), `GATE-PRIMITIVE.md` (the four stages), `EXPLORATORY-PHASE.md`,
-  `DECISION-PRIMITIVE.md`. Personas live under `agents/` — the directory is the
-  **authoritative roster**; no artefact enumerates agent filenames.
+- **The canon stays Markdown; programs live outside it.** The repo is Claude Code
+  skill/prompt authoring; its only executable surfaces are `install.sh`/`uninstall.sh`,
+  `scripts/check-suite-integrity.sh`, and the conformance-check stanzas in a feature's
+  `quickstart.md`. Validating and rendering chorus records are programs, and they live in
+  whatever a composition root binds to the ports, not in this repo. Counter-force: a
+  greppable fitness check of the canon itself may live here.
+- **Four skills and a roster.** Under `skill/`: `chorus-core` (the substrate: conductor,
+  gate, decision and exploratory primitives, the I1–I9 catalog, the ports), `chorus-review`
+  (the project-state round), `chorus-sdlc` (the lifecycle mode), `chorus-learn` (the
+  tutorial). Each composing skill declares `REQUIRED: chorus-core`. Personas live under
+  `agents/`; the directory is the **authoritative roster** and no artefact enumerates agent
+  filenames. New capability goes into one of these skills unless it needs a new trigger,
+  and is registered on every cold-start surface (frontmatter, `README.md`, `install.sh`,
+  `plugin.json`). Counter-force: a new skill is allowed when its trigger and audience are
+  distinct, as with the four above.
+- **Composition only through declared ports.** The chorus names no outside skill or
+  repository in its canon; it declares what it needs (`chorus-core/CONDUCTOR.md` § Ports)
+  with a default for each, and a composition root binds them. Counter-force: an unbound
+  port runs its default, so the chorus works standalone.
 - **No secrets, ever (absolute).** No credential, token, session cookie, or
   `CHORUS-PROJECT.md` carrying private project facts is committed. A committed secret is a
   one-way door; there is no legitimate case.
@@ -314,14 +330,17 @@ trail. *(canon: I1–I7 + the Dijkstra posture, INTEGRATION-LAYER.md; S7, SDLC-L
 - A review runs the four-stage gate primitive: **extract → author (uncapped) → vote
   (real, author-excluded) → tally (deterministic, symmetric)**.
 - **RSVP per round** (Principle II): personas self-select; the orchestrator never decides
-  participation for a persona. Panels cap at five; ties at the cap go to the operator,
-  never to orchestrator lens-merit judgment.
+  participation for a persona. Panels cap at five plus evidence-gated exceptional entry;
+  ties at the cap go to the operator, never to orchestrator lens-merit judgment.
+- **Records are data.** Persona replies (`rsvp`, `finding-report`, `vote-report`) and chorus
+  records (`review-record`, `sdlc-log`) are JSON validated against the bound schema before
+  they count or publish; the markdown page is rendered from the JSON.
 - **Exploratory phase first**: each joiner builds a persisted, lens-specific understanding
   (reference-first, addendum-first), and gates lead the operator interview (Principle IV).
 - The **agent-SDLC** mode gates a speckit feature through design → plan/tasks →
-  implementation, blocking only on 🔴 (Principle VII), driven by `SDLC-LAYER.md`.
-- Each round commits its artifact (`docs/reviews/…` or `specs/<feature>/agent-sdlc-log.md`)
-  as the next round's baseline (Principle X).
+  implementation, blocking only on 🔴 (Principle VII), driven by `chorus-sdlc`.
+- Each round commits its record (`docs/reviews/….json` or `specs/<feature>/agent-sdlc-log.json`,
+  each with its rendered `.md`) as the next round's baseline (Principle X).
 - Never push directly to `main`; never pass a 🔴 with `--no-verify`-style silence.
 
 ## Governance
@@ -350,4 +369,4 @@ Amendments MUST:
 6. **Procedure over artifact (Principle X).** An amendment is ratified by the operator
    (N+1), recorded in git history, and never back-dated to look cleaner than it was.
 
-**Version**: 1.1.0 | **Ratified**: 2026-06-12 | **Last Amended**: 2026-06-12
+**Version**: 1.2.0 | **Ratified**: 2026-06-12 | **Last Amended**: 2026-09-27

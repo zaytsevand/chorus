@@ -128,7 +128,7 @@ For **design** responses:
 4. **Trade-offs** — what this design buys, what it costs.
 5. **Next move** — the smallest concrete step the user can take.
 
-In a chorus round your reply will be schema-validated JSON (the schema ships separately); these structures fill its fields.
+Return your reply as the JSON kind (`rsvp`, `finding-report` or `vote-report`) the orchestrator's brief specifies; it is validated before it counts.
 
 ## Quality Controls
 

@@ -157,16 +157,19 @@ abstains, no separate security pass runs; the abstention is recorded.
   operator-overridable). It applies to every dispatch, Round 2 included. A
   dispatch past its budget is stopped.
 - **One failure rule.** A persona that is not installed, silent, past budget, or
-  returns malformed or over-length output **counts as ABSTAIN, with the reason
+  returns malformed, over-length, or validator-rejected output **counts as ABSTAIN, with the reason
   recorded in the roster**. There is no substitute lens. Quorum (≥3) is
   re-evaluated after the Phase 1 evidence check; below it, the round aborts as in
   Phase 0.5.
 - **Memory recovery.** Some personas write their report to
   `.claude/agent-memory/<persona-name>/` and return a summary; after each
   dispatch, `Read` any new files there — they are the report.
-- **Output format.** Persona replies and chorus records are moving to
-  schema-validated JSON rendered to pages (the schema lands separately); until
-  it lands, use the prose formats below.
+- **Output format.** Each persona returns JSON of the kind its phase names —
+  `rsvp` (Phase 0.5), `finding-report` (Phase 1, and Round-2 derives),
+  `vote-report` (Phase 2) — checked by the bound record validator
+  (`chorus-core/CONDUCTOR.md` § Ports) before it counts; a failing reply counts
+  as ABSTAIN under the rule above, the validator's reason recorded. Field shapes
+  are the bound schema's, not restated here.
 
 ## The procedure
 
@@ -310,14 +313,10 @@ Then re-evaluate quorum.
   has run; the consolidation matrix is written from the count.
 
 **Findings register** — the **single human-facing source of truth**, written
-before the vote. An operator who has not read the reports must understand each
-entry alone:
+before the vote; its fields are the bound schema's `review-record` register. An
+operator who has not read the reports must understand each entry alone.
 
-| ID | Advisor · Lens | Authored severity | Target (locator) | Pull-quote (verbatim) | confidence_on_hand | need_info · reason | graded |
-|----|----------------|-------------------|------------------|-----------------------|--------------------|--------------------|--------|
-| F1 | Evans · DDD | 🔴 | `webapp/data/models.py:42` | "The Order aggregate has no root to enforce its invariants." | high | — | true |
-
-- The pull-quote cell is the persona's marked span, verbatim and attributed —
+- The pull-quote is the persona's marked span, verbatim and attributed —
   never a conductor paraphrase or excerpt (I6, mechanized); preserve any
   `[principle]` / `[principle:proposed]` / `[unsupported]` tag.
 - A row with an open `NEED_INFO` is shown **held**, not graded; resolution goes
@@ -369,12 +368,8 @@ arithmetic over real votes, never the orchestrator's judgment (S9).
 **Convergence = `P + C`**, computed after the count.
 
 **Consolidation matrix** — produced **after the count**, a projection of the
-register plus the tally; it re-authors nothing:
-
-| ID | Authored severity | P | C | O | net | Final severity | Convergence (P + C) | Status |
-|----|-------------------|---|---|---|-----|----------------|---------------------|--------|
-
-`Status` is `graded`, `held` (flag open), `ungraded` (`R2-`), or `unvoted`.
+register plus the tally (fields: the bound schema's `review-record` matrix); it
+re-authors nothing. Status is `graded`, `held`, `ungraded` (`R2-`), or `unvoted`.
 
 ### Phase 3 — Conflict reconciliation
 
@@ -419,11 +414,13 @@ traces to its register entry; a bare `Fn` + score is a dead end.
 
 ## Artifact
 
-Path: `docs/reviews/YYYY-MM-DD-chorus-review.md` — **commit it.** On a filename
-collision, use `docs/reviews/YYYY-MM-DD-chorus-review-N.md` (N = 2, 3, …). The
-most recent artifact is the next round's primary baseline.
+The record is a `review-record` JSON at `docs/reviews/YYYY-MM-DD-chorus-review.json`,
+validated and rendered by the bound ports (`chorus-core/CONDUCTOR.md` § Ports) to
+the sibling `.md` page — **commit both.** On a collision, suffix `-N` (N = 2, 3, …).
+The most recent artifact is the next round's primary baseline. Older markdown-only
+records stay as they are.
 
-One ordered skeleton:
+The rendered page's order:
 
 1. **TL;DR** — 3 sentences: what the chorus found, what the top five
    prioritizes, and which 🔴 findings block public rollout (tracked as a unit

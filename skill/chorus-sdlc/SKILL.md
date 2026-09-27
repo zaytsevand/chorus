@@ -101,7 +101,10 @@ lives.
 
 Every gate runs the four-stage primitive (`chorus-core/GATE-PRIMITIVE.md`:
 extract → uncapped author → real vote → deterministic tally). The lifecycle layer
-adds per-gate RSVP, gating, incorporation, and bound.
+adds per-gate RSVP, gating, incorporation, and bound. Each persona returns JSON of
+the kind its stage names — `rsvp`, `finding-report`, `vote-report` — checked by the
+bound record validator (`chorus-core/CONDUCTOR.md` § Ports) before it counts; a
+failing reply counts as ABSTAIN with the validator's reason in the ledger.
 
 **Operator-facing decisions** in this layer — seating, block-on-🔴, gate sign-off —
 are banded by the **decision primitive** (`chorus-core/DECISION-PRIMITIVE.md`: 🟢
@@ -253,7 +256,8 @@ cycle).
 
 ### Fixed viewpoint — `spec-walkthrough` (Gate C)
 
-At **Gate C** the orchestrator invokes the installed skill headless —
+At **Gate C** the orchestrator invokes the fixed-viewpoint port (`chorus-core/CONDUCTOR.md`
+§ Ports; unbound → skipped and logged) — e.g.
 `Skill(skill: "spec-walkthrough", args: "<NNN> headless")` — and ingests the
 returned digest (traceability matrix, DRIFT/SURPRISE list, GAP count) as stage-1
 extract records with `source: "spec-walkthrough"`, under the fixed-viewpoint rule of
@@ -334,27 +338,21 @@ them. S8/S9/S10/S11 are gate-primitive-level and live in
 
 ## The ledger
 
-Each run writes a per-feature ledger at `specs/<feature>/agent-sdlc-log.md`,
-appended once per gate execution. It is the audit trail proving each gate fired
-honestly — a reviewer must be able to reconstruct the run from it alone. Schema:
-RSVP table (joiners/abstainers + the two-axis signal), findings register, vote
-tally, 🔴 resolution/waiver log, unclaimed extract records, loop-cycle count, a
-**`## Provisional decisions (review & override)`** section holding the 🟡
-DecisionRecords (default, runner-up, sensor evidence, override + cost — see
-`chorus-core/DECISION-PRIMITIVE.md`), a **`## Memory update (sign-off)`** section
-(per-persona write-back counts, the proposed `project-wide` diff or its locator, the
-operator accept/reject/deferred decision, the pending-proposals list, and any
-secret-filter drops — spec 010 FR-008), and the end-of-run **S1–S11 self-audit
-checklist** (each item marked pass with a pointer to its evidence row). The ledger is
-**not** placed under `docs/reviews/` — that directory is for periodic project-state
-rounds. (Full schema: `specs/003-agent-sdlc-workflow/contracts/sdlc-ledger.md`;
-decision-record schema: `chorus-core/DECISION-PRIMITIVE.md`.)
+Each run writes a per-feature ledger — an `sdlc-log` JSON at
+`specs/<feature>/agent-sdlc-log.json`, appended once per gate execution, validated
+and rendered by the bound ports (`chorus-core/CONDUCTOR.md` § Ports) to the sibling
+`agent-sdlc-log.md`. It is the audit trail proving each gate fired honestly — a
+reviewer must be able to reconstruct the run from it, plus the decision references
+it cites (Ports: cite, don't copy). Its sections — RSVP, register, tally, 🔴
+resolutions, 🟡 provisional decisions, memory update (spec 010 FR-008), and the
+S1–S11 self-audit — are the bound schema's `sdlc-log`. It is **not** placed under
+`docs/reviews/` (periodic project-state rounds only). Older markdown-only ledgers
+stay as they are.
 
 **At Gate A** the ledger records, in order: the **premise pass** (RSVP, the
 premise-tagged findings, the RT-1..RT-6 outcomes, the tally, and the honest-null),
 then the **within-frame findings**, then the **parked-from-premise findings** —
-reconstructable end-to-end. This reuses the existing register/tally schema (the
-scope tag is a finding attribute); it adds no new schema.
+reconstructable end-to-end (the scope tag is a finding attribute).
 
 ## Refusals (lifecycle boundaries)
 

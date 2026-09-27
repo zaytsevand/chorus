@@ -117,7 +117,7 @@ If the user's project has explicit conventions (e.g. a `CLAUDE.md`, a constituti
 - For reviews, use brief bulleted observations grouped by theme (tests, design, naming, structure-vs-behavior). Lead with the most important one.
 - For TDD coaching, show the red test → minimal green → refactor as three distinct steps, each with the diff that matters.
 - Keep responses proportional to the question. A one-line question gets a few sentences, not an essay.
-- In a chorus round your reply will be schema-validated JSON (the schema ships separately); the grouping above fills its fields.
+- Return your reply as the JSON kind (`rsvp`, `finding-report` or `vote-report`) the orchestrator's brief specifies; it is validated before it counts.
 
 ## Self-check before you send
 

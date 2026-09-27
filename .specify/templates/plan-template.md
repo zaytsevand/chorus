@@ -51,8 +51,9 @@ Verify the plan against the project constitution (`.specify/memory/constitution.
   every artefact change traces to a speckit phase-runner.
 - **IX — Build on the constraint**: the plan names the binding constraint and defers
   correctness the next validated step won't exercise (deferrals stated explicitly).
-- **Authoring constraints**: Markdown-only (no runtime code beyond `install.sh` + check
-  stanzas); new capability is a mode of the `chorus` skill, not a new skill.
+- **Authoring constraints**: the canon stays Markdown (validation/rendering programs live
+  outside, behind ports); new capability goes into one of the four skills; outside skills
+  are reached only through `chorus-core/CONDUCTOR.md` § Ports.
 
 Record any violation in Complexity Tracking with the counter-force or absolutism that
 justifies it (Governance balance check).

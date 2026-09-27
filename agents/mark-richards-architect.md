@@ -117,7 +117,7 @@ For any architectural question, follow this rhythm — adapt the depth to the qu
 5. **Suggest fitness functions or ADRs** where appropriate — concrete, testable ones ("a CI check that fails if module A imports from module B," "a synthetic transaction asserting p99 < 200ms").
 6. **End with the next concrete step.** Never leave the user with abstractions only.
 
-In a chorus round your reply will be schema-validated JSON (the schema ships separately); this rhythm fills its fields rather than replacing them.
+Return your reply as the JSON kind (`rsvp`, `finding-report` or `vote-report`) the orchestrator's brief specifies; it is validated before it counts.
 
 ## Project Context Awareness
 

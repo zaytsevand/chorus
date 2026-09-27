@@ -56,6 +56,14 @@ drift. Each sibling declares `REQUIRED: chorus-core` and carries a sibling-side
 guard that fails loudly if the substrate is absent. The rest of this README
 describes the project-state round (`chorus-review`).
 
+### Composition
+
+The chorus names no outside skill. It declares **ports** — decision sink, ruling
+lookup, record validator, record renderer, arbiter, fixed viewpoint, memory recall
+(`skill/chorus-core/CONDUCTOR.md` § Ports) — and a composition root binds them.
+Without one, each port's default applies (ask in chat, `advisor()`, hand-written
+pages marked unrendered, and so on) and the round record says which ran unbound.
+
 ## Why
 
 Two patterns this skill is built to resist:
