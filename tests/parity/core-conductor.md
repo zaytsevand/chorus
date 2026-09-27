@@ -1,5 +1,7 @@
 # Parity — chorus-core CONDUCTOR + router (T010, FR-015 tier 2)
 
+> **Historical evidence of the 014 suite split** — a record of one run on branch `014-chorus-suite-decomposition` (pre-move HEAD `1081b97`, split commit `715e1c5`, squashed into `176311a` on main); paths describe that tree, and the current checks are `scripts/check-suite-integrity.sh`.
+
 **Tier 2: content-changed** (`CONDUCTOR.md` newly extracted from review's
 INTEGRATION-LAYER; `chorus-core/SKILL.md` new router) → full RED-GREEN, asserting
 on observable composed behavior, not file presence.
@@ -66,12 +68,13 @@ Deliberately introduce a sibling-local `I1` *definition* and confirm the
 residence check fails, then revert:
 
 ```bash
-printf '\n- **I1.** (sibling-local redefinition)\n' >> skill/chorus-review/INTEGRATION-LAYER.md
+printf '\n- **I1.** (sibling-local redefinition)\n' >> skill/chorus-review/SKILL.md
 bash scripts/check-suite-integrity.sh   # FC1 residence
-git checkout -- ...                      # (revert — restore the slim file)
+git checkout -- skill/chorus-review/SKILL.md   # revert
 ```
 
-Observed (RED):
+Observed (RED; recorded at T010, when the target file was the since-folded
+`skill/chorus-review/INTEGRATION-LAYER.md` — today the locator is `SKILL.md`):
 
 ```
 RESIDENCE VIOLATION: I/D/S8–S10 token defined outside chorus-core:

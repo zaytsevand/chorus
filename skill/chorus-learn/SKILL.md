@@ -124,10 +124,10 @@ sections 2, 3, and 5 are left for you to fill)"* — **before** the step's
 navigation question (you decide the write first, then where to go). Consent is
 never folded into a navigation option.
 
-The source template resolves in order: inside this repo, the checkout's
-`templates/CHORUS-PROJECT.template.md` (authoritative); otherwise
-`<skill-base>/templates/` (the running skill's own copy); otherwise the plugin
-root's `templates/`. So both install channels genuinely deliver, not merely probe.
+The source template is this skill's own copy,
+`templates/CHORUS-PROJECT.template.md` under the skill's base directory (in the
+repo: `skill/chorus-learn/templates/`). It is the only copy; install.sh and the
+plugin both ship it with the skill, so either install channel delivers it.
 
 #### On accept
 

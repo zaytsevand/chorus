@@ -1,5 +1,7 @@
 # Live behavioral parity proof (Gate C · GC7 incorporation)
 
+> **Historical evidence of the 014 suite split** — a record of one run on branch `014-chorus-suite-decomposition` (pre-move HEAD `1081b97`, split commit `715e1c5`, squashed into `176311a` on main); paths describe that tree, and the current checks are `scripts/check-suite-integrity.sh`.
+
 Operator required a **live behavioral proof** (not grep/file-presence) to satisfy
 FR-015 tier-2 for the content-changed skills. Three subagents acted as the calling
 session, executing the BUILT skills and reporting observable output. Results below.
