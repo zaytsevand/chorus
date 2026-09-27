@@ -1,5 +1,10 @@
 # coryphaeus
 
+In Greek theatre the coryphaeus is the chorus leader who steps forward and speaks
+for the chorus to the protagonist. Here the chorus deliberates, you rule, and this
+skill carries what the chorus concluded to the place you rule: it checks standing
+rulings first, records your answer, and writes the reference back.
+
 A small skill that sits above the chorus review suite and problem-brief so that
 neither has to know the other. It holds:
 
