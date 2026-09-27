@@ -68,7 +68,7 @@ binding, never a chorus port (the chorus lists only what it needs).
 
 | Port | What the chorus needs | Default (nothing bound) | Binding |
 |---|---|---|---|
-| Decision sink | somewhere to put a 🟡 card or ask a 🔴 question; returns a ruling reference | ask in chat; keep the answer in the record's `local_rulings`, return `record: "#"` | a problem-brief entry (Q-n), written by the translation rules below; the answer is kept in the brief's `rulings` and only the reference goes back |
+| Decision sink | somewhere to put a 🟡 card or ask a 🔴 question; returns a ruling reference | a 🔴 question (including an unanswered gate) is asked interactively with `AskUserQuestion`, choice-shaped, at most four per call, and the round waits; otherwise ask in chat; keep the answer in the record's `local_rulings`, return `record: "#"` | a problem-brief entry (Q-n), written by the translation rules below; the answer is kept in the brief's `rulings` and only the reference goes back |
 | Ruling lookup | standing operator answers, checked before asking | the record's own `local_rulings` and prior records | the brief's rulings (`R-n`), searched before any new question |
 | Record renderer / publisher | where the round's record lives | commit `<record>.json` plus the page from `render.mjs` | same; a brief links the page from its evidence |
 | Record validator | a program that accepts or refuses a record | `bin/validate.mjs` (this skill) | — |
