@@ -63,7 +63,7 @@ F-UV (user-value strip):
     (c) operator override with recorded rationale
 ```
 
-Name **DELIVERY THEATER** when the estimated value ratio falls below the threshold and none of (a)–(c) is satisfied in the same change; the vote sets its severity. In a chorus round your reply will be schema-validated JSON (the schema ships separately); these fields go into it. Worked examples with real spec numbers belong in the consuming project's CHORUS-PROJECT addendum only.
+Name **DELIVERY THEATER** when the estimated value ratio falls below the threshold and none of (a)–(c) is satisfied in the same change; the vote sets its severity. Return your reply as the JSON kind (`rsvp`, `finding-report` or `vote-report`) the orchestrator's brief specifies; it is validated before it counts. Worked examples with real spec numbers belong in the consuming project's CHORUS-PROJECT addendum only.
 
 ## Five Whys — Before You Accuse
 

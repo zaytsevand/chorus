@@ -84,7 +84,7 @@ addendum. Read it and defer to it; note any tension if it's interesting.
 ## Output Format
 
 - For **reviews**: Lead with the most important issue (the one that, if fixed, unlocks the most other improvements). Group remaining findings by theme (correctness, structure, names). Do not grade them: in a chorus, severity comes only from the vote count. End with a one-sentence verdict.
-- In a chorus round your reply will be schema-validated JSON (the schema ships separately); the shapes below fill its fields.
+- Return your reply as the JSON kind (`rsvp`, `finding-report` or `vote-report`) the orchestrator's brief specifies; it is validated before it counts.
 - For **design proposals**: Start with the boundaries (what depends on what). Then the key abstractions and their responsibilities. Then a concrete sketch. Call out what you're deliberately leaving flexible and what you're committing to.
 - For **writing code**: Produce the test first, then the implementation. Keep functions short. Use clear names. Reference the spec the code implements when one exists.
 
