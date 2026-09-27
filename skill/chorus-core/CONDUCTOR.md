@@ -7,9 +7,8 @@ refusals, **and the single source of the `I1–I9` invariant catalog**.
 
 It is part of `chorus-core` — substrate, not a user-triggered skill. Both
 `chorus-review` (project-state rounds) and `chorus-sdlc` (lifecycle gates)
-reference it; neither redefines what lives here. The round-specific and
-lifecycle-specific layers add their own per-phase/per-gate discipline on top of
-this base (see `chorus-review/INTEGRATION-LAYER.md` and `chorus-sdlc/SKILL.md`).
+reference it; neither redefines what lives here. The round procedure of each
+consuming skill adds its own per-phase/per-gate discipline on top of this base.
 
 Throughout this file the "integration layer" is the calling session running
 whichever sibling skill composed core — the module that composes the personas,
@@ -105,24 +104,19 @@ The conductor files a side-note when the gate enters a **declared** regime (not
 inferred per-finding):
 
 - the seated board was **widened past the ordinary cap by an exceptional entry**
-  (`chorus-sdlc/SKILL.md` seating) — flag the exceptional seat for operator review;
+  (`DECISION-PRIMITIVE.md` § Seating) — flag the exceptional seat for operator review;
 - a finding **escalated or demoted at the exact threshold boundary** (`|net| == T`,
   `GATE-PRIMITIVE.md` Stage 4) — flag the marginal movement;
 - a finding is carried by **unanimous agreement among same-brief voters** — file the
   "one datum, not five" caution;
-- a **new-buildout gate is seated without the scope/deferral lens** — flag the missing
-  cut mandate for the operator (this is the flag-only safety net that *replaces* the
-  former hard "scope lens is never out-seated" carve-out; the lens now seats by
-  exceptional entry, `chorus-sdlc/SKILL.md` seating, and its absence is surfaced, not
-  forced);
-- a **Gate A corpus defers cross-user or reuse value without Cooper seated** — flag
-  missing product beneficiary review (`alan-cooper-advisor` mandatory on cross-user/reuse
-  deferrals per project addendum and `chorus-core/DEFERRAL-CHECKLIST.md`).
+- a corpus **defers cross-user or reuse value** (`DECISION-PRIMITIVE.md` § Deferral
+  checklist) and the board seats **no product lens**, or **no security lens** where trust
+  enforcement is server-bound — flag the missing beneficiary / trust review;
+- any further regime a consuming skill declares under the same rules.
 
-Side-notes are a human-catch layer **beside** the tally, never inside it. Making a
-side-note *do more* — hold or gate an outcome on its strength — is **out of scope
-here and deferred to a separate spec** (Principle IX): the flag-only net ships now;
-the gating version waits for a validated need.
+Side-notes are a human-catch layer **beside** the tally, never inside it; a side-note
+never seats a lens. Making a side-note *do more* — hold or gate an outcome on its
+strength — is out of scope (Principle IX) until a validated need.
 
 ## The chair decides nothing — decision slippage and its disguises
 
@@ -134,7 +128,7 @@ it must not make.**
 
 | Disguise | What it actually is | The owner |
 |---|---|---|
-| "Lens X is covered by lens Y" (seating) | a lens-merit judgment; one shared finding does not transfer a mandate | mechanical sort; ties → the operator (S3) |
+| "Lens X is covered by lens Y" (seating) | a lens-merit judgment; one shared finding does not transfer a role | mechanical sort; a tie → recorded 🟡 default (`DECISION-PRIMITIVE.md` § Seating) |
 | "These findings are duplicates" | a severity-affecting merge; dedupe that erases a voter's distinct claim edits the vote | the authors confirm the merge, or both findings stand |
 | "This 🟡 is cheap to fold in" | a scope decision during incorporation | the spec runner via clarify; the operator's recorded default |
 | "The panel clearly means…" | speaking for a lens; inference is not a report | re-read the report; if silent, ask the persona |
@@ -234,8 +228,8 @@ repaired. Siblings reference these tokens; they never redefine them.
   matrix. Findings come from the personas only.
 - **I2.** The integration layer never decides RSVP for a persona. JOIN /
   ABSTAIN is the persona's reply, not the orchestrator's inference.
-- **I3.** The integration layer never drafts an abstainer who has refused
-  twice. The third refusal aborts the round, full stop.
+- **I3.** The integration layer never drafts an abstainer. Below quorum it
+  re-pings once; the second refusal aborts the round, full stop.
 - **I4.** The integration layer never merges phases. Each phase's gate
   fires or the round halts.
 - **I5.** The integration layer never substitutes `advisor()` for persona
@@ -253,9 +247,8 @@ repaired. Siblings reference these tokens; they never redefine them.
   acceptable; tagged `[unsupported]` is excluded from the matrix and
   convergence counts. Re-dispatch policy: zero-tool-use reports get one
   re-dispatch with explicit artefact-list amendment; second zero round
-  marks the lens substituted-without-evidence. The gate is enforced
-  post-Round-1 and post-Round-2; the review SKILL.md's "Phase 1 evidence
-  check" section describes the mechanism.
+  marks the lens substituted-without-evidence. The gate is enforced after
+  every authoring stage and every cross-evaluation stage, in both modes.
 - **I9.** The chair decides nothing. Every decision in a round has a named
   owner — the operator (scope, sign-off, ties, deferrals), a persona (its
   findings, its RSVP, its gates, merge of its findings), the tally
@@ -266,29 +259,9 @@ repaired. Siblings reference these tokens; they never redefine them.
   are catalogued in "The chair decides nothing" above. Permitted
   first-person verbs: *halt, route, refuse, record, count.*
 
-- **S8 / S9 / S10 / S11 (gate-primitive invariants — defined in `GATE-PRIMITIVE.md`).**
-  A review's stages are separated. **S8:** the author of a finding is never its
-  grader — the Phase-2 vote is dispatched to *other* lenses (an author never
-  votes on its own finding). **S9:** the integration layer never synthesizes a
-  vote or a grade; the stage-4 tally aggregates real votes only, and a
-  *predicted* reaction is not a vote. **S10:** every persona names its gates —
-  the needs it cannot honestly review without — and prompts for an unmet gate
-  instead of inferring past it; dependent findings are conditional on the
-  stated assumption.   **S11:** when any persona raises `NEED_INFO` on a finding (at proposition or vote),
-  the orchestrator routes resolution through peer provision or operator provision only
-  — it never invents remediation or reformulates the finding; **`confidence_on_hand:
-  low` mandates `NEED_INFO`**; open `NEED_INFO` blocks tally until resolved.
-  These bind the review's Phases 1/2/4 exactly as they bind the SDLC gates —
-  the back-test that produced them showed author-grades-self buries a lens.
-
-- **D1–D5 (decision-primitive invariants — defined in `DECISION-PRIMITIVE.md`).**
-  Operator-facing decisions are banded by a declared predicate, never inference (D1);
-  🔴 never auto-proceeds (D2); every 🟡 default is recorded and reversible (D3);
-  classification is mechanical (D4); signals are evidence-anchored (D5). They bind the
-  base round's decisions (scope, quorum, seating) exactly as they bind the SDLC gates.
-
-The lifecycle layer's `S1–S7` (defined in `chorus-sdlc/SKILL.md`) **extend**
-this `I1–I9` catalog — they reference these tokens and do not redefine them.
+The gate-primitive `S8–S11` (`GATE-PRIMITIVE.md`), the decision-primitive `D1–D5`
+(`DECISION-PRIMITIVE.md`), and the lifecycle `S1–S7` (the chorus-sdlc skill) **extend**
+this catalog, bind both modes where they apply, and are defined only in their homes.
 
 ## Refusals (system boundaries, not modesty)
 
@@ -351,7 +324,7 @@ a contract across the boundary.
 ### Contract: agent-memory layout
 
 Per-lens persisted understanding lives at
-`.agents/agent-memory/<persona-name>/`. A persona writes its understanding
+`.claude/agent-memory/<persona-name>/`. A persona writes its understanding
 record there; the orchestrator reads any new file there after a dispatch (a
 persona's actual report may be written to memory and only summarized inline).
 This layout is the convention a future memory-update skill reads and writes.
@@ -385,7 +358,7 @@ from a chorus round's artifact:
 |---|---|
 | ID | `Fn` finding id |
 | Advisor · Lens | who authored it and through which lens |
-| Severity | 🔴 / 🟠 / 🟡 / 🟢 (post-tally) |
+| Severity | 🔴 / 🟡 / 🟢 (post-tally) |
 | Target locator | the `file:line` (or principle tag) anchor |
 | Summary / pull-quote | one-sentence, context-free summary (≤20 words); a verbatim pull-quote where a quote is carried |
 | Tag | `[principle]` / `[principle:proposed]` / `[unsupported]` |
@@ -394,7 +367,7 @@ from a chorus round's artifact:
 ### Agent-memory layout (the write targets)
 
 The callback's write targets are the agent-memory layout and two-tier memory
-model named above: `.agents/agent-memory/<persona>/` records (the index) and
+model named above: `.claude/agent-memory/<persona>/` records (the index) and
 the `CHORUS-PROJECT.md` "Project understanding" section (the authoritative
 base). A project declares **targets** and **policy** for the flow in its
 `CHORUS-PROJECT.md` findings→memory section (template carries it).
@@ -415,12 +388,11 @@ Deny-default: if provenance is unclear, do not write. Reading is unrestricted.
 
 ### Secret pre-filter — enforced behavioral obligation (FR-010a, deny-default)
 
-The write surface above carries verbatim pull-quotes to durable storage. The
-contract therefore specifies the secret pre-filter as a **behavioral
-obligation, not a noun**, and records it as a **hard precondition on the
-deferred callback** — the callback spec MUST carry "implements FR-010a (secret
-pre-filter)" as a gate, so the deferred work cannot ship conforming yet
-unfiltered:
+This is the **single definition** of the secret pre-filter. It binds **every**
+write to persisted memory — the lifecycle's sign-off memory update today, and the
+deferred callback, whose spec MUST carry "implements FR-010a (secret pre-filter)"
+as a gate. It runs on every candidate fact **before** any record write or
+proposal, independent of any operator confirm:
 
 - **Deny-default**: an excerpt is **dropped unless it passes** the filter.
   Default outcome on any uncertainty is drop, never write.
@@ -433,12 +405,12 @@ unfiltered:
   drop is a contract violation.
 - **Sole-reach fence (FR-010b)**: the callback reads only the findings-artifact
   shape above — never `chorus-core` file internals.
+- **No runtime**: the skill has none, so the filter is persona-applied discipline
+  made verifiable by the audit line — the ledger drop-record, not a label, is the
+  guard.
 
-This reuses the existing memory-update secret pre-filter language (now resident
-in `chorus-sdlc`); this contract names it as the obligation the deferred
-callback inherits. **Negative case (SC-006):** a secret-shaped excerpt (e.g.
-`AKIA…`, an internal hostname, a customer name) presented to the callback would
-be **dropped and audited**, never written to memory.
+**Negative case (SC-006):** a secret-shaped excerpt (e.g. `AKIA…`, an internal
+hostname, a customer name) is **dropped and audited**, never written to memory.
 
 ## Reference
 
