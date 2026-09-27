@@ -1,0 +1,18 @@
+{
+  "kind": "decision",
+  "id": "B-seating-tie-1",
+  "point": "RSVP seating — tie at the cap",
+  "catalog_row": 2,
+  "band": "🟡",
+  "title": "Which lens takes the fifth seat",
+  "problem": "Two lenses tie for the fifth seat on the plan review, and one of them has to wait.",
+  "evidence": [{ "kind": "document", "ref": "agent-sdlc-log.json#gates[1].rsvp" }],
+  "solutions": [
+    { "id": "seat-evans", "label": "Seat the domain lens", "summary": "The domain lens takes the seat; the language lens waits.", "cost": { "work": "None." } },
+    { "id": "seat-guido", "label": "Seat the language lens", "recommended": true, "summary": "The language lens takes the seat; the domain lens waits.", "cost": { "work": "None." } }
+  ],
+  "resolution": "default-applied",
+  "status": "decided",
+  "decision": { "chose": "seat-bob", "date": "2026-09-26" },
+  "ruling_ref": { "id": "R-9", "record": "notes.txt" }
+}

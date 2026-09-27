@@ -1,0 +1,37 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "finding-report.schema.json",
+  "title": "Finding report",
+  "description": "One persona's authoring output (GATE-PRIMITIVE.md Stage 2; chorus-review Phase 1). Uncapped: no count target. In review mode the prose (claims, pull-quotes, reasons, gate questions) is at most 700 words.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["kind", "schema_version", "mode", "round", "persona", "lens", "tool_uses", "findings"],
+  "properties": {
+    "kind": { "const": "finding-report", "description": "Record kind." },
+    "schema_version": { "const": "1", "description": "Schema version." },
+    "mode": { "type": "string", "enum": ["review", "sdlc", "challenge"], "description": "review: a chorus-review round (700-word limit). sdlc: a lifecycle gate. challenge: chorus challenge." },
+    "round": { "type": "string", "minLength": 1, "description": "The round date or gate/cycle this report is for." },
+    "persona": { "$ref": "common.schema.json#/$defs/persona", "description": "The authoring persona." },
+    "lens": { "$ref": "common.schema.json#/$defs/lens", "description": "Its lens." },
+    "tool_uses": { "type": "integer", "minimum": 0, "description": "Tool calls made while authoring. Zero fails the Phase 1 evidence check." },
+    "gate_questions": {
+      "type": "array",
+      "description": "Unmet [gate] needs, asked instead of inferred past (S10). Findings depending on one carry conditional_on.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["need", "question"],
+        "properties": {
+          "need": { "type": "string", "minLength": 3, "description": "The declared gate need, e.g. 'who the user is and how many'." },
+          "question": { "type": "string", "minLength": 5, "description": "The question for the operator." },
+          "assumption": { "type": "string", "description": "The assumption dependent findings are conditional on meanwhile." }
+        }
+      }
+    },
+    "findings": {
+      "type": "array",
+      "items": { "$ref": "common.schema.json#/$defs/finding" },
+      "description": "The findings, as many as the corpus honestly warrants. Ids are unique within the report."
+    }
+  }
+}

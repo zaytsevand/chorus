@@ -1,0 +1,111 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "decision.schema.json",
+  "title": "Decision",
+  "description": "The shared shape of an operator-facing decision: the chorus DecisionRecord (DECISION-PRIMITIVE.md) with field names aligned to a problem-brief entry, so a brief entry can be derived from it without loss. Chorus-only fields (point, band, sensor, resolution, override, catalog_row) have no brief counterpart and stay in the chorus record.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "point", "band", "title", "problem", "evidence", "solutions", "status", "resolution"],
+  "properties": {
+    "kind": { "const": "decision", "description": "Record kind, when the decision is stored as a file of its own." },
+    "id": { "type": "string", "pattern": "^[A-Za-z0-9]+(-[A-Za-z0-9]+)*-[0-9]+$", "description": "DecisionRecord id: <gate/phase>-<point>-<n>, e.g. A-seating-tie-1." },
+    "point": { "type": "string", "minLength": 3, "description": "Which decision point, as named in the decision catalog." },
+    "catalog_row": { "type": "integer", "minimum": 1, "description": "The DECISION-PRIMITIVE.md catalog row the band came from. Absent means unlisted, which forces band 🔴." },
+    "band": { "$ref": "common.schema.json#/$defs/severity", "description": "🟢 auto-resolve, 🟡 recorded default + async override, 🔴 hard-block. By declared predicate, never inference (D1)." },
+    "title": { "type": "string", "minLength": 5, "maxLength": 90, "description": "The decision as a headline. Maps to a brief entry's title." },
+    "problem": { "type": "string", "minLength": 20, "maxLength": 400, "description": "What has to be decided, in one or two sentences. Maps to a brief entry's problem." },
+    "brief": { "type": "string", "description": "Why it matters. Maps to a brief entry's brief." },
+    "sensor": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["signal", "reading"],
+      "description": "The rule that fired, its anchors, and its outcome.",
+      "properties": {
+        "signal": { "type": "string", "minLength": 3, "description": "The predicate that was evaluated (mechanical test or persona flag)." },
+        "evidence": { "type": "array", "items": { "type": "string" }, "description": "The anchors the predicate read." },
+        "reading": { "type": "string", "minLength": 2, "description": "The predicate's outcome." }
+      }
+    },
+    "evidence": {
+      "type": "array",
+      "minItems": 1,
+      "description": "Evidence, in the problem-brief evidence shape.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["kind", "ref"],
+        "properties": {
+          "kind": { "type": "string", "enum": ["code", "document", "finding", "run", "commit", "test", "measurement", "ruling"], "description": "What sort of thing is cited. A chorus finding is kind finding with ref '<record>#<Fn>'." },
+          "ref": { "type": "string", "minLength": 1, "description": "The citation: path:line, commit, finding id, ruling id." },
+          "note": { "type": "string", "description": "What this citation shows, in one sentence." },
+          "url": { "type": "string", "description": "Optional link." },
+          "verified": { "type": "boolean", "description": "false marks the claim unproven." }
+        }
+      }
+    },
+    "solutions": {
+      "type": "array",
+      "minItems": 1,
+      "description": "The options (DecisionRecord chosen + alternatives). The first is the default and carries recommended: true.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "label", "summary", "cost"],
+        "properties": {
+          "id": { "type": "string", "pattern": "^[a-z0-9-]+$", "description": "Short handle, unique within the decision." },
+          "label": { "type": "string", "maxLength": 90, "description": "The option as a headline." },
+          "recommended": { "type": "boolean", "description": "The default (🟡) or highlighted default (🔴). Taken from the vote where one exists." },
+          "reversible": { "type": "boolean", "description": "Whether carrying it out can be undone at comparable cost." },
+          "summary": { "type": "string", "minLength": 20, "description": "The option's consequence: what choosing it actually means." },
+          "cost": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["work"],
+            "description": "Its price.",
+            "properties": {
+              "work": { "type": "string", "description": "What doing it consists of." },
+              "risk": { "type": "string", "description": "What could go wrong." },
+              "forecloses": { "type": "string", "description": "What it rules out later." }
+            }
+          }
+        }
+      }
+    },
+    "resolution": { "type": "string", "enum": ["auto-resolved", "default-applied", "in-progress", "escalated"], "description": "DecisionRecord resolution. in-progress is a self-heal cycle in flight." },
+    "cycle": { "type": "integer", "minimum": 1, "maximum": 3, "description": "Self-heal only: cycle N of 3." },
+    "override": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["how", "cost"],
+      "description": "🟡 only: the one-action override and its cost (D3).",
+      "properties": {
+        "how": { "type": "string", "minLength": 5, "description": "How to reverse the default." },
+        "cost": { "type": "string", "minLength": 3, "description": "What reversing costs." }
+      }
+    },
+    "status": { "type": "string", "enum": ["open", "decided", "complete", "superseded"], "description": "Same meanings as a problem-brief entry's status." },
+    "decision": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["chose", "date"],
+      "description": "Which option was chosen. Same shape as a brief entry's decision.",
+      "properties": {
+        "chose": { "type": "string", "description": "The id of the chosen solution." },
+        "date": { "$ref": "common.schema.json#/$defs/date", "description": "When it was chosen." },
+        "note": { "type": "string", "description": "Why. Never a restatement of an operator ruling — cite it with ruling_ref." }
+      }
+    },
+    "ruling_ref": { "$ref": "common.schema.json#/$defs/ruling_ref", "description": "The operator ruling that settled this decision, held by the ruling sink." },
+    "entry_ref": { "$ref": "common.schema.json#/$defs/ruling_ref", "description": "The brief entry (Q-n) this decision was published as, written back by the root." }
+  },
+  "allOf": [
+    { "if": { "properties": { "status": { "enum": ["decided", "complete"] } }, "required": ["status"] },
+      "then": { "required": ["decision"] } },
+    { "if": { "properties": { "band": { "const": "🟡" } }, "required": ["band"] },
+      "then": { "required": ["override"], "properties": { "resolution": { "enum": ["default-applied", "in-progress"] } } } },
+    { "if": { "properties": { "band": { "const": "🔴" } }, "required": ["band"] },
+      "then": { "properties": { "resolution": { "const": "escalated" }, "solutions": { "minItems": 2, "maxItems": 4 } } } },
+    { "if": { "properties": { "band": { "const": "🟢" } }, "required": ["band"] },
+      "then": { "properties": { "resolution": { "const": "auto-resolved" } } } }
+  ]
+}

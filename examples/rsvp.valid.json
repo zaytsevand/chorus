@@ -1,0 +1,12 @@
+{
+  "kind": "rsvp",
+  "schema_version": "1",
+  "persona": "security-and-trust-advisor",
+  "lens": "security",
+  "round": "2026-09-27",
+  "decision": "EXCEPTIONAL",
+  "applies": ["exports leave the trust boundary as files"],
+  "expected": { "stakes": "🔴", "hook": "export files carry personal data to shared storage" },
+  "uncovered_delta": "exports leave the trust boundary as files",
+  "reason": "No seated lens covers data leaving the service as files."
+}

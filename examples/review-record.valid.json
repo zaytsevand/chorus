@@ -1,0 +1,92 @@
+{
+  "kind": "review-record",
+  "schema_version": "1",
+  "date": "2026-09-27",
+  "target": "specs/012-order-export/spec.md",
+  "mode": "project-state",
+  "round_context": "Since the last round: the order-export spec was drafted, the export job moved from cron to the queue worker, and the CSV writer gained a streaming path. No incidents.",
+  "baseline_ref": "docs/reviews/2026-08-30-chorus-review.json",
+  "tldr": [
+    "The chorus found that the order aggregate cannot enforce its own invariants, and that the export job's retry path is under-specified.",
+    "The top five puts the aggregate root first, then the retry contract and the streaming writer's backpressure.",
+    "One 🔴 finding (F1, the missing aggregate root) blocks public rollout."
+  ],
+  "roster": [
+    { "persona": "eric-evans-advisor", "lens": "DDD", "decision": "JOIN", "applies": ["order aggregate reshaped in spec 012"], "expected": "🔴", "hook": "invariants move to the writer", "reason": "The spec moves order rules into the export writer.", "seated": true, "seat": "ordinary" },
+    { "persona": "mark-richards-architect", "lens": "architecture", "decision": "JOIN", "applies": ["export job moved to the queue worker"], "expected": "🟡", "hook": "new async seam", "reason": "A new asynchronous seam.", "seated": true, "seat": "ordinary" },
+    { "persona": "kent-beck-persona", "lens": "TDD / simple design", "decision": "JOIN", "applies": ["streaming CSV path added"], "expected": "🟡", "hook": "no tests on the new path", "reason": "The streaming path has no tests.", "seated": true, "seat": "ordinary" },
+    { "persona": "security-and-trust-advisor", "lens": "security", "decision": "JOIN", "applies": ["exports leave the trust boundary as files"], "expected": "🟡", "hook": "export files carry customer data", "reason": "Export files carry personal data.", "seated": true, "seat": "ordinary" },
+    { "persona": "alan-cooper-advisor", "lens": "adversarial product", "decision": "ABSTAIN", "reason": "No user-facing change this round.", "seated": false },
+    { "persona": "guido-python-reviewer", "lens": "Python", "decision": "ABSTAIN", "reason": "Not installed in this environment.", "failure": "not-installed", "seated": false }
+  ],
+  "quorum": { "joiners": 4, "branch": "proceed" },
+  "register": [
+    { "id": "F1", "author": "eric-evans-advisor", "lens": "DDD", "authored_severity": "🟡", "locator": "src/orders/model.py:42", "pull_quote": "The Order aggregate has no root to enforce its invariants.", "evidence": [{ "kind": "file_line", "ref": "src/orders/model.py:42", "note": "Line items are mutated directly by the writer." }], "confidence_on_hand": "high", "need_info": false, "graded": true,
+      "convergence_notes": [{ "persona": "mark-richards-architect", "pull_quote": "Without a root, the queue worker becomes a second owner of order state." }] },
+    { "id": "F2", "author": "mark-richards-architect", "lens": "architecture", "authored_severity": "🔴", "locator": "src/export/worker.py:10-30", "pull_quote": "The worker retries forever with no dead-letter path.", "evidence": [{ "kind": "file_line", "ref": "src/export/worker.py:10-30" }], "confidence_on_hand": "high", "need_info": false, "graded": true },
+    { "id": "F3", "author": "kent-beck-persona", "lens": "TDD / simple design", "authored_severity": "🟢", "locator": "src/export/csv.py:5", "pull_quote": "The writer's name no longer says what it does.", "evidence": [{ "kind": "file_line", "ref": "src/export/csv.py:5" }], "confidence_on_hand": "high", "need_info": false, "graded": true },
+    { "id": "F4", "author": "security-and-trust-advisor", "lens": "security", "authored_severity": "🟡", "locator": "src/export/storage.py:18", "pull_quote": "Export files are written world-readable to shared storage.", "evidence": [{ "kind": "file_line", "ref": "src/export/storage.py:18" }], "confidence_on_hand": "high", "need_info": false, "graded": true },
+    { "id": "F5", "author": "kent-beck-persona", "lens": "TDD / simple design", "authored_severity": "🟡", "locator": "src/export/csv.py:60-90", "pull_quote": "I cannot tell whether backpressure is intended here.", "evidence": [{ "kind": "file_line", "ref": "src/export/csv.py:60-90" }], "confidence_on_hand": "low", "need_info": true,
+      "need_info_reasons": [{ "raiser": "kent-beck-persona", "reason": "The spec does not say how many rows an export may hold.", "stage": "author" }], "graded": true },
+    { "id": "F6", "author": "mark-richards-architect", "lens": "architecture", "authored_severity": "🟢", "locator": "[principle] docs/constitution.md §4", "pull_quote": "The export module should own its own configuration.", "evidence": [{ "kind": "principle", "ref": "docs/constitution.md §4" }], "confidence_on_hand": "high", "need_info": false, "graded": true },
+    { "id": "F7", "author": "eric-evans-advisor", "lens": "DDD", "authored_severity": "🟡", "locator": "src/orders", "pull_quote": "The ordering language is drifting.", "evidence": [], "unsupported": true, "confidence_on_hand": "high", "need_info": false, "graded": true },
+    { "id": "R2-1", "author": "security-and-trust-advisor", "lens": "security", "authored_severity": "🟡", "locator": "src/orders/model.py:88", "pull_quote": "With no aggregate root, nothing checks who may export an order.", "evidence": [{ "kind": "file_line", "ref": "src/orders/model.py:88" }], "confidence_on_hand": "high", "need_info": false, "graded": false, "derived_from": "F1" }
+  ],
+  "tally": [
+    { "finding": "F1", "authored_severity": "🟡", "status": "graded", "n": 3, "p": 2, "c": 1, "o": 0, "net": 2, "threshold": 1, "movement": "escalate", "final_severity": "🔴", "convergence": 3, "gating": true },
+    { "finding": "F2", "authored_severity": "🔴", "status": "graded", "n": 3, "p": 0, "c": 1, "o": 2, "net": -2, "threshold": 1, "movement": "demote", "final_severity": "🟡", "convergence": 1, "gating": false },
+    { "finding": "F3", "authored_severity": "🟢", "status": "graded", "n": 3, "p": 0, "c": 0, "o": 1, "net": -1, "threshold": 1, "movement": "demote", "final_severity": "dropped", "convergence": 0, "gating": false },
+    { "finding": "F4", "authored_severity": "🟡", "status": "graded", "n": 3, "p": 1, "c": 1, "o": 1, "net": 0, "threshold": 1, "movement": "agreed", "final_severity": "🟡", "convergence": 2, "gating": false },
+    { "finding": "F5", "authored_severity": "🟡", "status": "held" },
+    { "finding": "F6", "authored_severity": "🟢", "status": "unvoted", "n": 3, "p": 0, "c": 0, "o": 0, "net": 0, "threshold": 1, "movement": "unvoted", "final_severity": "🟢", "convergence": 0, "gating": false },
+    { "finding": "R2-1", "authored_severity": "🟡", "status": "ungraded", "final_severity": "🟡" }
+  ],
+  "conflicts": [
+    { "id": "C1", "advisors": ["mark-richards-architect", "kent-beck-persona"], "disputed": "Whether the retry path needs a dead-letter queue now or a bounded retry count is enough for this scale.", "outcome": "arbiter-ruled", "arbiter_ruling": "A bounded retry count is enough until export volume is measured.", "findings": ["F2"] }
+  ],
+  "top_five": [
+    { "rank": 1, "finding": "F1", "pull_quote": "The Order aggregate has no root to enforce its invariants.", "locator": "src/orders/model.py:42", "final_severity": "🔴", "cost": "medium", "value": "Unblocks the export writer and removes a second owner of order state.", "convergence": 3 },
+    { "rank": 2, "finding": "F4", "pull_quote": "Export files are written world-readable to shared storage.", "locator": "src/export/storage.py:18", "final_severity": "🟡", "cost": "low", "value": "Closes a personal-data exposure.", "convergence": 2 },
+    { "rank": 3, "finding": "F2", "pull_quote": "The worker retries forever with no dead-letter path.", "locator": "src/export/worker.py:10-30", "final_severity": "🟡", "cost": "low", "value": "Stops runaway retries.", "convergence": 1, "arbiter_note": "C1: a bounded retry count is enough for now." },
+    { "rank": 4, "finding": "R2-1", "pull_quote": "With no aggregate root, nothing checks who may export an order.", "locator": "src/orders/model.py:88", "final_severity": "🟡", "cost": "medium", "value": "Authorization lands with the aggregate root.", "convergence": 0 },
+    { "rank": 5, "finding": "F6", "pull_quote": "The export module should own its own configuration.", "locator": "[principle] docs/constitution.md §4", "final_severity": "🟢", "cost": "low", "value": "Keeps configuration with its owner.", "convergence": 0 }
+  ],
+  "held": [
+    { "finding": "F5", "reasons": [{ "raiser": "kent-beck-persona", "reason": "The spec does not say how many rows an export may hold.", "stage": "author" }], "route": "operator", "decision_ref": "phase2-need-info-routing-1" }
+  ],
+  "baseline": {
+    "assume_closed": [],
+    "in_progress": ["F1 aggregate root"],
+    "re_evaluate": ["F5 once the export size limit is ruled"]
+  },
+  "appendix": [
+    { "persona": "eric-evans-advisor", "reports": [".claude/agent-memory/eric-evans-advisor/2026-09-27-r1.json"] },
+    { "persona": "mark-richards-architect", "reports": [".claude/agent-memory/mark-richards-architect/2026-09-27-r1.json"] },
+    { "persona": "kent-beck-persona", "reports": [".claude/agent-memory/kent-beck-persona/2026-09-27-r1.json"] },
+    { "persona": "security-and-trust-advisor", "reports": [".claude/agent-memory/security-and-trust-advisor/2026-09-27-r1.json"] }
+  ],
+  "decisions": [
+    {
+      "id": "phase2-need-info-routing-1",
+      "point": "NEED_INFO resolution routing",
+      "catalog_row": 14,
+      "band": "🟡",
+      "title": "How many rows may one export hold",
+      "problem": "A finding about the CSV writer cannot be graded until someone says how large an export is allowed to be.",
+      "sensor": { "signal": "open NEED_INFO with confidence_on_hand low", "evidence": ["register F5"], "reading": "operator path: no seated persona holds the size limit" },
+      "evidence": [{ "kind": "finding", "ref": "docs/reviews/2026-09-27-chorus-review.json#F5", "note": "The held finding." }],
+      "solutions": [
+        { "id": "ask-operator", "label": "Ask the operator for the export size limit", "recommended": true, "reversible": true, "summary": "The finding stays held until the operator names a limit; then its author revises or confirms it.", "cost": { "work": "One question to the operator." } },
+        { "id": "ask-peer", "label": "Ask the delivery-and-ops lens", "reversible": true, "summary": "Route the question to a persona that may know typical export sizes from operations.", "cost": { "work": "One more dispatch.", "risk": "It is not seated this round." } }
+      ],
+      "resolution": "default-applied",
+      "override": { "how": "Re-route the question to the peer path.", "cost": "One dispatch." },
+      "status": "open",
+      "entry_ref": { "id": "Q-3", "record": "docs/briefs/order-export/brief.json" }
+    }
+  ],
+  "side_notes": [
+    { "regime": "threshold-boundary", "note": "F3 was demoted at exactly |net| = T.", "findings": ["F3"] }
+  ],
+  "rulings_cited": [{ "id": "R-3", "record": "docs/briefs/order-export/brief.json" }]
+}

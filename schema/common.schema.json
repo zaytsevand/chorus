@@ -1,0 +1,281 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "common.schema.json",
+  "title": "Shared definitions for chorus records",
+  "description": "Building blocks referenced by the rsvp, finding-report, vote-report, review-record and sdlc-log schemas. Not a record kind of its own.",
+  "$defs": {
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "A moment with its time zone: YYYY-MM-DDTHH:MM, optional seconds, then Z or an offset. Same shape as problem-brief timestamps."
+    },
+    "date": {
+      "type": "string",
+      "format": "date",
+      "description": "A calendar day, YYYY-MM-DD."
+    },
+    "severity": {
+      "type": "string",
+      "enum": ["🔴", "🟡", "🟢"],
+      "description": "The three-level scale owned by GATE-PRIMITIVE.md, shared by findings and decisions."
+    },
+    "final_severity": {
+      "type": "string",
+      "enum": ["🔴", "🟡", "🟢", "dropped"],
+      "description": "Post-tally severity. 'dropped' is the demotion of a 🟢 (GATE-PRIMITIVE.md Stage 4: 🟢→drop)."
+    },
+    "confidence": {
+      "type": "string",
+      "enum": ["high", "low"],
+      "description": "Declared confidence_on_hand: epistemic sufficiency of the evidence on hand. low requires need_info (S11). Declared by the persona, never inferred."
+    },
+    "persona": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9-]*$",
+      "description": "The persona's agent name as installed, e.g. eric-evans-advisor."
+    },
+    "lens": {
+      "type": "string",
+      "minLength": 2,
+      "maxLength": 60,
+      "description": "The lens the persona reviews through, e.g. DDD, architecture, security."
+    },
+    "finding_id": {
+      "type": "string",
+      "pattern": "^(F[0-9]+|R2-[0-9]+)$",
+      "description": "Fn for a Round-1 or gate finding; R2-n for a finding derived in Round 2."
+    },
+    "locator": {
+      "type": "string",
+      "minLength": 3,
+      "description": "The finding's target: '<file>:<line>', '<file>:<start>-<end>', or a principle tag such as '[principle] constitution §III'."
+    },
+    "pull_quote": {
+      "type": "string",
+      "minLength": 5,
+      "maxLength": 300,
+      "pattern": "^[^\\n]+$",
+      "description": "One short sentence in the persona's own words, marked by the persona. Relayed verbatim, never selected or paraphrased by the conductor (I6)."
+    },
+    "evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "ref"],
+      "description": "One piece of I8 evidence behind a finding or vote.",
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": ["file_line", "principle", "principle_proposed"],
+          "description": "file_line: a real anchor in the corpus. principle: an existing principle, ref says where it is established. principle_proposed: a principle named here for the first time."
+        },
+        "ref": {
+          "type": "string",
+          "minLength": 3,
+          "description": "file_line: '<file>:<line>' or '<file>:<start>-<end>'. principle: where it is established (constitution clause, prior finding, project doc). principle_proposed: the principle's name."
+        },
+        "note": {
+          "type": "string",
+          "description": "What this citation shows, in one sentence."
+        }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "kind": { "const": "file_line" } }, "required": ["kind"] },
+          "then": { "properties": { "ref": { "pattern": "^[^\\s:][^:]*:[0-9]+(-[0-9]+)?$" } } }
+        }
+      ]
+    },
+    "need_info_reason": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["raiser", "reason"],
+      "description": "One raiser's reason for an open NEED_INFO flag. A finding may carry several.",
+      "properties": {
+        "raiser": { "$ref": "#/$defs/persona", "description": "The persona that raised the flag." },
+        "reason": { "type": "string", "minLength": 5, "description": "One sentence naming what is missing." },
+        "stage": { "type": "string", "enum": ["author", "vote"], "description": "Where the flag was raised: Stage 2 (author) or Stage 3 (vote)." }
+      }
+    },
+    "finding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "lens", "locator", "claim", "evidence", "proposed_severity", "pull_quote", "confidence_on_hand", "need_info"],
+      "description": "One authored finding (GATE-PRIMITIVE.md Stage 2).",
+      "properties": {
+        "id": { "$ref": "#/$defs/finding_id", "description": "Finding id, unique within its record." },
+        "lens": { "$ref": "#/$defs/lens", "description": "The authoring lens." },
+        "locator": { "$ref": "#/$defs/locator", "description": "The target the finding is about; duplicates are grouped only on an identical locator." },
+        "claim": { "type": "string", "minLength": 10, "description": "The finding itself, in the persona's words. Counts toward the report's word limit." },
+        "evidence": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/evidence" },
+          "description": "I8 evidence. Empty means the finding is demoted to [unsupported] at registration and excluded from vote, tally and ranking."
+        },
+        "proposed_severity": { "$ref": "#/$defs/severity", "description": "The author's severity, before the vote." },
+        "pull_quote": { "$ref": "#/$defs/pull_quote", "description": "The persona-marked PULL-QUOTE for this finding." },
+        "confidence_on_hand": { "$ref": "#/$defs/confidence", "description": "Declared per finding. low → need_info must be true." },
+        "need_info": { "type": "boolean", "description": "Open NEED_INFO flag (S11). true blocks the tally for this finding." },
+        "need_info_reason": { "type": "string", "minLength": 5, "description": "One sentence naming what is missing. Required when need_info is true." },
+        "conditional_on": { "type": "string", "minLength": 5, "description": "The stated assumption this finding depends on while one of the persona's gates is unmet (S10)." },
+        "scope": { "type": "string", "enum": ["premise", "within-frame"], "description": "Gate A premise pass only: the author's declared scope, confirmed by the vote." },
+        "attack_form": {
+          "type": "string",
+          "enum": ["steelman-null", "reframe", "root-cause-doubt", "unvalidated-assumption"],
+          "description": "Premise findings only: which of the four premise attack forms this finding carries (chorus-sdlc § Gate A · 1)."
+        },
+        "experiment": { "type": "string", "minLength": 5, "description": "The cheapest experiment that would settle it. Required with attack_form unvalidated-assumption." },
+        "derived_from": { "$ref": "#/$defs/finding_id", "description": "Round-2 derived findings only: the finding whose implications led here." },
+        "graded": { "type": "boolean", "description": "false for R2- derived findings: no second lens has voted on them." }
+      },
+      "allOf": [
+        { "if": { "properties": { "confidence_on_hand": { "const": "low" } }, "required": ["confidence_on_hand"] },
+          "then": { "properties": { "need_info": { "const": true } } } },
+        { "if": { "properties": { "need_info": { "const": true } }, "required": ["need_info"] },
+          "then": { "required": ["need_info_reason"] } },
+        { "if": { "properties": { "attack_form": { "const": "unvalidated-assumption" } }, "required": ["attack_form"] },
+          "then": { "required": ["experiment"] } }
+      ]
+    },
+    "ruling_ref": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "record"],
+      "description": "A pointer to an operator ruling held elsewhere. Chorus records never restate a ruling; they cite it (Q-2).",
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^([a-z0-9][a-z0-9-]*/)?[QR]-[0-9]+$",
+          "description": "The ruling's id in the record that holds it: R-n for a ruling, Q-n for a decided brief entry, optionally prefixed by the brief's subject, e.g. spec-215/R-4."
+        },
+        "record": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Where the ruling lives: a path to a brief's JSON, a URL, or '#' for this record's own local_rulings (fallback when no ruling sink is bound)."
+        }
+      }
+    },
+    "rsvp_row": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["persona", "lens", "decision", "reason"],
+      "description": "One roster member's RSVP outcome as recorded in a review record or ledger.",
+      "properties": {
+        "persona": { "$ref": "#/$defs/persona", "description": "Who replied." },
+        "lens": { "$ref": "#/$defs/lens", "description": "Their lens." },
+        "decision": { "type": "string", "enum": ["JOIN", "ABSTAIN", "EXCEPTIONAL"], "description": "The persona's own reply (I2). EXCEPTIONAL is exceptional entry beyond the cap." },
+        "applies": { "type": "array", "items": { "type": "string", "minLength": 3 }, "description": "Axis A: cited round-context deltas." },
+        "expected": { "$ref": "#/$defs/severity", "description": "Axis B: expected stakes (🔴 means 🔴-potential)." },
+        "hook": { "type": "string", "description": "Axis B's one-line evidence hook." },
+        "uncovered_delta": { "type": "string", "minLength": 3, "description": "EXCEPTIONAL only: the delta no seated ordinary lens covers." },
+        "reason": { "type": "string", "minLength": 3, "description": "One-line reason, or the failure-rule reason (not installed, silent, past budget, malformed, over-length, no evidence)." },
+        "failure": { "type": "string", "enum": ["not-installed", "silent", "past-budget", "malformed", "over-length", "no-evidence"], "description": "Set when the persona counts as ABSTAIN under the one failure rule." },
+        "seated": { "type": "boolean", "description": "Whether the persona holds a seat on this board." },
+        "seat": { "type": "string", "enum": ["ordinary", "exceptional"], "description": "Seat kind, when seated." }
+      },
+      "allOf": [
+        { "if": { "properties": { "decision": { "const": "EXCEPTIONAL" } }, "required": ["decision"] },
+          "then": { "required": ["uncovered_delta"] } },
+        { "if": { "properties": { "seated": { "const": true } }, "required": ["seated"] },
+          "then": { "required": ["seat"] } }
+      ]
+    },
+    "register_entry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "author", "lens", "authored_severity", "locator", "pull_quote", "confidence_on_hand", "need_info", "graded"],
+      "description": "One row of the findings register — the single human-facing source of truth, written before the vote.",
+      "properties": {
+        "id": { "$ref": "#/$defs/finding_id", "description": "Fn, or R2-n for a derived finding." },
+        "author": { "$ref": "#/$defs/persona", "description": "The authoring persona." },
+        "lens": { "$ref": "#/$defs/lens", "description": "The authoring lens." },
+        "authored_severity": { "$ref": "#/$defs/severity", "description": "The author's proposed severity." },
+        "locator": { "$ref": "#/$defs/locator", "description": "Target locator." },
+        "pull_quote": { "$ref": "#/$defs/pull_quote", "description": "The persona's marked span, verbatim." },
+        "evidence": { "type": "array", "items": { "$ref": "#/$defs/evidence" }, "description": "The finding's I8 evidence, copied from the report." },
+        "unsupported": { "type": "boolean", "description": "true: no file:line and no principle tag — visible, but outside the matrix, the vote and convergence (I8)." },
+        "confidence_on_hand": { "$ref": "#/$defs/confidence", "description": "The author's declared confidence." },
+        "need_info": { "type": "boolean", "description": "Open NEED_INFO flag. true shows the row held." },
+        "need_info_reasons": { "type": "array", "items": { "$ref": "#/$defs/need_info_reason" }, "description": "One entry per raiser. Required when need_info is true." },
+        "graded": { "type": "boolean", "description": "false for R2- derived findings (shown [ungraded])." },
+        "derived_from": { "$ref": "#/$defs/finding_id", "description": "R2- only: the finding it was derived from." },
+        "scope": { "type": "string", "enum": ["premise", "within-frame"], "description": "Gate A only: premise or within-frame, as confirmed by the vote." },
+        "parked": { "type": "boolean", "description": "Gate A only: a within-frame finding parked from the premise pass." },
+        "convergence_notes": {
+          "type": "array",
+          "description": "Converging lenses, each in its own Round-2 words.",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["persona", "pull_quote"],
+            "properties": {
+              "persona": { "$ref": "#/$defs/persona", "description": "The converging persona." },
+              "pull_quote": { "$ref": "#/$defs/pull_quote", "description": "Its marked convergence note, verbatim." }
+            }
+          }
+        }
+      },
+      "allOf": [
+        { "if": { "properties": { "need_info": { "const": true } }, "required": ["need_info"] },
+          "then": { "required": ["need_info_reasons"], "properties": { "need_info_reasons": { "minItems": 1 } } } },
+        { "if": { "properties": { "id": { "pattern": "^R2-" } }, "required": ["id"] },
+          "then": { "required": ["derived_from"], "properties": { "graded": { "const": false } } } }
+      ]
+    },
+    "tally_row": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["finding", "authored_severity", "status"],
+      "description": "One row of the consolidation matrix: the deterministic Stage-4 count for one finding. A projection; it re-authors nothing.",
+      "properties": {
+        "finding": { "$ref": "#/$defs/finding_id", "description": "The register entry this row counts." },
+        "authored_severity": { "$ref": "#/$defs/severity", "description": "Copied from the register." },
+        "status": { "type": "string", "enum": ["graded", "held", "ungraded", "unvoted"], "description": "graded: counted. held: NEED_INFO open, not counted. ungraded: R2- derived. unvoted: every voter abstained." },
+        "n": { "type": "integer", "minimum": 0, "description": "N: the count of non-author voters on the finding (GATE-PRIMITIVE.md Stage 4). A tally must not run at N < 2." },
+        "p": { "type": "integer", "minimum": 0, "description": "PRIORITIZE count among non-author voters." },
+        "c": { "type": "integer", "minimum": 0, "description": "CONFIRM count among non-author voters." },
+        "o": { "type": "integer", "minimum": 0, "description": "OVER-RATE count among non-author voters." },
+        "net": { "type": "integer", "description": "net = P − O. CONFIRM is excluded." },
+        "threshold": { "type": "integer", "minimum": 1, "description": "T = max(1, floor(N / 2))." },
+        "movement": { "type": "string", "enum": ["escalate", "demote", "hold", "agreed", "unvoted"], "description": "escalate: net ≥ T. demote: net ≤ −T. agreed: held with CONFIRM votes. hold: otherwise held. unvoted: all abstained." },
+        "final_severity": { "$ref": "#/$defs/final_severity", "description": "Post-tally severity: authored severity moved at most one level." },
+        "convergence": { "type": "integer", "minimum": 0, "description": "Convergence = P + C, used to rank, never to escalate." },
+        "gating": { "type": "boolean", "description": "true iff final_severity is 🔴." }
+      },
+      "allOf": [
+        { "if": { "properties": { "status": { "enum": ["graded", "unvoted"] } }, "required": ["status"] },
+          "then": { "required": ["n", "p", "c", "o", "net", "threshold", "movement", "final_severity", "convergence", "gating"] } },
+        { "if": { "properties": { "status": { "const": "ungraded" } }, "required": ["status"] },
+          "then": { "required": ["final_severity"] } }
+      ]
+    },
+    "extract_record": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["artifact", "location", "observation", "raw_excerpt", "candidate_lens", "source"],
+      "description": "A Stage-1 extract record: one factual observation, no judgment.",
+      "properties": {
+        "artifact": { "type": "string", "minLength": 1, "description": "Path of the artefact read." },
+        "location": { "type": "string", "pattern": "^[^\\s:][^:]*:[0-9]+(-[0-9]+)?$", "description": "'<file>:<line>' or '<file>:<start>-<end>'." },
+        "observation": { "type": "string", "minLength": 5, "description": "One factual sentence, no judgment." },
+        "raw_excerpt": { "type": "string", "description": "Verbatim quote." },
+        "candidate_lens": { "type": "string", "minLength": 2, "description": "The lens this most concerns, or 'unassigned'." },
+        "source": { "type": "string", "minLength": 2, "description": "'explore', 'spec-walkthrough', or another fixed-viewpoint tag." }
+      }
+    },
+    "side_note": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["regime", "note"],
+      "description": "A conductor side-note: flag-only, routed to the operator, never changes severity or the tally (CONDUCTOR.md § Side-notes).",
+      "properties": {
+        "regime": {
+          "type": "string",
+          "enum": ["exceptional-seat", "threshold-boundary", "unanimous-same-brief", "missing-beneficiary-lens", "missing-scope-lens", "other"],
+          "description": "The declared risk regime the procedure entered."
+        },
+        "note": { "type": "string", "minLength": 5, "description": "The side-note text." },
+        "findings": { "type": "array", "items": { "$ref": "#/$defs/finding_id" }, "description": "Findings it concerns, if any." }
+      }
+    }
+  }
+}
