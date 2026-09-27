@@ -1,6 +1,6 @@
 {
   "name": "chorus",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "Multi-advisor review for Claude Code, packaged as a composable suite of four skills (chorus-core substrate, chorus-review project-state round, chorus-sdlc lifecycle, chorus-learn tutorial). Nine persona advisors (Evans, Richards, Cooper, Norman, Uncle Bob, Beck, Delivery-and-Ops, Security-and-Trust, Goldratt) plus an optional Guido Python lens run a structured, RSVP-gated review through their lenses; conflicts go to advisor(); output is a durable markdown artifact you commit.",
   "author": {
     "name": "Andrey Zaytsev"

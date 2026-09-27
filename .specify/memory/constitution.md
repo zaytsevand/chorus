@@ -1,7 +1,7 @@
 <!--
 SYNC IMPACT REPORT
-Version change: 1.1.0 → 1.2.0
-Bump type: MINOR — Authoring Constraints rewritten to the actual layout (four skills
+Version change: 1.1.0 → 2.0.0
+Bump type: MAJOR (operator ruling, suite-review Q-16: reversing "Markdown-only" and "one skill" is a governance change) — Authoring Constraints rewritten to the actual layout (four skills
            under skill/ + the agents/ roster; programs for validation and rendering live
            outside the repo, bound through ports); a "Composition only through declared
            ports" constraint and a "Records are data" Review Workflow rule added;
@@ -39,7 +39,7 @@ Templates updated:
   - .specify/templates/tasks-template.md ✅ "conformance check is a first-class
     task" reminder added (Principle V / the SC-008 pattern).
   - README.md ✅ already describes the machinery these principles formalize.
-  - @ 1.2.0: plan-template.md ✅ Authoring-constraints line updated; README.md ✅
+  - @ 2.0.0: plan-template.md ✅ Authoring-constraints line updated; README.md ✅
     Composition subsection added.
 
 Follow-up TODOs:
@@ -370,4 +370,4 @@ Amendments MUST:
 6. **Procedure over artifact (Principle X).** An amendment is ratified by the operator
    (N+1), recorded in git history, and never back-dated to look cleaner than it was.
 
-**Version**: 1.2.0 | **Ratified**: 2026-06-12 | **Last Amended**: 2026-09-27
+**Version**: 2.0.0 | **Ratified**: 2026-06-12 | **Last Amended**: 2026-09-27

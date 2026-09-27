@@ -234,6 +234,18 @@ flowchart TD
   - **Convergence count** (for Phase-4 ranking) is `P + C` — all agreement, used to
     *rank*, never to *escalate*. Severity escalation counts only `P`: a finding many
     lenses agree on can rank in the top-5 while honestly holding at 🟡.
+  - **Settled cases** (the record validator enforces them):
+    1. `N = P + C + O` exactly: a lens that abstains on, is absent from, or holds the
+       finding with NEED_INFO is not counted.
+    2. Any `CONFIRM` with `|net| < T` is agreed-at-severity, even when `P` and `O`
+       cancel (e.g. 2/1/1).
+    3. Findings grouped by one locator are tallied per author entry; grouping is for
+       display and ranking only.
+    4. An ungraded `R2-` finding is not tallied and carries no gating flag; an
+       ungraded 🔴 is surfaced to the operator, not gated on.
+    5. Reply caps are upper bounds only; lifecycle gates set none.
+    6. A 🔴 incorporated in cycle *k* is resolved in *k*; the proof is cycle *k+1*'s
+       re-run, recorded as a new ledger entry (the ledger stays append-only).
 - **Success criterion**: arithmetic only — no judgment added. Identical votes at an
   identical `N` always yield identical severities; there are **no tally ties**, and no
   seat's vote is re-weighted (severity is presence-blind — entry buys a voice, not
