@@ -70,7 +70,8 @@ test("no tally at N < 2", () => {
   const d = rr(); Object.assign(row(d, "F4"), { n: 1, p: 1, c: 0, o: 0, net: 1, threshold: 1, movement: "escalate", final_severity: "🔴", convergence: 1, gating: true });
   expectError("review-record", d, /must not run at N < 2/);
 });
-test("votes cannot outnumber N", () => { const d = rr(); row(d, "F4").n = 2; expectError("review-record", d, /exceeds N = 2/); });
+test("N must equal P + C + O (settled case 1)", () => { const d = rr(); row(d, "F4").n = 2; expectError("review-record", d, /N = 2, but P \+ C \+ O = 3/); });
+test("an abstaining lens does not count toward N", () => { const d = rr(); row(d, "F4").n = 4; expectError("review-record", d, /N = 4, but P \+ C \+ O = 3/); });
 test("N cannot exceed seated non-authors (S8)", () => { const d = rr(); row(d, "F6").n = 4; row(d, "F6").threshold = 2; expectError("review-record", d, /exceeds the seated non-author personas/); });
 test("votes cast but status unvoted", () => { const d = rr(); row(d, "F4").status = "unvoted"; expectError("review-record", d, /status is unvoted, but votes were cast/); });
 test("authored severity must match the register", () => { const d = rr(); row(d, "F4").authored_severity = "🔴"; expectError("review-record", d, /differs from the register/); });

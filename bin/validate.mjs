@@ -293,7 +293,7 @@ class Semantics {
     }
     const { n, p: P, c: C, o: O } = r;
     if (![n, P, C, O].every(Number.isInteger)) return; // schema reports it
-    if (P + C + O > n) this.err(p, `P + C + O = ${P + C + O} exceeds N = ${n}`, "N counts the non-author voters; votes cannot outnumber them");
+    if (P + C + O !== n) this.err(p, `N = ${n}, but P + C + O = ${P + C + O}`, "N counts exactly the non-author voters on this finding: N = P + C + O (GATE-PRIMITIVE.md § Stage 4, settled case 1)");
     if (seated && n > seated.size - 1) this.err(p, `N = ${n} exceeds the seated non-author personas (${seated.size - 1})`, "S8: the author never votes on its own finding");
     const want = tally(r.authored_severity, n, P, C, O);
     if (want.status === "graded" && n < 2) this.err(p, `a tally must not run at N < 2 (N = ${n})`, "GATE-PRIMITIVE.md § Stage 4");
