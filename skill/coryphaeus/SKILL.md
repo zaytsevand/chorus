@@ -106,7 +106,7 @@ Install it beside this skill:
 
 ```sh
 git clone https://github.com/zaytsevand/problem-brief
-cd problem-brief && ./install.sh
+cd problem-brief && ./install.sh   # --dir <skills dir> for a per-project install
 ```
 
 The suite installer reports whether it is present. Only coryphaeus names

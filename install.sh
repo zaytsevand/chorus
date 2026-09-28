@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 # chorus suite installer.
 #
-# Copies every suite skill directory (skill/*/ — the four skills chorus-core,
-# chorus-review, chorus-sdlc, chorus-learn — including subfolders such as
-# chorus-learn/templates/) and the persona agents into your Claude Code config.
+# Copies every suite skill directory (skill/*/: chorus-core, chorus-review,
+# chorus-sdlc, chorus-learn and coryphaeus, subfolders included) and the persona
+# agents into your Claude Code config.
 #
 # Every file it writes is recorded, with the hash of what it wrote, in
 # $CLAUDE_HOME/.chorus-install-manifest. On a re-run each shipped file is:
@@ -164,15 +164,21 @@ echo "Installed: $counts_installed. Updated: $counts_updated. Current: $counts_c
 echo "Differs, kept: $counts_kept. Skipped (not ours): $counts_skipped."
 echo "Manifest:  $MANIFEST"
 echo
-echo "Required: coryphaeus, the record validator and renderer every round uses"
-echo "(Node 18 or later). Install it from its checkout: ./install.sh in the"
-echo "coryphaeus repository, with the same CLAUDE_HOME."
-if [[ -f "$SKILLS_DST/coryphaeus/bin/validate.mjs" ]]; then
-  echo "  found: $SKILLS_DST/coryphaeus"
+if command -v node >/dev/null 2>&1; then
+  echo "Node: $(node --version) (coryphaeus's validator and renderer need 18 or later)."
 else
-  echo "  not found under $SKILLS_DST: rounds will run unvalidated until it is installed."
+  echo "Node: not found. coryphaeus's validator and renderer need Node 18 or later;"
+  echo "  until it is installed, rounds run unvalidated and pages are written by hand."
 fi
-command -v node >/dev/null 2>&1 || echo "  node not found: the validator needs Node 18 or later."
+if [[ -f "$SKILLS_DST/problem-brief/SKILL.md" ]]; then
+  echo "problem-brief: found at $SKILLS_DST/problem-brief (coryphaeus binds to it)."
+else
+  echo "problem-brief: not found under $SKILLS_DST."
+  echo "  Optional: without it coryphaeus falls back to each port's default"
+  echo "  (questions in chat, answers kept in the record). To install it:"
+  echo "    git clone https://github.com/zaytsevand/problem-brief"
+  echo "    cd problem-brief && ./install.sh --dir \"$SKILLS_DST\""
+fi
 echo
 echo "Next:"
 echo "  1. Set up the project addendum: in Claude Code say 'chorus learn' (it can"

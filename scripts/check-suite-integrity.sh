@@ -12,6 +12,8 @@
 #        indexes every core file
 #   FC5  stale-content guards: stale token ranges (I1–I8, S1–S9), the retired
 #        🟠 severity, the wrong persona-memory path (.agents/agent-memory)
+#   FC6  port boundary: the chorus skills and personas never name problem-brief
+#        and never cite a coryphaeus file; only coryphaeus binds providers
 #
 # Runs on REPO SOURCE. Installed copies are not checked: a release is dogfooded
 # through the real install channel instead (CONTRIBUTING "Releasing").
@@ -235,7 +237,7 @@ fc4=0
 #     resolves. References are backticked `*.md` names/paths and markdown link
 #     targets. Which references are suite files, and where they resolve:
 #       skill/… or agents/…            repo root
-#       chorus-{core,review,sdlc,learn}/…  skill/
+#       chorus-{core,review,sdlc,learn}/…, coryphaeus/…  skill/
 #       ./…  ../…  templates/…         the citing file's directory
 #       bare UPPER-CASE.md name        the citing file's directory, then
 #                                      chorus-core (every skill composes core)
@@ -254,7 +256,7 @@ while IFS= read -r line; do
   ok=skip
   case "$ref" in
     skill/*|agents/*)                    [[ -f "$ref" ]] && ok=1 || ok=0 ;;
-    chorus-core/*|chorus-review/*|chorus-sdlc/*|chorus-learn/*)
+    chorus-core/*|chorus-review/*|chorus-sdlc/*|chorus-learn/*|coryphaeus/*)
                                          [[ -f "$SKILL_DIR/$ref" ]] && ok=1 || ok=0 ;;
     ./*|../*|templates/*)                [[ -f "$dir/$ref" ]] && ok=1 || ok=0 ;;
     */*) ;;                              # docs/…, specs/…, .specify/… — target project
@@ -323,10 +325,34 @@ if [[ $fc5 -eq 0 ]]; then note "PASS — no stale token range, no 🟠, no .agen
 [[ $fc5 -ne 0 ]] && fail=1
 
 # ---------------------------------------------------------------------------
+# FC6 — port boundary
+# ---------------------------------------------------------------------------
+section "FC6 — port boundary"
+fc6=0
+CHORUS_SIDE=("$SKILL_DIR"/chorus-* "$AGENTS_DIR")
+
+names="$(grep -rniE 'problem[- ]brief' "${CHORUS_SIDE[@]}" 2>/dev/null || true)"
+if [[ -n "$names" ]]; then
+  note "BOUNDARY VIOLATION: the chorus names problem-brief (only coryphaeus binds it):"
+  printf '%s\n' "$names" | sed 's/^/    /'
+  fc6=1
+fi
+
+leans="$(grep -rnE '(skill/)?coryphaeus/[A-Za-z0-9_./-]+' "${CHORUS_SIDE[@]}" 2>/dev/null || true)"
+if [[ -n "$leans" ]]; then
+  note "BOUNDARY VIOLATION: the chorus cites a coryphaeus file (refer to the bound port instead):"
+  printf '%s\n' "$leans" | sed 's/^/    /'
+  fc6=1
+fi
+
+if [[ $fc6 -eq 0 ]]; then note "PASS — the chorus names no provider and cites no coryphaeus file."; fi
+[[ $fc6 -ne 0 ]] && fail=1
+
+# ---------------------------------------------------------------------------
 section "RESULT"
 if [[ $fail -ne 0 ]]; then
   echo "FAIL — one or more fitness checks reported violations (see locators above)."
   exit 1
 fi
-echo "OK — FC1 to FC5 all pass."
+echo "OK — FC1 to FC6 all pass."
 exit 0

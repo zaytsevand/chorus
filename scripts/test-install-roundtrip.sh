@@ -26,13 +26,23 @@ mkdir -p "$HOME_DIR/skills/other-skill"
 echo "not ours" > "$HOME_DIR/skills/other-skill/SKILL.md"
 
 MANIFEST="$HOME_DIR/.chorus-install-manifest"
-"$REPO_DIR/install.sh" > /dev/null
+out="$("$REPO_DIR/install.sh")"
 [[ -f "$MANIFEST" ]] || fail "manifest not written"
+[[ -f "$HOME_DIR/skills/coryphaeus/bin/validate.mjs" ]] || fail "coryphaeus not installed with the suite"
+grep -qi "separate repository\|coryphaeus repository" <<<"$out" && fail "closing message still sends users to a separate coryphaeus repository"
+grep -q "^Node: " <<<"$out" || fail "closing message does not report Node"
+grep -q "^problem-brief: not found" <<<"$out" || fail "closing message does not report a missing problem-brief"
+grep -q "git clone https://github.com/zaytsevand/problem-brief" <<<"$out" || fail "closing message gives no problem-brief install command"
+
+# problem-brief present: reported as found, and never touched by the suite.
+mkdir -p "$HOME_DIR/skills/problem-brief"
+echo "someone else's skill" > "$HOME_DIR/skills/problem-brief/SKILL.md"
 
 # Re-run with nothing changed: every file of ours is current.
 out="$("$REPO_DIR/install.sh")"
 grep -q "^  updated\|^  installed\|^  differs" <<<"$out" && fail "unchanged re-run changed something"
 grep -q "^  current        agents/eric-evans-advisor.md" <<<"$out" || fail "unchanged file not reported current"
+grep -q "^problem-brief: found" <<<"$out" || fail "installed problem-brief not reported as found"
 
 # An older installed file (the manifest hash matches its old content) is updated
 # without --force; a file the user edited is kept.
@@ -89,5 +99,6 @@ done
 grep -qx "user customization" "$HOME_DIR/agents/kent-beck-persona.md" \
   || fail "uninstall removed an agent install had skipped"
 [[ -f "$HOME_DIR/skills/other-skill/SKILL.md" ]] || fail "uninstall removed an unrelated file"
+grep -qx "someone else's skill" "$HOME_DIR/skills/problem-brief/SKILL.md" || fail "uninstall touched problem-brief"
 
 echo "PASS — install -> re-run -> refresh -> uninstall round trip into a temp CLAUDE_HOME."

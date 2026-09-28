@@ -2,7 +2,7 @@
 # chorus suite uninstaller.
 #
 # Removes the files install.sh recorded in $CLAUDE_HOME/.chorus-install-manifest
-# (the four suite skills and the persona agents it wrote) when they are still
+# (the suite skills and the persona agents it wrote) when they are still
 # as installed, then the manifest itself. A recorded file you edited since (its
 # hash differs from the one recorded) is reported as "differs, kept" and left
 # alone, as is one recorded before hashes were. Files install.sh skipped because

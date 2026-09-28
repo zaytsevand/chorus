@@ -19,6 +19,23 @@ jobs:
       - name: check-suite-integrity
         run: bash scripts/check-suite-integrity.sh
 
+  coryphaeus:
+    name: coryphaeus tests and canon drift
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      # Includes test/canon-drift.test.mjs: the validator against the canon.
+      - name: node --test
+        run: node --test skill/coryphaeus/test/*.test.mjs
+      - name: Committed review records validate
+        run: |
+          for f in docs/reviews/*.json; do
+            node skill/coryphaeus/bin/validate.mjs review-record "$f"
+          done
+
   install-roundtrip:
     name: install -> verify -> uninstall -> verify
     runs-on: ubuntu-latest
