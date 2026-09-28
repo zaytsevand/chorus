@@ -105,7 +105,10 @@ adds per-gate RSVP, gating, incorporation, and bound. Each persona returns JSON 
 the kind its stage names — `rsvp`, `finding-report`, `vote-report` — checked by the
 bound record validator (`chorus-core/CONDUCTOR.md` § Ports) before it counts; a
 failing reply gets one automatic retry, then counts as ABSTAIN with the validator's
-reason in the ledger (`CONDUCTOR.md` § Ports: recover quietly).
+reason in the ledger (`CONDUCTOR.md` § Ports: recover quietly). A report a persona
+writes to `.claude/agent-memory/<persona>/` instead of returning it is read after the
+dispatch and validated the same way before it counts. A "version mismatch" is install
+drift, reported once, not a persona failure.
 
 **Operator-facing decisions** in this layer — seating, block-on-🔴, gate sign-off —
 are banded by the **decision primitive** (`chorus-core/DECISION-PRIMITIVE.md`: 🟢
@@ -292,7 +295,7 @@ It reuses the exploratory phase's write-back contract and invents **no new write
   endpoint").
 - **Secret pre-filter first (010 FR-007).** Every candidate fact passes the secret pre-filter
   (`chorus-core/CONDUCTOR.md` § Secret pre-filter) before any record write or proposal, on **both**
-  paths; drops are recorded in the ledger.
+  paths; the ledger records that it ran and what it dropped, or that it did not run.
 - **Scope routing, banded by `chorus-core/DECISION-PRIMITIVE.md`.**
   - **`lens-specific` facts → mechanically-decidable → 🟢 auto.** Each persona writes them to its own
     record (the exploratory-phase fact, written at sign-off).

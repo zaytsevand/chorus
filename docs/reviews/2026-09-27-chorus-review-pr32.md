@@ -9,6 +9,8 @@
 
 **Recovered without asking.** none
 
+**Secret filter.** not run (the round predates the recorded run; personas wrote understanding records without it).
+
 ## 1. TL;DR
 
 Five reviewers raised 34 findings and 9 derived ones on PR 32 and coryphaeus; the seams hold in direction, but the contract between the two repositories is unversioned, operator-facing failures are recorded without reaching the operator, and several rules have two authors. The top five: route unresolved conflicts and dropped seats to the operator (F34), make the secret filter prove it ran (F10), fix ruling references that cannot resolve (F18), version the schema contract (F4), and announce unbound ports before the round (F23). Three findings ended at 🔴 (F34, F10, F18); six findings had one voter each and are recorded as minority reports (F1, F8, F15, F19, F21, F27), which keep their authored severity without gating.

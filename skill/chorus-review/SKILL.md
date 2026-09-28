@@ -165,10 +165,13 @@ abstains, no separate security pass runs; the abstention is recorded.
   bindings and are never asked live. The operator is asked only when the round
   cannot reach a valid result alone: quorum (≥3) fails, re-evaluated after the
   Phase 1 evidence check (the round then aborts as in Phase 0.5), or a lost seat
-  leaves a 🔴 finding without enough voters to count it.
+  leaves a 🔴 finding without enough voters to count it. A "version mismatch"
+  is not a persona failure: it is reported once for the round (`CONDUCTOR.md`
+  § Ports).
 - **Memory recovery.** Some personas write their report to
   `.claude/agent-memory/<persona-name>/` and return a summary; after each
-  dispatch, `Read` any new files there — they are the report.
+  dispatch, `Read` any new files there — they are the report, and it goes
+  through the record validator before it counts, like any other reply.
 - **Output format.** Each persona returns JSON of the kind its phase names —
   `rsvp` (Phase 0.5), `finding-report` (Phase 1, and Round-2 derives),
   `vote-report` (Phase 2) — checked by the bound record validator
