@@ -1,0 +1,71 @@
+{
+  "kind": "vote-report",
+  "schema_version": "1",
+  "mode": "review",
+  "round": "2026-09-27",
+  "persona": "mark-richards-architect",
+  "lens": "architecture",
+  "tool_uses": 6,
+  "own_findings": ["F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8"],
+  "votes": [
+    { "finding": "F9", "confidence_on_hand": "high", "vote": "CONFIRM", "reason": "The report has two producers, and the unvalidated one sets the effective control.", "pull_quote": "The memory folder is a second report channel, and it skips the gate." },
+    { "finding": "F10", "confidence_on_hand": "high", "vote": "CONFIRM", "reason": "A self-reported integer that renders as zero when missing is not evidence." },
+    { "finding": "F11", "confidence_on_hand": "high", "vote": "CONFIRM", "reason": "Same unversioned, fail-open seam as my F4/F5, seen from the trust side.", "pull_quote": "An absent validator and an absent version pin fail the same quiet way." },
+    { "finding": "F12", "confidence_on_hand": "high", "vote": "CONFIRM", "reason": "Two delete guards with two strengths; low stakes at A1." },
+    { "finding": "F13", "confidence_on_hand": "high", "vote": "CONFIRM", "reason": "Correct distinction: validation checks shape, not trust." },
+    { "finding": "F14", "confidence_on_hand": "high", "vote": "CONFIRM", "reason": "Proportionate CI, rightly rated." },
+    { "finding": "F16", "confidence_on_hand": "high", "vote": "CONFIRM", "reason": "Semantic coupling at the seam: one token, two meanings, and the mapping rule crosses them." },
+    { "finding": "F17", "confidence_on_hand": "high", "vote": "CONFIRM", "reason": "held versus hold is the distinction the tally most needs." },
+    { "finding": "F18", "confidence_on_hand": "high", "vote": "CONFIRM", "reason": "ruling.schema.json pins ^R-[0-9]+$ while ruling_ref admits a prefix, so the contract key has two spellings." },
+    { "finding": "F19", "confidence_on_hand": "high", "vote": "CONFIRM", "reason": "Verified: coryphaeus tests never load the brief schema; see R2-2.", "pull_quote": "Conforming to the brief without a drift check is only a promise." },
+    { "finding": "F20", "confidence_on_hand": "high", "vote": "CONFIRM", "reason": "Inbound translation is missing its lifecycle cases." },
+    { "finding": "F21", "confidence_on_hand": "high", "vote": "PRIORITIZE", "reason": "No stated winner between canon and validator is the root of F1's drift risk; that is 🟡, not 🟢.", "pull_quote": "Two authors of one rule need a tiebreak written down." },
+    { "finding": "F22", "confidence_on_hand": "high", "vote": "CONFIRM", "reason": "Duplicate failure policy confirmed; see my F3." },
+    { "finding": "F23", "confidence_on_hand": "high", "vote": "CONFIRM", "reason": "A promise with no field in the review-record schema cannot be kept." },
+    { "finding": "F24", "confidence_on_hand": "high", "vote": "CONFIRM", "reason": "The dogfood release gate (R-7) cannot see stale agents, so the fitness function has a blind spot." },
+    { "finding": "F25", "confidence_on_hand": "high", "vote": "CONFIRM", "reason": "Real, and small at A1." },
+    { "finding": "F26", "confidence_on_hand": "high", "vote": "CONFIRM", "reason": "Consistent with my F5." },
+    { "finding": "F28", "confidence_on_hand": "high", "vote": "CONFIRM", "reason": "A bindings block is the right remedy and pairs with R2-1." },
+    { "finding": "F29", "confidence_on_hand": "high", "vote": "CONFIRM", "reason": "Same duplicate policy; the zero-tool re-dispatch is the precedent to reuse." },
+    { "finding": "F30", "confidence_on_hand": "high", "vote": "CONFIRM", "reason": "Fallback visibility is free text, so nothing can check it." },
+    { "finding": "F31", "confidence_on_hand": "high", "vote": "CONFIRM", "reason": "Converges with my F2 and adds the renderer row.", "pull_quote": "One port table, two stories, the defaults already disagree." },
+    { "finding": "F32", "confidence_on_hand": "high", "vote": "CONFIRM", "reason": "Arithmetic that can't be audited from the page." },
+    { "finding": "F33", "confidence_on_hand": "high", "vote": "CONFIRM", "reason": "Wrong exit code misdirects the fixer; minor." },
+    { "finding": "F34", "confidence_on_hand": "high", "vote": "CONFIRM", "reason": "Routing unresolved conflicts through the decision sink uses a port that already exists." }
+  ],
+  "derived": [
+    {
+      "id": "R2-1",
+      "lens": "architecture",
+      "locator": "skill/chorus-core/CONDUCTOR.md:268",
+      "claim": "Given F23, F30 and F11: the reason no record can say which ports were bound is that the chorus never defines how a binding is discovered. 'A composition root may bind each port' is the whole mechanism. Today a binding exists only if the model happens to load coryphaeus through its description trigger, so bound or default can vary per session. Recommendation: the chorus owns a small bindings contract (port to provider command) that the root writes and Phase 0 reads, keeping the dependency inverted.",
+      "evidence": [
+        { "kind": "file_line", "ref": "skill/chorus-core/CONDUCTOR.md:268", "note": "The only statement of the binding mechanism." },
+        { "kind": "file_line", "ref": "coryphaeus/SKILL.md:1-10", "note": "Binding reaches the session only through the skill description." }
+      ],
+      "proposed_severity": "🟡",
+      "pull_quote": "Nothing says how a port gets bound, so nothing can report it.",
+      "confidence_on_hand": "high",
+      "need_info": false,
+      "derived_from": "F23",
+      "graded": false
+    },
+    {
+      "id": "R2-2",
+      "lens": "architecture",
+      "locator": "coryphaeus/schema/ruling.schema.json:5",
+      "claim": "Given F19: the ruling shape has two authors, problem-brief's schema (line 791) and coryphaeus ruling.schema.json. Their required fields match today, and no test compares them. Ruling: SANCTIONED DIVERGENCE, since the root may depend on its members (R-1) but should not force the brief onto the chorus's release cadence. Owners: problem-brief upstream, coryphaeus conformist. The price is a coryphaeus parity test that loads the installed brief schema's ruling def and fails on a difference in fields or id pattern.",
+      "evidence": [
+        { "kind": "file_line", "ref": "coryphaeus/schema/ruling.schema.json:5-11" },
+        { "kind": "file_line", "ref": "~/.claude/skills/problem-brief/schema/problem-brief.schema.json:791-800" },
+        { "kind": "file_line", "ref": "coryphaeus/test/validate.test.mjs:120", "note": "The only ruling test, and it never loads the brief schema." }
+      ],
+      "proposed_severity": "🟡",
+      "pull_quote": "The ruling shape is copied field for field, and nothing notices when the original moves.",
+      "confidence_on_hand": "high",
+      "need_info": false,
+      "derived_from": "F19",
+      "graded": false
+    }
+  ]
+}

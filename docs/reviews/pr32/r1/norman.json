@@ -1,0 +1,103 @@
+{
+  "kind": "finding-report",
+  "schema_version": "1",
+  "mode": "review",
+  "round": "2026-09-27",
+  "persona": "don-norman-advisor",
+  "lens": "human-centered design",
+  "tool_uses": 12,
+  "gate_questions": [
+    { "need": "what the user came to do", "question": "When a persona reply is rejected mid-round, do you want to see it as it happens, and should the persona get one corrected retry?", "assumption": "A4: told live, one retry" }
+  ],
+  "findings": [
+    {
+      "id": "F1",
+      "lens": "human-centered design",
+      "locator": "skill/chorus-review/SKILL.md:159-172",
+      "claim": "A rejected reply reaches no one while it can still be fixed. The review skill turns it straight into ABSTAIN with the reason written to the roster; coryphaeus says it goes back to the persona once. The persona never learns what was wrong (gulf of execution), and the operator learns only by reading the finished roster (gulf of evaluation). The procedure already knows the better pattern: a zero-tool-use report gets one re-dispatch with an instruction.",
+      "evidence": [
+        { "kind": "file_line", "ref": "skill/chorus-review/SKILL.md:159-172", "note": "failure rule: ABSTAIN, reason recorded, no retry" },
+        { "kind": "file_line", "ref": "coryphaeus/SKILL.md:42-44", "note": "invalid reply goes back to the persona once" },
+        { "kind": "file_line", "ref": "skill/chorus-review/SKILL.md:292-297", "note": "zero-tool-use gets one re-dispatch with a hint" }
+      ],
+      "proposed_severity": "🟡",
+      "pull_quote": "A broken reply is filed away while it could still be fixed, and the two texts disagree about whether it gets a second chance.",
+      "confidence_on_hand": "high",
+      "need_info": false,
+      "conditional_on": "A4: told live, one retry"
+    },
+    {
+      "id": "F2",
+      "lens": "human-centered design",
+      "locator": "coryphaeus/SKILL.md:63-64",
+      "claim": "Coryphaeus says a port that falls back to its default is never silent, but the record has no place for this. It could only go into optional free-text side_notes, which the validator cannot check. On the rendered page, the only clue is a Local rulings heading. An operator cannot see which bindings ran, so a round that fell back looks the same as one that did not.",
+      "evidence": [
+        { "kind": "file_line", "ref": "coryphaeus/SKILL.md:63-64", "note": "the claim" },
+        { "kind": "file_line", "ref": "coryphaeus/bin/render.mjs:120-123", "note": "side_notes optional; local_rulings heading is the only port signal" },
+        { "kind": "principle", "ref": "feedback: a state change the user cannot perceive cannot close the action-perception loop" }
+      ],
+      "proposed_severity": "🟡",
+      "pull_quote": "The promise not to fall back silently rests on a free-text note that nothing checks.",
+      "confidence_on_hand": "high",
+      "need_info": false
+    },
+    {
+      "id": "F3",
+      "lens": "human-centered design",
+      "locator": "skill/chorus-core/CONDUCTOR.md:270-278",
+      "claim": "The two port tables give different defaults. CONDUCTOR says an unbound validator means none (the record says unvalidated), while coryphaeus names bin/validate.mjs. The same happens for memory recall (none versus agent-memory) and the renderer (hand-written unrendered page versus render.mjs). Whichever file the operator reads, that is the model they form of what runs when nothing is bound.",
+      "evidence": [
+        { "kind": "file_line", "ref": "skill/chorus-core/CONDUCTOR.md:270-278" },
+        { "kind": "file_line", "ref": "coryphaeus/SKILL.md:53-61" }
+      ],
+      "proposed_severity": "🟡",
+      "pull_quote": "Two tables tell the operator two different stories about what runs when nothing is bound.",
+      "confidence_on_hand": "high",
+      "need_info": false
+    },
+    {
+      "id": "F4",
+      "lens": "human-centered design",
+      "locator": "coryphaeus/bin/render.mjs:66-70",
+      "claim": "Held findings, ungraded findings and the Held section do show on the page. The tally, though, cannot be checked from it. Rows carry n, threshold and movement, but the matrix leaves them out, so settled cases 1 (N = P + C + O) and 2 (CONFIRM with |net| < T) can be read only in the JSON. Case 4 says an ungraded 🔴 is surfaced to the operator, but the page has no place that does this beyond an [ungraded] tag.",
+      "evidence": [
+        { "kind": "file_line", "ref": "coryphaeus/bin/render.mjs:66-70", "note": "matrix columns omit N, T, movement" },
+        { "kind": "file_line", "ref": "coryphaeus/schema/common.schema.json:233-246", "note": "n, threshold, movement required on graded rows" },
+        { "kind": "file_line", "ref": "skill/chorus-core/GATE-PRIMITIVE.md:237-245", "note": "six settled cases" }
+      ],
+      "proposed_severity": "🟡",
+      "pull_quote": "The page shows the verdict but hides the numbers that would let a reader check it.",
+      "confidence_on_hand": "high",
+      "need_info": false
+    },
+    {
+      "id": "F5",
+      "lens": "human-centered design",
+      "locator": "coryphaeus/bin/validate.mjs:536-540",
+      "claim": "Field errors are written for the fixer: path, message, and a hint taken from the schema. Missing-field and cross-field errors carry no hint; for example, an empty applies does not say that it is allowed only with ABSTAIN. Unparseable JSON exits 2 and prints usage text, so the caller is told it called the tool wrong when the real fault is its JSON.",
+      "evidence": [
+        { "kind": "file_line", "ref": "coryphaeus/bin/validate.mjs:536-540", "note": "parse failure prints usage, exit 2" },
+        { "kind": "file_line", "ref": "coryphaeus/bin/validate.mjs:10", "note": "exit 2 = usage or unreadable input, one code for two causes" }
+      ],
+      "proposed_severity": "🟢",
+      "pull_quote": "Broken JSON is answered with a usage message, which points the fixer the wrong way.",
+      "confidence_on_hand": "high",
+      "need_info": false
+    },
+    {
+      "id": "F6",
+      "lens": "human-centered design",
+      "locator": "skill/chorus-review/SKILL.md:383-387",
+      "claim": "When advisor() is unavailable, a conflict is recorded as unresolved for the operator, but nothing turns it into a question. The conflict's decision_ref is optional, and no rule sends the conflict through the decision sink. The failure rule and a quorum abort work the same way: they record what happened without giving the operator a next step. Recommendation: send every unresolved conflict and every failure-rule ABSTAIN through the decision sink as a card with a default. The operator then gets a question with a recovery path, not just a log line.",
+      "evidence": [
+        { "kind": "file_line", "ref": "skill/chorus-review/SKILL.md:383-387" },
+        { "kind": "file_line", "ref": "skill/chorus-core/CONDUCTOR.md:276", "note": "arbiter default: record unresolved" },
+        { "kind": "file_line", "ref": "coryphaeus/schema/review-record.schema.json:38-52", "note": "decision_ref optional on conflicts" }
+      ],
+      "proposed_severity": "🟡",
+      "pull_quote": "Unresolved for the operator is only a record, not a question the operator is asked.",
+      "confidence_on_hand": "high",
+      "need_info": false
+    }
+  ]
+}

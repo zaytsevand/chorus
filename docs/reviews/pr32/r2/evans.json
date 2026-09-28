@@ -1,0 +1,43 @@
+{
+  "kind": "vote-report",
+  "schema_version": "1",
+  "mode": "review",
+  "round": "2026-09-27",
+  "persona": "eric-evans-advisor",
+  "lens": "DDD",
+  "tool_uses": 5,
+  "own_findings": ["F16", "F17", "F18", "F19", "F20", "F21"],
+  "votes": [
+    { "finding": "F1", "confidence_on_hand": "high", "vote": "OVER-RATE", "reason": "Drift between the prose and tally() surfaces loudly as rejected records (coryphaeus/bin/validate.mjs:300 errors on any mismatch). It is not silent, so 🟡 fits better than a gate." },
+    { "finding": "F2", "confidence_on_hand": "high", "vote": "CONFIRM", "reason": "The two tables diverge. My derive R2-1 argues they answer two different questions under one word.", "evidence": [{ "kind": "file_line", "ref": "coryphaeus/SKILL.md:53" }], "pull_quote": "The port table exists twice and means two things by 'unbound'." },
+    { "finding": "F3", "confidence_on_hand": "high", "vote": "CONFIRM", "reason": "Reply policy is chorus language; a binding should not restate it." },
+    { "finding": "F4", "confidence_on_hand": "high", "vote": "CONFIRM", "reason": "An unversioned Published Language across two repos turns a contract change into apparent silence." },
+    { "finding": "F6", "confidence_on_hand": "high", "vote": "CONFIRM", "reason": "The direction matches R-1; the rating is right." },
+    { "finding": "F7", "confidence_on_hand": "high", "vote": "CONFIRM", "reason": "Stale product language in the manifest is cosmetic but real." },
+    { "finding": "F9", "confidence_on_hand": "high", "vote": "CONFIRM", "reason": "One report kind with two producers, only one of them validated, is a split authority." },
+    { "finding": "F22", "confidence_on_hand": "high", "vote": "CONFIRM", "reason": "Same seam as F3, seen from the operator's side." },
+    { "finding": "F23", "confidence_on_hand": "high", "vote": "CONFIRM", "reason": "The record model has no concept of a binding, so the fallback it promises to name cannot be written.", "pull_quote": "A fallback is an event the round lives through, and the record has no word for it." },
+    { "finding": "F30", "confidence_on_hand": "high", "vote": "CONFIRM", "reason": "Converges with F23; side_notes is free text (coryphaeus/schema/review-record.schema.json:122).", "pull_quote": "Free text is where a model puts the things it has not named yet." },
+    { "finding": "F31", "confidence_on_hand": "high", "vote": "CONFIRM", "reason": "Same locator as F2; the operator forms two models from it." },
+    { "finding": "F32", "confidence_on_hand": "high", "vote": "CONFIRM", "reason": "Hiding N and T on the page hides the Core's arithmetic from the reader it serves." },
+    { "finding": "F34", "confidence_on_hand": "high", "vote": "CONFIRM", "reason": "An unresolved conflict never becomes a decision, which is the inbound gap of my F20 viewed from the other end.", "pull_quote": "Unresolved should be a decision the sink carries, not a line in the record." }
+  ],
+  "derived": [
+    {
+      "id": "R2-1",
+      "lens": "DDD",
+      "locator": "coryphaeus/SKILL.md:53",
+      "claim": "F2 and F31 read the two port tables as disagreeing. They are really answering different questions under one word. CONDUCTOR's 'unbound' means no composition root at all. coryphaeus's 'Default (nothing bound)' means the root is present but no provider, such as the brief, is bound: validate.mjs and local_rulings exist only because coryphaeus is there. So the round has three states: no root, root only, and root plus provider. The language names two of them, and the record names none. Name the three binding levels once, in CONDUCTOR, and let coryphaeus's column cite the middle one.",
+      "evidence": [
+        { "kind": "file_line", "ref": "skill/chorus-core/CONDUCTOR.md:270-278", "note": "'Default when unbound' means no root at all." },
+        { "kind": "file_line", "ref": "coryphaeus/SKILL.md:53", "note": "'Default (nothing bound)' beside a separate Binding column means root present, provider absent." }
+      ],
+      "proposed_severity": "🟡",
+      "pull_quote": "'Unbound' covers two states, and the round actually has three.",
+      "confidence_on_hand": "high",
+      "need_info": false,
+      "derived_from": "F2",
+      "graded": false
+    }
+  ]
+}

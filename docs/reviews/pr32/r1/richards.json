@@ -1,0 +1,134 @@
+{
+  "kind": "finding-report",
+  "schema_version": "1",
+  "mode": "review",
+  "round": "2026-09-27",
+  "persona": "mark-richards-architect",
+  "lens": "architecture",
+  "tool_uses": 19,
+  "gate_questions": [
+    { "need": "ranked architectural characteristics", "question": "Which qualities rank highest for the suite (suite-review/Q-20)?", "assumption": "A2: conformance, evolvability, simplicity, portability" },
+    { "need": "the grading bar", "question": "Single-operator tool now, or a plugin others install (suite-review/Q-19)?", "assumption": "A1: operator alone, outside installers a future group" }
+  ],
+  "findings": [
+    {
+      "id": "F1",
+      "lens": "architecture",
+      "locator": "skill/chorus-core/GATE-PRIMITIVE.md:207-240",
+      "claim": "The Stage-4 rule has two authors in two repos: GATE-PRIMITIVE prose and coryphaeus tally(). Q-14 aligned them once, but nothing fails when they drift again, because the tests hand-copy cases. Ruling: SANCTIONED DIVERGENCE, since the repo boundary is deliberate. GATE-PRIMITIVE owns the rule and tally() implements it. The price is a parity test: a machine-readable case table in GATE-PRIMITIVE that a coryphaeus test loads from the installed chorus-core, failing on any mismatch.",
+      "evidence": [
+        { "kind": "file_line", "ref": "skill/chorus-core/GATE-PRIMITIVE.md:207-240", "note": "The rule and six settled cases, in prose." },
+        { "kind": "file_line", "ref": "coryphaeus/bin/validate.mjs:172-183", "note": "tally() re-authors the same arithmetic." },
+        { "kind": "file_line", "ref": "coryphaeus/test/validate.test.mjs:39-43", "note": "Cases copied by hand; GATE-PRIMITIVE is never read." },
+        { "kind": "file_line", "ref": ".specify/memory/constitution.md:87", "note": "A tally rule appearing outside its canon doc is named as the smell." }
+      ],
+      "proposed_severity": "🔴",
+      "pull_quote": "Two authors of the vote rule, and no alarm when they disagree.",
+      "confidence_on_hand": "high",
+      "need_info": false,
+      "conditional_on": "A2: conformance ranks first"
+    },
+    {
+      "id": "F2",
+      "lens": "architecture",
+      "locator": "skill/chorus-core/CONDUCTOR.md:270-278",
+      "claim": "Both repos restate the port table, and their defaults already disagree. For the validator, CONDUCTOR's unbound default is 'none, record says unvalidated' while coryphaeus lists validate.mjs. For memory recall and ruling lookup, CONDUCTOR has 'none' while coryphaeus lists agent-memory and local_rulings. Ruling: CONSOLIDATE. CONDUCTOR owns each port's contract and default, and coryphaeus keeps only a Binding column that cites the port by name.",
+      "evidence": [
+        { "kind": "file_line", "ref": "skill/chorus-core/CONDUCTOR.md:274" },
+        { "kind": "file_line", "ref": "skill/chorus-core/CONDUCTOR.md:278" },
+        { "kind": "file_line", "ref": "coryphaeus/SKILL.md:53-61", "note": "Its column is labelled Default (nothing bound) but it lists the bindings." }
+      ],
+      "proposed_severity": "🟡",
+      "pull_quote": "The port contract is written twice and already reads two ways.",
+      "confidence_on_hand": "high",
+      "need_info": false
+    },
+    {
+      "id": "F3",
+      "lens": "architecture",
+      "locator": "skill/chorus-review/SKILL.md:159-172",
+      "claim": "Two texts decide what happens to a reply that fails validation. The chorus says ABSTAIN with no retry, and coryphaeus says send it back once. That policy belongs to the chorus, and the binding should not re-decide it. Ruling: CONSOLIDATE into the record-validator row of CONDUCTOR, carrying whatever A4 settles, and delete the policy sentence from coryphaeus.",
+      "evidence": [
+        { "kind": "file_line", "ref": "skill/chorus-review/SKILL.md:159-172" },
+        { "kind": "file_line", "ref": "coryphaeus/SKILL.md:42-44" }
+      ],
+      "proposed_severity": "🟡",
+      "pull_quote": "The provider is re-deciding a rule the chorus owns.",
+      "confidence_on_hand": "high",
+      "need_info": false,
+      "conditional_on": "A4: one retry, then fail loudly"
+    },
+    {
+      "id": "F4",
+      "lens": "architecture",
+      "locator": "coryphaeus/schema/finding-report.schema.json",
+      "claim": "The cross-repo contract has no version. Every schema pins schema_version const '1', but the chorus canon names no expected version, and coryphaeus has no version, tag or remote. On a breaking schema change every reply fails, counts as ABSTAIN, and the round aborts on quorum. That is loud by accident, and the root cause sits buried in roster reasons. The port contract should state the schema major it expects, and the validator should report a mismatch as its own error.",
+      "evidence": [
+        { "kind": "file_line", "ref": "coryphaeus/schema/finding-report.schema.json:11", "note": "schema_version const '1'." },
+        { "kind": "file_line", "ref": "skill/chorus-core/CONDUCTOR.md:274", "note": "'the bound schema', with no version." },
+        { "kind": "file_line", "ref": "coryphaeus/install.sh:1-26", "note": "Plain copy, nothing versioned." }
+      ],
+      "proposed_severity": "🟡",
+      "pull_quote": "A schema bump would read as ten abstentions, not as a version mismatch.",
+      "confidence_on_hand": "high",
+      "need_info": false,
+      "conditional_on": "A1 and A4"
+    },
+    {
+      "id": "F5",
+      "lens": "architecture",
+      "locator": ".github/workflows/integrity.yml:1-25",
+      "claim": "No automation ever runs the program that carries conformance, quality number one. Chorus CI runs only bash checks and an install round trip, which is correct under constitution 2.0.0. But coryphaeus has no CI and no remote, so its 63 tests run only when someone remembers to. The chorus install also never checks whether coryphaeus is present, so a round falls back to 'unvalidated' without anyone noticing.",
+      "evidence": [
+        { "kind": "file_line", "ref": ".github/workflows/integrity.yml:1-25" },
+        { "kind": "file_line", "ref": ".specify/memory/constitution.md:306-310" },
+        { "kind": "file_line", "ref": "install.sh:1", "note": "No mention of coryphaeus or node." }
+      ],
+      "proposed_severity": "🟡",
+      "pull_quote": "The rule-checking program itself goes unchecked.",
+      "confidence_on_hand": "high",
+      "need_info": false,
+      "conditional_on": "A2: conformance ranks first"
+    },
+    {
+      "id": "F6",
+      "lens": "architecture",
+      "locator": ".specify/memory/constitution.md:321-324",
+      "claim": "The dependency points the right way. Nothing under skill/, agents/, install.sh or plugin.json names coryphaeus or the brief, so R-1 and R-10 hold at runtime. But convention is the only thing enforcing it. A greppable FC in check-suite-integrity, which the constitution allows, would turn a future slip into a red build.",
+      "evidence": [
+        { "kind": "file_line", "ref": ".specify/memory/constitution.md:321-324" },
+        { "kind": "file_line", "ref": "scripts/check-suite-integrity.sh:6-13", "note": "FC1-FC5 do not cover it." }
+      ],
+      "proposed_severity": "🟢",
+      "pull_quote": "The direction is right today, and nothing keeps it right tomorrow.",
+      "confidence_on_hand": "high",
+      "need_info": false
+    },
+    {
+      "id": "F7",
+      "lens": "architecture",
+      "locator": ".claude-plugin/plugin.json:4-8",
+      "claim": "The manifest still promises 'a durable markdown artifact' and points at the chorus-review repository. Both predate the JSON records and the Q-9 rename.",
+      "evidence": [{ "kind": "file_line", "ref": ".claude-plugin/plugin.json:4-8" }],
+      "proposed_severity": "🟢",
+      "pull_quote": "The manifest describes the previous version of the suite.",
+      "confidence_on_hand": "high",
+      "need_info": false
+    },
+    {
+      "id": "F8",
+      "lens": "architecture",
+      "locator": "skill/chorus-core/CONDUCTOR.md:266-282",
+      "claim": "Cost profile against A2. Conformance is bought properly, with code (R-3). Simplicity and portability pay: a Node runtime, two repos, two install channels. Evolvability pays through contract coupling: a tally change now means a lockstep edit across two repos with no tooling to make lockstep safe. Recommendation: accept the profile, but only with F1's parity test and F4's version check in the same change. Without them the conformance gain decays into drift.",
+      "evidence": [
+        { "kind": "file_line", "ref": "skill/chorus-core/CONDUCTOR.md:266-282" },
+        { "kind": "file_line", "ref": "coryphaeus/SKILL.md:29-37" }
+      ],
+      "proposed_severity": "🟡",
+      "pull_quote": "The right trade, as long as the drift alarms ship with it.",
+      "confidence_on_hand": "high",
+      "need_info": false,
+      "conditional_on": "A2 ranking"
+    }
+  ]
+}

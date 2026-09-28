@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "vote-report.schema.json",
+  "title": "Vote report",
+  "description": "One persona's Round-2 / Stage-3 output: declared votes on findings it did not author, plus derived findings (chorus-review Phase 2; GATE-PRIMITIVE.md Stage 3). In review mode the prose is at most 600 words.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["kind", "schema_version", "mode", "round", "persona", "lens", "own_findings", "votes", "derived"],
+  "properties": {
+    "kind": { "const": "vote-report", "description": "Record kind." },
+    "schema_version": { "$ref": "common.schema.json#/$defs/schema_version", "description": "Schema version; the major must be 1." },
+    "mode": { "type": "string", "enum": ["review", "sdlc", "challenge"], "description": "review: chorus-review Round 2 (600-word limit). sdlc / challenge: a gate's vote stage." },
+    "round": { "type": "string", "minLength": 1, "description": "The round date or gate/cycle." },
+    "persona": { "$ref": "common.schema.json#/$defs/persona", "description": "The voting persona." },
+    "lens": { "$ref": "common.schema.json#/$defs/lens", "description": "Its lens." },
+    "tool_uses": { "type": "integer", "minimum": 0, "description": "Tool calls made this round; the evidence check runs again on Round-2 output." },
+    "own_findings": { "type": "array", "items": { "$ref": "common.schema.json#/$defs/finding_id" }, "description": "The persona's own finding ids, which it must not vote on (S8)." },
+    "votes": {
+      "type": "array",
+      "description": "One declared vote per finding the persona has a view on. Abstention is simply no vote.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["finding", "confidence_on_hand", "vote", "reason"],
+        "properties": {
+          "finding": { "$ref": "common.schema.json#/$defs/finding_id", "description": "The finding voted on." },
+          "confidence_on_hand": { "$ref": "common.schema.json#/$defs/confidence", "description": "Declared first. low → vote must be NEED_INFO." },
+          "vote": { "type": "string", "enum": ["PRIORITIZE", "CONFIRM", "OVER-RATE", "NEED_INFO"], "description": "PRIORITIZE: under-rated, escalate. CONFIRM: correctly rated. OVER-RATE: over-rated, wrong, out of scope or too vague. NEED_INFO: information gap." },
+          "reason": { "type": "string", "minLength": 5, "description": "One-line reason; for OVER-RATE a file:line or one-line reason; for NEED_INFO what is missing." },
+          "evidence": { "type": "array", "items": { "$ref": "common.schema.json#/$defs/evidence" }, "description": "Citations for project-specific claims ('I read X.py:NN and confirm')." },
+          "pull_quote": { "$ref": "common.schema.json#/$defs/pull_quote", "description": "Convergence note, marked PULL-QUOTE, relayed verbatim under the entry." }
+        },
+        "allOf": [
+          { "if": { "properties": { "confidence_on_hand": { "const": "low" } }, "required": ["confidence_on_hand"] },
+            "then": { "properties": { "vote": { "const": "NEED_INFO" } } } }
+        ]
+      }
+    },
+    "derived": {
+      "type": "array",
+      "description": "Findings derived in the persona's own territory from what other lenses reported. Ids R2-n, graded: false.",
+      "items": {
+        "allOf": [
+          { "$ref": "common.schema.json#/$defs/finding" },
+          { "required": ["derived_from", "graded"], "properties": { "id": { "pattern": "^R2-[0-9]+$" }, "graded": { "const": false } } }
+        ]
+      }
+    }
+  }
+}

@@ -1,5 +1,7 @@
 # Parity — chorus-sdlc lifecycle gate (T018, FR-015 tier 2)
 
+> **Historical evidence of the 014 suite split** — a record of one run on branch `014-chorus-suite-decomposition` (pre-move HEAD `1081b97`, split commit `715e1c5`, squashed into `176311a` on main); paths describe that tree, and the current checks are `scripts/check-suite-integrity.sh`.
+
 **Tier 2: content-changed** (`SDLC-LAYER.md` promoted to `chorus-sdlc/SKILL.md`:
 frontmatter added, line-3 "companion to INTEGRATION-LAYER.md" rewritten to point
 at chorus-core, all primitive cross-refs re-pointed to `chorus-core/*`,

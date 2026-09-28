@@ -1,0 +1,67 @@
+{
+  "kind": "vote-report",
+  "schema_version": "1",
+  "mode": "review",
+  "round": "2026-09-27",
+  "persona": "alan-cooper-advisor",
+  "lens": "adversarial product",
+  "tool_uses": 4,
+  "own_findings": ["F22", "F23", "F24", "F25", "F26", "F27", "F28"],
+  "votes": [
+    { "finding": "F2", "confidence_on_hand": "high", "vote": "CONFIRM", "reason": "The two tables give two defaults, so the operator's picture depends on which file they read.", "pull_quote": "One contract, one table." },
+    { "finding": "F3", "confidence_on_hand": "high", "vote": "CONFIRM", "reason": "Same seam as my F22. The chorus owns the retry policy.", "pull_quote": "Decide the retry once, in the chorus." },
+    { "finding": "F4", "confidence_on_hand": "high", "vote": "PRIORITIZE", "reason": "The operator sees ten personas fail and is pointed at the personas, not the version. The quorum abort then advises waiting, which fixes nothing (SKILL.md:220-223).", "evidence": [{ "kind": "file_line", "ref": "skill/chorus-review/SKILL.md:220-223" }], "pull_quote": "A version mismatch is blamed on the personas, and the advice is to wait." },
+    { "finding": "F5", "confidence_on_hand": "high", "vote": "CONFIRM", "reason": "Nothing checks the program that carries conformance." },
+    { "finding": "F7", "confidence_on_hand": "high", "vote": "PRIORITIZE", "reason": "The stale promise is also in install.sh:120-121 and README.md:19,39,358-362. The user is told to commit a markdown file while the baseline is now the JSON (see R2-1).", "evidence": [{ "kind": "file_line", "ref": "install.sh:120-121" }, { "kind": "file_line", "ref": "README.md:358-362" }], "pull_quote": "Every surface the user reads first still describes the old artifact." },
+    { "finding": "F9", "confidence_on_hand": "high", "vote": "CONFIRM", "reason": "Two producers for one report. The weaker one wins." },
+    { "finding": "F10", "confidence_on_hand": "high", "vote": "CONFIRM", "reason": "Printing a missing value as 0 tells the reader something false." },
+    { "finding": "F11", "confidence_on_hand": "high", "vote": "CONFIRM", "reason": "It converges with my F23: failing open and not being told are the same problem.", "pull_quote": "An unvalidated round has to announce itself." },
+    { "finding": "F12", "confidence_on_hand": "high", "vote": "CONFIRM", "reason": "Rated correctly: no boundary crossed today." },
+    { "finding": "F13", "confidence_on_hand": "high", "vote": "CONFIRM", "reason": "Proportionate for one operator." },
+    { "finding": "F14", "confidence_on_hand": "high", "vote": "CONFIRM", "reason": "Correct and proportionate." },
+    { "finding": "F15", "confidence_on_hand": "high", "vote": "CONFIRM", "reason": "The same shape as my F27: the net fires, and the lens that should answer it may not be seated.", "pull_quote": "Removing the mandates left the side-note carrying more than it can." },
+    { "finding": "F16", "confidence_on_hand": "high", "vote": "CONFIRM", "reason": "An operator reading 'escalated' in the brief will act on the opposite meaning." },
+    { "finding": "F20", "confidence_on_hand": "high", "vote": "CONFIRM", "reason": "Citing a dead ruling misleads the operator." },
+    { "finding": "F29", "confidence_on_hand": "high", "vote": "CONFIRM", "reason": "It converges with my F22 from the mechanism side.", "pull_quote": "The reply is filed away while it could still be fixed." },
+    { "finding": "F30", "confidence_on_hand": "high", "vote": "CONFIRM", "reason": "It converges with my F23 and F28.", "pull_quote": "A fallback the page cannot show is a silent fallback." },
+    { "finding": "F31", "confidence_on_hand": "high", "vote": "CONFIRM", "reason": "The same seam as F2, seen from the operator's side." },
+    { "finding": "F32", "confidence_on_hand": "high", "vote": "CONFIRM", "reason": "A verdict the reader cannot check is only an assertion." },
+    { "finding": "F33", "confidence_on_hand": "high", "vote": "CONFIRM", "reason": "A misleading exit message is a minor problem." },
+    { "finding": "F34", "confidence_on_hand": "high", "vote": "PRIORITIZE", "reason": "This is the fix for my F22 and for the quorum abort. Every dead end becomes a decision card with a default.", "pull_quote": "A log line is not a next step, and a card with a default is." }
+  ],
+  "derived": [
+    {
+      "id": "R2-1",
+      "lens": "adversarial product",
+      "locator": "install.sh:120-121",
+      "claim": "Given F7, the installer's closing promise and the README still say the round produces a markdown file you commit. The skill now makes the JSON the record and the baseline, and asks you to commit both. A user who follows the first surface they read commits only the page, and the next round has no baseline to read.",
+      "evidence": [
+        { "kind": "file_line", "ref": "install.sh:120-121" },
+        { "kind": "file_line", "ref": "README.md:39" },
+        { "kind": "file_line", "ref": "skill/chorus-review/SKILL.md:417-420" }
+      ],
+      "proposed_severity": "🟡",
+      "pull_quote": "The installer tells the user to commit the file the next round does not read.",
+      "confidence_on_hand": "high",
+      "need_info": false,
+      "derived_from": "F7",
+      "graded": false
+    },
+    {
+      "id": "R2-2",
+      "lens": "adversarial product",
+      "locator": "skill/chorus-review/SKILL.md:220-223",
+      "claim": "Given F4 and F11, a schema or Node failure makes every reply fail. Quorum then aborts into a hand-written chorus-abstained.md that has no schema kind, and the only advice is 'revisit at next cadence'. The next cadence fails the same way. The abort should name the cause when every failure shares one reason, and hand the operator the fix.",
+      "evidence": [
+        { "kind": "file_line", "ref": "skill/chorus-review/SKILL.md:220-223" },
+        { "kind": "file_line", "ref": "coryphaeus/SKILL.md:39-40", "note": "The kinds list has no abstained record." }
+      ],
+      "proposed_severity": "🟡",
+      "pull_quote": "The abort's advice is to wait, and waiting does not fix a broken validator.",
+      "confidence_on_hand": "high",
+      "need_info": false,
+      "derived_from": "F4",
+      "graded": false
+    }
+  ]
+}

@@ -1,0 +1,1 @@
+{"kind":"rsvp","schema_version":"1","persona":"guido-python-reviewer","lens":"python-idiom","round":"2026-09-27","decision":"ABSTAIN","applies":[],"expected":{"stakes":"🟢","hook":"no Python in the PR diff or in coryphaeus"},"reason":"The PR diff and coryphaeus contain zero .py files; the new runtime code is Node, so a Python language lens would only add noise."}

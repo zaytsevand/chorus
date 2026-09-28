@@ -1,0 +1,45 @@
+name: integrity
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  integrity:
+    name: Suite integrity checks
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      # FC3's `claude plugin validate` step is skipped with a warning here (no
+      # claude CLI on the runner); run it locally before a release.
+      - name: check-suite-integrity
+        run: bash scripts/check-suite-integrity.sh
+
+  coryphaeus:
+    name: coryphaeus tests and canon drift
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      # Includes test/canon-drift.test.mjs: the validator against the canon.
+      - name: node --test
+        run: node --test skill/coryphaeus/test/*.test.mjs
+      - name: Committed review records validate
+        run: |
+          for f in docs/reviews/*.json; do
+            node skill/coryphaeus/bin/validate.mjs review-record "$f"
+          done
+
+  install-roundtrip:
+    name: install -> verify -> uninstall -> verify
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Round trip into a temp CLAUDE_HOME
+        run: bash scripts/test-install-roundtrip.sh

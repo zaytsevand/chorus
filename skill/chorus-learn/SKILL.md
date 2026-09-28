@@ -15,7 +15,7 @@ description: >-
 This skill is the **single canonical definition** of the `chorus learn` mode
 (trigger: "chorus learn" / `/chorus learn`). It is the **navigational** member of
 the chorus suite — explanatory and teaching, not gating. It mutates nothing except
-one **opt-in** scaffold the user explicitly confirms (S2). The orchestrator running
+one **opt-in** scaffold the user explicitly confirms (Step 2). The orchestrator running
 this skill delivers each step as a short explanation **plus** an AskUserQuestion
 navigation choice — never a wall of text.
 
@@ -39,10 +39,11 @@ substrate guard is not required — but when it points at a primitive it points 
 the real `chorus-core` file, and a runtime-missing doc is handled by the wrap-up's
 "cited doc missing" rule below.)
 
-**Three modes.** The chorus suite has three operator-facing entries: two *review*
-modes — the project-state round (`chorus-review`, "spawn the chorus") and the
-agent-SDLC lifecycle (`chorus-sdlc`, "run the agent-SDLC on feature 0NN") — and
-this navigational tutorial. The two review modes share the gate primitive
+**Three modes, plus this tutorial.** The chorus suite has three *review* modes —
+the project-state round (`chorus-review`, "spawn the chorus"), the agent-SDLC
+lifecycle (`chorus-sdlc`, "run the agent-SDLC on feature 0NN"), and `chorus
+challenge <target>` (Gate A's premise pass run standalone, in `chorus-sdlc`) — and
+this navigational tutorial. The review modes share the gate primitive
 (`chorus-core/GATE-PRIMITIVE.md`); this tutorial teaches, it does not gate.
 
 ## How navigation works (the same four choices on every step)
@@ -55,10 +56,10 @@ Every step ends with one question offering the same four choices:
    **"Recap this step"** on that step — going deeper is bounded to one level, and
    only the step you deepened shows "Recap".
 3. **Jump to another step** — pick any step by name and land there directly,
-   without replaying the ones you skipped. On steps S1–S4 the jump list also
-   offers **"back to where I was"**; on S5 there is no "back" (you are at the end),
-   and the question says so — typing free text keeps you on S5.
-4. **Exit.** On S1 this reads **"Exit — get the cheat-sheet"**, because exiting
+   without replaying the ones you skipped. On Steps 1–4 the jump list also
+   offers **"back to where I was"**; on Step 5 there is no "back" (you are at the end),
+   and the question says so — typing free text keeps you on Step 5.
+4. **Exit.** On Step 1 this reads **"Exit — get the cheat-sheet"**, because exiting
    from orientation hands an expert the whole command surface at once.
 
 You can also just type what you want in the tool's free-text box. From any step,
@@ -71,7 +72,7 @@ conversation: in a new session, say "chorus learn" and jump straight to any step
 
 ---
 
-## S1 · orient
+## Step 1 · orient
 
 By the end of this tutorial you will be able to set up the chorus on your project
 and run your first review — without reading the dense companion docs first. That
@@ -80,8 +81,9 @@ is what this tutorial is for.
 The chorus is a **multi-lens review**: a panel of persona advisors each reads your
 target through one lens (architecture, domain, product, security, and more), and
 their findings are scored by a vote rather than any single opinion. It has **three
-modes** — two review modes (the project-state round `chorus-review` and the
-agent-SDLC lifecycle `chorus-sdlc`) and this tutorial.
+review modes** — the project-state round (`chorus-review`), the agent-SDLC
+lifecycle (`chorus-sdlc`), and `chorus challenge` (a standalone premise pass) — plus
+this tutorial.
 
 On entry the tutorial quietly checks that what it needs is reachable — the addendum
 template, the persona agents, whether you already have a project addendum, and
@@ -90,7 +92,7 @@ These checks only read; they change nothing. If something it needs is genuinely
 missing, it shows you how to fix it (below) — it never runs anything for you.
 
 **Install sub-step (only if something the mode needs is genuinely missing).** If a
-needed artefact is unreachable, S1 **instructs** — it never runs commands and
+needed artefact is unreachable, Step 1 **instructs** — it never runs commands and
 never writes — with remedy text matched to the detected channel:
 
 - **file-path channel**: clone the repository and run its installer (`./install.sh`)
@@ -102,14 +104,14 @@ If nothing is missing, the sub-step does not appear.
 
 Cites: the `chorus-review` and `chorus-sdlc` skills (the two review modes).
 
-**Navigation question (S1):** Continue → set up · Go deeper on the three modes ·
+**Navigation question (Step 1):** Continue → set up · Go deeper on the modes ·
 Jump to another step · **Exit — get the cheat-sheet**. (Exit here delivers the
 expert cheat-sheet: the addendum checklist, the command list, and "in a new
 session, say 'chorus learn' and jump straight to any step.")
 
 ---
 
-## S2 · set up
+## Step 2 · set up
 
 Every project gives the chorus a one-page **addendum** at
 `docs/reviews/CHORUS-PROJECT.md`: its scope exclusions, the anchor surface the
@@ -117,17 +119,17 @@ review should focus on, and a security data-surface checklist. The chorus reads
 this at the start of every round. Authoring it is the single biggest setup
 friction — so this step can **do** it for you, on request.
 
-**The scaffold offer (opt-in, a dedicated question).** After this explanation, S2
+**The scaffold offer (opt-in, a dedicated question).** After this explanation, Step 2
 presents a **separate, dedicated confirmation question** — *"Scaffold
 `docs/reviews/CHORUS-PROJECT.md` from the template now? (creates one file;
 sections 2, 3, and 5 are left for you to fill)"* — **before** the step's
 navigation question (you decide the write first, then where to go). Consent is
 never folded into a navigation option.
 
-The source template resolves in order: inside this repo, the checkout's
-`templates/CHORUS-PROJECT.template.md` (authoritative); otherwise
-`<skill-base>/templates/` (the running skill's own copy); otherwise the plugin
-root's `templates/`. So both install channels genuinely deliver, not merely probe.
+The source template is this skill's own copy,
+`templates/CHORUS-PROJECT.template.md` under the skill's base directory (in the
+repo: `skill/chorus-learn/templates/`). It is the only copy; install.sh and the
+plugin both ship it with the skill, so either install channel delivers it.
 
 #### On accept
 
@@ -152,12 +154,12 @@ count is zero.
 Cites: `templates/CHORUS-PROJECT.template.md`, the `chorus-review` skill (it reads
 the addendum), `install.sh` (file-path channel).
 
-**Navigation question (S2):** Continue → run a round · Go deeper on the addendum ·
+**Navigation question (Step 2):** Continue → run a round · Go deeper on the addendum ·
 Jump to another step · Exit the tutorial.
 
 ---
 
-## S3 · run a round
+## Step 3 · run a round
 
 To review something, say **"spawn the chorus"** pointed at a spec or a design —
 this is the `chorus-review` skill. The personas **RSVP** (each self-selects in or
@@ -173,12 +175,12 @@ does not restate it.
 
 Cites: the `chorus-review` skill, `chorus-core/GATE-PRIMITIVE.md`.
 
-**Navigation question (S3):** Continue → agent-SDLC · Go deeper on a round · Jump
+**Navigation question (Step 3):** Continue → agent-SDLC · Go deeper on a round · Jump
 to another step · Exit the tutorial.
 
 ---
 
-## S4 · agent-SDLC
+## Step 4 · agent-SDLC
 
 The second review mode **gates a speckit feature** as it moves through its
 lifecycle — this is the `chorus-sdlc` skill. Say **"run the agent-SDLC on feature
@@ -192,12 +194,12 @@ banding lives in `chorus-core/DECISION-PRIMITIVE.md`.
 
 Cites: the `chorus-sdlc` skill, `chorus-core/DECISION-PRIMITIVE.md`.
 
-**Navigation question (S4):** Continue → work with results · Go deeper on
+**Navigation question (Step 4):** Continue → work with results · Go deeper on
 block-on-🔴 · Jump to another step · Exit the tutorial.
 
 ---
 
-## S5 · work with results
+## Step 5 · work with results
 
 Each round leaves `docs/reviews/YYYY-MM-DD-chorus-review.md` — **commit it**; the
 most recent artifact is the next round's baseline, so the next round assumes its
@@ -208,9 +210,9 @@ builds on it.
 
 Cites: the `chorus-review` skill, `chorus-core/DECISION-PRIMITIVE.md`.
 
-**Navigation question (S5):** **Finish the tutorial** · Go deeper on results ·
-Jump to an earlier step (S1–S4) · Exit the tutorial. (No "back" slot here — you
-are at the end; typing free text keeps you on S5.)
+**Navigation question (Step 5):** **Finish the tutorial** · Go deeper on results ·
+Jump to an earlier step (Steps 1–4) · Exit the tutorial. (No "back" slot here — you
+are at the end; typing free text keeps you on Step 5.)
 
 ---
 
@@ -223,7 +225,7 @@ step"), and pointers to the canonical docs for depth (the `chorus-review` and
 `chorus-sdlc` skills, and the substrate primitives `chorus-core/GATE-PRIMITIVE.md`
 and `chorus-core/DECISION-PRIMITIVE.md`). When a scaffold was created, name the
 sections to fill (2/3/5) and that removing the SCAFFOLDED marker is the "this is
-now real" signal. **At S1 this wrap-up doubles as the expert cheat-sheet.**
+now real" signal. **At Step 1 this wrap-up doubles as the expert cheat-sheet.**
 
 If a cited doc is missing at runtime (e.g. a stale installed copy), say so
 plainly, continue at summary altitude, and point to the canonical source resolved

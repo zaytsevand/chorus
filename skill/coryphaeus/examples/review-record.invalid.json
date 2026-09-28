@@ -1,0 +1,31 @@
+{
+  "kind": "review-record",
+  "schema_version": "1",
+  "date": "2026-09-27",
+  "target": "specs/012-order-export/spec.md",
+  "mode": "project-state",
+  "round_context": "Since the last round: the export job moved to the queue worker.",
+  "bindings": { "ports": [{ "port": "arbiter", "provider": "default" }], "recoveries": [{ "kind": "retry", "subject": "kent-beck-persona", "phase": "round-1", "reason": "malformed" }, { "kind": "retry", "subject": "kent-beck-persona", "phase": "round-1", "reason": "malformed again" }] },
+  "tldr": ["The chorus found two problems.", "The top five ranks the held one first.", "Nothing blocks rollout."],
+  "roster": [
+    { "persona": "eric-evans-advisor", "lens": "DDD", "decision": "JOIN", "applies": ["order aggregate"], "expected": "🟡", "reason": "Aggregate.", "seated": true, "seat": "ordinary" },
+    { "persona": "mark-richards-architect", "lens": "architecture", "decision": "JOIN", "applies": ["queue worker"], "expected": "🟡", "reason": "Seam.", "seated": true, "seat": "ordinary" },
+    { "persona": "kent-beck-persona", "lens": "TDD", "decision": "JOIN", "applies": ["streaming path"], "expected": "🟡", "reason": "Tests.", "seated": true, "seat": "ordinary" }
+  ],
+  "quorum": { "joiners": 3, "branch": "proceed" },
+  "register": [
+    { "id": "F1", "author": "eric-evans-advisor", "lens": "DDD", "authored_severity": "🟡", "locator": "src/orders/model.py:42", "pull_quote": "The Order aggregate has no root.", "evidence": [{ "kind": "file_line", "ref": "src/orders/model.py:42" }], "confidence_on_hand": "high", "need_info": false, "graded": true },
+    { "id": "F2", "author": "kent-beck-persona", "lens": "TDD", "authored_severity": "🟡", "locator": "src/export/csv.py:60", "pull_quote": "Backpressure is unclear.", "evidence": [{ "kind": "file_line", "ref": "src/export/csv.py:60" }], "confidence_on_hand": "low", "need_info": true, "need_info_reasons": [{ "raiser": "kent-beck-persona", "reason": "Export size is not specified." }], "graded": true }
+  ],
+  "tally": [
+    { "finding": "F1", "authored_severity": "🟡", "status": "graded", "n": 2, "p": 1, "c": 1, "o": 0, "net": 2, "threshold": 2, "movement": "unmoved", "final_severity": "🟡", "convergence": 1, "gating": false },
+    { "finding": "F2", "authored_severity": "🟡", "status": "held" }
+  ],
+  "conflicts": [],
+  "top_five": [
+    { "rank": 1, "finding": "F2", "pull_quote": "Backpressure is unclear.", "locator": "src/export/csv.py:60", "final_severity": "🟡", "cost": "low", "value": "Unknown until ruled.", "convergence": 0 }
+  ],
+  "held": [],
+  "baseline": { "assume_closed": [], "in_progress": [], "re_evaluate": [] },
+  "appendix": []
+}

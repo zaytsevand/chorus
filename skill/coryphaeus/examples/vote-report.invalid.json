@@ -1,0 +1,28 @@
+{
+  "kind": "vote-report",
+  "schema_version": "1",
+  "mode": "review",
+  "round": "2026-09-27",
+  "persona": "security-and-trust-advisor",
+  "lens": "security",
+  "own_findings": ["F4"],
+  "votes": [
+    { "finding": "F4", "confidence_on_hand": "high", "vote": "PRIORITIZE", "reason": "My own finding deserves more." },
+    { "finding": "F1", "confidence_on_hand": "low", "vote": "CONFIRM", "reason": "Probably right, hard to say." }
+  ],
+  "derived": [
+    {
+      "id": "R2-1",
+      "lens": "security",
+      "locator": "src/orders/model.py:88",
+      "claim": "I agree with the DDD lens.",
+      "evidence": [],
+      "proposed_severity": "🟡",
+      "pull_quote": "I agree with Evans.",
+      "confidence_on_hand": "high",
+      "need_info": false,
+      "derived_from": "F1",
+      "graded": true
+    }
+  ]
+}

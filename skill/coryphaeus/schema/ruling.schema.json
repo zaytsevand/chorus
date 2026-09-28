@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "ruling.schema.json",
+  "title": "Ruling",
+  "description": "The shared shape of an operator ruling. Field-for-field the problem-brief ruling, so a ruling moves between a brief and a chorus fallback record without loss. Chorus records normally hold only a ruling_ref to it.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "created", "updated", "about", "said", "source"],
+  "properties": {
+    "kind": { "const": "ruling", "description": "Record kind, when the ruling is stored as a file of its own." },
+    "id": { "type": "string", "pattern": "^R-[0-9]+$", "description": "Stable citation handle. R-1, R-2, … Never renumber, never reuse." },
+    "created": { "$ref": "common.schema.json#/$defs/timestamp", "description": "When the ruling was given. Set once." },
+    "updated": { "$ref": "common.schema.json#/$defs/timestamp", "description": "When this record last changed." },
+    "about": { "type": "string", "minLength": 10, "description": "The question it answers, phrased the way it would be asked again." },
+    "said": { "type": "string", "minLength": 10, "description": "The answer itself, in the operator's own words where given." },
+    "source": { "type": "string", "minLength": 3, "description": "Where it was given: 'chat, 2026-09-25', 'comment on Q-4', a commit or a document." },
+    "entries": { "type": "array", "items": { "type": "string", "pattern": "^Q-[0-9]+$" }, "description": "Entries (decisions) this ruling bears on." },
+    "status": { "type": "string", "enum": ["active", "replaced"], "default": "active", "description": "active — still holds. replaced — the operator later said otherwise; replacedBy names the successor." },
+    "replacedBy": { "type": "string", "pattern": "^R-[0-9]+$", "description": "The ruling that took over. Required once status is replaced." },
+    "memory": { "type": "string", "description": "A memory file the ruling was also saved to, when it is a general working preference." }
+  },
+  "allOf": [
+    { "if": { "properties": { "status": { "const": "replaced" } }, "required": ["status"] },
+      "then": { "required": ["replacedBy"] } }
+  ]
+}

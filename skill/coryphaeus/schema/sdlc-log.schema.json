@@ -1,0 +1,174 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "sdlc-log.schema.json",
+  "title": "SDLC ledger",
+  "description": "The per-feature agent-SDLC ledger (chorus-sdlc § The ledger): append-only, one gate section per gate execution, enough to reconstruct the run alone. Operator rulings appear only as ruling_ref.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["kind", "schema_version", "feature", "feature_dir", "run_started", "mode", "status", "gates", "decisions", "self_audit"],
+  "properties": {
+    "kind": { "const": "sdlc-log", "description": "Record kind." },
+    "schema_version": { "$ref": "common.schema.json#/$defs/schema_version", "description": "Schema version; the major must be 1." },
+    "feature": { "type": "string", "minLength": 2, "description": "Feature name." },
+    "feature_dir": { "type": "string", "minLength": 2, "description": "specs/<feature>/." },
+    "run_started": { "$ref": "common.schema.json#/$defs/date", "description": "When the run started." },
+    "mode": { "type": "string", "enum": ["agent-sdlc", "challenge"], "description": "agent-sdlc: the lifecycle. challenge: chorus challenge (premise pass standalone)." },
+    "status": { "type": "string", "enum": ["in-progress", "halted-awaiting-operator", "complete"], "description": "Run status." },
+    "gates": {
+      "type": "array",
+      "description": "Gate executions in order; a re-run appends a new cycle, never edits a prior one.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["gate", "name", "cycle", "corpus", "rsvp", "seating", "quorum", "register", "tally", "red_resolutions", "outcome"],
+        "properties": {
+          "gate": { "type": "string", "enum": ["A", "B", "C", "challenge"], "description": "Gate A (design), B (plan/tasks), C (implementation), or a standalone challenge." },
+          "name": { "type": "string", "enum": ["design", "plan-tasks", "implementation", "premise"], "description": "The gate's name." },
+          "cycle": { "type": "integer", "minimum": 1, "maximum": 3, "description": "Loop cycle; bounded at 3 (S7)." },
+          "corpus": { "type": "array", "minItems": 1, "items": { "type": "string" }, "description": "Artefacts reviewed." },
+          "rsvp": { "type": "array", "items": { "$ref": "common.schema.json#/$defs/rsvp_row" }, "description": "This gate's RSVP (never carried from another gate, S2)." },
+          "seating": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["band"],
+            "description": "How the panel was seated.",
+            "properties": {
+              "band": { "type": "string", "enum": ["🟢", "🟡"], "description": "🟢 strict sort or J ≤ 5; 🟡 tie at the cap → default panel." },
+              "decision_ref": { "type": "string", "description": "🟡 only: id of the seating DecisionRecord in decisions." }
+            }
+          },
+          "quorum": { "type": "string", "enum": ["ok", "re-pinged", "aborted"], "description": "Quorum outcome." },
+          "premise_pass": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["red_team", "honest_null"],
+            "description": "Gate A and challenge only: the premise pass, recorded before the within-frame findings.",
+            "properties": {
+              "red_team": {
+                "type": "array",
+                "minItems": 6,
+                "maxItems": 6,
+                "description": "The fixed RT-1..RT-6 checklist, each outcome recorded every pass.",
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": ["item", "outcome"],
+                  "properties": {
+                    "item": { "type": "string", "enum": ["RT-1", "RT-2", "RT-3", "RT-4", "RT-5", "RT-6"], "description": "Checklist item." },
+                    "outcome": { "type": "string", "minLength": 3, "description": "What the pass found for this item." }
+                  }
+                }
+              },
+              "honest_null": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["premise_survives", "tried"],
+                "description": "The honest-null: when the premise survives, what was tried.",
+                "properties": {
+                  "premise_survives": { "type": "boolean", "description": "Whether the premise survived the pass." },
+                  "tried": {
+                    "type": "array",
+                    "description": "Each attack attempted: a lens and one of the four attack forms.",
+                    "items": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": ["persona", "attack_form", "note"],
+                      "properties": {
+                        "persona": { "$ref": "common.schema.json#/$defs/persona", "description": "Who attacked." },
+                        "attack_form": { "type": "string", "enum": ["steelman-null", "reframe", "root-cause-doubt", "unvalidated-assumption"], "description": "The attack form." },
+                        "note": { "type": "string", "minLength": 10, "description": "What was tried and why it did not land." }
+                      }
+                    }
+                  }
+                },
+                "allOf": [
+                  { "if": { "properties": { "premise_survives": { "const": true } }, "required": ["premise_survives"] },
+                    "then": { "properties": { "tried": { "minItems": 1 } } } }
+                ]
+              },
+              "pass_ok": { "type": "boolean", "description": "false: the pass did not genuinely attack the premise — a failed pass, re-run." }
+            }
+          },
+          "register": { "type": "array", "items": { "$ref": "common.schema.json#/$defs/register_entry" }, "description": "Findings register; scope and parked mark premise, within-frame and parked-from-premise findings." },
+          "tally": { "type": "array", "items": { "$ref": "common.schema.json#/$defs/tally_row" }, "description": "Vote tally: one row per register entry that is not [unsupported]." },
+          "red_resolutions": {
+            "type": "array",
+            "description": "🔴 resolution/waiver log: every gating 🔴 gets a row before the run can be complete (S4).",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["finding", "disposition", "detail"],
+              "properties": {
+                "finding": { "$ref": "common.schema.json#/$defs/finding_id", "description": "The gating finding." },
+                "disposition": { "type": "string", "enum": ["resolved", "waived", "open"], "description": "resolved (incorporation, verified by re-run), waived (operator only), or still open." },
+                "detail": { "type": "string", "minLength": 5, "description": "How it was resolved, or where the waiver rationale lives." },
+                "ruling_ref": { "$ref": "common.schema.json#/$defs/ruling_ref", "description": "The operator's waiver ruling. Required when waived." }
+              },
+              "allOf": [
+                { "if": { "properties": { "disposition": { "const": "waived" } }, "required": ["disposition"] },
+                  "then": { "required": ["ruling_ref"] } }
+              ]
+            }
+          },
+          "unclaimed_records": { "type": "array", "items": { "$ref": "common.schema.json#/$defs/extract_record" }, "description": "Fixed-viewpoint records no persona authored into a finding: visible, non-gating." },
+          "side_notes": { "type": "array", "items": { "$ref": "common.schema.json#/$defs/side_note" }, "description": "Conductor side-notes for this gate." },
+          "outcome": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["result"],
+            "description": "How the gate execution ended.",
+            "properties": {
+              "result": { "type": "string", "enum": ["pass", "halt", "bound-reached", "self-heal", "aborted"], "description": "pass: proceed. halt: awaiting operator. bound-reached: the third cycle left a 🔴 uncleared; it goes to the operator as a hard-block (S7). self-heal: 🟡 auto-incorporate and re-run. aborted: quorum failed." },
+              "next": { "type": "string", "description": "pass: the next phase." },
+              "awaiting": { "type": "array", "items": { "$ref": "common.schema.json#/$defs/finding_id" }, "description": "halt/bound-reached: the findings waiting on the operator." }
+            }
+          }
+        }
+      }
+    },
+    "decisions": { "type": "array", "items": { "$ref": "decision.schema.json" }, "description": "Provisional decisions (review & override) and every other DecisionRecord of the run." },
+    "memory_update": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["personas", "operator", "secret_filter"],
+      "description": "Memory update (sign-off): once per lifecycle, after Gate C clears.",
+      "properties": {
+        "personas": {
+          "type": "array",
+          "description": "Per-persona write-back.",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["persona", "written"],
+            "properties": {
+              "persona": { "$ref": "common.schema.json#/$defs/persona", "description": "The lens." },
+              "written": { "type": "integer", "minimum": 0, "description": "Records written to its own memory." },
+              "noop": { "type": "string", "enum": ["no-locator", "does-not-generalize", "no-memory-dir"], "description": "Which test produced a no-op, when written is 0." }
+            }
+          }
+        },
+        "project_wide_diff": { "type": "string", "description": "The proposed addendum diff, or its locator." },
+        "operator": { "type": "string", "enum": ["accepted", "rejected", "deferred", "lapsed", "none-proposed"], "description": "The operator's answer to the project-wide proposal." },
+        "operator_ref": { "$ref": "common.schema.json#/$defs/ruling_ref", "description": "Where the accept/reject was ruled." },
+        "pending": { "type": "array", "items": { "type": "string" }, "description": "Pending proposals, re-offered at the next sign-off." },
+        "secret_filter": { "$ref": "common.schema.json#/$defs/secret_filter", "description": "Whether the secret pre-filter ran over the sign-off writes, and its drops." }
+      }
+    },
+    "self_audit": {
+      "type": "array",
+      "description": "End-of-run S1–S11 self-audit: each item with a pointer to its evidence.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["rule", "pass", "evidence"],
+        "properties": {
+          "rule": { "type": "string", "enum": ["S1", "S2", "S3", "S4", "S5", "S6", "S7", "S8", "S9", "S10", "S11"], "description": "The invariant." },
+          "pass": { "type": "boolean", "description": "Whether it held." },
+          "evidence": { "type": "string", "minLength": 3, "description": "Pointer to the evidence row, e.g. 'gates[1].tally'." }
+        }
+      }
+    },
+    "rulings_cited": { "type": "array", "items": { "$ref": "common.schema.json#/$defs/ruling_ref" }, "description": "Standing operator rulings the run relied on." },
+    "local_rulings": { "type": "array", "items": { "$ref": "ruling.schema.json" }, "description": "Fallback only, when no ruling sink is bound: rulings held in this record, cited as record '#'." }
+  }
+}
