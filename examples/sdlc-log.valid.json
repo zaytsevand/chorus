@@ -556,7 +556,7 @@
     ],
     "operator": "none-proposed",
     "pending": [],
-    "secret_drops": 0
+    "secret_filter": { "ran": true, "drops": 0 }
   },
   "self_audit": [
     {

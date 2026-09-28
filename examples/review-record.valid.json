@@ -21,6 +21,7 @@
       { "kind": "abstention", "subject": "guido-python-reviewer", "phase": "rsvp", "reason": "not installed" }
     ]
   },
+  "secret_filter": { "ran": false, "note": "no persona wrote to agent memory this round" },
   "tldr": [
     "The chorus found that the order aggregate cannot enforce its own invariants, and that the export job's retry path is under-specified.",
     "The top five puts the aggregate root first, then the retry contract and the streaming writer's backpressure.",

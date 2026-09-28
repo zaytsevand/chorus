@@ -8,7 +8,7 @@
   "required": ["kind", "schema_version", "feature", "feature_dir", "run_started", "mode", "status", "gates", "decisions", "self_audit"],
   "properties": {
     "kind": { "const": "sdlc-log", "description": "Record kind." },
-    "schema_version": { "const": "1", "description": "Schema version." },
+    "schema_version": { "$ref": "common.schema.json#/$defs/schema_version", "description": "Schema version; the major must be 1." },
     "feature": { "type": "string", "minLength": 2, "description": "Feature name." },
     "feature_dir": { "type": "string", "minLength": 2, "description": "specs/<feature>/." },
     "run_started": { "$ref": "common.schema.json#/$defs/date", "description": "When the run started." },
@@ -130,7 +130,7 @@
     "memory_update": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["personas", "operator"],
+      "required": ["personas", "operator", "secret_filter"],
       "description": "Memory update (sign-off): once per lifecycle, after Gate C clears.",
       "properties": {
         "personas": {
@@ -151,7 +151,7 @@
         "operator": { "type": "string", "enum": ["accepted", "rejected", "deferred", "lapsed", "none-proposed"], "description": "The operator's answer to the project-wide proposal." },
         "operator_ref": { "$ref": "common.schema.json#/$defs/ruling_ref", "description": "Where the accept/reject was ruled." },
         "pending": { "type": "array", "items": { "type": "string" }, "description": "Pending proposals, re-offered at the next sign-off." },
-        "secret_drops": { "type": "integer", "minimum": 0, "description": "Candidate facts dropped by the secret pre-filter." }
+        "secret_filter": { "$ref": "common.schema.json#/$defs/secret_filter", "description": "Whether the secret pre-filter ran over the sign-off writes, and its drops." }
       }
     },
     "self_audit": {

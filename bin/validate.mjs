@@ -11,6 +11,10 @@
  *   kinds: rsvp, finding-report, vote-report, review-record, sdlc-log,
  *          decision, ruling
  *   exit:  0 valid · 1 invalid · 2 usage or unreadable input
+ *          3 version mismatch (the record's schema major is not the one supported)
+ *
+ * First, the declared schema_version: a major other than SCHEMA_MAJOR is one
+ * "version mismatch" error and nothing else is checked.
  *
  * Two passes:
  *   1. The schema (schema/<kind>.schema.json). Types, required fields, enums,
@@ -32,6 +36,9 @@ import { fileURLToPath } from "node:url";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const SCHEMA_DIR = join(HERE, "..", "schema");
+
+/** The schema major this validator supports. The chorus states the major it expects (CONDUCTOR.md § Ports). */
+export const SCHEMA_MAJOR = 1;
 
 export const KINDS = ["rsvp", "finding-report", "vote-report", "review-record", "sdlc-log", "decision", "ruling"];
 
@@ -526,6 +533,12 @@ function checkReviewRecord(d, s) {
   for (const p of seated) if (!(d.appendix ?? []).some((a) => a.persona === p)) s.warn("appendix", `no report link for seated persona "${p}"`);
   s.unique(d.local_rulings, "id", "local_rulings", "ruling id");
   checkBindings(d.bindings, d.roster, s);
+  checkSecretFilter(d.secret_filter, "secret_filter", s);
+}
+
+/** A filter that did not run has no drop count: "not run" never reads as zero. */
+function checkSecretFilter(f, path, s) {
+  if (f && f.ran === false && f.drops !== undefined) s.err(join2(path, "drops"), "a drop count on a filter that did not run", "remove drops; not run is recorded as ran: false");
 }
 
 /** Recoveries are recorded, one retry at most, and every failure-rule abstention appears. */
@@ -599,6 +612,7 @@ function checkSdlcLog(d, s) {
   (d.memory_update?.personas ?? []).forEach((m, i) => {
     if (m.written === 0 && !m.noop) s.err(`memory_update → personas[${i}]`, "a no-op must name the test that produced it", "set noop");
   });
+  checkSecretFilter(d.memory_update?.secret_filter, "memory_update → secret_filter", s);
   s.unique(d.local_rulings, "id", "local_rulings", "ruling id");
 }
 
@@ -618,6 +632,8 @@ const SEMANTIC = {
  */
 export function validate(kind, data, opts = {}) {
   if (!KINDS.includes(kind)) throw new Error(`unknown kind "${kind}"`);
+  const mismatch = versionMismatch(kind, data);
+  if (mismatch) return { valid: false, reason: "version mismatch", errors: [mismatch], warnings: [] };
   const w = new SchemaWalker();
   w.check(data, schemas()[`${kind}.schema.json`], "", `${kind}.schema.json`);
   const s = new Semantics(opts.file ? dirname(resolve(opts.file)) : undefined);
@@ -631,7 +647,24 @@ export function validate(kind, data, opts = {}) {
     if (w.errors.length === 0) throw new Error("semantic check crashed on a schema-valid record");
   }
   const errors = [...w.errors, ...s.errors];
-  return { valid: errors.length === 0, errors, warnings: s.warnings };
+  return { valid: errors.length === 0, ...(errors.length ? { reason: "invalid" } : {}), errors, warnings: s.warnings };
+}
+
+/**
+ * A record declaring another schema major is drift between the chorus and this
+ * validator, not a fault in the record: one error, no field-by-field noise.
+ */
+function versionMismatch(kind, data) {
+  if (!schemas()[`${kind}.schema.json`].properties?.schema_version) return null;
+  const v = data?.schema_version;
+  if (typeof v !== "string" || !/^[0-9]+(\.[0-9]+)?$/.test(v)) return null;
+  const major = Number(v.split(".")[0]);
+  if (major === SCHEMA_MAJOR) return null;
+  return {
+    path: "schema_version",
+    message: `version mismatch: the record declares schema ${v}, this validator supports major ${SCHEMA_MAJOR}`,
+    hint: major > SCHEMA_MAJOR ? "install the coryphaeus release for that major" : "the record predates this schema; re-emit it against the current major",
+  };
 }
 
 /* ── CLI ─────────────────────────────────────────────────────────────────── */
@@ -658,11 +691,12 @@ function main(argv) {
   else {
     const line = (x, tag) => `  ${tag} ${x.path}: ${x.message}${x.hint ? `\n      → ${x.hint}` : ""}`;
     if (r.valid) process.stdout.write(`${file}: valid ${kind}${r.warnings.length ? `, ${r.warnings.length} warning(s)` : ""}\n`);
+    else if (r.reason === "version mismatch") process.stdout.write(`${file}: version mismatch\n`);
     else process.stdout.write(`${file}: invalid ${kind} — ${r.errors.length} error(s)\n`);
     for (const e of r.errors) process.stdout.write(line(e, "✗") + "\n");
     for (const x of r.warnings) process.stdout.write(line(x, "!") + "\n");
   }
-  process.exit(r.valid ? 0 : 1);
+  process.exit(r.valid ? 0 : r.reason === "version mismatch" ? 3 : 1);
 }
 
 const invoked = process.argv[1] && realpathSync(process.argv[1]) === realpathSync(fileURLToPath(import.meta.url));

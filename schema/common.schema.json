@@ -4,6 +4,25 @@
   "title": "Shared definitions for chorus records",
   "description": "Building blocks referenced by the rsvp, finding-report, vote-report, review-record and sdlc-log schemas. Not a record kind of its own.",
   "$defs": {
+    "schema_version": {
+      "type": "string",
+      "pattern": "^[0-9]+(\\.[0-9]+)?$",
+      "description": "The schema version the record was written against: a major, optionally a .minor. The validator supports one major (1) and reports any other as a version mismatch."
+    },
+    "secret_filter": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["ran"],
+      "description": "Whether the secret pre-filter (CONDUCTOR.md § Secret pre-filter) ran over this run's memory writes. Not run is recorded as such, never as zero drops.",
+      "properties": {
+        "ran": { "type": "boolean", "description": "true when every candidate memory write passed the filter; false when it did not run." },
+        "drops": { "type": "integer", "minimum": 0, "description": "Candidate facts the filter dropped. Required when ran is true; absent when it is false." },
+        "note": { "type": "string", "minLength": 3, "description": "Why it did not run, or where the drops are audited." }
+      },
+      "allOf": [
+        { "if": { "properties": { "ran": { "const": true } } }, "then": { "required": ["drops"] } }
+      ]
+    },
     "timestamp": {
       "type": "string",
       "format": "date-time",

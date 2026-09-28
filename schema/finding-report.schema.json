@@ -8,7 +8,7 @@
   "required": ["kind", "schema_version", "mode", "round", "persona", "lens", "tool_uses", "findings"],
   "properties": {
     "kind": { "const": "finding-report", "description": "Record kind." },
-    "schema_version": { "const": "1", "description": "Schema version." },
+    "schema_version": { "$ref": "common.schema.json#/$defs/schema_version", "description": "Schema version; the major must be 1." },
     "mode": { "type": "string", "enum": ["review", "sdlc", "challenge"], "description": "review: a chorus-review round (700-word limit). sdlc: a lifecycle gate. challenge: chorus challenge." },
     "round": { "type": "string", "minLength": 1, "description": "The round date or gate/cycle this report is for." },
     "persona": { "$ref": "common.schema.json#/$defs/persona", "description": "The authoring persona." },

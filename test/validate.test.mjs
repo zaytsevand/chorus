@@ -298,3 +298,32 @@ test("an abstention recovery matches a failure on the roster", () => {
 });
 test("ports are listed once", () => { const d = rr(); d.bindings.ports.push({ port: "arbiter", provider: "default" }); expectError("review-record", d, /duplicate port "arbiter"/); });
 test("an unknown port is refused", () => { const d = rr(); d.bindings.ports.push({ port: "version-check", provider: "coryphaeus" }); expectError("review-record", d, /"version-check" is not allowed here/); });
+
+/* ── schema major (Q-26) ───────────────────────────────────────────────── */
+
+test("another schema major is one version mismatch, nothing else", () => {
+  const d = rr(); d.schema_version = "2"; delete d.tldr;
+  const r = validate("review-record", d);
+  assert.equal(r.valid, false);
+  assert.equal(r.reason, "version mismatch");
+  assert.equal(r.errors.length, 1);
+  assert.match(r.errors[0].message, /version mismatch: the record declares schema 2, this validator supports major 1/);
+});
+test("a minor of the supported major passes", () => { const d = load("rsvp.valid.json"); d.schema_version = "1.3"; assert.equal(validate("rsvp", d).valid, true); });
+test("an ordinary failure is reported as invalid, not as a mismatch", () => { assert.equal(validate("rsvp", load("rsvp.invalid.json")).reason, "invalid"); });
+test("a malformed version is a schema error", () => { const d = load("rsvp.valid.json"); d.schema_version = "v1"; const r = validate("rsvp", d); assert.equal(r.reason, "invalid"); assert.match(messages(r), /schema_version: "v1" is not the right shape/); });
+test("cli: a version mismatch exits 3 with one line", () => {
+  const dir = mkdtempSync(join(tmpdir(), "cv-")), f = join(dir, "r.json");
+  const d = load("rsvp.valid.json"); d.schema_version = "2";
+  writeFileSync(f, JSON.stringify(d));
+  const r = cli("rsvp", f);
+  assert.equal(r.status, 3);
+  assert.match(r.stdout, /: version mismatch\n/);
+});
+
+/* ── secret pre-filter run (Q-28) ──────────────────────────────────────── */
+
+test("a review record says whether the secret filter ran", () => { const d = rr(); delete d.secret_filter; expectError("review-record", d, /missing "secret_filter"/); });
+test("a filter that ran carries its drop count", () => { const d = rr(); d.secret_filter = { ran: true }; expectError("review-record", d, /secret_filter: is missing "drops"/); });
+test("a filter that did not run has no drop count", () => { const d = rr(); d.secret_filter = { ran: false, drops: 0 }; expectError("review-record", d, /drop count on a filter that did not run/); });
+test("the sign-off memory update records the filter run", () => { const d = sl(); delete d.memory_update.secret_filter; expectError("sdlc-log", d, /missing "secret_filter"/); });

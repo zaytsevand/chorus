@@ -8,7 +8,7 @@
   "required": ["kind", "schema_version", "persona", "lens", "round", "decision", "reason"],
   "properties": {
     "kind": { "const": "rsvp", "description": "Record kind." },
-    "schema_version": { "const": "1", "description": "Schema version this reply conforms to." },
+    "schema_version": { "$ref": "common.schema.json#/$defs/schema_version", "description": "Schema version; the major must be 1." },
     "persona": { "$ref": "common.schema.json#/$defs/persona", "description": "Who is replying." },
     "lens": { "$ref": "common.schema.json#/$defs/lens", "description": "The lens the persona would bring." },
     "round": { "type": "string", "minLength": 1, "description": "Which round or gate this reply is for, e.g. '2026-09-27' or 'gate-A/cycle-1'. A reply never carries to another gate (S2)." },

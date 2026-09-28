@@ -8,7 +8,7 @@
   "required": ["kind", "schema_version", "mode", "round", "persona", "lens", "own_findings", "votes", "derived"],
   "properties": {
     "kind": { "const": "vote-report", "description": "Record kind." },
-    "schema_version": { "const": "1", "description": "Schema version." },
+    "schema_version": { "$ref": "common.schema.json#/$defs/schema_version", "description": "Schema version; the major must be 1." },
     "mode": { "type": "string", "enum": ["review", "sdlc", "challenge"], "description": "review: chorus-review Round 2 (600-word limit). sdlc / challenge: a gate's vote stage." },
     "round": { "type": "string", "minLength": 1, "description": "The round date or gate/cycle." },
     "persona": { "$ref": "common.schema.json#/$defs/persona", "description": "The voting persona." },

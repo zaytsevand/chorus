@@ -55,3 +55,15 @@ test("review record shows bindings and recoveries once, at the top", () => {
   assert.match(md, /decision-sink: default · ruling-lookup: default · record-validator: coryphaeus/);
   assert.match(md, /\*\*Recovered without asking\.\*\* retry — kent-beck-persona \(round-1\): /);
 });
+
+test("a secret filter that did not run reads as not run, never as zero", () => {
+  const d = load("review-record.valid.json");
+  const md = render("review-record", d);
+  assert.match(md, /\*\*Secret filter\.\*\* not run \(no persona wrote to agent memory this round\)\./);
+  assert.doesNotMatch(md, /0 drop/);
+  d.secret_filter = { ran: true, drops: 2 };
+  assert.match(render("review-record", d), /\*\*Secret filter\.\*\* ran, 2 drop\(s\)\./);
+  const s = load("sdlc-log.valid.json");
+  s.memory_update.secret_filter = { ran: false };
+  assert.match(render("sdlc-log", s), /Secret filter: not run\./);
+});

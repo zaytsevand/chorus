@@ -33,7 +33,7 @@ both. It owns four things:
 the project if present, else `~/.claude/skills/coryphaeus`.
 
 ```
-node <root>/bin/validate.mjs <kind> <file.json> [--json]   # 0 valid · 1 invalid · 2 usage
+node <root>/bin/validate.mjs <kind> <file.json> [--json]   # 0 valid · 1 invalid · 2 usage · 3 version mismatch
 node <root>/bin/render.mjs   <review-record|sdlc-log> <file.json> <out.md>
 ```
 
@@ -45,9 +45,14 @@ invalid reply gets exactly one automatic retry with the validator's reason; if
 the retry fails too, the persona counts as ABSTAIN under the one failure rule.
 Both are written to the record's `bindings.recoveries`, never asked live.
 Validate every record before it is published. The renderer validates again and
-refuses invalid input. There is no runtime version check between the chorus and
-this skill: releasing both through the real install channel covers version
-drift.
+refuses invalid input.
+
+**Version.** The validator supports schema major 1 and the chorus states the
+major it expects (CONDUCTOR § Ports). A reply or record declaring another major
+fails with the single reason "version mismatch" (exit 3, `reason` in `--json`)
+and nothing else is checked. That is drift between the installed chorus and
+this skill, not a persona fault: it is reported once, never retried or counted
+as an abstention.
 
 **What reaches the operator.** Recoverable failures do not: the operator's
 attention is the scarcest thing in the loop. A retry, a fallback to a port's
@@ -126,8 +131,23 @@ over unchanged. `point`, `band`, `sensor`, `resolution`, `override` and
 3. **The recommendation comes from the vote.** The recommended option is the
    one the vote supports (the highest-convergence remedy, or the chorus default
    for a 🟡). The translation never picks its own favourite.
-4. **Bearing.** A 🔴 decision (`hard-block`) is `bearing: blocks-goal`; a 🟡
-   is `escalated` in the brief's sense.
+4. **Raise by need, not severity.** Before any entry is raised, check whether
+   the operator has anything to choose:
+   - A decision becomes a question only when its options differ in values or
+     priorities that no standing ruling settles.
+   - A decision with one sensible option, or a cheap fix whose only
+     alternative is doing nothing, is taken as recommended. It goes on the
+     brief's `mechanical` list once applied, or `outstanding` while not yet
+     done, never as an entry. The chorus record keeps its default and override
+     path.
+   - A recoverable failure is never raised.
+   - An unanswered gate question is always raised, as `bearing: blocks-goal`,
+     and asked interactively with `AskUserQuestion`; never `escalated`. So is a
+     🔴 (`hard-block`): the chorus gives it no default to take
+     (DECISION-PRIMITIVE D2).
+   - A genuine value choice that does not block is `escalated` in the brief's
+     sense. A 🟡 that passes the check lands here; one that does not is settled
+     work, as above.
 5. **Write the ids back.** Once the entry exists, set the chorus decision's
    `entry_ref` to `{id: "Q-n", record: "<brief.json>"}`. Once the operator rules,
    set `ruling_ref` to the brief's `R-n`, and move `status` and `decision` to

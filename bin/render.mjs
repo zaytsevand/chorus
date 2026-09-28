@@ -92,6 +92,12 @@ function bindingsBlock(b) {
   return [`**Bindings.** ${ports}`, "", `**Recovered without asking.** ${rec}`].join("\n");
 }
 
+/** "not run" is shown as such; a missing count is never printed as zero. */
+function secretFilter(f) {
+  const note = f.note ? ` (${f.note})` : "";
+  return f.ran ? `ran, ${f.drops} drop(s)${note}.` : `not run${note}.`;
+}
+
 function sideNotes(list) {
   return list.map((n) => `- **${n.regime}**: ${n.note}${n.findings?.length ? ` (${n.findings.join(", ")})` : ""}`).join("\n");
 }
@@ -101,7 +107,7 @@ export function renderReviewRecord(d) {
   const L = [];
   L.push(`# Chorus review — ${d.date}`, "", `- **Target**: ${d.target}`, `- **Mode**: ${d.mode === "pr-design" ? "design review of the PR's approach, not a line-by-line diff review" : "project-state review"}`);
   if (d.baseline_ref) L.push(`- **Baseline**: ${d.baseline_ref}`);
-  L.push("", `**Round context.** ${d.round_context}`, "", bindingsBlock(d.bindings), "");
+  L.push("", `**Round context.** ${d.round_context}`, "", bindingsBlock(d.bindings), "", `**Secret filter.** ${secretFilter(d.secret_filter)}`, "");
   L.push("## 1. TL;DR", "", d.tldr.join(" "), "");
   L.push("## 2. Roster (this round)", "", rsvpTable(d.roster), "",
     `Joiners: ${d.quorum.joiners}. Quorum: ${d.quorum.branch}.${d.seating_decision ? ` Seating decision: ${d.seating_decision}.` : ""}`, "");
@@ -198,7 +204,7 @@ export function renderSdlcLog(d) {
     const m = d.memory_update;
     L.push("## Memory update (sign-off)", "", table(["Persona", "Written", "No-op test"], m.personas.map((p) => [p.persona, p.written, p.noop])), "",
       `Project-wide proposal: ${m.project_wide_diff ?? "none"} — operator: ${m.operator}${m.operator_ref ? ` (${ref(m.operator_ref)})` : ""}.`,
-      `Pending proposals: ${m.pending?.length ? m.pending.join("; ") : "none"}. Secret-filter drops: ${m.secret_drops ?? 0}.`, "");
+      `Pending proposals: ${m.pending?.length ? m.pending.join("; ") : "none"}. Secret filter: ${secretFilter(m.secret_filter)}`, "");
   }
   L.push("## Self-audit (S1–S11)", "", d.self_audit.length ? table(["Rule", "Pass", "Evidence"], d.self_audit.map((a) => [a.rule, a.pass ? "pass" : "FAIL", a.evidence])) : "Not yet run.", "");
   if (d.rulings_cited?.length) L.push("## Operator rulings relied on", "", ...d.rulings_cited.map((r) => `- ${ref(r)}`), "");
