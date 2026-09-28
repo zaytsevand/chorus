@@ -1,0 +1,38 @@
+{
+  "kind": "finding-report",
+  "schema_version": "1",
+  "mode": "review",
+  "round": "2026-09-27",
+  "persona": "kent-beck-persona",
+  "lens": "TDD / simple design",
+  "tool_uses": 14,
+  "gate_questions": [
+    { "need": "the grading bar", "question": "Is the export job an internal tool or a customer-facing service?", "assumption": "customer-facing" }
+  ],
+  "findings": [
+    {
+      "id": "F1",
+      "lens": "TDD / simple design",
+      "locator": "src/export/csv.py:5",
+      "claim": "The streaming writer landed without a single test; the only coverage is the old batch path.",
+      "evidence": [{ "kind": "file_line", "ref": "src/export/csv.py:5", "note": "New class, no test module imports it." }],
+      "proposed_severity": "🟡",
+      "pull_quote": "The streaming path shipped with no test at all.",
+      "confidence_on_hand": "high",
+      "need_info": false,
+      "conditional_on": "customer-facing"
+    },
+    {
+      "id": "F2",
+      "lens": "TDD / simple design",
+      "locator": "src/export/csv.py:60-90",
+      "claim": "The writer buffers without bound; whether that matters depends on export size, which nothing states.",
+      "evidence": [{ "kind": "file_line", "ref": "src/export/csv.py:60-90" }],
+      "proposed_severity": "🟡",
+      "pull_quote": "I cannot tell whether backpressure is intended here.",
+      "confidence_on_hand": "low",
+      "need_info": true,
+      "need_info_reason": "The spec does not say how many rows an export may hold."
+    }
+  ]
+}

@@ -1,0 +1,10 @@
+{
+  "kind": "ruling",
+  "id": "4",
+  "created": "2026-09-26",
+  "updated": "2026-09-26T10:05Z",
+  "about": "Should checkout retry ship with the retry wait differing from the spec?",
+  "said": "Fix the constant first.",
+  "source": "chat",
+  "status": "replaced"
+}

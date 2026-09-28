@@ -1,0 +1,22 @@
+{
+  "kind": "finding-report",
+  "schema_version": "1",
+  "mode": "review",
+  "round": "2026-09-27",
+  "persona": "kent-beck-persona",
+  "lens": "TDD / simple design",
+  "tool_uses": 0,
+  "findings": [
+    {
+      "id": "F1",
+      "lens": "TDD / simple design",
+      "locator": "src/export/csv.py:60-90",
+      "claim": "The writer probably buffers without bound, I think.",
+      "evidence": [{ "kind": "file_line", "ref": "src/export/csv.py" }],
+      "proposed_severity": "🟡",
+      "pullquote": "Probably unbounded.",
+      "confidence_on_hand": "low",
+      "need_info": false
+    }
+  ]
+}

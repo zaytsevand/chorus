@@ -1,0 +1,34 @@
+{
+  "kind": "sdlc-log",
+  "schema_version": "1",
+  "feature": "checkout-retry",
+  "feature_dir": "specs/014-checkout-retry/",
+  "run_started": "2026-09-20",
+  "mode": "agent-sdlc",
+  "status": "complete",
+  "gates": [
+    {
+      "gate": "B", "name": "plan-tasks", "cycle": 2,
+      "corpus": ["specs/014-checkout-retry/plan.md"],
+      "rsvp": [
+        { "persona": "mark-richards-architect", "lens": "architecture", "decision": "JOIN", "applies": ["plan"], "expected": "🟡", "reason": "Plan.", "seated": true, "seat": "ordinary" },
+        { "persona": "eric-evans-advisor", "lens": "DDD", "decision": "JOIN", "applies": ["entity"], "expected": "🟡", "reason": "Entity.", "seated": true, "seat": "ordinary" },
+        { "persona": "security-and-trust-advisor", "lens": "security", "decision": "JOIN", "applies": ["tokens"], "expected": "🔴", "reason": "Tokens.", "seated": true, "seat": "ordinary" }
+      ],
+      "seating": { "band": "🟡" },
+      "quorum": "ok",
+      "register": [
+        { "id": "F1", "author": "security-and-trust-advisor", "lens": "security", "authored_severity": "🔴", "locator": "specs/014-checkout-retry/plan.md:72", "pull_quote": "A retried charge reuses a card token.", "evidence": [{ "kind": "file_line", "ref": "specs/014-checkout-retry/plan.md:72" }], "confidence_on_hand": "high", "need_info": false, "graded": true }
+      ],
+      "tally": [
+        { "finding": "F1", "authored_severity": "🔴", "status": "graded", "n": 2, "p": 0, "c": 2, "o": 0, "net": 0, "threshold": 1, "movement": "agreed", "final_severity": "🔴", "convergence": 2, "gating": true }
+      ],
+      "red_resolutions": [
+        { "finding": "F1", "disposition": "waived", "detail": "Operator waived it in chat." }
+      ],
+      "outcome": { "result": "pass" }
+    }
+  ],
+  "decisions": [],
+  "self_audit": [{ "rule": "S1", "pass": true, "evidence": "gates[0]" }]
+}

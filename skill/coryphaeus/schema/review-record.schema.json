@@ -1,0 +1,128 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "review-record.schema.json",
+  "title": "Review record",
+  "description": "The durable record of one chorus-review round: the data the review page is rendered from (chorus-review § Artifact). Vote arithmetic lives here and only here; operator rulings appear only as ruling_ref.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["kind", "schema_version", "date", "target", "mode", "round_context", "bindings", "secret_filter", "tldr", "roster", "quorum", "register", "tally", "conflicts", "top_five", "held", "baseline", "appendix"],
+  "properties": {
+    "kind": { "const": "review-record", "description": "Record kind." },
+    "schema_version": { "$ref": "common.schema.json#/$defs/schema_version", "description": "Schema version; the major must be 1." },
+    "date": { "$ref": "common.schema.json#/$defs/date", "description": "The round's date stamp." },
+    "target": { "type": "string", "minLength": 3, "description": "What was reviewed: a spec, a design, a PR, or the codebase." },
+    "mode": { "type": "string", "enum": ["project-state", "pr-design"], "description": "project-state: the ordinary round. pr-design: design review of a PR's approach." },
+    "round_context": { "type": "string", "minLength": 20, "description": "The paragraph of concrete since-last-chorus deltas every brief carried." },
+    "bindings": { "$ref": "common.schema.json#/$defs/bindings", "description": "Port providers and recovered failures for this round." },
+    "secret_filter": { "$ref": "common.schema.json#/$defs/secret_filter", "description": "Whether the secret pre-filter ran over the memory the round's personas wrote." },
+    "baseline_ref": { "type": "string", "description": "The prior review record this round baselines against, if any." },
+    "tldr": {
+      "type": "array",
+      "minItems": 3,
+      "maxItems": 3,
+      "items": { "type": "string", "minLength": 10 },
+      "description": "Three sentences: what the chorus found; what the top five prioritizes; which 🔴 findings block public rollout."
+    },
+    "roster": { "type": "array", "minItems": 1, "items": { "$ref": "common.schema.json#/$defs/rsvp_row" }, "description": "Every roster member's RSVP: joiners, seating, abstainers with reasons." },
+    "quorum": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["joiners", "branch"],
+      "description": "The quorum outcome.",
+      "properties": {
+        "joiners": { "type": "integer", "minimum": 0, "description": "J: ordinary JOIN replies after the failure rule." },
+        "branch": { "type": "string", "enum": ["proceed", "re-asked-proceed", "aborted"], "description": "proceed: J ≥ 3. re-asked-proceed: J < 3, abstainers re-asked once, then J ≥ 3. aborted: still J < 3." }
+      }
+    },
+    "seating_decision": { "type": "string", "description": "Id of the seating DecisionRecord in decisions, when J ≥ 6." },
+    "register": { "type": "array", "items": { "$ref": "common.schema.json#/$defs/register_entry" }, "description": "The findings register, written before the vote." },
+    "tally": { "type": "array", "items": { "$ref": "common.schema.json#/$defs/tally_row" }, "description": "The consolidation matrix: one row per register entry that is not [unsupported]." },
+    "conflicts": {
+      "type": "array",
+      "description": "Genuine conflicts (Phase 3). Empty when there were none.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "advisors", "disputed", "outcome", "findings"],
+        "properties": {
+          "id": { "type": "string", "pattern": "^C[0-9]+$", "description": "Cn." },
+          "advisors": { "type": "array", "minItems": 2, "items": { "$ref": "common.schema.json#/$defs/persona" }, "description": "Who disagrees." },
+          "disputed": { "type": "string", "minLength": 10, "description": "What is disputed and how the user-visible outcome differs." },
+          "outcome": { "type": "string", "enum": ["arbiter-ruled", "unresolved"], "description": "arbiter-ruled: the arbiter port (default advisor()) ruled. unresolved: left for the operator." },
+          "arbiter_ruling": { "type": "string", "minLength": 5, "description": "The arbiter's ruling. It annotates the ranking and never changes counted severity. Not an operator ruling." },
+          "decision_ref": { "type": "string", "description": "Unresolved only: id of the decision in decisions that carries it to the operator." },
+          "findings": { "type": "array", "minItems": 1, "items": { "$ref": "common.schema.json#/$defs/finding_id" }, "description": "The finding ids it touches." }
+        },
+        "allOf": [
+          { "if": { "properties": { "outcome": { "const": "arbiter-ruled" } }, "required": ["outcome"] },
+            "then": { "required": ["arbiter_ruling"] } }
+        ]
+      }
+    },
+    "top_five": {
+      "type": "array",
+      "maxItems": 5,
+      "description": "The ranking, drafted by the conductor. Held findings are excluded.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["rank", "finding", "pull_quote", "locator", "final_severity", "cost", "value", "convergence"],
+        "properties": {
+          "rank": { "type": "integer", "minimum": 1, "maximum": 5, "description": "Position 1–5." },
+          "finding": { "$ref": "common.schema.json#/$defs/finding_id", "description": "The register entry." },
+          "pull_quote": { "$ref": "common.schema.json#/$defs/pull_quote", "description": "Copied verbatim from the register entry." },
+          "locator": { "$ref": "common.schema.json#/$defs/locator", "description": "Copied from the register entry." },
+          "final_severity": { "$ref": "common.schema.json#/$defs/final_severity", "description": "Copied from the tally row." },
+          "cost": { "type": "string", "enum": ["low", "medium", "high"], "description": "Cost to act on it." },
+          "value": { "type": "string", "minLength": 5, "description": "Risk reduced + friction removed + decisions unblocked." },
+          "constitutional_roi": { "type": "string", "description": "Only when the addendum lists principles." },
+          "convergence": { "type": "integer", "minimum": 0, "description": "P + C from the tally row." },
+          "arbiter_note": { "type": "string", "description": "A conflict ruling or sanity-check note that annotates this entry." }
+        }
+      }
+    },
+    "held": {
+      "type": "array",
+      "description": "Findings with NEED_INFO still open at ranking.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["finding", "reasons", "route"],
+        "properties": {
+          "finding": { "$ref": "common.schema.json#/$defs/finding_id", "description": "The held finding." },
+          "reasons": { "type": "array", "minItems": 1, "items": { "$ref": "common.schema.json#/$defs/need_info_reason" }, "description": "The open reasons." },
+          "route": { "type": "string", "enum": ["peer", "operator"], "description": "The S11 path the last resolution attempt took." },
+          "decision_ref": { "type": "string", "description": "Operator path: id of the decision in decisions that carries the ask." }
+        }
+      }
+    },
+    "baseline": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["assume_closed", "in_progress", "re_evaluate"],
+      "description": "What the next round should assume.",
+      "properties": {
+        "assume_closed": { "type": "array", "items": { "type": "string" }, "description": "Assume closed." },
+        "in_progress": { "type": "array", "items": { "type": "string" }, "description": "Assume in progress." },
+        "re_evaluate": { "type": "array", "items": { "type": "string" }, "description": "Re-evaluate." }
+      }
+    },
+    "appendix": {
+      "type": "array",
+      "description": "Each lens's reports, as links.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["persona", "reports"],
+        "properties": {
+          "persona": { "$ref": "common.schema.json#/$defs/persona", "description": "The lens." },
+          "reports": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 }, "description": "File or memory-dir paths of its finding and vote reports." }
+        }
+      }
+    },
+    "decisions": { "type": "array", "items": { "$ref": "decision.schema.json" }, "description": "DecisionRecords made during the round." },
+    "side_notes": { "type": "array", "items": { "$ref": "common.schema.json#/$defs/side_note" }, "description": "Conductor side-notes." },
+    "rulings_cited": { "type": "array", "items": { "$ref": "common.schema.json#/$defs/ruling_ref" }, "description": "Standing operator rulings this round relied on." },
+    "local_rulings": { "type": "array", "items": { "$ref": "ruling.schema.json" }, "description": "Fallback only, when no ruling sink is bound: rulings held in this record, cited as record '#'." }
+  }
+}
