@@ -12,7 +12,7 @@ validator, renderer and provider bindings).
   tightening, new failure-mode entries, clearer briefs.
 - **Persona agents** (`agents/*.md`) — sharpening voice, fixing calibration
   notes, updating relationship sections.
-- **Schema and tooling** (`skill/coryphaeus/schema/`, `bin/`, `test/`) — Node,
+- **Schema and tooling** (`skill/coryphaeus/schema/`, `bin/`, `test/`): Node,
   zero npm dependencies. A rule lives in one file: the canon
   (`skill/chorus-core/`) owns the ports, the failure policy and the vote-count
   rule; coryphaeus refers to them and encodes them in the validator. When they

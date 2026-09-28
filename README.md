@@ -55,7 +55,7 @@ composition root binds them to the outside world:
   addendum, which it can scaffold on request from the template it ships at
   `skill/chorus-learn/templates/CHORUS-PROJECT.template.md`) and both review
   modes. Trigger: **"chorus learn."**
-- **`coryphaeus`** — the **composition root**: the JSON schema for every
+- **`coryphaeus`**, the **composition root**: the JSON schema for every
   chorus record, the zero-dependency validator and renderer every round uses
   (`skill/coryphaeus/bin/`), and the bindings of the chorus's ports to
   providers, problem-brief by default. It enforces the canon's rules and
@@ -283,7 +283,7 @@ version of this matrix — heatmap, radar, and per-axis breakdown — is at
 - **The `advisor()` tool** — conflict reconciliation (Phase 3) routes disputes
   to it. Without it the chorus records each conflict, unresolved, for you to
   rule on.
-- **Node 18 or later** — coryphaeus's validator and renderer. No npm
+- **Node 18 or later**: coryphaeus's validator and renderer. No npm
   dependencies. Without Node, rounds run unvalidated and pages are hand-written.
 
 **Optional:**
@@ -292,7 +292,7 @@ version of this matrix — heatmap, radar, and per-axis breakdown — is at
   feeds the review (the fixed viewpoint at `chorus-sdlc` Gate C).
 - **memsearch** — recall of past-session context when the round context is
   drafted; the project's own memory surface works too.
-- **problem-brief** — the decision sink, ruling store and lookup, and publisher
+- **problem-brief**: the decision sink, ruling store and lookup, and publisher
   coryphaeus binds to. Without it each port falls back to its default
   (questions in chat, answers kept in the record). Install:
   `git clone https://github.com/zaytsevand/problem-brief && cd problem-brief && ./install.sh`.
