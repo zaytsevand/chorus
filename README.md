@@ -295,12 +295,18 @@ cd chorus
 ./install.sh
 ```
 
-`install.sh` mirrors each `skill/<name>/` directory into
-`~/.claude/skills/<name>/` (replacing any earlier copy, so files removed
-upstream disappear) and copies the persona agents into `~/.claude/agents/`.
-Existing agent files it did not write are preserved unless you pass `--force`.
-Every file it writes is recorded in `~/.claude/.chorus-install-manifest`.
-Re-running it is safe and is also how you upgrade.
+`install.sh` copies each `skill/<name>/` directory into
+`~/.claude/skills/<name>/` and the persona agents into `~/.claude/agents/`.
+Every file it writes is recorded, with a hash of what it wrote, in
+`~/.claude/.chorus-install-manifest`. Re-running it is safe and is how you
+upgrade: a file still as installed is updated, a file you edited is reported as
+"differs, kept" and left alone, and files an earlier version shipped but this
+one does not are pruned unless you edited them. Files it did not write are left
+alone. `--force` overwrites every shipped file.
+
+The suite requires coryphaeus, the record validator and renderer (a separate
+repository), and Node 18 or later: run `./install.sh` in its checkout with the
+same `CLAUDE_HOME`.
 
 **Per-project install** — install into one project's `.claude/` instead of your
 global config, by pointing `CLAUDE_HOME` at it (run from the project root):
@@ -327,9 +333,10 @@ claude --plugin-dir <repo>
 CLAUDE_HOME=$PWD/.claude <repo>/uninstall.sh   # per-project install
 ```
 
-Removes exactly the files listed in the install manifest, then the manifest.
-Agent files `install.sh` skipped (because they already existed) are left alone,
-as are your per-project addenda and chorus artifacts under `docs/reviews/`.
+Removes the files listed in the install manifest that are still as installed,
+then the manifest. A listed file you edited is reported as "differs, kept" and
+left alone. Files `install.sh` skipped (because they already existed) are left
+alone, as are your per-project addenda and chorus artifacts under `docs/reviews/`.
 
 ## Run a round
 
