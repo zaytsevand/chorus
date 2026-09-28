@@ -27,6 +27,28 @@ both. It owns four things:
 4. **The bindings**: which provider serves each port the chorus declares, and
    how data crosses from one to the other.
 
+## What the canon owns
+
+The rules this skill enforces are written once, in the chorus canon, and this
+file refers to them instead of restating them:
+
+- **The ports**, their contracts and their defaults when nothing is bound:
+  [`../chorus-core/CONDUCTOR.md`](../chorus-core/CONDUCTOR.md) § Ports.
+- **The failure policy** (one automatic retry, then ABSTAIN; fall back to a
+  port's default; record every recovery; when the operator is asked; a
+  version mismatch is install drift): the same section, the record validator
+  row and "Recover quietly".
+- **The vote-count rule** (`net`, the threshold, movement, gating and the
+  settled cases): [`../chorus-core/GATE-PRIMITIVE.md`](../chorus-core/GATE-PRIMITIVE.md)
+  § Stage 4.
+- **Who owns which fact** (rulings cited, never restated; vote arithmetic only
+  in chorus records): CONDUCTOR § Ports, "Cite, don't copy".
+
+Where this skill and the canon disagree, the canon wins and this skill is the
+one to fix. `test/canon-drift.test.mjs` fails when the validator or the schema
+stops matching the canon's port names, schema major, threshold rule or list of
+settled cases.
+
 ## Finding the tools
 
 `<root>` is the installed skill directory: `.claude/skills/coryphaeus` in
@@ -40,60 +62,55 @@ node <root>/bin/render.mjs   <review-record|sdlc-log> <file.json> <out.md>
 Kinds: `rsvp`, `finding-report`, `vote-report`, `review-record`, `sdlc-log`,
 `decision`, `ruling`.
 
-**When to run it.** Validate every persona reply before it is counted. An
-invalid reply gets exactly one automatic retry with the validator's reason; if
-the retry fails too, the persona counts as ABSTAIN under the one failure rule.
-Both are written to the record's `bindings.recoveries`, never asked live.
-Validate every record before it is published. The renderer validates again and
-refuses invalid input.
+**When to run it.** Validate every persona reply before it is counted and every
+record before it is published. On a failure, give the validator's reason to the
+retry the canon allows; write each retry, fallback and abstention to the
+record's `bindings.recoveries`. The renderer validates again and refuses
+invalid input.
 
-**Version.** The validator supports schema major 1 and the chorus states the
-major it expects (CONDUCTOR § Ports). A reply or record declaring another major
-fails with the single reason "version mismatch" (exit 3, `reason` in `--json`)
-and nothing else is checked. That is drift between the installed chorus and
-this skill, not a persona fault: it is reported once, never retried or counted
-as an abstention.
+**Version.** The validator supports schema major 1. A reply or record declaring
+another major fails with the single reason "version mismatch" (exit 3,
+`reason` in `--json`) and nothing else is checked.
 
-**What reaches the operator.** Recoverable failures do not: the operator's
-attention is the scarcest thing in the loop. A retry, a fallback to a port's
-default and an abstention by failure are recorded and the round goes on. The operator is asked only when the round cannot reach a valid
-result alone: it stops for lack of reviewers (quorum), or a lost seat leaves a
-🔴 finding without enough voters to count it.
+**Ruling references.** A `ruling_ref` record path is read from the repository
+root. The validator opens a local record and checks the id is there: an id it
+does not hold is an error; an absent or unreadable record is a warning, so a
+private brief kept outside the repository does not break validation.
 
-A `ruling_ref` record path is read from the repository root. The validator opens
-a local record and checks the id is there: an id it does not hold is an error;
-an absent or unreadable record is a warning, so a private brief kept outside the
-repository does not break validation.
+## Bindings
 
-## Ports
+What serves each port when problem-brief is installed. Anything not listed, or
+not installed, falls back to the port's default in CONDUCTOR § Ports. Where a
+provider stores answers is internal to its binding, never a chorus port.
 
-The chorus declares what it needs from outside. Each port has a default that
-works when nothing is bound. Where a provider stores answers is internal to its
-binding, never a chorus port (the chorus lists only what it needs).
-
-| Port | What the chorus needs | Default (nothing bound) | Binding |
-|---|---|---|---|
-| Decision sink | somewhere to put a 🟡 card or ask a 🔴 question; returns a ruling reference | a 🔴 question (including an unanswered gate) is asked interactively with `AskUserQuestion`, choice-shaped, at most four per call, and the round waits; otherwise ask in chat; keep the answer in the record's `local_rulings`, return `record: "#"` | a problem-brief entry (Q-n), written by the translation rules below; the answer is kept in the brief's `rulings` and only the reference goes back |
-| Ruling lookup | standing operator answers, checked before asking | the record's own `local_rulings` and prior records | the brief's rulings (`R-n`), searched before any new question |
-| Record renderer / publisher | where the round's record lives | commit `<record>.json` plus the page from `render.mjs` | same; a brief links the page from its evidence |
-| Record validator | a program that accepts or refuses a record | `bin/validate.mjs` (this skill) | — |
-| Arbiter | a ruling on a framed conflict | `advisor()`; absent → the conflict is recorded unresolved for the operator | — |
-| Fixed viewpoint | a spec-to-code digest at Gate C | `spec-walkthrough` headless; absent → skip and log | — |
-| Memory recall | earlier understanding before a round | `.claude/agent-memory/<persona>/` and the addendum; absent → skip and log | a memory-recall skill such as memsearch |
+| Port | Binding |
+|---|---|
+| decision sink | a problem-brief entry (Q-n), written by the translation rules below; the answer is kept in the brief's `rulings` and only the reference goes back |
+| ruling lookup | the brief's rulings (`R-n`), searched before any new question |
+| record validator | `bin/validate.mjs` (this skill) |
+| record renderer / publisher | `bin/render.mjs` (this skill); commit `<record>.json` and the page, and a brief links the page from its evidence |
+| arbiter | none; the default applies |
+| fixed viewpoint | none; the default applies |
+| memory recall | a memory-recall skill such as memsearch, when installed |
 
 Each review record names the provider that served each port, or `default`, in
-its `bindings` block, shown once at the top of the page. A port that falls back
-to its default is a recorded recovery, never a question and never silent.
+its `bindings` block, shown once at the top of the page.
 
-## Who owns which fact
+## Dependencies
 
-- **Operator rulings** (answers, waivers, sign-offs, preferences) live wherever the
-  decision sink's provider keeps them (the chorus never sees where). A chorus record cites them as `ruling_ref: {id, record}` and
-  never restates them.
-- **Vote arithmetic** (seating, P/C/O, net, severities, cycles) lives only in the
-  chorus record. A brief cites it and never re-decides it.
-- **Project-wide facts** stay in the chorus addendum's project-understanding
-  section.
+| Skill | Provides here | Without it |
+|---|---|---|
+| [problem-brief](https://github.com/zaytsevand/problem-brief) | the decision sink, the ruling store and lookup, and the publisher for operator-facing pages | each port falls back to its default in CONDUCTOR § Ports: questions are asked in chat and answers kept in the record |
+
+Install it beside this skill:
+
+```sh
+git clone https://github.com/zaytsevand/problem-brief
+cd problem-brief && ./install.sh
+```
+
+The suite installer reports whether it is present. Only coryphaeus names
+problem-brief; the chorus skills and personas never do.
 
 ## Default channel
 

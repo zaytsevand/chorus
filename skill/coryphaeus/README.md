@@ -5,8 +5,8 @@ for the chorus to the protagonist. Here the chorus deliberates, you rule, and th
 skill carries what the chorus concluded to the place you rule: it checks standing
 rulings first, records your answer, and writes the reference back.
 
-A small skill that sits above the chorus review suite and problem-brief so that
-neither has to know the other. It holds:
+It sits above the chorus skills and problem-brief so that neither has to know the
+other. It holds:
 
 - `schema/`: JSON Schema (2020-12) for every chorus record (`rsvp`,
   `finding-report`, `vote-report`, `review-record`, `sdlc-log`) and for the
@@ -16,15 +16,19 @@ neither has to know the other. It holds:
   `ruling_ref` shape and lookup, recorded recoveries).
 - `bin/render.mjs`: renders a review record or a ledger to markdown, and refuses
   invalid input.
-- `SKILL.md`: the port bindings and the chorus-to-brief translation rules.
+- `SKILL.md`: the port bindings and the chorus-to-brief translation rules. The
+  rules it enforces are the chorus canon's (`../chorus-core/`); the canon wins.
 
 ```sh
 node bin/validate.mjs review-record examples/review-record.valid.json
 node bin/render.mjs review-record examples/review-record.valid.json review.md
 node --test test/*.test.mjs
-./install.sh            # copies into ${CLAUDE_HOME:-~/.claude}/skills/coryphaeus
 ```
 
-Requires Node 18 or later. No npm dependencies.
+The suite installer (`install.sh` at the repository root) installs it with the
+other skills. Requires Node 18 or later; no npm dependencies. It binds to
+[problem-brief](https://github.com/zaytsevand/problem-brief) when that is
+installed, and falls back to each port's default when it is not (`SKILL.md`
+§ Dependencies).
 
-License: CC BY 4.0 (see `LICENSE`).
+License: CC BY 4.0, as the rest of the repository (`LICENSE` at its root).

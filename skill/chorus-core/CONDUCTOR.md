@@ -266,12 +266,12 @@ this catalog, bind both modes where they apply, and are defined only in their ho
 
 ## Ports
 
-What the chorus needs from outside. A composition root may bind each port; unbound, the default applies and the round record says so.
+What the chorus needs from outside. A composition root may bind each port; unbound, the default applies and the round record says so. This table is the one statement of the ports, their contracts and their defaults: a composition root lists its bindings and refers here.
 
 | Port | Contract | Default when unbound |
 |---|---|---|
-| decision sink | takes a decision record; returns the choice and a ruling reference, or deferred | ask in chat; keep the answer locally and return its local reference |
-| ruling lookup | before any operator ask (catalog rows that ask the operator, NEED_INFO to the operator, gate interview questions), find a standing ruling; a fitting one resolves the ask 🟢 and is cited | none |
+| decision sink | takes a decision record; returns the choice and a ruling reference, or deferred | ask in chat; a 🔴 ask (an unanswered gate included) is a blocking choice question put with `AskUserQuestion`, at most four per call, and the round waits; keep the answer in the record's local rulings and return its local reference |
+| ruling lookup | before any operator ask (catalog rows that ask the operator, NEED_INFO to the operator, gate interview questions), find a standing ruling; a fitting one resolves the ask 🟢 and is cited | the record's local rulings and earlier records |
 | record validator | validates every persona reply and every chorus record against the bound schema before it is counted or published; a failing persona reply gets one retry, then counts as ABSTAIN with the validator's reason logged. Expects schema major 1: a "version mismatch" is install drift, reported once and never retried or counted against a persona | none; the round runs and its record says "unvalidated" |
 | record renderer / publisher | the durable record is JSON; its markdown page is rendered from it, never hand-written | commit the JSON; write the markdown by hand, marked "unrendered" |
 | arbiter | resolves framed conflicts (I5) | `advisor()`; if unavailable, record the conflict unresolved for the operator |

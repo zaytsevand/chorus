@@ -287,7 +287,7 @@
       "type": "object",
       "additionalProperties": false,
       "required": ["ports", "recoveries"],
-      "description": "Which provider served each port, and every failure the round recovered from without asking the operator (chorus-review § One failure rule). Shown once at the top of the page.",
+      "description": "Which provider served each port, and every failure the round recovered from without asking the operator (chorus-core CONDUCTOR.md § Ports, Recover quietly). Shown once at the top of the page.",
       "properties": {
         "ports": {
           "type": "array",
