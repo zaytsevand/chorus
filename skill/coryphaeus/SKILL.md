@@ -1,13 +1,17 @@
 ---
 name: coryphaeus
 description: >-
-  Binds the chorus suite to its providers (problem-brief by default) without
-  either knowing the other. Owns the shared JSON schema for all chorus data and
-  for decisions and rulings, the validator and renderers that enforce it, the
-  port bindings, and the rules for translating a chorus decision into a brief
-  entry. Use whenever a chorus skill emits a persona reply, a record, a decision
-  or an operator question, or when a session has findings, decisions or
-  questions for the operator.
+  Validates, renders and routes chorus-suite data: the JSON schema and
+  validator for persona replies (RSVP, finding report, vote report), review
+  records and agent-SDLC ledgers; the renderers that turn those records into
+  pages; and the rules for turning a chorus decision into a problem-brief entry
+  and writing the operator's ruling back into the chorus record. Use whenever a
+  chorus-review round or an agent-SDLC gate produces a persona reply, a record,
+  a decision or a question for the operator; when a chorus decision has to
+  become a brief entry, or a brief ruling has to flow back into a chorus
+  record; or when a chorus JSON file needs checking or rendering, even if the
+  user only says "check Beck's reply" or "re-render the ledger". Findings that
+  did not come out of a chorus round belong to problem-brief, not here.
 ---
 
 # Composite root
