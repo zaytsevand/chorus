@@ -1,15 +1,19 @@
 ---
 name: chorus-review
 description: >-
-  Multi-advisor project state review
-  (Evans/Richards/Cooper/Norman/Uncle Bob/Beck/Delivery-and-Ops/security/Goldratt)
-  with per-round RSVP self-selection, cross-evaluation, conflict reconciliation,
-  and ranked recommendations. Use when the user asks to "spawn the chorus" /
-  "spawn the regular chorus" or for a project-state review of a spec, design,
-  PR, or codebase. Not for chorus challenge mode or the agent-SDLC lifecycle
-  (use chorus-sdlc) or the chorus learn tutorial (use chorus-learn). Produces a
-  durable artifact at docs/reviews/YYYY-MM-DD-chorus-review.md. REQUIRED
-  composition: chorus-core (shared substrate).
+  Runs a multi-advisor review of a project's state: up to nine persona lenses
+  (DDD, architecture, adversarial product, human-centred design, clean code,
+  TDD, delivery and ops, security, constraint and flow, plus Python) examine a
+  spec, feature design, PR approach or whole codebase, cross-check each other's
+  findings, and leave a ranked review record in docs/reviews/. Use when the user
+  says "spawn the chorus", "spawn the regular chorus", "chorus review" or
+  "/chorus-review", or asks for several expert perspectives, an advisory panel
+  or a multi-lens design review of a spec, design, PR or the codebase, including
+  a periodic health check after a release or a "what should we fix next" sweep.
+  Not for line-by-line diff or bug review (use /code-review), one persona's
+  opinion (spawn that persona), the agent-SDLC lifecycle or "chorus challenge"
+  (use chorus-sdlc), or the chorus learn tutorial (use chorus-learn). REQUIRED
+  composition: chorus-core.
 ---
 
 # Chorus Review — repeatable procedure
