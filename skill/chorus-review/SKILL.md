@@ -75,8 +75,8 @@ post-condition holds** (I4).
 
 For the gated speckit lifecycle, and for `chorus challenge`, use the sibling
 skill **`chorus-sdlc`**. Don't use for single-lens questions (spawn that persona
-directly), line-by-line diff review (`superpowers:code-reviewer` or
-`/ultrareview`), or one-off architecture questions (`mark-richards-architect`).
+directly) or one-off architecture questions (`mark-richards-architect`).
+Line-by-line diff review goes to Claude Code's built-in `/code-review`.
 
 ## PR design review (targeted mode)
 
@@ -88,7 +88,7 @@ PR's approach and seams**, not a line-by-line diff review. Phase 0 adjustments:
   *"Mode: design review of the PR's approach, not a line-by-line diff review."*
 - **Anchor surface** — the diff paths + their governing specs/contracts/tests;
   chase each `# Implements:` / spec reference to an invariant.
-- **Artifact path** — `docs/reviews/YYYY-MM-DD-chorus-review-prNNN.md`.
+- **Artifact stem** — `chorus-review-prNNN` (see § Artifact for naming).
 - **Exclusions** — unchanged; Security-and-Trust still overrides on attacker surface.
 
 When the operator asks for coding discipline / architecture / DDD, **weight the
@@ -425,9 +425,13 @@ traces to its register entry; a bare `Fn` + score is a dead end.
 
 ## Artifact
 
-The record is a `review-record` JSON at `docs/reviews/YYYY-MM-DD-chorus-review.json`,
-validated and rendered by the bound ports (`chorus-core/CONDUCTOR.md` § Ports) to
-the sibling `.md` page — **commit both.** On a collision, suffix `-N` (N = 2, 3, …).
+The record is a `review-record` JSON, validated and rendered by the bound ports
+(`chorus-core/CONDUCTOR.md` § Ports) to a sibling `.md` page — **commit both.**
+
+Name: `<stem>.json` + `<stem>.md`, stem `YYYY-MM-DD-chorus-review` (PR mode
+`YYYY-MM-DD-chorus-review-prNNN`). If `docs/reviews/<stem>*` already exists, both
+take the lowest free `-N` (N = 2, 3, …).
+
 The most recent artifact is the next round's primary baseline. Older markdown-only
 records stay as they are.
 
