@@ -25,6 +25,9 @@ node bin/render.mjs review-record examples/review-record.valid.json review.md
 node --test test/*.test.mjs
 ```
 
+Run the tests with a glob (one argument per file), or plain `node --test` from this
+directory. `node --test test/` fails: Node reads a directory argument as one test file.
+
 The suite installer (`install.sh` at the repository root) installs it with the
 other skills. Requires Node 18 or later; no npm dependencies. It binds to
 [problem-brief](https://github.com/zaytsevand/problem-brief) when that is
