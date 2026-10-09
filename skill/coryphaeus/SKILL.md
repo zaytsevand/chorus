@@ -1,13 +1,17 @@
 ---
 name: coryphaeus
 description: >-
-  Binds the chorus suite to its providers (problem-brief by default) without
-  either knowing the other. Owns the shared JSON schema for all chorus data and
-  for decisions and rulings, the validator and renderers that enforce it, the
-  port bindings, and the rules for translating a chorus decision into a brief
-  entry. Use whenever a chorus skill emits a persona reply, a record, a decision
-  or an operator question, or when a session has findings, decisions or
-  questions for the operator.
+  Validates, renders and routes chorus-suite data: the JSON schema and
+  validator for persona replies (RSVP, finding report, vote report), review
+  records and agent-SDLC ledgers; the renderers that turn those records into
+  pages; and the rules for turning a chorus decision into a problem-brief entry
+  and writing the operator's ruling back into the chorus record. Use whenever a
+  chorus-review round or an agent-SDLC gate produces a persona reply, a record,
+  a decision or a question for the operator; when a chorus decision has to
+  become a brief entry, or a brief ruling has to flow back into a chorus
+  record; or when a chorus JSON file needs checking or rendering, even if the
+  user only says "check Beck's reply" or "re-render the ledger". Findings that
+  did not come out of a chorus round belong to problem-brief, not here.
 ---
 
 # Composite root
@@ -47,7 +51,8 @@ file refers to them instead of restating them:
 Where this skill and the canon disagree, the canon wins and this skill is the
 one to fix. `test/canon-drift.test.mjs` fails when the validator or the schema
 stops matching the canon's port names, schema major, threshold rule or list of
-settled cases.
+settled cases, or when the exit-code table below stops quoting the canon's
+record validator row.
 
 ## Finding the tools
 
@@ -63,14 +68,19 @@ Kinds: `rsvp`, `finding-report`, `vote-report`, `review-record`, `sdlc-log`,
 `decision`, `ruling`.
 
 **When to run it.** Validate every persona reply before it is counted and every
-record before it is published. On a failure, give the validator's reason to the
-retry the canon allows; write each retry, fallback and abstention to the
-record's `bindings.recoveries`. The renderer validates again and refuses
-invalid input.
+record before it is published. The renderer validates again and refuses
+invalid input. What each exit code means for a persona reply (CONDUCTOR §
+Ports, record validator row):
 
-**Version.** The validator supports schema major 1. A reply or record declaring
-another major fails with the single reason "version mismatch" (exit 3,
-`reason` in `--json`) and nothing else is checked.
+| Exit | Meaning | Do |
+|---|---|---|
+| 0 | valid | count it |
+| 1 | invalid | one retry, then counts as ABSTAIN with the validator's reason logged; the retry is automatic and carries the reason |
+| 2 | usage | fix the command; the persona is not charged |
+| 3 | "version mismatch": the reply declares a schema major other than 1; nothing else is checked | install drift, reported once and never retried or counted against a persona |
+
+Write every retry, fallback and abstention to the record's
+`bindings.recoveries`; none of them is asked live.
 
 **Ruling references.** A `ruling_ref` record path is read from the repository
 root. The validator opens a local record and checks the id is there: an id it
@@ -114,10 +124,8 @@ problem-brief; the chorus skills and personas never do.
 
 ## Default channel
 
-Findings, open decisions and questions for the operator go to a brief by
-default, not only when asked for one. Chat carries the short summary of what
-changed and the link. Every answer the operator gives, in chat or in a comment
-on the page, is recorded as a ruling in the brief in the same turn.
+When problem-brief is installed, chorus findings, decisions and questions for
+the operator go to a brief by default, as problem-brief describes.
 
 ## Translating a chorus decision into a brief entry
 
@@ -147,7 +155,9 @@ over unchanged. `point`, `band`, `sensor`, `resolution`, `override` and
    each with its id and final severity.
 3. **The recommendation comes from the vote.** The recommended option is the
    one the vote supports (the highest-convergence remedy, or the chorus default
-   for a 🟡). The translation never picks its own favourite.
+   for a 🟡). The translation never picks its own favourite. Exactly one
+   solution is `recommended: true` and it is listed first; the validator
+   rejects a decision that lists it anywhere else.
 4. **Raise by need, not severity.** Before any entry is raised, check whether
    the operator has anything to choose:
    - A decision becomes a question only when its options differ in values or
@@ -167,8 +177,13 @@ over unchanged. `point`, `band`, `sensor`, `resolution`, `override` and
      work, as above.
 5. **Write the ids back.** Once the entry exists, set the chorus decision's
    `entry_ref` to `{id: "Q-n", record: "<brief.json>"}`. Once the operator rules,
-   set `ruling_ref` to the brief's `R-n`, and move `status` and `decision` to
-   match. Re-validate the chorus record. Ids are written exactly as the brief
+   set:
+   - `ruling_ref`: `{id: "R-n", record: "<brief.json>"}`
+   - `status`: `decided` (`complete` once carried out)
+   - `decision`: `{chose: "<solution id>", date: "<YYYY-MM-DD>"}`, an object
+     like the brief entry's, never a bare string
+
+   Re-validate the chorus record. Ids are written exactly as the brief
    writes them (`R-4`, `Q-7`), never with a subject prefix: `record` already
    says which brief.
 

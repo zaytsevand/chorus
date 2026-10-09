@@ -70,6 +70,26 @@ test("the validator supports the schema major the canon expects", () => {
   assert.equal(SCHEMA_MAJOR, Number(m[1]));
 });
 
+/* SKILL.md restates the record validator row's failure policy as an exit-code
+   table, because agents do not open the canon from a project. The restated
+   cells must carry the canon's own clauses, word for word. */
+test("SKILL.md's exit-code table carries the canon's failure policy verbatim", () => {
+  const row = ports.find((r) => portId(r[0]) === "record-validator");
+  assert.ok(row, "no record validator row in CONDUCTOR § Ports");
+  const retry = row[1].match(/a failing persona reply gets (.+?)\.(?:\s|$)/);
+  assert.ok(retry, "the record validator row states no retry rule for a failing reply");
+  const drift = row[1].match(/a "version mismatch" is (.+?)\.?\s*$/);
+  assert.ok(drift, "the record validator row states no rule for a version mismatch");
+  const exits = tableRows(section(read(join(ROOT, "SKILL.md")), "Finding the tools"));
+  const cell = (code) => {
+    const r = exits.find((x) => x[0] === code);
+    assert.ok(r, `SKILL.md § Finding the tools has no exit ${code} row`);
+    return r[r.length - 1];
+  };
+  assert.ok(cell("1").includes(retry[1]), `exit 1 row must contain the canon's "${retry[1]}"`);
+  assert.ok(cell("3").includes(drift[1]), `exit 3 row must contain the canon's "${drift[1]}"`);
+});
+
 /* ── GATE-PRIMITIVE § Stage 4 ───────────────────────────────────────────── */
 
 test("the threshold is the canon's T = max(a, floor(N / b))", () => {
