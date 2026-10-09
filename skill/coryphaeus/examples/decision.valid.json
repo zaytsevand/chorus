@@ -1,0 +1,21 @@
+{
+  "kind": "decision",
+  "id": "C-waiver-1",
+  "point": "Final feature sign-off / 🔴 waiver",
+  "catalog_row": 11,
+  "band": "🔴",
+  "title": "Ship checkout retry with the timeout mismatch unfixed",
+  "problem": "The code waits 45 seconds between retries where the spec says 30, and only a waiver lets the feature ship this week.",
+  "brief": "The mismatch is harmless for shoppers but makes the spec wrong. Fixing it means another implementation pass.",
+  "sensor": { "signal": "waiver is the only path", "evidence": ["gates[3].unclaimed_records[0]"], "reading": "🔴: always asks" },
+  "evidence": [{ "kind": "code", "ref": "src/checkout/retry.py:88", "note": "MAX_WAIT = 45 against the spec's 30." }],
+  "solutions": [
+    { "id": "fix-first", "label": "Change the code to 30 seconds before shipping", "recommended": true, "reversible": true, "summary": "One constant changes and the gate re-runs; the spec stays true.", "cost": { "work": "One code change and a Gate C re-run." } },
+    { "id": "waive", "label": "Ship as is and record the waiver", "reversible": true, "summary": "The feature ships now; the spec is corrected to 45 seconds afterwards.", "cost": { "work": "A spec edit later.", "risk": "The spec is wrong until then." } }
+  ],
+  "resolution": "hard-block",
+  "status": "decided",
+  "decision": { "chose": "fix-first", "date": "2026-09-26" },
+  "ruling_ref": { "id": "R-4", "record": "specs/014-checkout-retry/brief/brief.json" },
+  "entry_ref": { "id": "Q-7", "record": "specs/014-checkout-retry/brief/brief.json" }
+}

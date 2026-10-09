@@ -1,47 +1,76 @@
 #!/usr/bin/env bash
 # chorus suite uninstaller.
 #
-# Removes every suite skill (chorus-core, chorus-review, chorus-sdlc) and the
-# persona agents from your Claude Code config. Refuses to touch any other files.
+# Removes the files install.sh recorded in $CLAUDE_HOME/.chorus-install-manifest
+# (the suite skills and the persona agents it wrote) when they are still
+# as installed, then the manifest itself. A recorded file you edited since (its
+# hash differs from the one recorded) is reported as "differs, kept" and left
+# alone, as is one recorded before hashes were. Files install.sh skipped because
+# they already existed are not in the manifest and are left alone. Skill
+# directories left empty are removed; nothing else is touched.
 #
 # Usage:
-#   ./uninstall.sh
-#   CLAUDE_HOME=/tmp/x ./uninstall.sh
+#   ./uninstall.sh                          # uninstall from ~/.claude
+#   CLAUDE_HOME=$PWD/.claude ./uninstall.sh # per-project uninstall
 #
 set -euo pipefail
 
 CLAUDE_HOME="${CLAUDE_HOME:-$HOME/.claude}"
-REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-AGENTS_SRC="$REPO_DIR/agents"
-SKILLS_SRC="$REPO_DIR/skill"
+MANIFEST="$CLAUDE_HOME/.chorus-install-manifest"
 
-SKILLS_DST="$CLAUDE_HOME/skills"
-AGENTS_DST="$CLAUDE_HOME/agents"
+if [[ ! -f "$MANIFEST" ]]; then
+  echo "No chorus install manifest at $MANIFEST — nothing to remove."
+  echo "(Installs made before the manifest existed: remove skills/chorus-* and the"
+  echo " persona agents under $CLAUDE_HOME by hand.)"
+  exit 0
+fi
 
-# Derive the skill set from the repo's skill/ dir — the same source install.sh
-# globs — so adding or removing a suite skill never needs editing a list here.
-for skill_src in "$SKILLS_SRC"/*/; do
-  name="$(basename "${skill_src%/}")"
-  dst="$SKILLS_DST/$name"
-  if [[ -d "$dst" ]]; then
-    echo "Removing $dst"
-    rm -rf "$dst"
-  fi
-done
+if command -v sha256sum >/dev/null 2>&1; then
+  hash_of() { sha256sum "$1" | cut -d' ' -f1; }
+else
+  hash_of() { shasum -a 256 "$1" | cut -d' ' -f1; }
+fi
 
-# Derive the agent set from the repo's agents/ dir — the same source of truth
-# install.sh globs — so adding or removing a persona never needs editing a list here.
 removed=0
-for src in "$AGENTS_SRC"/*.md; do
-  a="$(basename "$src")"
-  if [[ -f "$AGENTS_DST/$a" ]]; then
-    rm -f "$AGENTS_DST/$a"
-    echo "  removed $a"
-    removed=$((removed + 1))
+kept=0
+dirs=()
+while IFS= read -r line; do
+  [[ -z "$line" || "$line" == \#* ]] && continue
+  rec="" rel="$line"
+  if [[ "$line" =~ ^[0-9a-f]{64}\ \ (.*)$ ]]; then rec="${line%% *}"; rel="${BASH_REMATCH[1]}"; fi
+  # Refuse anything that could escape CLAUDE_HOME.
+  if [[ "$rel" == /* || "$rel" == *..* ]]; then
+    echo "  refuse $rel  (not a relative path inside CLAUDE_HOME)" >&2
+    continue
   fi
-done
+  target="$CLAUDE_HOME/$rel"
+  if [[ -f "$target" && ! -L "$target" ]]; then
+    if [[ -n "$rec" && "$(hash_of "$target")" == "$rec" ]]; then
+      rm -f "$target"
+      removed=$((removed + 1))
+    else
+      why="edited since install"; [[ -z "$rec" ]] && why="recorded before hashes were"
+      echo "  differs, kept  $rel  ($why; remove it by hand if unwanted)"
+      kept=$((kept + 1))
+    fi
+  elif [[ -L "$target" ]]; then
+    echo "  differs, kept  $rel  (now a symlink; remove it by hand if unwanted)"
+    kept=$((kept + 1))
+  fi
+  case "$rel" in
+    skills/*/*) dirs+=("$(dirname "$target")") ;;
+  esac
+done < "$MANIFEST"
 
-echo
-echo "Removed: $removed agent file(s) + suite skill dirs."
+# Remove skill directories (deepest first) that are now empty.
+if [[ ${#dirs[@]} -gt 0 ]]; then
+  printf '%s\n' "${dirs[@]}" | LC_ALL=C sort -ru | while IFS= read -r d; do
+    rmdir "$d" 2>/dev/null || true
+  done
+fi
+
+rm -f "$MANIFEST"
+
+echo "Removed: $removed file(s) listed in the chorus install manifest. Differs, kept: $kept."
 echo "Note: per-project addenda at docs/reviews/CHORUS-PROJECT.md and any"
 echo "chorus artifacts under docs/reviews/ are left untouched."

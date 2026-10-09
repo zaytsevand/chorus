@@ -1,0 +1,58 @@
+{
+  "kind": "vote-report",
+  "schema_version": "1",
+  "mode": "review",
+  "round": "2026-09-27",
+  "persona": "don-norman-advisor",
+  "lens": "human-centered design",
+  "tool_uses": 5,
+  "own_findings": ["F29", "F30", "F31", "F32", "F33", "F34"],
+  "votes": [
+    { "finding": "F2", "confidence_on_hand": "high", "vote": "CONFIRM", "reason": "Same drift I saw from the operator's side; two tables give two mental models.", "evidence": [{ "kind": "file_line", "ref": "skill/chorus-core/CONDUCTOR.md:270-278" }], "pull_quote": "Whichever table the operator reads first becomes their model of what runs." },
+    { "finding": "F3", "confidence_on_hand": "high", "vote": "CONFIRM", "reason": "The owner belongs with the chorus; the cognitive cost is that the persona never learns what was wrong.", "pull_quote": "One rule owned in one place is also one story told to the user." },
+    { "finding": "F4", "confidence_on_hand": "high", "vote": "CONFIRM", "reason": "A cause the operator cannot see gets blamed on the wrong party; my R2-2 traces this through the failure enum.", "pull_quote": "A version bump shows up as a row of abstentions, and the operator will look for the fault in the personas." },
+    { "finding": "F7", "confidence_on_hand": "high", "vote": "CONFIRM", "reason": "The manifest is part of the system image; stale, but low stakes." },
+    { "finding": "F9", "confidence_on_hand": "high", "vote": "CONFIRM", "reason": "A second, unchecked path makes the operator's model of 'validated' wrong without any sign." },
+    { "finding": "F10", "confidence_on_hand": "high", "vote": "PRIORITIZE", "reason": "render.mjs:189 prints `secret_drops ?? 0`: a false 'clean' is worse than silence, because it creates a confident wrong belief.", "evidence": [{ "kind": "file_line", "ref": "coryphaeus/bin/render.mjs:189" }], "pull_quote": "A filter that never ran is reported as a clean pass, so the page itself is wrong." },
+    { "finding": "F11", "confidence_on_hand": "high", "vote": "CONFIRM", "reason": "Fail-open with no disclosure field repeats the gap in my F31." },
+    { "finding": "F16", "confidence_on_hand": "high", "vote": "CONFIRM", "reason": "A word whose meaning inverts across a seam is a textbook producer of mistakes." },
+    { "finding": "F17", "confidence_on_hand": "high", "vote": "CONFIRM", "reason": "held and hold in one row compound my F32: the page already hides the numbers that would tell them apart.", "pull_quote": "Two near-identical words for uncounted and counted-but-unmoved, on a page that hides the counts." },
+    { "finding": "F22", "confidence_on_hand": "high", "vote": "CONFIRM", "reason": "Converges with my F29.", "pull_quote": "The seat vanishes during the round, and the operator hears about it only after the round is over." },
+    { "finding": "F23", "confidence_on_hand": "high", "vote": "CONFIRM", "reason": "Converges with my F30.", "pull_quote": "The record promises a label it has no field for." },
+    { "finding": "F24", "confidence_on_hand": "high", "vote": "CONFIRM", "reason": "Grounded at install.sh:79-81; see R2-1 for the feedback side." },
+    { "finding": "F25", "confidence_on_hand": "high", "vote": "CONFIRM", "reason": "The only remedy the installer offers is the destructive one." },
+    { "finding": "F26", "confidence_on_hand": "high", "vote": "CONFIRM", "reason": "Correct at 🟢 while outside installers are a future group (A1)." },
+    { "finding": "F28", "confidence_on_hand": "high", "vote": "CONFIRM", "reason": "The JSON/page split is right; the missing validated/unvalidated label is the gap." }
+  ],
+  "derived": [
+    {
+      "id": "R2-1",
+      "lens": "human-centered design",
+      "locator": "install.sh:79-81",
+      "claim": "Given F24, the installer prints the same 'keep' line whether the installed agent matches the source or is stale. The operator dogfooding a release cannot tell which personas are out of date. The only remedy it offers is --force, which F25 shows is destructive. Showing 'keep (unchanged)' versus 'keep (differs from source)' would close the gulf of evaluation.",
+      "evidence": [{ "kind": "file_line", "ref": "install.sh:79-81", "note": "keep message printed without comparing contents" }],
+      "proposed_severity": "🟡",
+      "pull_quote": "Every agent file says 'keep', whether it is current or stale.",
+      "confidence_on_hand": "high",
+      "need_info": false,
+      "derived_from": "F24",
+      "graded": false
+    },
+    {
+      "id": "R2-2",
+      "lens": "human-centered design",
+      "locator": "coryphaeus/schema/common.schema.json:171",
+      "claim": "Given F4 and F11, the roster's failure kinds have no value for a version or contract mismatch. A schema bump is therefore recorded as five separate 'malformed' seats, each with its own reason (render.mjs:84). The validator's field message is clear ('schema_version: must be \"1\", is \"2\"'), but the page never groups identical causes, so the operator sees personas misbehaving, not a version mismatch.",
+      "evidence": [
+        { "kind": "file_line", "ref": "coryphaeus/schema/common.schema.json:171", "note": "failure enum: not-installed, silent, past-budget, malformed, over-length, no-evidence" },
+        { "kind": "file_line", "ref": "coryphaeus/bin/render.mjs:84", "note": "reason rendered per row only" }
+      ],
+      "proposed_severity": "🟡",
+      "pull_quote": "A single version mismatch is shown as five personas failing separately.",
+      "confidence_on_hand": "high",
+      "need_info": false,
+      "derived_from": "F4",
+      "graded": false
+    }
+  ]
+}

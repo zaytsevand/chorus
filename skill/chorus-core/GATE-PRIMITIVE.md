@@ -1,18 +1,15 @@
 # Chorus Gate Primitive
 
 This is the **single canonical definition** of how a chorus conducts one review.
-Both the periodic project-state round (`INTEGRATION-LAYER.md`, Phases 1/2/4) and
-the per-feature SDLC gates (`SDLC-LAYER.md`, Gates A/B/C) run *this* mechanic.
-There is exactly one copy; neither layer restates it.
+Both the project-state round (chorus-review, its authoring / cross-evaluation /
+ranking phases) and the lifecycle reviews (chorus-sdlc, Gates A/B/C) run *this*
+mechanic. There is exactly one copy; neither mode restates it.
 
 A review is four **separable, specialized stages**, each with a distinct actor
 and a distinct success criterion. Running them blended is the failure mode this
-file exists to prevent: a 2026-06-06 back-test of the constraint-and-flow lens
-(today's Goldratt advisor)
-showed that when one agent both **authored and graded** findings it ranked the
-new lens dead last; when authoring was split from a **real adversarial vote** the
-same lens came back mid-pack. Stage separation changed the answer. The stage you
-cheap out on is the stage that lies to you — and stage 3 is load-bearing.
+file exists to prevent: an agent that both **authors and grades** findings buries
+the lens it disfavours; a **real adversarial vote** does not. The stage you cheap
+out on is the stage that lies to you — and stage 3 is load-bearing.
 
 ```mermaid
 flowchart TD
@@ -31,7 +28,8 @@ flowchart TD
 
 - **Actor**: read-only `Explore` / general-purpose agents, in parallel.
 - **Input**: the review corpus (for the base round, the artefacts named in the
-  brief; for an SDLC gate, the gate's corpus per `SDLC-LAYER.md`).
+  brief; for a lifecycle gate, the gate's corpus as the lifecycle reviews
+  (chorus-sdlc) define it).
 - **Output**: structured **extract records** — one factual observation each:
 
   ```
@@ -48,12 +46,11 @@ flowchart TD
 - **Success criterion**: coverage of the corpus; every record carries a real
   `file:line` anchor. These anchors are what later satisfy the I8 evidence gate.
 - **Must not**: assign severity or author findings (that is stages 2–4).
-- **Fixed viewpoint (SDLC Gate C only)**: the headless `spec-walkthrough` digest
-  (`Skill(skill: "spec-walkthrough", args: "<NNN> headless")`) is ingested as
-  records with `source: "spec-walkthrough"`. It is **not authoritative** — a
-  persona must author a record into a finding for it to face the vote; any
-  DRIFT/SURPRISE no persona claims is logged as an unclaimed record (visible,
-  non-gating). See `SDLC-LAYER.md`.
+- **Fixed viewpoint**: a consuming skill may ingest a fixed-viewpoint digest (the
+  headless `spec-walkthrough` at the lifecycle's Gate C) as records with its own
+  `source:` tag. It is **not authoritative** — a persona must author a record into
+  a finding for it to face the vote; any item no persona claims is logged as an
+  unclaimed record (visible, non-gating).
 
 ## Stage 2 — Author
 
@@ -67,8 +64,8 @@ flowchart TD
 - **Output**: **findings**, each:
   `{id, lens, evidence (file:line | [principle] | [principle:proposed]),
   proposed_severity (🔴/🟡/🟢), pull_quote (one short verbatim sentence in the
-  persona's own words — the line the human-facing register relays unedited;
-  spec 008-detail-rich-relay), need_info (boolean — open flag on this finding; see
+  persona's own words — the line the human-facing register relays unedited),
+  need_info (boolean — open flag on this finding; see
   NEED_INFO below), need_info_reason (string — one sentence when `need_info: true`),
   confidence_on_hand (`high` | `low` — declared per finding; see NEED_INFO below)}`.
   The persona marks this line itself; the orchestrator relays it and never
@@ -81,11 +78,10 @@ flowchart TD
   `file:line` and no principle tag (such a finding is demoted to
   `[unsupported]` per I8 and excluded from the tally); **author past an unmet
   gate** — when one of the persona's declared gates is unanswered, the honest
-  output is the question itself, with any dependent findings marked
-  **conditional on the stated assumption** rather than graded as if the answer
-  were known (S10). An unmet exploratory `[gate]` is an **S10 frame gap, not a
-  per-finding S11 flag**: the persona leads with the gate question, or marks
-  dependent findings conditional on the stated assumption — it does **not** raise
+  output is the question itself, and the round waits for the answer; no
+  dependent finding is authored on an assumed answer (S10). An unmet
+  exploratory `[gate]` is an **S10 frame gap, not a per-finding S11 flag**: the
+  persona returns the gate question and stops. It does **not** raise
   `need_info` on a finding as a substitute for a missing frame (that boundary is
   the routing rule; S11 owns only gaps that remain once the frame is sufficient).
 
@@ -110,14 +106,12 @@ flowchart TD
     `NEED_INFO` — not `CONFIRM`, `PRIORITIZE`, or `OVER-RATE` with hedged prose.
 
   The value is **declared by the voter**, never inferred by the orchestrator from prose
-  (S9). Abstention on a finding is allowed. The `CONFIRM` value exists so the tally can tell
-  "I agree, rank it high" apart from "this is under-rated, escalate" — the ambiguity that
-  inflated convergent agreement into gating severity (issue #13; spec `009-confirm-vote-tally`).
-- **Corroboration threshold.** A finding independently reported by **three or
-  more** Stage-2 authors is recorded `CONFIRM` at its authored severity and skips
-  Stage 3. Findings below the threshold are adjudicated normally. The threshold
-  governs *severity adjudication only* — usable / not-usable triage still runs on
-  every finding a persona did not author.
+  (S9). Abstention on a finding is allowed. The `CONFIRM` value lets the tally tell
+  "I agree, rank it high" apart from "this is under-rated, escalate".
+- **Duplicates.** Findings are grouped only when they cite the **same locator**;
+  each author's proposed severity is kept, and every finding faces the vote.
+  Convergence is `P + C`, computed after the vote count (Stage 4). A voter who finds
+  a finding not usable votes `OVER-RATE` with its reason.
 - **Success criterion**: adversarial and real — each vote traces to a dispatched
   persona, and no finding is voted on by its own author.
 - **Must not**: be predicted, inferred, or summarized by the orchestrator. A
@@ -128,12 +122,12 @@ flowchart TD
 `NEED_INFO` is a **per-finding state flag** (`need_info: true`), raised at **Stage 2
 (Author)** or **Stage 3 (Vote)** only when the **review frame is otherwise
 sufficient** but *this specific finding* cannot honestly proceed. Raising it is
-**mandatory** when any trigger below holds — not a discretionary escape hatch.
+**required** when any trigger below holds — not a discretionary escape hatch.
 
 Its boundary with S10 is settled at the two seams that own each case, so no separate
 routing table is needed: an unmet exploratory **`[gate]`** is a frame gap resolved by
-S10 at Stage 2 (the persona leads with the gate question, dependent findings
-conditional on the stated assumption); `need_info` is only for gaps that **remain on
+S10 before Stage 2 (the persona returns the gate question and the round waits);
+`need_info` is only for gaps that **remain on
 a specific finding once the frame is sufficient**. Do not use `need_info` to bypass an
 open S10 gate — resolve the frame first, then raise S11 for what is left.
 
@@ -146,7 +140,7 @@ on hand** — how much the persona trusts what it knows, not whether a fix is ob
 | Value | Meaning | Effect |
 |-------|---------|--------|
 | `high` | evidence chain closes for what you *know*; you are not guessing at facts | you **may** author or cast a severity vote — **unless** formulation or remediation is still undecidable (see triggers) |
-| `low` | material is thin, ambiguous, second-hand, or you would be guessing | **`need_info: true` is mandatory** — do not author a confident finding or cast a severity vote |
+| `low` | material is thin, ambiguous, second-hand, or you would be guessing | **`need_info: true` is required** — do not author a confident finding or cast a severity vote |
 
 `confidence_on_hand` does **not** cover **decisibility** of formulation or
 remediation — those triggers can fire at `high` confidence (solid `file:line`
@@ -188,7 +182,7 @@ finding with `need_info: true` is resolved through **exactly one** of:
 | **Operator provision** | the gap requires project/operator knowledge no seated persona can supply | orchestrator routes a **live framed ask** to the Operator/User | operator context is recorded; the author **revises or confirms** the finding; the flag clears |
 
 The orchestrator picks **one** path per resolution attempt — not both, not a
-synthetic blend. If peer provision fails to close the gap, escalate to operator
+synthetic blend. If peer provision fails to close the gap, route to operator
 provision on the **next** resolution attempt (a second routing, not a parallel
 ask).
 
@@ -219,48 +213,59 @@ flowchart TD
   is excluded from `net`** — agreement-at-severity does not move severity). Let `N` be
   the count of **non-author voters** on the finding and `T = max(1, floor(N / 2))` the
   **board-scaled threshold** (a wider board demands proportionally more agreement, so
-  exceptional entry — `SDLC-LAYER.md` seating — cannot make escalation cheaper):
+  exceptional entry — `DECISION-PRIMITIVE.md` § Seating — cannot make escalation cheaper):
 
   | Condition | Effect |
   |---|---|
   | `net ≥ T` | escalate one level (🟢→🟡→🔴, capped at 🔴) |
   | `net ≤ −T` | demote one level (🔴→🟡→🟢, 🟢→drop) |
-  | `\|net\| < T` | hold author-proposed severity |
+  | `\|net\| < T` | **unmoved**: the author-proposed severity stands |
 
-  - At the standard full board of 5 (`N = 4`), `T = floor(4/2) = 2` — the rule reduces
-    **exactly** to the prior fixed `±2`, so this change is backward-compatible at the
-    size the canon was calibrated for. The floor `T ≥ 1` holds for any voted finding; a
-    tally **MUST NOT** run at `N < 2`.
-  - `net = 0` (all-abstain, or all-CONFIRM, or balanced) holds; an all-abstain
-    finding is marked **unvoted** (non-gating, surfaced). A finding held by CONFIRM
-    is **agreed-at-severity**, not unvoted — it has real votes, they just don't move it.
+  - At a full board of 5 (`N = 4`), `T = floor(4/2) = 2`. The floor `T ≥ 1` holds for
+    any voted finding; a tally **MUST NOT** run at `N < 2`.
+  - *Unmoved* means counted, severity kept. It is not *held*, which means NEED_INFO
+    is open and the finding is not counted at all.
+  - `net = 0` (all-abstain, or all-CONFIRM, or balanced) leaves it unmoved; an all-abstain
+    finding is marked **unvoted** (non-gating, surfaced). A finding left unmoved with CONFIRM
+    votes is **agreed-at-severity**, not unvoted — it has real votes, they just don't move it.
   - Movement is **one level per tally**, regardless of margin (a 4–0 OVER-RATE
     demotes 🔴→🟡, not to nothing — the finding survives in the record).
   - A finding is **gating** iff its post-tally severity is 🔴 — full stop. No
     additional judgment clause: the vote is the confirmation.
   - **Convergence count** (for Phase-4 ranking) is `P + C` — all agreement, used to
-    *rank*, never to *escalate*. Severity escalation counts only `P`. This decouples
-    the two meanings of "convergence" that issue #13 conflated: a finding many lenses
-    agree on can rank in the top-5 while honestly holding at 🟡.
+    *rank*, never to *escalate*. Severity escalation counts only `P`: a finding many
+    lenses agree on can rank in the top-5 while honestly staying at 🟡.
+  - **Settled cases** (the record validator enforces them):
+    1. `N = P + C + O` exactly: a lens that abstains on, is absent from, or raised NEED_INFO on the
+       finding is not counted.
+    2. Any `CONFIRM` with `|net| < T` is agreed-at-severity, even when `P` and `O`
+       cancel (e.g. 2/1/1).
+    3. Findings grouped by one locator are tallied per author entry; grouping is for
+       display and ranking only.
+    4. An ungraded `R2-` finding is not tallied and carries no gating flag; an
+       ungraded 🔴 is surfaced to the operator, not gated on.
+    5. Reply caps are upper bounds only; lifecycle gates set none.
+    6. A 🔴 incorporated in cycle *k* is resolved in *k*; the proof is cycle *k+1*'s
+       re-run, recorded as a new ledger entry (the ledger stays append-only).
+    7. A finding with exactly one non-author voter is a **minority report**: not
+       tallied, keeps its authored severity, never gating, listed apart and out of the
+       top five. (`N = 0` stays unvoted.)
 - **Success criterion**: arithmetic only — no judgment added. Identical votes at an
   identical `N` always yield identical severities; there are **no tally ties**, and no
   seat's vote is re-weighted (severity is presence-blind — entry buys a voice, not
-  weight). (Operator tie-breaking exists only for SDLC **ordinary-seat** cap seating,
-  never in the tally.)
+  weight). (A seating tie is a decision, `DECISION-PRIMITIVE.md` catalog row 2 — never
+  a tally tie.)
 - **Must not**: re-weight by lens, author, or orchestrator preference; add a
   judgment clause to the gating decision.
 - **Rendered, never re-authored**: this post-tally severity is the value the
-  human-facing findings register and its derived matrix display (spec
-  `008-detail-rich-relay`, FR-007). Severity lives authoritatively here, in the
-  tally; the register renders it, the matrix projects it — neither re-computes it.
+  human-facing findings register and its derived matrix display. Severity lives
+  authoritatively here, in the tally; the register renders it, the matrix projects
+  it — neither re-computes it.
 
 Symmetry is deliberate: convergent `PRIORITIZE` escalates just as clear `OVER-RATE`
 demotes; a demote-only tally would silently let an author-under-rated finding through.
-The older rule was "two lenses converging on a concern earn 🔴" — **amended** by spec
-`009-confirm-vote-tally` (closing issue #13): two lenses **both claiming under-rated**
-(`PRIORITIZE`) earn the escalation; two lenses merely **agreeing** at the proposed
-severity (`CONFIRM`) hold it. Agreement is convergence for *ranking*, not a force on
-*severity* — escalation now requires an explicit under-rated claim, not popularity.
+Agreement (`CONFIRM`) is convergence for *ranking*, not a force on *severity* —
+escalation requires an explicit under-rated claim, not popularity.
 
 ## Invariants this primitive carries
 
@@ -269,7 +274,6 @@ integration layer’s I1–I9.
 
 - **S8.** The author of a finding is never its grader. Stage 3 dispatches to
   personas *other than* the author; a persona never votes on its own finding.
-  (The back-test failure mode: author-grades-self buried the new lens last.)
 - **S9.** The orchestrator never synthesizes a vote or a grade. Stage 3 is a real
   dispatch to seated personas; stage 4 aggregates real votes only. A predicted
   reaction is not a vote. (Extends I1/I6 to the voting and tally stages.)
@@ -277,43 +281,52 @@ integration layer’s I1–I9.
   it cannot honestly review without (`[gate]` entries in its profile,
   `EXPLORATORY-PHASE.md`) — and **prompts for an unmet gate instead of inferring
   past it**. A gate resolves only as *referenced* or *operator-confirmed*; while
-  it is open, the persona leads with the question and marks dependent findings
-  conditional on the stated assumption. The later stages cannot catch a
+  it is open, the persona returns the question and the round waits; no working
+  assumption stands in for the answer. The later stages cannot catch a
   wrong-bar review — every vote asks "is this severe *within the frame*," so
   convergent PRIORITIZE amplifies an altitude error rather than correcting it.
   Honesty about the frame lives in each persona's own chain of thought, before
-  authoring. (Provenance: a 2026-06-11 gate reviewed single-operator dev tooling
-  against an inferred production bar; 13 manufactured gating 🔴 had to be
-  operator-overridden wholesale — issue #6.)
+  authoring.
 - **S11.** When any persona sets `need_info: true` on a finding — at proposition
   (Stage 2) or vote (Stage 3) — the orchestrator **must not** invent remediation,
   reformulate the finding, or infer the missing context. The flag is **per-finding**
   and applies only once the review frame is sufficient; an unmet exploratory `[gate]`
   is an S10 frame gap, not an S11 flag. **`confidence_on_hand: low` → `need_info: true`
-  is mandatory**; the axis is declared by the persona, never inferred from hedging.
+  is required**; the axis is declared by the persona, never inferred from hedging.
   The finding **must not** tally until `need_info` is cleared through **exactly one**
   of two paths: **peer provision** (another seated persona supplies the required
   information) or **operator provision** (the Operator/User supplies additional
   context). The orchestrator **routes**; it does not resolve. (Extends S9/I6 to
   information gaps at proposition and vote.)
 
+## Constitution preview
+
+The chorus previews constitution alignment **before** implementation lands. The
+project constitution stays authoritative; the preview names the gate habits a
+review applies to it:
+
+- **Value-first spec ordering.** A design review expects `spec.md` to carry
+  **Outcome & Stage-1 proof** (primary outcome, Stage-1 proof slice, stage
+  boundary) **before** functional-requirement expansion; a lens may accuse
+  FR-before-verdict when those sections are missing or vague.
+- **Deferred trust machinery.** Schema that exists only for a DEFERRED parent FR is
+  theater — the anti-theater rule in `DECISION-PRIMITIVE.md` § Deferral checklist
+  owns it; a plan review checks data-model fields against it.
+- **Project principles.** A project's constitution or addendum may declare its own
+  preview checks (e.g. an inventory a plan must carry for a class of surface).
+  Personas cite them as `[principle]` evidence (I8); the orchestrator applies none
+  of them itself.
+
 ## Adoption note
 
-`INTEGRATION-LAYER.md` (base round Phases 1/2/4) and `SDLC-LAYER.md` (gates
-A/B/C) **reference this file** for the mechanic; they do not restate it. Any
+Both modes **reference this file** for the mechanic; they do not restate it. Any
 change to extract/author/vote/tally happens here, once, so the two modes cannot
-drift. The lifecycle-specific invariants S1–S7 live in `SDLC-LAYER.md`; the
-gate-primitive invariants S8–S11 live here because they bind both modes.
+drift. The lifecycle-specific invariants S1–S7 live in the lifecycle reviews
+(chorus-sdlc); the gate-primitive invariants S8–S11 live here because they bind
+both modes.
 
 ## Provenance
 
 Designed in `docs/superpowers/specs/2026-06-06-agent-sdlc-workflow-design.md`
 and specified in `specs/003-agent-sdlc-workflow/` (see
-`contracts/gate-primitive.md` and `contracts/sdlc-invariants.md`). The
-stage-separation rule and S8/S9 come from a 2026-06-06 back-test of the
-constraint-and-flow lens. The Stage-3 corroboration threshold was set from a
-measurement over ~50 rounds and 2,998 findings: findings carrying three or more
-independent authors changed band 0% of the time, so adjudicating them spent a stage
-to reproduce a verdict already reached. The numbers, the instrumentation, and the
-conditions under which this should be reverted are in
-`docs/round2-derive-evidence.md`.
+`contracts/gate-primitive.md` and `contracts/sdlc-invariants.md`).

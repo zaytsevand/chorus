@@ -1,0 +1,40 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "rsvp.schema.json",
+  "title": "RSVP reply",
+  "description": "A persona's joining reply for one round or one gate (chorus-review Phase 0.5; DECISION-PRIMITIVE.md § The RSVP signal, § Seating). At most 80 words of prose across reason, hook, applies and uncovered_delta.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["kind", "schema_version", "persona", "lens", "round", "decision", "reason"],
+  "properties": {
+    "kind": { "const": "rsvp", "description": "Record kind." },
+    "schema_version": { "$ref": "common.schema.json#/$defs/schema_version", "description": "Schema version; the major must be 1." },
+    "persona": { "$ref": "common.schema.json#/$defs/persona", "description": "Who is replying." },
+    "lens": { "$ref": "common.schema.json#/$defs/lens", "description": "The lens the persona would bring." },
+    "round": { "type": "string", "minLength": 1, "description": "Which round or gate this reply is for, e.g. '2026-09-27' or 'gate-A/cycle-1'. A reply never carries to another gate (S2)." },
+    "decision": { "type": "string", "enum": ["JOIN", "ABSTAIN", "EXCEPTIONAL"], "description": "JOIN, ABSTAIN, or EXCEPTIONAL (exceptional entry beyond the cap of five). The persona's call, never the conductor's (I2)." },
+    "applies": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 3 },
+      "description": "Axis A — applicability: concrete round-context deltas the lens touches, cited. Empty means not applicable."
+    },
+    "expected": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["stakes", "hook"],
+      "description": "Axis B — expected stakes.",
+      "properties": {
+        "stakes": { "$ref": "common.schema.json#/$defs/severity", "description": "🟢, 🟡 or 🔴-potential." },
+        "hook": { "type": "string", "minLength": 3, "description": "One-line evidence hook for the stakes." }
+      }
+    },
+    "uncovered_delta": { "type": "string", "minLength": 3, "description": "EXCEPTIONAL only: the concrete round-context delta no seated ordinary lens covers. Distinct entries must cite distinct deltas." },
+    "reason": { "type": "string", "minLength": 3, "description": "One-sentence reason." }
+  },
+  "allOf": [
+    { "if": { "properties": { "decision": { "enum": ["JOIN", "EXCEPTIONAL"] } }, "required": ["decision"] },
+      "then": { "required": ["applies", "expected"], "properties": { "applies": { "minItems": 1 } } } },
+    { "if": { "properties": { "decision": { "const": "EXCEPTIONAL" } }, "required": ["decision"] },
+      "then": { "required": ["uncovered_delta"] } }
+  ]
+}

@@ -1,0 +1,30 @@
+{
+  "kind": "vote-report",
+  "schema_version": "1",
+  "mode": "review",
+  "round": "2026-09-27",
+  "persona": "security-and-trust-advisor",
+  "lens": "security",
+  "tool_uses": 6,
+  "own_findings": ["F4"],
+  "votes": [
+    { "finding": "F1", "confidence_on_hand": "high", "vote": "PRIORITIZE", "reason": "Without a root, authorization has nowhere to live.", "evidence": [{ "kind": "file_line", "ref": "src/orders/model.py:88" }], "pull_quote": "No root means no place to check who may export." },
+    { "finding": "F2", "confidence_on_hand": "high", "vote": "OVER-RATE", "reason": "src/export/worker.py:12 caps retries at the queue level already." },
+    { "finding": "F5", "confidence_on_hand": "low", "vote": "NEED_INFO", "reason": "Export size limits are an operator fact I do not have." }
+  ],
+  "derived": [
+    {
+      "id": "R2-1",
+      "lens": "security",
+      "locator": "src/orders/model.py:88",
+      "claim": "Given F1, the export path has no authorization check of its own; it trusts whatever loaded the order.",
+      "evidence": [{ "kind": "file_line", "ref": "src/orders/model.py:88" }],
+      "proposed_severity": "🟡",
+      "pull_quote": "With no aggregate root, nothing checks who may export an order.",
+      "confidence_on_hand": "high",
+      "need_info": false,
+      "derived_from": "F1",
+      "graded": false
+    }
+  ]
+}

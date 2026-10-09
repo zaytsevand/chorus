@@ -1,0 +1,62 @@
+{
+  "kind": "vote-report",
+  "schema_version": "1",
+  "mode": "review",
+  "round": "2026-09-27",
+  "persona": "security-and-trust-advisor",
+  "lens": "security",
+  "tool_uses": 6,
+  "own_findings": ["F9", "F10", "F11", "F12", "F13", "F14", "F15"],
+  "votes": [
+    { "finding": "F3", "confidence_on_hand": "high", "vote": "CONFIRM", "reason": "Retry policy belongs to the chorus. A retry costs no trust as long as the validator runs again on the second answer." },
+    { "finding": "F4", "confidence_on_hand": "high", "vote": "CONFIRM", "reason": "Same mechanism as my F11: an unversioned contract means drift shows up as abstentions and is blamed on the personas.", "pull_quote": "A version mismatch has to name itself, or it blames the personas." },
+    { "finding": "F5", "confidence_on_hand": "high", "vote": "CONFIRM", "reason": "Every round executes the validator, yet it lives in an unpushed repo with no CI. Its integrity depends on one working copy." },
+    { "finding": "F6", "confidence_on_hand": "high", "vote": "CONFIRM", "reason": "The grep check is cheap, and it keeps the provider out of the canon." },
+    { "finding": "F8", "confidence_on_hand": "high", "vote": "CONFIRM", "reason": "The trade holds only if the drift alarms ship with it." },
+    { "finding": "F18", "confidence_on_hand": "high", "vote": "PRIORITIZE", "reason": "A remote ruling_ref is checked for shape only (coryphaeus/bin/validate.mjs:204-225), and a fitting ruling closes an operator ask as 🟢 (CONDUCTOR.md:273). So the reference can be forged. See R2-1.", "evidence": [{ "kind": "file_line", "ref": "coryphaeus/bin/validate.mjs:204-225" }], "pull_quote": "A citation nobody resolves can speak with the operator's authority." },
+    { "finding": "F22", "confidence_on_hand": "high", "vote": "CONFIRM", "reason": "When a seat is lost silently, a trust lens can vanish mid-round without anyone noticing." },
+    { "finding": "F23", "confidence_on_hand": "high", "vote": "PRIORITIZE", "reason": "A control that is missing and leaves no record looks like a control that ran. Together with my F11, a fail-open default with nowhere to record the failure is the dormant-guard shape.", "evidence": [{ "kind": "file_line", "ref": "skill/chorus-core/CONDUCTOR.md:274" }], "pull_quote": "An unvalidated round that cannot say so reads as validated." },
+    { "finding": "F24", "confidence_on_hand": "high", "vote": "CONFIRM", "reason": "A stale persona prompt means a stale review lens, and dogfooding would not catch it." },
+    { "finding": "F25", "confidence_on_hand": "high", "vote": "CONFIRM", "reason": "Rated correctly. The damage stays local." },
+    { "finding": "F26", "confidence_on_hand": "high", "vote": "CONFIRM", "reason": "Outside installers would get the fail-open default without knowing it." },
+    { "finding": "F27", "confidence_on_hand": "high", "vote": "CONFIRM", "reason": "The same gap applies to the security lens on cross-user deferrals (my F15)." },
+    { "finding": "F29", "confidence_on_hand": "high", "vote": "CONFIRM", "reason": "Two texts disagree about the policy." },
+    { "finding": "F30", "confidence_on_hand": "high", "vote": "CONFIRM", "reason": "Free text that no validator checks cannot carry a claim that a fallback is never silent." },
+    { "finding": "F33", "confidence_on_hand": "high", "vote": "CONFIRM", "reason": "Rated correctly." }
+  ],
+  "derived": [
+    {
+      "id": "R2-1",
+      "lens": "security",
+      "locator": "coryphaeus/bin/validate.mjs:204-225",
+      "claim": "Given F18, the validator resolves only '#' references. A reference to a remote record is checked for shape alone, and whether it 'fits' the question is left to the conductor's judgement (CONDUCTOR.md:273). Under 'cite, don't copy' (CONDUCTOR.md:281), the record never shows the ruling's words. A missing, misread or prompt-injected R-n can therefore close an operator ask as 🟢, and no reader can check it.",
+      "evidence": [
+        { "kind": "file_line", "ref": "coryphaeus/bin/validate.mjs:204-225" },
+        { "kind": "file_line", "ref": "skill/chorus-core/CONDUCTOR.md:273" },
+        { "kind": "file_line", "ref": "skill/chorus-core/CONDUCTOR.md:281" }
+      ],
+      "proposed_severity": "🟡",
+      "pull_quote": "The operator's authority is cited by id, and nobody checks the id.",
+      "confidence_on_hand": "high",
+      "need_info": false,
+      "derived_from": "F18",
+      "graded": false
+    },
+    {
+      "id": "R2-2",
+      "lens": "security",
+      "locator": "install.sh:78-84",
+      "claim": "Given F24, an agent file with a chorus persona's name that install.sh did not write is skipped and kept. The chorus then dispatches whatever prompt holds that name. FC4 and FC5 check the repo, never the installed copies, so a shadowed persona looks like a seated lens.",
+      "evidence": [
+        { "kind": "file_line", "ref": "install.sh:78-84" }
+      ],
+      "proposed_severity": "🟢",
+      "pull_quote": "The chorus trusts the persona's name, not its text.",
+      "confidence_on_hand": "high",
+      "need_info": false,
+      "conditional_on": "A1 solo operator",
+      "derived_from": "F24",
+      "graded": false
+    }
+  ]
+}

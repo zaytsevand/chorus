@@ -1,0 +1,2160 @@
+{
+ "kind": "review-record",
+ "schema_version": "1",
+ "date": "2026-09-27",
+ "target": "chorus PR #32 and coryphaeus",
+ "mode": "pr-design",
+ "round_context": "Design review of chorus PR #32 (branch suite-review/integration; about 40 files, +1.4k/−2.2k against main) and the new coryphaeus repository. Deltas: seven declared ports in CONDUCTOR; persona replies and records as JSON checked by coryphaeus's validator; mandates removed and the cap of five on every board; seating and the deferral checklist moved into DECISION-PRIMITIVE; three-level severity and six settled vote-count cases; the review procedure rewritten with INTEGRATION-LAYER folded in; persona files reworked; plugin packaging, install manifest, integrity checks and CI; coryphaeus schemas, validator, renderer and port bindings. Out of scope: specs/, tests/parity/, older reviews.",
+ "bindings": {
+  "ports": [
+   { "port": "decision-sink", "provider": "problem-brief" },
+   { "port": "ruling-lookup", "provider": "problem-brief" },
+   { "port": "record-validator", "provider": "coryphaeus" },
+   { "port": "record-renderer", "provider": "coryphaeus" },
+   { "port": "memory-recall", "provider": "default" }
+  ],
+  "recoveries": []
+ },
+ "register": [
+  {
+   "id": "F1",
+   "author": "mark-richards-architect",
+   "lens": "architecture",
+   "authored_severity": "🔴",
+   "locator": "skill/chorus-core/GATE-PRIMITIVE.md:207-240",
+   "pull_quote": "Two authors of the vote rule, and no alarm when they disagree.",
+   "evidence": [
+    {
+     "kind": "file_line",
+     "ref": "skill/chorus-core/GATE-PRIMITIVE.md:207-240",
+     "note": "The rule and six settled cases, in prose."
+    },
+    {
+     "kind": "file_line",
+     "ref": "coryphaeus/bin/validate.mjs:172-183",
+     "note": "tally() re-authors the same arithmetic."
+    },
+    {
+     "kind": "file_line",
+     "ref": "coryphaeus/test/validate.test.mjs:39-43",
+     "note": "Cases copied by hand; GATE-PRIMITIVE is never read."
+    },
+    {
+     "kind": "file_line",
+     "ref": ".specify/memory/constitution.md:87",
+     "note": "A tally rule appearing outside its canon doc is named as the smell."
+    }
+   ],
+   "confidence_on_hand": "high",
+   "need_info": false,
+   "graded": true
+  },
+  {
+   "id": "F2",
+   "author": "mark-richards-architect",
+   "lens": "architecture",
+   "authored_severity": "🟡",
+   "locator": "skill/chorus-core/CONDUCTOR.md:270-278",
+   "pull_quote": "The port contract is written twice and already reads two ways.",
+   "evidence": [
+    {
+     "kind": "file_line",
+     "ref": "skill/chorus-core/CONDUCTOR.md:274"
+    },
+    {
+     "kind": "file_line",
+     "ref": "skill/chorus-core/CONDUCTOR.md:278"
+    },
+    {
+     "kind": "file_line",
+     "ref": "coryphaeus/SKILL.md:53-61",
+     "note": "Its column is labelled Default (nothing bound) but it lists the bindings."
+    }
+   ],
+   "confidence_on_hand": "high",
+   "need_info": false,
+   "graded": true,
+   "convergence_notes": [
+    {
+     "persona": "eric-evans-advisor",
+     "pull_quote": "The port table exists twice and means two things by 'unbound'."
+    },
+    {
+     "persona": "alan-cooper-advisor",
+     "pull_quote": "One contract, one table."
+    },
+    {
+     "persona": "don-norman-advisor",
+     "pull_quote": "Whichever table the operator reads first becomes their model of what runs."
+    }
+   ]
+  },
+  {
+   "id": "F3",
+   "author": "mark-richards-architect",
+   "lens": "architecture",
+   "authored_severity": "🟡",
+   "locator": "skill/chorus-review/SKILL.md:159-172",
+   "pull_quote": "The provider is re-deciding a rule the chorus owns.",
+   "evidence": [
+    {
+     "kind": "file_line",
+     "ref": "skill/chorus-review/SKILL.md:159-172"
+    },
+    {
+     "kind": "file_line",
+     "ref": "coryphaeus/SKILL.md:42-44"
+    }
+   ],
+   "confidence_on_hand": "high",
+   "need_info": false,
+   "graded": true,
+   "convergence_notes": [
+    {
+     "persona": "alan-cooper-advisor",
+     "pull_quote": "Decide the retry once, in the chorus."
+    },
+    {
+     "persona": "don-norman-advisor",
+     "pull_quote": "One rule owned in one place is also one story told to the user."
+    }
+   ]
+  },
+  {
+   "id": "F4",
+   "author": "mark-richards-architect",
+   "lens": "architecture",
+   "authored_severity": "🟡",
+   "locator": "coryphaeus/schema/finding-report.schema.json",
+   "pull_quote": "A schema bump would read as ten abstentions, not as a version mismatch.",
+   "evidence": [
+    {
+     "kind": "file_line",
+     "ref": "coryphaeus/schema/finding-report.schema.json:11",
+     "note": "schema_version const '1'."
+    },
+    {
+     "kind": "file_line",
+     "ref": "skill/chorus-core/CONDUCTOR.md:274",
+     "note": "'the bound schema', with no version."
+    },
+    {
+     "kind": "file_line",
+     "ref": "coryphaeus/install.sh:1-26",
+     "note": "Plain copy, nothing versioned."
+    }
+   ],
+   "confidence_on_hand": "high",
+   "need_info": false,
+   "graded": true,
+   "convergence_notes": [
+    {
+     "persona": "security-and-trust-advisor",
+     "pull_quote": "A version mismatch has to name itself, or it blames the personas."
+    },
+    {
+     "persona": "alan-cooper-advisor",
+     "pull_quote": "A version mismatch is blamed on the personas, and the advice is to wait."
+    },
+    {
+     "persona": "don-norman-advisor",
+     "pull_quote": "A version bump shows up as a row of abstentions, and the operator will look for the fault in the personas."
+    }
+   ]
+  },
+  {
+   "id": "F5",
+   "author": "mark-richards-architect",
+   "lens": "architecture",
+   "authored_severity": "🟡",
+   "locator": ".github/workflows/integrity.yml:1-25",
+   "pull_quote": "The rule-checking program itself goes unchecked.",
+   "evidence": [
+    {
+     "kind": "file_line",
+     "ref": ".github/workflows/integrity.yml:1-25"
+    },
+    {
+     "kind": "file_line",
+     "ref": ".specify/memory/constitution.md:306-310"
+    },
+    {
+     "kind": "file_line",
+     "ref": "install.sh:1",
+     "note": "No mention of coryphaeus or node."
+    }
+   ],
+   "confidence_on_hand": "high",
+   "need_info": false,
+   "graded": true
+  },
+  {
+   "id": "F6",
+   "author": "mark-richards-architect",
+   "lens": "architecture",
+   "authored_severity": "🟢",
+   "locator": ".specify/memory/constitution.md:321-324",
+   "pull_quote": "The direction is right today, and nothing keeps it right tomorrow.",
+   "evidence": [
+    {
+     "kind": "file_line",
+     "ref": ".specify/memory/constitution.md:321-324"
+    },
+    {
+     "kind": "file_line",
+     "ref": "scripts/check-suite-integrity.sh:6-13",
+     "note": "FC1-FC5 do not cover it."
+    }
+   ],
+   "confidence_on_hand": "high",
+   "need_info": false,
+   "graded": true
+  },
+  {
+   "id": "F7",
+   "author": "mark-richards-architect",
+   "lens": "architecture",
+   "authored_severity": "🟢",
+   "locator": ".claude-plugin/plugin.json:4-8",
+   "pull_quote": "The manifest describes the previous version of the suite.",
+   "evidence": [
+    {
+     "kind": "file_line",
+     "ref": ".claude-plugin/plugin.json:4-8"
+    }
+   ],
+   "confidence_on_hand": "high",
+   "need_info": false,
+   "graded": true,
+   "convergence_notes": [
+    {
+     "persona": "alan-cooper-advisor",
+     "pull_quote": "Every surface the user reads first still describes the old artifact."
+    }
+   ]
+  },
+  {
+   "id": "F8",
+   "author": "mark-richards-architect",
+   "lens": "architecture",
+   "authored_severity": "🟡",
+   "locator": "skill/chorus-core/CONDUCTOR.md:266-282",
+   "pull_quote": "The right trade, as long as the drift alarms ship with it.",
+   "evidence": [
+    {
+     "kind": "file_line",
+     "ref": "skill/chorus-core/CONDUCTOR.md:266-282"
+    },
+    {
+     "kind": "file_line",
+     "ref": "coryphaeus/SKILL.md:29-37"
+    }
+   ],
+   "confidence_on_hand": "high",
+   "need_info": false,
+   "graded": true
+  },
+  {
+   "id": "F9",
+   "author": "security-and-trust-advisor",
+   "lens": "security",
+   "authored_severity": "🟡",
+   "locator": "skill/chorus-review/SKILL.md:164-166",
+   "pull_quote": "The memory folder is a back door past the validator.",
+   "evidence": [
+    {
+     "kind": "file_line",
+     "ref": "skill/chorus-review/SKILL.md:164-166",
+     "note": "'Read any new files there: they are the report.'"
+    },
+    {
+     "kind": "file_line",
+     "ref": "skill/chorus-review/SKILL.md:167-172",
+     "note": "Replies are checked by the validator before they count."
+    },
+    {
+     "kind": "file_line",
+     "ref": "skill/chorus-core/EXPLORATORY-PHASE.md:105-107",
+     "note": "Memory is an index, never the evidentiary endpoint."
+    }
+   ],
+   "confidence_on_hand": "high",
+   "need_info": false,
+   "graded": true,
+   "convergence_notes": [
+    {
+     "persona": "mark-richards-architect",
+     "pull_quote": "The memory folder is a second report channel, and it skips the gate."
+    }
+   ]
+  },
+  {
+   "id": "F10",
+   "author": "security-and-trust-advisor",
+   "lens": "security",
+   "authored_severity": "🟡",
+   "locator": "skill/chorus-core/CONDUCTOR.md:406-427",
+   "pull_quote": "A filter that never ran now reads as zero drops.",
+   "evidence": [
+    {
+     "kind": "file_line",
+     "ref": "coryphaeus/bin/render.mjs:189",
+     "note": "secret_drops ?? 0"
+    },
+    {
+     "kind": "file_line",
+     "ref": "coryphaeus/schema/sdlc-log.schema.json:154",
+     "note": "Optional integer, self-reported."
+    },
+    {
+     "kind": "file_line",
+     "ref": "skill/chorus-core/CONDUCTOR.md:424-426",
+     "note": "'No runtime: the skill has none'."
+    },
+    {
+     "kind": "file_line",
+     "ref": ".specify/memory/constitution.md:306-309",
+     "note": "Programs now live outside the canon."
+    }
+   ],
+   "confidence_on_hand": "high",
+   "need_info": false,
+   "graded": true,
+   "convergence_notes": [
+    {
+     "persona": "don-norman-advisor",
+     "pull_quote": "A filter that never ran is reported as a clean pass, so the page itself is wrong."
+    }
+   ]
+  },
+  {
+   "id": "F11",
+   "author": "security-and-trust-advisor",
+   "lens": "security",
+   "authored_severity": "🟡",
+   "locator": "skill/chorus-core/CONDUCTOR.md:274",
+   "pull_quote": "A missing validator fails quietly or blames the wrong party.",
+   "evidence": [
+    {
+     "kind": "file_line",
+     "ref": "coryphaeus/install.sh:14",
+     "note": "Missing node is only a warning."
+    },
+    {
+     "kind": "file_line",
+     "ref": "coryphaeus/bin/validate.mjs:540",
+     "note": "Exit contract is 0/1/2 only."
+    },
+    {
+     "kind": "file_line",
+     "ref": "skill/chorus-review/SKILL.md:159-163",
+     "note": "Every failure is treated as ABSTAIN."
+    }
+   ],
+   "confidence_on_hand": "high",
+   "need_info": false,
+   "graded": true,
+   "convergence_notes": [
+    {
+     "persona": "mark-richards-architect",
+     "pull_quote": "An absent validator and an absent version pin fail the same quiet way."
+    },
+    {
+     "persona": "alan-cooper-advisor",
+     "pull_quote": "An unvalidated round has to announce itself."
+    }
+   ]
+  },
+  {
+   "id": "F12",
+   "author": "security-and-trust-advisor",
+   "lens": "security",
+   "authored_severity": "🟢",
+   "locator": "install.sh:95-103",
+   "pull_quote": "The two delete paths guard differently, and the weak one sets the rule.",
+   "evidence": [
+    {
+     "kind": "file_line",
+     "ref": "install.sh:97-101"
+    },
+    {
+     "kind": "file_line",
+     "ref": "uninstall.sh:29-33",
+     "note": "Guard present."
+    }
+   ],
+   "confidence_on_hand": "high",
+   "need_info": false,
+   "graded": true
+  },
+  {
+   "id": "F13",
+   "author": "security-and-trust-advisor",
+   "lens": "security",
+   "authored_severity": "🟢",
+   "locator": "coryphaeus/bin/render.mjs:23",
+   "pull_quote": "Valid JSON is not trusted content.",
+   "evidence": [
+    {
+     "kind": "file_line",
+     "ref": "coryphaeus/bin/render.mjs:40-56"
+    }
+   ],
+   "confidence_on_hand": "high",
+   "need_info": false,
+   "graded": true
+  },
+  {
+   "id": "F14",
+   "author": "security-and-trust-advisor",
+   "lens": "security",
+   "authored_severity": "🟢",
+   "locator": ".github/workflows/integrity.yml:3-9",
+   "pull_quote": "This CI has no secrets to leak, and that is correct.",
+   "evidence": [
+    {
+     "kind": "file_line",
+     "ref": ".github/workflows/integrity.yml:3-9"
+    }
+   ],
+   "confidence_on_hand": "high",
+   "need_info": false,
+   "graded": true
+  },
+  {
+   "id": "F15",
+   "author": "security-and-trust-advisor",
+   "lens": "security",
+   "authored_severity": "🟡",
+   "locator": "skill/chorus-core/DECISION-PRIMITIVE.md:235-237",
+   "pull_quote": "The safety net catches the safer case and misses the worse one.",
+   "evidence": [
+    {
+     "kind": "file_line",
+     "ref": "skill/chorus-core/DECISION-PRIMITIVE.md:201"
+    },
+    {
+     "kind": "file_line",
+     "ref": "skill/chorus-core/DECISION-PRIMITIVE.md:178"
+    }
+   ],
+   "confidence_on_hand": "high",
+   "need_info": false,
+   "graded": true,
+   "convergence_notes": [
+    {
+     "persona": "alan-cooper-advisor",
+     "pull_quote": "Removing the mandates left the side-note carrying more than it can."
+    }
+   ]
+  },
+  {
+   "id": "F16",
+   "author": "eric-evans-advisor",
+   "lens": "ddd",
+   "authored_severity": "🟡",
+   "locator": "coryphaeus/SKILL.md:102",
+   "pull_quote": "In the chorus 'escalated' means blocked; in the brief it means not blocking, and the glossary skips the one word that flips.",
+   "evidence": [
+    {
+     "kind": "file_line",
+     "ref": "coryphaeus/schema/decision.schema.json:107",
+     "note": "band 🔴 forces resolution 'escalated'."
+    },
+    {
+     "kind": "file_line",
+     "ref": "~/.claude/skills/problem-brief/schema/problem-brief.schema.json:260",
+     "note": "brief bearing 'escalated' is defined as not standing in the goal's way."
+    },
+    {
+     "kind": "file_line",
+     "ref": "coryphaeus/schema/sdlc-log.schema.json:121",
+     "note": "gate result 'escalated' is a third meaning."
+    }
+   ],
+   "confidence_on_hand": "high",
+   "need_info": false,
+   "graded": true
+  },
+  {
+   "id": "F17",
+   "author": "eric-evans-advisor",
+   "lens": "ddd",
+   "authored_severity": "🟡",
+   "locator": "coryphaeus/schema/common.schema.json:232-239",
+   "pull_quote": "One row can say held and hold, and they mean uncounted and counted-but-unmoved.",
+   "evidence": [
+    {
+     "kind": "file_line",
+     "ref": "skill/chorus-core/GATE-PRIMITIVE.md:223-228",
+     "note": "'hold author-proposed severity' and 'a finding held by CONFIRM' are the tally sense."
+    },
+    {
+     "kind": "file_line",
+     "ref": "skill/chorus-review/SKILL.md:322",
+     "note": "'shown held, not graded' is the NEED_INFO sense."
+    }
+   ],
+   "confidence_on_hand": "high",
+   "need_info": false,
+   "graded": true,
+   "convergence_notes": [
+    {
+     "persona": "don-norman-advisor",
+     "pull_quote": "Two near-identical words for uncounted and counted-but-unmoved, on a page that hides the counts."
+    }
+   ]
+  },
+  {
+   "id": "F18",
+   "author": "eric-evans-advisor",
+   "lens": "ddd",
+   "authored_severity": "🟡",
+   "locator": "coryphaeus/schema/common.schema.json:147",
+   "pull_quote": "The citation key has two spellings, and the reader matches only one of them, locally, and none remotely.",
+   "evidence": [
+    {
+     "kind": "file_line",
+     "ref": "coryphaeus/bin/validate.mjs:222-229",
+     "note": "'#' is resolved by exact id; a Q-n in ruling_ref only warns; remote records are not opened."
+    },
+    {
+     "kind": "file_line",
+     "ref": "coryphaeus/schema/ruling.schema.json:11",
+     "note": "ruling ids are bare R-n."
+    },
+    {
+     "kind": "file_line",
+     "ref": "docs/reviews/pr32/standing-rulings.md:3",
+     "note": "citers are told to write suite-review/R-3."
+    }
+   ],
+   "confidence_on_hand": "high",
+   "need_info": false,
+   "graded": true,
+   "convergence_notes": [
+    {
+     "persona": "security-and-trust-advisor",
+     "pull_quote": "A citation nobody resolves can speak with the operator's authority."
+    }
+   ]
+  },
+  {
+   "id": "F19",
+   "author": "eric-evans-advisor",
+   "lens": "ddd",
+   "authored_severity": "🟡",
+   "locator": "coryphaeus/schema/decision.schema.json:5",
+   "pull_quote": "The chorus conforms to the brief, which is right, but nobody wrote it down or checks it.",
+   "evidence": [
+    {
+     "kind": "file_line",
+     "ref": "coryphaeus/schema/decision.schema.json:86",
+     "note": "status 'same meanings as a problem-brief entry's status', asserted, not checked."
+    },
+    {
+     "kind": "file_line",
+     "ref": "coryphaeus/schema/ruling.schema.json:5",
+     "note": "ruling declared field-for-field the brief's."
+    }
+   ],
+   "confidence_on_hand": "high",
+   "need_info": false,
+   "graded": true,
+   "convergence_notes": [
+    {
+     "persona": "mark-richards-architect",
+     "pull_quote": "Conforming to the brief without a drift check is only a promise."
+    }
+   ]
+  },
+  {
+   "id": "F20",
+   "author": "eric-evans-advisor",
+   "lens": "ddd",
+   "authored_severity": "🟡",
+   "locator": "coryphaeus/SKILL.md:83-109",
+   "pull_quote": "The layer translates outbound well; inbound it only knows the day the operator says yes.",
+   "evidence": [
+    {
+     "kind": "file_line",
+     "ref": "coryphaeus/schema/ruling.schema.json:18-19",
+     "note": "rulings can be replaced; no chorus rule follows."
+    },
+    {
+     "kind": "file_line",
+     "ref": "~/.claude/skills/problem-brief/schema/problem-brief.schema.json:254",
+     "note": "brief entries reopen under the same id and can be superseded."
+    }
+   ],
+   "confidence_on_hand": "high",
+   "need_info": false,
+   "graded": true
+  },
+  {
+   "id": "F21",
+   "author": "eric-evans-advisor",
+   "lens": "ddd",
+   "authored_severity": "🟢",
+   "locator": "skill/chorus-core/GATE-PRIMITIVE.md:237",
+   "pull_quote": "The Core has one author and one enforcer; say which one wins, and keep the brief's rules out of it.",
+   "evidence": [
+    {
+     "kind": "file_line",
+     "ref": "coryphaeus/bin/validate.mjs:238",
+     "note": "brief-entry ordering enforced inside the decision check."
+    }
+   ],
+   "confidence_on_hand": "high",
+   "need_info": false,
+   "graded": true,
+   "convergence_notes": [
+    {
+     "persona": "mark-richards-architect",
+     "pull_quote": "Two authors of one rule need a tiebreak written down."
+    }
+   ]
+  },
+  {
+   "id": "F22",
+   "author": "alan-cooper-advisor",
+   "lens": "user goals",
+   "authored_severity": "🟡",
+   "locator": "skill/chorus-review/SKILL.md:159-172",
+   "pull_quote": "A seat can disappear mid-round and the operator finds out only from the record.",
+   "evidence": [
+    {
+     "kind": "file_line",
+     "ref": "skill/chorus-review/SKILL.md:159-163",
+     "note": "One failure rule: rejected output counts as ABSTAIN, reason written to the roster, no retry mentioned."
+    },
+    {
+     "kind": "file_line",
+     "ref": "coryphaeus/SKILL.md:42-44",
+     "note": "An invalid reply goes back to the persona once, then counts as ABSTAIN."
+    }
+   ],
+   "confidence_on_hand": "high",
+   "need_info": false,
+   "graded": true,
+   "convergence_notes": [
+    {
+     "persona": "don-norman-advisor",
+     "pull_quote": "The seat vanishes during the round, and the operator hears about it only after the round is over."
+    }
+   ]
+  },
+  {
+   "id": "F23",
+   "author": "alan-cooper-advisor",
+   "lens": "user goals",
+   "authored_severity": "🟡",
+   "locator": "skill/chorus-core/CONDUCTOR.md:274",
+   "pull_quote": "The record promises to say 'unvalidated' and has no place to say it.",
+   "evidence": [
+    {
+     "kind": "file_line",
+     "ref": "skill/chorus-core/CONDUCTOR.md:268-276",
+     "note": "Unbound defaults: 'unvalidated', 'unrendered'; 'the round record says so'."
+    },
+    {
+     "kind": "file_line",
+     "ref": "skill/chorus-review/SKILL.md:176-196",
+     "note": "Phase 0 post-conditions: scope, date and round context; nothing about port bindings."
+    },
+    {
+     "kind": "file_line",
+     "ref": "coryphaeus/schema/review-record.schema.json:8",
+     "note": "The required fields include no binding or validation status."
+    }
+   ],
+   "confidence_on_hand": "high",
+   "need_info": false,
+   "graded": true,
+   "convergence_notes": [
+    {
+     "persona": "security-and-trust-advisor",
+     "pull_quote": "An unvalidated round that cannot say so reads as validated."
+    },
+    {
+     "persona": "eric-evans-advisor",
+     "pull_quote": "A fallback is an event the round lives through, and the record has no word for it."
+    },
+    {
+     "persona": "don-norman-advisor",
+     "pull_quote": "The record promises a label it has no field for."
+    }
+   ]
+  },
+  {
+   "id": "F24",
+   "author": "alan-cooper-advisor",
+   "lens": "user goals",
+   "authored_severity": "🟡",
+   "locator": "install.sh:79-81",
+   "pull_quote": "Dogfooding a release can leave last month's personas installed.",
+   "evidence": [
+    {
+     "kind": "file_line",
+     "ref": "install.sh:78-85",
+     "note": "The 'keep' branch: recorded in the manifest, not copied."
+    },
+    {
+     "kind": "file_line",
+     "ref": "install.sh:9-11",
+     "note": "The header's re-run promise, true only for skills."
+    },
+    {
+     "kind": "file_line",
+     "ref": "scripts/test-install-roundtrip.sh:25-26",
+     "note": "Re-run uses identical source; no stale-agent upgrade case."
+    }
+   ],
+   "confidence_on_hand": "high",
+   "need_info": false,
+   "graded": true
+  },
+  {
+   "id": "F25",
+   "author": "alan-cooper-advisor",
+   "lens": "user goals",
+   "authored_severity": "🟢",
+   "locator": "install.sh:13-16,87-89",
+   "pull_quote": "--force destroys the very customization the installer says it protects.",
+   "evidence": [
+    {
+     "kind": "file_line",
+     "ref": "install.sh:87-89",
+     "note": "cp -f, then recorded in the manifest."
+    },
+    {
+     "kind": "file_line",
+     "ref": "uninstall.sh:36-38",
+     "note": "Removes every recorded file."
+    }
+   ],
+   "confidence_on_hand": "high",
+   "need_info": false,
+   "graded": true
+  },
+  {
+   "id": "F26",
+   "author": "alan-cooper-advisor",
+   "lens": "user goals",
+   "authored_severity": "🟢",
+   "locator": "install.sh:109-121",
+   "pull_quote": "The installer never mentions the validator the whole redesign rests on.",
+   "evidence": [
+    {
+     "kind": "file_line",
+     "ref": "install.sh:113-118",
+     "note": "'Next:' steps mention the addendum and 'spawn the chorus' only."
+    },
+    {
+     "kind": "file_line",
+     "ref": "coryphaeus/install.sh:14",
+     "note": "Only warns when Node is missing."
+    }
+   ],
+   "confidence_on_hand": "high",
+   "need_info": false,
+   "graded": true
+  },
+  {
+   "id": "F27",
+   "author": "alan-cooper-advisor",
+   "lens": "user goals",
+   "authored_severity": "🟡",
+   "locator": "skill/chorus-core/DECISION-PRIMITIVE.md:179,226",
+   "pull_quote": "The deferral check still fires, but nobody is assigned to write the strip.",
+   "evidence": [
+    {
+     "kind": "file_line",
+     "ref": "skill/chorus-core/DECISION-PRIMITIVE.md:179",
+     "note": "Row 13: recorded default 'strip requested', no author."
+    },
+    {
+     "kind": "file_line",
+     "ref": "skill/chorus-core/DECISION-PRIMITIVE.md:79-95",
+     "note": "Exceptional entry needs a delta no seated lens covers; coverage is judged by role."
+    }
+   ],
+   "confidence_on_hand": "high",
+   "need_info": false,
+   "graded": true
+  },
+  {
+   "id": "F28",
+   "author": "alan-cooper-advisor",
+   "lens": "user goals",
+   "authored_severity": "🟢",
+   "locator": "skill/chorus-review/SKILL.md:314-316,423-433",
+   "pull_quote": "The page serves the operator well, except it cannot say whether the round was validated.",
+   "evidence": [
+    {
+     "kind": "file_line",
+     "ref": "skill/chorus-review/SKILL.md:423-433",
+     "note": "Page order: roster with abstainers and reasons."
+    },
+    {
+     "kind": "file_line",
+     "ref": "coryphaeus/schema/common.schema.json:170-171",
+     "note": "rsvp_row failure enum."
+    }
+   ],
+   "confidence_on_hand": "high",
+   "need_info": false,
+   "graded": true
+  },
+  {
+   "id": "F29",
+   "author": "don-norman-advisor",
+   "lens": "human-centred design",
+   "authored_severity": "🟡",
+   "locator": "skill/chorus-review/SKILL.md:159-172",
+   "pull_quote": "A broken reply is filed away while it could still be fixed, and the two texts disagree about whether it gets a second chance.",
+   "evidence": [
+    {
+     "kind": "file_line",
+     "ref": "skill/chorus-review/SKILL.md:159-172",
+     "note": "failure rule: ABSTAIN, reason recorded, no retry"
+    },
+    {
+     "kind": "file_line",
+     "ref": "coryphaeus/SKILL.md:42-44",
+     "note": "invalid reply goes back to the persona once"
+    },
+    {
+     "kind": "file_line",
+     "ref": "skill/chorus-review/SKILL.md:292-297",
+     "note": "zero-tool-use gets one re-dispatch with a hint"
+    }
+   ],
+   "confidence_on_hand": "high",
+   "need_info": false,
+   "graded": true,
+   "convergence_notes": [
+    {
+     "persona": "alan-cooper-advisor",
+     "pull_quote": "The reply is filed away while it could still be fixed."
+    }
+   ]
+  },
+  {
+   "id": "F30",
+   "author": "don-norman-advisor",
+   "lens": "human-centred design",
+   "authored_severity": "🟡",
+   "locator": "coryphaeus/SKILL.md:63-64",
+   "pull_quote": "The promise not to fall back silently rests on a free-text note that nothing checks.",
+   "evidence": [
+    {
+     "kind": "file_line",
+     "ref": "coryphaeus/SKILL.md:63-64",
+     "note": "the claim"
+    },
+    {
+     "kind": "file_line",
+     "ref": "coryphaeus/bin/render.mjs:120-123",
+     "note": "side_notes optional; local_rulings heading is the only port signal"
+    },
+    {
+     "kind": "principle",
+     "ref": "feedback: a state change the user cannot perceive cannot close the action-perception loop"
+    }
+   ],
+   "confidence_on_hand": "high",
+   "need_info": false,
+   "graded": true,
+   "convergence_notes": [
+    {
+     "persona": "eric-evans-advisor",
+     "pull_quote": "Free text is where a model puts the things it has not named yet."
+    },
+    {
+     "persona": "alan-cooper-advisor",
+     "pull_quote": "A fallback the page cannot show is a silent fallback."
+    }
+   ]
+  },
+  {
+   "id": "F31",
+   "author": "don-norman-advisor",
+   "lens": "human-centred design",
+   "authored_severity": "🟡",
+   "locator": "skill/chorus-core/CONDUCTOR.md:270-278",
+   "pull_quote": "Two tables tell the operator two different stories about what runs when nothing is bound.",
+   "evidence": [
+    {
+     "kind": "file_line",
+     "ref": "skill/chorus-core/CONDUCTOR.md:270-278"
+    },
+    {
+     "kind": "file_line",
+     "ref": "coryphaeus/SKILL.md:53-61"
+    }
+   ],
+   "confidence_on_hand": "high",
+   "need_info": false,
+   "graded": true,
+   "convergence_notes": [
+    {
+     "persona": "mark-richards-architect",
+     "pull_quote": "One port table, two stories, the defaults already disagree."
+    }
+   ]
+  },
+  {
+   "id": "F32",
+   "author": "don-norman-advisor",
+   "lens": "human-centred design",
+   "authored_severity": "🟡",
+   "locator": "coryphaeus/bin/render.mjs:66-70",
+   "pull_quote": "The page shows the verdict but hides the numbers that would let a reader check it.",
+   "evidence": [
+    {
+     "kind": "file_line",
+     "ref": "coryphaeus/bin/render.mjs:66-70",
+     "note": "matrix columns omit N, T, movement"
+    },
+    {
+     "kind": "file_line",
+     "ref": "coryphaeus/schema/common.schema.json:233-246",
+     "note": "n, threshold, movement required on graded rows"
+    },
+    {
+     "kind": "file_line",
+     "ref": "skill/chorus-core/GATE-PRIMITIVE.md:237-245",
+     "note": "six settled cases"
+    }
+   ],
+   "confidence_on_hand": "high",
+   "need_info": false,
+   "graded": true
+  },
+  {
+   "id": "F33",
+   "author": "don-norman-advisor",
+   "lens": "human-centred design",
+   "authored_severity": "🟢",
+   "locator": "coryphaeus/bin/validate.mjs:536-540",
+   "pull_quote": "Broken JSON is answered with a usage message, which points the fixer the wrong way.",
+   "evidence": [
+    {
+     "kind": "file_line",
+     "ref": "coryphaeus/bin/validate.mjs:536-540",
+     "note": "parse failure prints usage, exit 2"
+    },
+    {
+     "kind": "file_line",
+     "ref": "coryphaeus/bin/validate.mjs:10",
+     "note": "exit 2 = usage or unreadable input, one code for two causes"
+    }
+   ],
+   "confidence_on_hand": "high",
+   "need_info": false,
+   "graded": true
+  },
+  {
+   "id": "F34",
+   "author": "don-norman-advisor",
+   "lens": "human-centred design",
+   "authored_severity": "🟡",
+   "locator": "skill/chorus-review/SKILL.md:383-387",
+   "pull_quote": "Unresolved for the operator is only a record, not a question the operator is asked.",
+   "evidence": [
+    {
+     "kind": "file_line",
+     "ref": "skill/chorus-review/SKILL.md:383-387"
+    },
+    {
+     "kind": "file_line",
+     "ref": "skill/chorus-core/CONDUCTOR.md:276",
+     "note": "arbiter default: record unresolved"
+    },
+    {
+     "kind": "file_line",
+     "ref": "coryphaeus/schema/review-record.schema.json:38-52",
+     "note": "decision_ref optional on conflicts"
+    }
+   ],
+   "confidence_on_hand": "high",
+   "need_info": false,
+   "graded": true,
+   "convergence_notes": [
+    {
+     "persona": "eric-evans-advisor",
+     "pull_quote": "Unresolved should be a decision the sink carries, not a line in the record."
+    },
+    {
+     "persona": "alan-cooper-advisor",
+     "pull_quote": "A log line is not a next step, and a card with a default is."
+    }
+   ]
+  },
+  {
+   "id": "R2-1",
+   "author": "mark-richards-architect",
+   "lens": "architecture",
+   "authored_severity": "🟡",
+   "locator": "skill/chorus-core/CONDUCTOR.md:268",
+   "pull_quote": "Nothing says how a port gets bound, so nothing can report it.",
+   "evidence": [
+    {
+     "kind": "file_line",
+     "ref": "skill/chorus-core/CONDUCTOR.md:268",
+     "note": "The only statement of the binding mechanism."
+    },
+    {
+     "kind": "file_line",
+     "ref": "coryphaeus/SKILL.md:1-10",
+     "note": "Binding reaches the session only through the skill description."
+    }
+   ],
+   "confidence_on_hand": "high",
+   "need_info": false,
+   "graded": false,
+   "derived_from": "F23"
+  },
+  {
+   "id": "R2-2",
+   "author": "mark-richards-architect",
+   "lens": "architecture",
+   "authored_severity": "🟡",
+   "locator": "coryphaeus/schema/ruling.schema.json:5",
+   "pull_quote": "The ruling shape is copied field for field, and nothing notices when the original moves.",
+   "evidence": [
+    {
+     "kind": "file_line",
+     "ref": "coryphaeus/schema/ruling.schema.json:5-11"
+    },
+    {
+     "kind": "file_line",
+     "ref": "~/.claude/skills/problem-brief/schema/problem-brief.schema.json:791-800"
+    },
+    {
+     "kind": "file_line",
+     "ref": "coryphaeus/test/validate.test.mjs:120",
+     "note": "The only ruling test, and it never loads the brief schema."
+    }
+   ],
+   "confidence_on_hand": "high",
+   "need_info": false,
+   "graded": false,
+   "derived_from": "F19"
+  },
+  {
+   "id": "R2-3",
+   "author": "security-and-trust-advisor",
+   "lens": "security",
+   "authored_severity": "🟡",
+   "locator": "coryphaeus/bin/validate.mjs:204-225",
+   "pull_quote": "The operator's authority is cited by id, and nobody checks the id.",
+   "evidence": [
+    {
+     "kind": "file_line",
+     "ref": "coryphaeus/bin/validate.mjs:204-225"
+    },
+    {
+     "kind": "file_line",
+     "ref": "skill/chorus-core/CONDUCTOR.md:273"
+    },
+    {
+     "kind": "file_line",
+     "ref": "skill/chorus-core/CONDUCTOR.md:281"
+    }
+   ],
+   "confidence_on_hand": "high",
+   "need_info": false,
+   "graded": false,
+   "derived_from": "F18"
+  },
+  {
+   "id": "R2-4",
+   "author": "security-and-trust-advisor",
+   "lens": "security",
+   "authored_severity": "🟢",
+   "locator": "install.sh:78-84",
+   "pull_quote": "The chorus trusts the persona's name, not its text.",
+   "evidence": [
+    {
+     "kind": "file_line",
+     "ref": "install.sh:78-84"
+    }
+   ],
+   "confidence_on_hand": "high",
+   "need_info": false,
+   "graded": false,
+   "derived_from": "F24"
+  },
+  {
+   "id": "R2-5",
+   "author": "eric-evans-advisor",
+   "lens": "ddd",
+   "authored_severity": "🟡",
+   "locator": "coryphaeus/SKILL.md:53",
+   "pull_quote": "'Unbound' covers two states, and the round actually has three.",
+   "evidence": [
+    {
+     "kind": "file_line",
+     "ref": "skill/chorus-core/CONDUCTOR.md:270-278",
+     "note": "'Default when unbound' means no root at all."
+    },
+    {
+     "kind": "file_line",
+     "ref": "coryphaeus/SKILL.md:53",
+     "note": "'Default (nothing bound)' beside a separate Binding column means root present, provider absent."
+    }
+   ],
+   "confidence_on_hand": "high",
+   "need_info": false,
+   "graded": false,
+   "derived_from": "F2"
+  },
+  {
+   "id": "R2-6",
+   "author": "alan-cooper-advisor",
+   "lens": "user goals",
+   "authored_severity": "🟡",
+   "locator": "install.sh:120-121",
+   "pull_quote": "The installer tells the user to commit the file the next round does not read.",
+   "evidence": [
+    {
+     "kind": "file_line",
+     "ref": "install.sh:120-121"
+    },
+    {
+     "kind": "file_line",
+     "ref": "README.md:39"
+    },
+    {
+     "kind": "file_line",
+     "ref": "skill/chorus-review/SKILL.md:417-420"
+    }
+   ],
+   "confidence_on_hand": "high",
+   "need_info": false,
+   "graded": false,
+   "derived_from": "F7"
+  },
+  {
+   "id": "R2-7",
+   "author": "alan-cooper-advisor",
+   "lens": "user goals",
+   "authored_severity": "🟡",
+   "locator": "skill/chorus-review/SKILL.md:220-223",
+   "pull_quote": "The abort's advice is to wait, and waiting does not fix a broken validator.",
+   "evidence": [
+    {
+     "kind": "file_line",
+     "ref": "skill/chorus-review/SKILL.md:220-223"
+    },
+    {
+     "kind": "file_line",
+     "ref": "coryphaeus/SKILL.md:39-40",
+     "note": "The kinds list has no abstained record."
+    }
+   ],
+   "confidence_on_hand": "high",
+   "need_info": false,
+   "graded": false,
+   "derived_from": "F4"
+  },
+  {
+   "id": "R2-8",
+   "author": "don-norman-advisor",
+   "lens": "human-centred design",
+   "authored_severity": "🟡",
+   "locator": "install.sh:79-81",
+   "pull_quote": "Every agent file says 'keep', whether it is current or stale.",
+   "evidence": [
+    {
+     "kind": "file_line",
+     "ref": "install.sh:79-81",
+     "note": "keep message printed without comparing contents"
+    }
+   ],
+   "confidence_on_hand": "high",
+   "need_info": false,
+   "graded": false,
+   "derived_from": "F24"
+  },
+  {
+   "id": "R2-9",
+   "author": "don-norman-advisor",
+   "lens": "human-centred design",
+   "authored_severity": "🟡",
+   "locator": "coryphaeus/schema/common.schema.json:171",
+   "pull_quote": "A single version mismatch is shown as five personas failing separately.",
+   "evidence": [
+    {
+     "kind": "file_line",
+     "ref": "coryphaeus/schema/common.schema.json:171",
+     "note": "failure enum: not-installed, silent, past-budget, malformed, over-length, no-evidence"
+    },
+    {
+     "kind": "file_line",
+     "ref": "coryphaeus/bin/render.mjs:84",
+     "note": "reason rendered per row only"
+    }
+   ],
+   "confidence_on_hand": "high",
+   "need_info": false,
+   "graded": false,
+   "derived_from": "F4"
+  }
+ ],
+ "tally": [
+  {
+   "finding": "F1",
+   "authored_severity": "🔴",
+   "status": "minority-report",
+   "n": 1,
+   "p": 0,
+   "c": 0,
+   "o": 1,
+   "final_severity": "🔴"
+  },
+  {
+   "finding": "F2",
+   "authored_severity": "🟡",
+   "status": "graded",
+   "n": 3,
+   "p": 0,
+   "c": 3,
+   "o": 0,
+   "net": 0,
+   "threshold": 1,
+   "movement": "agreed",
+   "final_severity": "🟡",
+   "convergence": 3,
+   "gating": false
+  },
+  {
+   "finding": "F3",
+   "authored_severity": "🟡",
+   "status": "graded",
+   "n": 4,
+   "p": 0,
+   "c": 4,
+   "o": 0,
+   "net": 0,
+   "threshold": 2,
+   "movement": "agreed",
+   "final_severity": "🟡",
+   "convergence": 4,
+   "gating": false
+  },
+  {
+   "finding": "F4",
+   "authored_severity": "🟡",
+   "status": "graded",
+   "n": 4,
+   "p": 1,
+   "c": 3,
+   "o": 0,
+   "net": 1,
+   "threshold": 2,
+   "movement": "agreed",
+   "final_severity": "🟡",
+   "convergence": 4,
+   "gating": false
+  },
+  {
+   "finding": "F5",
+   "authored_severity": "🟡",
+   "status": "graded",
+   "n": 2,
+   "p": 0,
+   "c": 2,
+   "o": 0,
+   "net": 0,
+   "threshold": 1,
+   "movement": "agreed",
+   "final_severity": "🟡",
+   "convergence": 2,
+   "gating": false
+  },
+  {
+   "finding": "F6",
+   "authored_severity": "🟢",
+   "status": "graded",
+   "n": 2,
+   "p": 0,
+   "c": 2,
+   "o": 0,
+   "net": 0,
+   "threshold": 1,
+   "movement": "agreed",
+   "final_severity": "🟢",
+   "convergence": 2,
+   "gating": false
+  },
+  {
+   "finding": "F7",
+   "authored_severity": "🟢",
+   "status": "graded",
+   "n": 3,
+   "p": 1,
+   "c": 2,
+   "o": 0,
+   "net": 1,
+   "threshold": 1,
+   "movement": "escalate",
+   "final_severity": "🟡",
+   "convergence": 3,
+   "gating": false
+  },
+  {
+   "finding": "F8",
+   "authored_severity": "🟡",
+   "status": "minority-report",
+   "n": 1,
+   "p": 0,
+   "c": 1,
+   "o": 0,
+   "final_severity": "🟡"
+  },
+  {
+   "finding": "F9",
+   "authored_severity": "🟡",
+   "status": "graded",
+   "n": 4,
+   "p": 0,
+   "c": 4,
+   "o": 0,
+   "net": 0,
+   "threshold": 2,
+   "movement": "agreed",
+   "final_severity": "🟡",
+   "convergence": 4,
+   "gating": false
+  },
+  {
+   "finding": "F10",
+   "authored_severity": "🟡",
+   "status": "graded",
+   "n": 3,
+   "p": 1,
+   "c": 2,
+   "o": 0,
+   "net": 1,
+   "threshold": 1,
+   "movement": "escalate",
+   "final_severity": "🔴",
+   "convergence": 3,
+   "gating": true
+  },
+  {
+   "finding": "F11",
+   "authored_severity": "🟡",
+   "status": "graded",
+   "n": 3,
+   "p": 0,
+   "c": 3,
+   "o": 0,
+   "net": 0,
+   "threshold": 1,
+   "movement": "agreed",
+   "final_severity": "🟡",
+   "convergence": 3,
+   "gating": false
+  },
+  {
+   "finding": "F12",
+   "authored_severity": "🟢",
+   "status": "graded",
+   "n": 2,
+   "p": 0,
+   "c": 2,
+   "o": 0,
+   "net": 0,
+   "threshold": 1,
+   "movement": "agreed",
+   "final_severity": "🟢",
+   "convergence": 2,
+   "gating": false
+  },
+  {
+   "finding": "F13",
+   "authored_severity": "🟢",
+   "status": "graded",
+   "n": 2,
+   "p": 0,
+   "c": 2,
+   "o": 0,
+   "net": 0,
+   "threshold": 1,
+   "movement": "agreed",
+   "final_severity": "🟢",
+   "convergence": 2,
+   "gating": false
+  },
+  {
+   "finding": "F14",
+   "authored_severity": "🟢",
+   "status": "graded",
+   "n": 2,
+   "p": 0,
+   "c": 2,
+   "o": 0,
+   "net": 0,
+   "threshold": 1,
+   "movement": "agreed",
+   "final_severity": "🟢",
+   "convergence": 2,
+   "gating": false
+  },
+  {
+   "finding": "F15",
+   "authored_severity": "🟡",
+   "status": "minority-report",
+   "n": 1,
+   "p": 0,
+   "c": 1,
+   "o": 0,
+   "final_severity": "🟡"
+  },
+  {
+   "finding": "F16",
+   "authored_severity": "🟡",
+   "status": "graded",
+   "n": 3,
+   "p": 0,
+   "c": 3,
+   "o": 0,
+   "net": 0,
+   "threshold": 1,
+   "movement": "agreed",
+   "final_severity": "🟡",
+   "convergence": 3,
+   "gating": false
+  },
+  {
+   "finding": "F17",
+   "authored_severity": "🟡",
+   "status": "graded",
+   "n": 2,
+   "p": 0,
+   "c": 2,
+   "o": 0,
+   "net": 0,
+   "threshold": 1,
+   "movement": "agreed",
+   "final_severity": "🟡",
+   "convergence": 2,
+   "gating": false
+  },
+  {
+   "finding": "F18",
+   "authored_severity": "🟡",
+   "status": "graded",
+   "n": 2,
+   "p": 1,
+   "c": 1,
+   "o": 0,
+   "net": 1,
+   "threshold": 1,
+   "movement": "escalate",
+   "final_severity": "🔴",
+   "convergence": 2,
+   "gating": true
+  },
+  {
+   "finding": "F19",
+   "authored_severity": "🟡",
+   "status": "minority-report",
+   "n": 1,
+   "p": 0,
+   "c": 1,
+   "o": 0,
+   "final_severity": "🟡"
+  },
+  {
+   "finding": "F20",
+   "authored_severity": "🟡",
+   "status": "graded",
+   "n": 2,
+   "p": 0,
+   "c": 2,
+   "o": 0,
+   "net": 0,
+   "threshold": 1,
+   "movement": "agreed",
+   "final_severity": "🟡",
+   "convergence": 2,
+   "gating": false
+  },
+  {
+   "finding": "F21",
+   "authored_severity": "🟢",
+   "status": "minority-report",
+   "n": 1,
+   "p": 1,
+   "c": 0,
+   "o": 0,
+   "final_severity": "🟢"
+  },
+  {
+   "finding": "F22",
+   "authored_severity": "🟡",
+   "status": "graded",
+   "n": 4,
+   "p": 0,
+   "c": 4,
+   "o": 0,
+   "net": 0,
+   "threshold": 2,
+   "movement": "agreed",
+   "final_severity": "🟡",
+   "convergence": 4,
+   "gating": false
+  },
+  {
+   "finding": "F23",
+   "authored_severity": "🟡",
+   "status": "graded",
+   "n": 4,
+   "p": 1,
+   "c": 3,
+   "o": 0,
+   "net": 1,
+   "threshold": 2,
+   "movement": "agreed",
+   "final_severity": "🟡",
+   "convergence": 4,
+   "gating": false
+  },
+  {
+   "finding": "F24",
+   "authored_severity": "🟡",
+   "status": "graded",
+   "n": 3,
+   "p": 0,
+   "c": 3,
+   "o": 0,
+   "net": 0,
+   "threshold": 1,
+   "movement": "agreed",
+   "final_severity": "🟡",
+   "convergence": 3,
+   "gating": false
+  },
+  {
+   "finding": "F25",
+   "authored_severity": "🟢",
+   "status": "graded",
+   "n": 3,
+   "p": 0,
+   "c": 3,
+   "o": 0,
+   "net": 0,
+   "threshold": 1,
+   "movement": "agreed",
+   "final_severity": "🟢",
+   "convergence": 3,
+   "gating": false
+  },
+  {
+   "finding": "F26",
+   "authored_severity": "🟢",
+   "status": "graded",
+   "n": 3,
+   "p": 0,
+   "c": 3,
+   "o": 0,
+   "net": 0,
+   "threshold": 1,
+   "movement": "agreed",
+   "final_severity": "🟢",
+   "convergence": 3,
+   "gating": false
+  },
+  {
+   "finding": "F27",
+   "authored_severity": "🟡",
+   "status": "minority-report",
+   "n": 1,
+   "p": 0,
+   "c": 1,
+   "o": 0,
+   "final_severity": "🟡"
+  },
+  {
+   "finding": "F28",
+   "authored_severity": "🟢",
+   "status": "graded",
+   "n": 2,
+   "p": 0,
+   "c": 2,
+   "o": 0,
+   "net": 0,
+   "threshold": 1,
+   "movement": "agreed",
+   "final_severity": "🟢",
+   "convergence": 2,
+   "gating": false
+  },
+  {
+   "finding": "F29",
+   "authored_severity": "🟡",
+   "status": "graded",
+   "n": 3,
+   "p": 0,
+   "c": 3,
+   "o": 0,
+   "net": 0,
+   "threshold": 1,
+   "movement": "agreed",
+   "final_severity": "🟡",
+   "convergence": 3,
+   "gating": false
+  },
+  {
+   "finding": "F30",
+   "authored_severity": "🟡",
+   "status": "graded",
+   "n": 4,
+   "p": 0,
+   "c": 4,
+   "o": 0,
+   "net": 0,
+   "threshold": 2,
+   "movement": "agreed",
+   "final_severity": "🟡",
+   "convergence": 4,
+   "gating": false
+  },
+  {
+   "finding": "F31",
+   "authored_severity": "🟡",
+   "status": "graded",
+   "n": 3,
+   "p": 0,
+   "c": 3,
+   "o": 0,
+   "net": 0,
+   "threshold": 1,
+   "movement": "agreed",
+   "final_severity": "🟡",
+   "convergence": 3,
+   "gating": false
+  },
+  {
+   "finding": "F32",
+   "authored_severity": "🟡",
+   "status": "graded",
+   "n": 3,
+   "p": 0,
+   "c": 3,
+   "o": 0,
+   "net": 0,
+   "threshold": 1,
+   "movement": "agreed",
+   "final_severity": "🟡",
+   "convergence": 3,
+   "gating": false
+  },
+  {
+   "finding": "F33",
+   "authored_severity": "🟢",
+   "status": "graded",
+   "n": 3,
+   "p": 0,
+   "c": 3,
+   "o": 0,
+   "net": 0,
+   "threshold": 1,
+   "movement": "agreed",
+   "final_severity": "🟢",
+   "convergence": 3,
+   "gating": false
+  },
+  {
+   "finding": "F34",
+   "authored_severity": "🟡",
+   "status": "graded",
+   "n": 3,
+   "p": 1,
+   "c": 2,
+   "o": 0,
+   "net": 1,
+   "threshold": 1,
+   "movement": "escalate",
+   "final_severity": "🔴",
+   "convergence": 3,
+   "gating": true
+  },
+  {
+   "finding": "R2-1",
+   "authored_severity": "🟡",
+   "status": "ungraded",
+   "final_severity": "🟡"
+  },
+  {
+   "finding": "R2-2",
+   "authored_severity": "🟡",
+   "status": "ungraded",
+   "final_severity": "🟡"
+  },
+  {
+   "finding": "R2-3",
+   "authored_severity": "🟡",
+   "status": "ungraded",
+   "final_severity": "🟡"
+  },
+  {
+   "finding": "R2-4",
+   "authored_severity": "🟢",
+   "status": "ungraded",
+   "final_severity": "🟢"
+  },
+  {
+   "finding": "R2-5",
+   "authored_severity": "🟡",
+   "status": "ungraded",
+   "final_severity": "🟡"
+  },
+  {
+   "finding": "R2-6",
+   "authored_severity": "🟡",
+   "status": "ungraded",
+   "final_severity": "🟡"
+  },
+  {
+   "finding": "R2-7",
+   "authored_severity": "🟡",
+   "status": "ungraded",
+   "final_severity": "🟡"
+  },
+  {
+   "finding": "R2-8",
+   "authored_severity": "🟡",
+   "status": "ungraded",
+   "final_severity": "🟡"
+  },
+  {
+   "finding": "R2-9",
+   "authored_severity": "🟡",
+   "status": "ungraded",
+   "final_severity": "🟡"
+  }
+ ],
+ "roster": [
+  {
+   "persona": "kent-beck-persona",
+   "lens": "tests and simple design",
+   "decision": "JOIN",
+   "applies": [
+    "coryphaeus validator Stage-4 arithmetic vs GATE-PRIMITIVE prose",
+    "63 node tests: behaviour pinned or shape only",
+    "FC4/FC5 integrity checks and CI"
+   ],
+   "expected": "🟡",
+   "hook": "N = P + C + O now has two authors; can any test see them disagree?",
+   "reason": "Rules moved from prose into a program; whether tests corner that move is my ground.",
+   "seated": false
+  },
+  {
+   "persona": "alan-cooper-advisor",
+   "lens": "user goals and who benefits",
+   "decision": "JOIN",
+   "applies": [
+    "malformed persona JSON silently counts as ABSTAIN (delta 2)",
+    "Cooper/Security Gate A mandate removed (delta 3)",
+    "install/uninstall promise to the operator (delta 7)"
+   ],
+   "expected": "🟡",
+   "hook": "a program-validated JSON contract can drop a seat without telling the solo operator it happened",
+   "reason": "Who the operator is, and what a rejected reply leaves them able to do, both belong to my lens.",
+   "seated": true,
+   "seat": "ordinary"
+  },
+  {
+   "persona": "delivery-and-ops-advisor",
+   "lens": "delivery-and-ops",
+   "decision": "JOIN",
+   "applies": [
+    "delta 7: install.sh manifest/uninstall, CI, release = dogfooding",
+    "delta 2: Node validator as runtime dependency of a Markdown suite",
+    "delta 8: coryphaeus local-only repo, 63 tests, no release path"
+   ],
+   "expected": "🟡",
+   "hook": "release path and rollback for chorus+coryphaeus pairing unpriced; is CI gate real?",
+   "reason": "New runtime code, installer and CI change what it costs to ship, roll back and run the suite.",
+   "seated": false
+  },
+  {
+   "persona": "eric-evans-advisor",
+   "lens": "ddd",
+   "decision": "JOIN",
+   "applies": [
+    "CONDUCTOR.md § Ports: chorus/coryphaeus context boundary",
+    "coryphaeus decision-to-brief translation rules",
+    "severity and verdict vocabularies written by personas, matched by validator"
+   ],
+   "expected": "🟡",
+   "hook": "one word may mean different things across chorus, schema and brief",
+   "reason": "The chorus-coryphaeus split creates a new context seam, and I need to check whether its translation and shared vocabulary are explicit.",
+   "seated": true,
+   "seat": "ordinary"
+  },
+  {
+   "persona": "eliyahu-goldratt-advisor",
+   "lens": "constraint/scope",
+   "decision": "JOIN",
+   "applies": [
+    "delta 1: seven ports with defaults, only one provider bound",
+    "delta 2: JSON replies plus Node validator and renderer",
+    "delta 7: plugin packaging, install manifest, FC4/FC5, CI"
+   ],
+   "expected": "🟡",
+   "hook": "seven ports and a CI pipeline for a one-operator tool: which part shortens the review verdict loop?",
+   "reason": "The PR adds a lot of infrastructure to internal tooling, so someone has to own the cut list.",
+   "seated": false
+  },
+  {
+   "persona": "guido-python-reviewer",
+   "lens": "python-idiom",
+   "decision": "ABSTAIN",
+   "applies": [],
+   "expected": "🟢",
+   "hook": "no Python in the PR diff or in coryphaeus",
+   "reason": "The PR diff and coryphaeus contain zero .py files; the new runtime code is Node, so a Python language lens would only add noise.",
+   "seated": false
+  },
+  {
+   "persona": "don-norman-advisor",
+   "lens": "human-centered design",
+   "decision": "JOIN",
+   "applies": [
+    "persona replies and records become JSON checked by validate.mjs: what the operator sees when a reply is malformed and silently counts as ABSTAIN",
+    "seven ports with defaults: can the operator tell which binding is active",
+    "chorus-review rewrite: advisor() fallback and one failure rule, as operator feedback"
+   ],
+   "expected": "🟡",
+   "hook": "validator failures that turn into ABSTAIN with no signal open a gulf of evaluation for the operator",
+   "reason": "The operator's feedback and failure surfaces change in deltas 2, 1 and 5.",
+   "seated": true,
+   "seat": "ordinary"
+  },
+  {
+   "persona": "mark-richards-architect",
+   "lens": "architecture",
+   "decision": "JOIN",
+   "applies": [
+    "seven ports in CONDUCTOR.md as the chorus/coryphaeus seam",
+    "JSON schemas as cross-repo contract",
+    "Stage-4 arithmetic authored in GATE-PRIMITIVE and validate.mjs",
+    "constitution 2.0.0 runtime-code lift"
+   ],
+   "expected": "🔴",
+   "hook": "Stage-4 rule now has two authors across two repos, with no parity test",
+   "reason": "The PR draws a new cross-repo seam, and contracts at seams are the rule I own.",
+   "seated": true,
+   "seat": "ordinary"
+  },
+  {
+   "persona": "security-and-trust-advisor",
+   "lens": "security",
+   "decision": "JOIN",
+   "applies": [
+    "install.sh writes into ~/.claude and uninstalls by manifest",
+    "new GitHub Actions CI supply chain",
+    "validate.mjs executes on agent-authored JSON",
+    "Security Gate A mandate removed; deferral checklist trust column moved"
+   ],
+   "expected": "🟡",
+   "hook": "new runtime code and install paths widen the trust boundary",
+   "reason": "Delta 7 and delta 2 add executable surface, and delta 3 removes the security mandate that guarded it.",
+   "seated": true,
+   "seat": "ordinary"
+  },
+  {
+   "persona": "uncle-bob-architect",
+   "lens": "clean-architecture",
+   "decision": "JOIN",
+   "applies": [
+    "chorus-core/CONDUCTOR.md seven ports: dependency direction, chorus names no other skill",
+    "coryphaeus validate.mjs/render.mjs: SRP of validator with Stage-4 arithmetic",
+    "rules moved into DECISION-PRIMITIVE and GATE-PRIMITIVE: responsibility boundaries"
+   ],
+   "expected": "🟡",
+   "hook": "validator also recomputes Stage-4 arithmetic, so two modules may decide one rule",
+   "reason": "Ports, dependency inversion and responsibility moves are this lens's home ground.",
+   "seated": false
+  }
+ ],
+ "quorum": {
+  "joiners": 9,
+  "branch": "proceed"
+ },
+ "secret_filter": {
+  "ran": false,
+  "note": "the round predates the recorded run; personas wrote understanding records without it"
+ },
+ "tldr": [
+  "Five reviewers raised 34 findings and 9 derived ones on PR 32 and coryphaeus; the seams hold in direction, but the contract between the two repositories is unversioned, operator-facing failures are recorded without reaching the operator, and several rules have two authors.",
+  "The top five: route unresolved conflicts and dropped seats to the operator (F34), make the secret filter prove it ran (F10), fix ruling references that cannot resolve (F18), version the schema contract (F4), and announce unbound ports before the round (F23).",
+  "Three findings ended at 🔴 (F34, F10, F18); six findings had one voter each and are recorded as minority reports (F1, F8, F15, F19, F21, F27), which keep their authored severity without gating."
+ ],
+ "top_five": [
+  {
+   "rank": 1,
+   "finding": "F34",
+   "pull_quote": "Unresolved for the operator is only a record, not a question the operator is asked.",
+   "locator": "skill/chorus-review/SKILL.md:383-387",
+   "final_severity": "🔴",
+   "cost": "low",
+   "value": "Turns recorded failures into questions the operator can answer; stops seats and conflicts vanishing silently.",
+   "convergence": 3
+  },
+  {
+   "rank": 2,
+   "finding": "F10",
+   "pull_quote": "A filter that never ran now reads as zero drops.",
+   "locator": "skill/chorus-core/CONDUCTOR.md:406-427",
+   "final_severity": "🔴",
+   "cost": "low",
+   "value": "A filter that never ran stops looking like a clean pass.",
+   "convergence": 3
+  },
+  {
+   "rank": 3,
+   "finding": "F18",
+   "pull_quote": "The citation key has two spellings, and the reader matches only one of them, locally, and none remotely.",
+   "locator": "coryphaeus/schema/common.schema.json:147",
+   "final_severity": "🔴",
+   "cost": "medium",
+   "value": "Ruling references resolve in one spelling; operator answers found by lookup are real.",
+   "convergence": 2
+  },
+  {
+   "rank": 4,
+   "finding": "F4",
+   "pull_quote": "A schema bump would read as ten abstentions, not as a version mismatch.",
+   "locator": "coryphaeus/schema/finding-report.schema.json",
+   "final_severity": "🟡",
+   "cost": "medium",
+   "value": "A schema change fails as a version mismatch instead of five malformed seats and a quorum abort.",
+   "convergence": 4
+  },
+  {
+   "rank": 5,
+   "finding": "F23",
+   "pull_quote": "The record promises to say 'unvalidated' and has no place to say it.",
+   "locator": "skill/chorus-core/CONDUCTOR.md:274",
+   "final_severity": "🟡",
+   "cost": "low",
+   "value": "The operator learns before the round which ports are bound and what runs unvalidated.",
+   "convergence": 4
+  }
+ ],
+ "conflicts": [],
+ "held": [],
+ "baseline": {
+  "assume_closed": [
+   "Dependency direction: the chorus canon names neither coryphaeus nor the brief (F6, confirmed)."
+  ],
+  "in_progress": [
+   "Operator questions Q-18 to Q-22 in the suite-review brief; findings conditional on A1 to A4."
+  ],
+  "re_evaluate": [
+   "Stage-4 parity between GATE-PRIMITIVE and validate.mjs (F1, F21) once one-voter findings have a defined status.",
+   "Seating default: Beck, Uncle Bob, Delivery and Goldratt were out-seated by a tie (Q-18)."
+  ]
+ },
+ "appendix": [
+  {
+   "persona": "alan-cooper-advisor",
+   "reports": [
+    "docs/reviews/pr32/rsvp/cooper.json",
+    "docs/reviews/pr32/r1/cooper.json",
+    "docs/reviews/pr32/r2/cooper.json"
+   ]
+  },
+  {
+   "persona": "don-norman-advisor",
+   "reports": [
+    "docs/reviews/pr32/rsvp/norman.json",
+    "docs/reviews/pr32/r1/norman.json",
+    "docs/reviews/pr32/r2/norman.json"
+   ]
+  },
+  {
+   "persona": "eric-evans-advisor",
+   "reports": [
+    "docs/reviews/pr32/rsvp/evans.json",
+    "docs/reviews/pr32/r1/evans.json",
+    "docs/reviews/pr32/r2/evans.json"
+   ]
+  },
+  {
+   "persona": "mark-richards-architect",
+   "reports": [
+    "docs/reviews/pr32/rsvp/richards.json",
+    "docs/reviews/pr32/r1/richards.json",
+    "docs/reviews/pr32/r2/richards.json"
+   ]
+  },
+  {
+   "persona": "security-and-trust-advisor",
+   "reports": [
+    "docs/reviews/pr32/rsvp/security.json",
+    "docs/reviews/pr32/r1/security.json",
+    "docs/reviews/pr32/r2/security.json"
+   ]
+  }
+ ],
+ "side_notes": [
+  {
+   "regime": "missing-scope-lens",
+   "note": "Goldratt (scope) was out-seated by the seating tie on a new buildout (coryphaeus); Beck (tests) likewise, although three joiners named program-versus-prose parity.",
+   "findings": []
+  },
+  {
+   "regime": "other",
+   "note": "The Round 2 brief asked for derived ids R2-<name>-n, which the schema rejects; four lenses noticed and used R2-n. The conductor renumbered them R2-1 to R2-9.",
+   "findings": []
+  }
+ ],
+ "decisions": [
+  {
+   "id": "phase0-5-seating-1",
+   "point": "RSVP seating — tie at the cap",
+   "catalog_row": 2,
+   "band": "🟡",
+   "title": "Default panel for a seven-way tie at seats three to five",
+   "problem": "Nine reviewers joined a panel capped at five; seven tied on cited deltas and stakes for the last three seats.",
+   "sensor": {
+    "signal": "two-axis RSVP sort",
+    "evidence": [
+     "docs/reviews/pr32/rsvp/: Richards and Security 4 deltas; seven at 3 deltas, all 🟡."
+    ],
+    "reading": "non-strict order at the fifth seat"
+   },
+   "evidence": [
+    {
+     "kind": "finding",
+     "ref": "docs/reviews/pr32/rsvp/",
+     "note": "Ten validated joining replies."
+    }
+   ],
+   "solutions": [
+    {
+     "id": "keep-default",
+     "label": "Keep the default panel (roster order)",
+     "recommended": true,
+     "reversible": true,
+     "summary": "Seat Evans, Cooper and Norman beside Richards and Security.",
+     "cost": {
+      "work": "None."
+     }
+    },
+    {
+     "id": "swap-beck-goldratt",
+     "label": "Swap Beck and Goldratt in for Cooper and Norman",
+     "reversible": true,
+     "summary": "Re-run from Round 1 with the swapped panel.",
+     "cost": {
+      "work": "Two new Round 1 reports and a re-vote."
+     }
+    }
+   ],
+   "resolution": "default-applied",
+   "override": {
+    "how": "Rule on the brief entry; the round re-runs from Round 1.",
+    "cost": "Two dispatches per swapped reviewer."
+   },
+   "status": "open",
+   "entry_ref": {
+    "id": "Q-18",
+    "record": "docs/briefs/suite-review/brief.json"
+   }
+  },
+  {
+   "id": "phase2-below-quorum-1",
+   "point": "Tally of a finding with fewer than two voters",
+   "band": "🔴",
+   "title": "Findings with only one voter have no defined status",
+   "problem": "Six findings (F1, F8, F15, F19, F21, F27) received exactly one non-author vote. Stage 4 forbids counting at N < 2 but defines no status for them, and the schema has none, so the record cannot validate.",
+   "sensor": {
+    "signal": "validator: a tally must not run at N < 2",
+    "evidence": [
+     "docs/reviews/pr32/draft-record.json: Six tally rows rejected."
+    ],
+    "reading": "unlisted decision point, band forced to 🔴"
+   },
+   "evidence": [
+    {
+     "kind": "finding",
+     "ref": "skill/chorus-core/GATE-PRIMITIVE.md § Stage 4",
+     "note": "\"a tally MUST NOT run at N < 2\", no status given."
+    }
+   ],
+   "solutions": [
+    {
+     "id": "minority-report",
+     "label": "Add a \"minority report\" status: keeps its severity, does not block, listed apart",
+     "recommended": true,
+     "reversible": true,
+     "summary": "One status in Stage 4, the schema and the validator; the six findings keep their authored severity and are listed separately.",
+     "cost": {
+      "work": "A line in Stage 4, one enum value, one validator branch and a test."
+     }
+    },
+    {
+     "id": "reask-voters",
+     "label": "Re-ask the other seated reviewers to vote on those six",
+     "reversible": true,
+     "summary": "Get N to two or more before counting.",
+     "cost": {
+      "work": "One short dispatch per reviewer."
+     }
+    }
+   ],
+   "resolution": "hard-block",
+   "status": "decided",
+   "entry_ref": {
+    "id": "Q-23",
+    "record": "docs/briefs/suite-review/brief.json"
+   },
+   "decision": {
+    "chose": "minority-report",
+    "date": "2026-09-27",
+    "note": "Operator: \"Add a minority report status\" (brief Q-23)."
+   },
+   "ruling_ref": {
+    "id": "Q-23",
+    "record": "docs/briefs/suite-review/brief.json"
+   }
+  }
+ ],
+ "seating_decision": "phase0-5-seating-1",
+ "rulings_cited": [
+  {
+   "id": "R-1",
+   "record": "docs/briefs/suite-review/brief.json"
+  },
+  {
+   "id": "R-2",
+   "record": "docs/briefs/suite-review/brief.json"
+  },
+  {
+   "id": "R-3",
+   "record": "docs/briefs/suite-review/brief.json"
+  },
+  {
+   "id": "R-5",
+   "record": "docs/briefs/suite-review/brief.json"
+  },
+  {
+   "id": "R-7",
+   "record": "docs/briefs/suite-review/brief.json"
+  },
+  {
+   "id": "R-10",
+   "record": "docs/briefs/suite-review/brief.json"
+  }
+ ]
+}

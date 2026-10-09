@@ -1,5 +1,7 @@
 # Parity baseline — pre-split observable behavior (RED reference)
 
+> **Historical evidence of the 014 suite split** — a record of one run on branch `014-chorus-suite-decomposition` (pre-move HEAD `1081b97`, split commit `715e1c5`, squashed into `176311a` on main); paths describe that tree, and the current checks are `scripts/check-suite-integrity.sh`.
+
 Captured BEFORE any file move (T002), from the single `skill/chorus-review/`
 (SKILL.md + INTEGRATION-LAYER.md + SDLC-LAYER.md + GATE/DECISION/EXPLORATORY
 primitives). This is the RED reference every post-split parity scenario asserts

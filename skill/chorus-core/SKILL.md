@@ -43,8 +43,8 @@ Read the file whose mechanic you need; do not read all four eagerly.
 
 | File | What it defines | Tokens it owns |
 |---|---|---|
-| `GATE-PRIMITIVE.md` | the four-stage review mechanic (extract → uncapped author → real vote → deterministic tally) + `NEED_INFO` resolution | `S8–S11` |
-| `DECISION-PRIMITIVE.md` | operator-facing decision banding (🟢 auto / 🟡 default+async override / 🔴 hard-block), by declared catalog predicate | `D1–D5` |
+| `GATE-PRIMITIVE.md` | the four-stage review mechanic (extract → uncapped author → real vote → deterministic tally) + `NEED_INFO` resolution; the three-level 🔴🟡🟢 severity scale; the constitution preview | `S8–S11` |
+| `DECISION-PRIMITIVE.md` | operator-facing decision banding (🟢 auto / 🟡 default+async override / 🔴 hard-block), by declared catalog predicate; seating (cap of five, exceptional entry, no mandate); the deferral checklist | `D1–D5` |
 | `EXPLORATORY-PHASE.md` | per-lens persisted understanding; reference-first harvest; two-tier memory | — |
 | `CONDUCTOR.md` | EWD-340 methodology; conductor voice; "the chair decides nothing" + slippage table; discipline cascade; system-boundary refusals; **the single `I1–I9` invariant catalog**; reserved-seam + findings→memory contracts | `I1–I9` (single source) |
 
@@ -54,16 +54,15 @@ Read the file whose mechanic you need; do not read all four eagerly.
 (GATE-PRIMITIVE.md), and `D1–D5` (DECISION-PRIMITIVE.md). No suite skill may
 **define** any `I` / `D` / `S8–S11` token outside this directory; siblings only
 **reference** them via composition. The sole tokens permitted to live outside
-core are the lifecycle `S1–S7` (defined in `chorus-sdlc/SKILL.md`), and only as
+core are the lifecycle `S1–S7` (defined in the chorus-sdlc skill), and only as
 references that extend core's `I1–I9`. `scripts/check-suite-integrity.sh` FC1
 enforces this residence rule.
 
 ## Composition contract (what a sibling does)
 
 1. Declare `REQUIRED: chorus-core` in its frontmatter/body.
-2. Carry the **sibling-side substrate guard** (fail loudly if core is
-   unreachable — naming the missing skill + recovery action; see CONDUCTOR.md /
-   the contract).
+2. Carry the **sibling-side substrate guard**: if core is unreachable, stop and
+   fail loudly, naming the missing skill and the recovery action.
 3. Reference core's tokens and mechanics by file name; never redefine them.
 
 The reserved-seam contracts (extract-stage record, agent-memory layout, two-tier
