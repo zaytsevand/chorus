@@ -43,7 +43,7 @@ composition root binds them to the outside world:
   review after `plan`, plan/tasks review after `tasks`, implementation review
   after `implement`). Each gate is RSVP-scoped, capped at five lenses, and blocks
   the pipeline only on an unresolved 🔴. Trigger: **"run the agent-SDLC on
-  feature 0NN."** Output: `specs/<feature>/agent-sdlc-log.md`.
+  feature 0NN."** Output: `specs/<feature>/agent-sdlc-log.json` (rendered to `agent-sdlc-log.md`).
   It also exposes **`chorus challenge`** — Gate A's **premise pass** run
   standalone, grilling a target's premise (problem / necessity-now / framing /
   load-bearing assumptions) and steelmanning the null or an alternative, on any

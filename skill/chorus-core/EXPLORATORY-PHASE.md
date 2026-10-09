@@ -279,5 +279,5 @@ Specified in `specs/004-advisor-exploratory-phase/` (spec FR-001..FR-023, resear
 D1–D12, `data-model.md`, `contracts/`, `quickstart.md`). The sessioning,
 memory-as-index, authoritative-addendum-plus-cache, and profile-coverage
 fitness-function refinements come from the **Gate A** design review
-(`agent-sdlc-log.md`, cycle 2). The per-lens profiles were nominated by the
+(`agent-sdlc-log.json`, cycle 2). The per-lens profiles were nominated by the
 advisors themselves and seeded from `information-needs-profiles.md`.

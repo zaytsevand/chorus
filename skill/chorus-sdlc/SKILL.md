@@ -5,7 +5,7 @@ description: >-
   (plan / tasks / implement) with three scoped chorus gates (design,
   plan-tasks, implementation), each running the shared four-stage gate primitive.
   Use when the user says "run the agent-SDLC on feature 0NN". Produces a
-  per-feature ledger at specs/<feature>/agent-sdlc-log.md. Also supports a
+  per-feature ledger at specs/<feature>/agent-sdlc-log.json (rendered to agent-sdlc-log.md). Also supports a
   "chorus challenge <target>" mode that grills a target's premise standalone —
   Gate A's premise pass run on its own, on any spec, design note, or raw idea.
   REQUIRED composition: chorus-core (shared substrate); independent of
