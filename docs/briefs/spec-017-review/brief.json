@@ -1,0 +1,376 @@
+{
+  "title": "Spec 017 chorus review: open decisions",
+  "subject": "The review of the reviewer-retune spec found one hole in the recipe and left four calls for you.",
+  "goal": "Settle the spec for retuning a reviewer for one project, so it can be built once building is allowed.",
+  "created": "2026-10-12T14:00Z",
+  "updated": "2026-10-12T14:00Z",
+  "source": "the chorus review of 2026-10-12 (docs/reviews/2026-10-12-chorus-review.md)",
+  "context": "Five lenses voted on 24 findings and derived ten more. Three went to red. Nothing is built; the build stays held by the earlier ruling that only the spec is written.",
+  "binding": {
+    "ref": "017-per-reviewer-run-settings",
+    "system": "spec",
+    "title": "Per-reviewer run settings",
+    "url": "https://github.com/zaytsevand/chorus/pull/36"
+  },
+  "changes": [
+    {
+      "kind": "raised",
+      "id": "Q-1",
+      "text": "Q-1 raised: the retune recipe breaks under --force in a per-project install and gives no staleness signal."
+    },
+    {
+      "kind": "raised",
+      "id": "Q-2",
+      "text": "Q-2 raised: how many warnings the README section may carry."
+    },
+    {
+      "kind": "raised",
+      "id": "Q-3",
+      "text": "Q-3 raised: whether the trade needs a decision record."
+    },
+    {
+      "kind": "raised",
+      "id": "Q-4",
+      "text": "Q-4 raised: whether a project copy shares the shipped reviewer's memory folder."
+    },
+    {
+      "kind": "raised",
+      "id": "Q-5",
+      "text": "Q-5 raised: two project facts are not yet in the addendum."
+    }
+  ],
+  "history": [],
+  "decisions": [
+    {
+      "id": "Q-1",
+      "created": "2026-10-12T14:00Z",
+      "updated": "2026-10-12T14:00Z",
+      "title": "The retune recipe can lose the retune, and a stale copy gives no signal",
+      "short": "fold in the agreed fixes",
+      "problem": "Spec 017 tells a reader to copy a shipped reviewer file into their project and edit it, but says nothing about the install that overwrites that copy, about a copy going stale, or about the extra keys such a file can carry.",
+      "brief": "The chorus review (five lenses, 34 entries) converged on a small set of zero-code fixes. In a per-project install the shipped file and the copy are the same path, so an installer run with --force erases the retune. A copy never learns the plugin moved, and no stamp says which version it was taken from. Three of the findings went to red after voting: the --force erase, the missing version stamp, and silent staleness with no named symptom. All fixes are sentences in the README section and two tasks; no code.",
+      "evidence": [
+        {
+          "kind": "code",
+          "ref": "install.sh:21-22",
+          "note": "The documented per-project install sets the Claude home to the project's own .claude folder."
+        },
+        {
+          "kind": "code",
+          "ref": "install.sh:101-105",
+          "note": "--force copies over any existing file with no warning; without it an unrecorded file is skipped (line 116)."
+        },
+        {
+          "kind": "document",
+          "ref": "specs/017-per-reviewer-run-settings/spec.md:74",
+          "note": "The stale copy is called the accepted cost, with a manual re-compare as the only control."
+        },
+        {
+          "kind": "document",
+          "ref": "docs/reviews/2026-10-12-chorus-review.md",
+          "note": "The record: F32, F16 and F12 at red, with four of four, three and two voters confirming."
+        }
+      ],
+      "unwound": {
+        "now": "A reader copies a shipped reviewer file to the project folder and edits its model, effort or tools. The installer never looks at that copy in a global install. In a per-project install the installer writes the same path, so a rerun skips an unrecorded copy, keeps an edited recorded one, and replaces either with --force. The functional requirement asking for a reason comment says nothing about the plugin version, and the re-compare step names no command and no source path for the shipped file.",
+        "whyWrong": "A reader following the recipe can lose the retune with one flag, cannot tell how old a copy is, and cannot tell that a round failing validation is the stale copy's fault. The person who carries that cost is the newcomer, not the author who accepted it.",
+        "target": "The recipe names both install modes, requires the shipped version in the reason comment, gives one diff command with the source path, names the staleness symptom, and warns about --force, privileged keys, committed copies, the public memory folder and keeping the Write tool."
+      },
+      "solutions": [
+        {
+          "id": "fold-in",
+          "label": "Fold the agreed fixes into the requirements and tasks T001 and T003",
+          "recommended": true,
+          "reversible": true,
+          "summary": "Edit the reason-comment requirement and the cost statement in the spec, and the two tasks, to carry the stamp, the diff command, the symptom, the per-project warning and the privileged-key and memory sentences.",
+          "cost": {
+            "work": "Edits to the requirements for the reason comment and the cost statement, and to tasks T001 and T003; a re-read of the plan's risk table. No code.",
+            "risk": "The README section may grow long enough that newcomers skip the warnings (see Q-2)."
+          }
+        },
+        {
+          "id": "as-is",
+          "label": "Leave the spec as it is and accept the cost",
+          "recommended": false,
+          "reversible": true,
+          "summary": "The spec stays as accepted in the walkthrough; the findings stay in the review record only.",
+          "cost": {
+            "work": "Nothing.",
+            "risk": "A newcomer can lose a retune with --force and a stale copy fails silently."
+          }
+        }
+      ],
+      "bearing": "blocks-goal",
+      "bearingReason": "The spec cannot be called ready while a documented install mode destroys the retune it describes; the walkthrough accepted the stale-copy cost, so this reopens that acceptance.",
+      "rolledUp": [
+        "F32 per-project install and --force",
+        "F16 and F34 shipped-version stamp",
+        "F12 silent staleness symptom",
+        "F31 and R2-33 diff command and source path",
+        "F33 rollback and listing overrides",
+        "F41, F42 and R2-42 privileged keys and committed copies",
+        "F43 and R2-21 public memory folder and the Write tool"
+      ]
+    },
+    {
+      "id": "Q-2",
+      "created": "2026-10-12T14:00Z",
+      "updated": "2026-10-12T14:00Z",
+      "title": "The fixes add ten sentences to a section promised to be short",
+      "short": "README length",
+      "problem": "Delivery-and-Ops wants the section capped at the recipe plus four ranked bullets, while Security and Cooper each want their own sentence.",
+      "brief": "Spec 017 promises one short section a reader can follow alone. A newcomer who meets ten warnings is likely to read none, and an unread warning is no control. The lenses could not agree and no arbiter was reachable, so the review left it for you.",
+      "evidence": [
+        {
+          "kind": "document",
+          "ref": "specs/017-per-reviewer-run-settings/spec.md:63",
+          "note": "The story promises one short section."
+        },
+        {
+          "kind": "document",
+          "ref": "specs/017-per-reviewer-run-settings/spec.md:102",
+          "note": "The success criterion needs a reader to act from the section alone."
+        },
+        {
+          "kind": "document",
+          "ref": "docs/reviews/2026-10-12-chorus-review.md",
+          "note": "Conflict C2 and finding R2-32 (cap at four bullets)."
+        }
+      ],
+      "unwound": {
+        "now": "The section is not written yet. The requirements list a recipe and a cost statement; the review proposes nine to ten extra sentences across Q-1.",
+        "whyWrong": "Too many warnings means none are read; too few leaves the --force and privileged-key hazards unmentioned.",
+        "target": "A five-step recipe plus one short box of ranked bullets, with everything else linked or dropped."
+      },
+      "solutions": [
+        {
+          "id": "cap-four",
+          "label": "Recipe plus a box of four ranked bullets",
+          "recommended": true,
+          "reversible": true,
+          "summary": "Keep stamp and diff, rollback, never --force over a retune, and committed copies are code; link or drop the rest.",
+          "cost": {
+            "work": "Choose the four and write the box when the README section is built.",
+            "risk": "Privileged keys and the public memory folder drop to a link."
+          }
+        },
+        {
+          "id": "all",
+          "label": "Carry every sentence the lenses asked for",
+          "recommended": false,
+          "reversible": true,
+          "summary": "Write each hazard as its own sentence.",
+          "cost": {
+            "work": "Write ten sentences.",
+            "risk": "A long section a newcomer is unlikely to read."
+          }
+        }
+      ],
+      "bearing": "escalated",
+      "bearingReason": "It shapes how the README is written, not whether the spec can be accepted.",
+      "rolledUp": [
+        "C2",
+        "R2-32",
+        "F45"
+      ]
+    },
+    {
+      "id": "Q-3",
+      "created": "2026-10-12T14:00Z",
+      "updated": "2026-10-12T14:00Z",
+      "title": "Does the no-config-layer trade need its own decision record?",
+      "short": "decision record or not",
+      "problem": "Richards wants a decision record naming who pays for the forks; Delivery-and-Ops says the spec Clarifications already hold the trade.",
+      "brief": "Richards asks for the trade, its gains and its cost-bearers to be recorded so it survives its author. Delivery-and-Ops says a new document nobody maintains adds upkeep, not safety. With no maintainer capacity, upkeep is the cost; with no record, the support load of a round failing on a forked body looks like a chorus bug.",
+      "evidence": [
+        {
+          "kind": "document",
+          "ref": "specs/017-per-reviewer-run-settings/plan.md:40-45",
+          "note": "Design decisions 3 and 4 accept the lost record visibility and the fork cost."
+        },
+        {
+          "kind": "document",
+          "ref": "docs/reviews/2026-10-12-chorus-review.md",
+          "note": "Conflict C1; F15 was dropped after one confirm and one over-rate."
+        }
+      ],
+      "unwound": {
+        "now": "The trade is written in the plan's design decisions and the spec's edge cases, with no named payer.",
+        "whyWrong": "The payer (newcomers carry staleness, the maintainer carries support load) is not written anywhere.",
+        "target": "The cost-bearers are named once, in the spec or plan, without a new document."
+      },
+      "solutions": [
+        {
+          "id": "one-line",
+          "label": "Name the payers in one line of the plan, no new document",
+          "recommended": true,
+          "reversible": true,
+          "summary": "Add a line to the plan's design decisions: newcomers pay staleness, the maintainer pays unseen support load.",
+          "cost": {
+            "work": "One line."
+          }
+        },
+        {
+          "id": "adr",
+          "label": "Write a decision record",
+          "recommended": false,
+          "reversible": true,
+          "summary": "A separate record with gains, losses and bearers.",
+          "cost": {
+            "work": "One new file to keep.",
+            "risk": "Another file nobody maintains."
+          }
+        },
+        {
+          "id": "nothing",
+          "label": "Leave it",
+          "recommended": false,
+          "reversible": true,
+          "summary": "The existing prose stands.",
+          "cost": {
+            "work": "Nothing."
+          }
+        }
+      ],
+      "bearing": "escalated",
+      "bearingReason": "A recording choice; it does not gate the spec.",
+      "rolledUp": [
+        "C1",
+        "F15"
+      ]
+    },
+    {
+      "id": "Q-4",
+      "created": "2026-10-12T14:00Z",
+      "updated": "2026-10-12T14:00Z",
+      "title": "Unchecked: does a project copy share the shipped reviewer's memory?",
+      "short": "shared memory folder",
+      "problem": "Evans could not confirm how Claude Code scopes the memory folder when a project file shadows a plugin file of the same name.",
+      "brief": "If both write to one folder, a stale copy reads and writes the live reviewer's recorded memory, and a private codebase's material lands in a published directory. Two other lenses confirmed the public-folder hazard from the file's own text, so the README sentence stands whatever the host does. Two more held findings (whether dispatch is by agent name, and the minimum tools list) were closed with file facts by the lenses that raised them, but stay held until you accept that.",
+      "evidence": [
+        {
+          "kind": "document",
+          "ref": "agents/kent-beck-persona.md:132",
+          "note": "The shipped body writes memory to .claude/agent-memory/<name>/."
+        },
+        {
+          "kind": "document",
+          "ref": "docs/reviews/2026-10-12-chorus-review.md",
+          "note": "Held: F1, F13, F22; derived R2-11 and R2-21 supply the file facts."
+        }
+      ],
+      "unwound": {
+        "now": "F1 is held with low confidence; no seated lens holds the host fact.",
+        "whyWrong": "The scoping claim is unverified.",
+        "target": "The host document is read and F1 is confirmed or dropped."
+      },
+      "solutions": [
+        {
+          "id": "read-doc",
+          "label": "Read the host sub-agent documentation on memory scope",
+          "recommended": true,
+          "reversible": true,
+          "summary": "Someone reads the host document; F1 is revised or confirmed.",
+          "cost": {
+            "work": "One document read."
+          }
+        },
+        {
+          "id": "leave",
+          "label": "Leave it held and keep the README sentence",
+          "recommended": false,
+          "reversible": true,
+          "summary": "The sentence on the public folder is written anyway.",
+          "cost": {
+            "work": "Nothing.",
+            "risk": "The claim stays unverified."
+          }
+        }
+      ],
+      "bearing": "escalated",
+      "bearingReason": "The README sentence covers the hazard either way.",
+      "rolledUp": [
+        "F1",
+        "F13 and R2-11",
+        "F22 and R2-21"
+      ],
+      "assumptions": [
+        "I have not read the host sub-agent document; the held finding is the persona's, not mine."
+      ]
+    },
+    {
+      "id": "Q-5",
+      "created": "2026-10-12T14:00Z",
+      "updated": "2026-10-12T14:00Z",
+      "title": "Two project facts you gave are not in the addendum",
+      "short": "write facts to addendum",
+      "problem": "You told the review that maintainer capacity cannot be counted on and that both operators and newcomers retune reviewers; the addendum does not say so.",
+      "brief": "Two lenses gated on these facts and waited for the answer. They are recorded in this round's record as local rulings, but the next round reads the addendum, not this record. Your answers settle the facts (R-1, R-2); where they are recorded is a separate call, and writing project-wide facts to the addendum needs your accept.",
+      "evidence": [
+        {
+          "kind": "document",
+          "ref": "docs/reviews/CHORUS-PROJECT.md",
+          "note": "The addendum holds no capacity or audience entry."
+        },
+        {
+          "kind": "document",
+          "ref": "docs/reviews/2026-10-12-chorus-review.json",
+          "note": "Local rulings R-1 and R-2."
+        }
+      ],
+      "unwound": {
+        "now": "The facts sit in the review record only.",
+        "whyWrong": "The next round repeats the question.",
+        "target": "The addendum states: maintainer capacity cannot be counted on (open repository); retuners are both operators and newcomers, a small number overall."
+      },
+      "solutions": [
+        {
+          "id": "write",
+          "label": "Write both facts to the addendum",
+          "recommended": true,
+          "reversible": true,
+          "summary": "Add two short entries to docs/reviews/CHORUS-PROJECT.md in your words.",
+          "cost": {
+            "work": "Two lines in one file."
+          }
+        },
+        {
+          "id": "keep-local",
+          "label": "Keep them in the review record only",
+          "recommended": false,
+          "reversible": true,
+          "summary": "The next round asks again.",
+          "cost": {
+            "work": "Nothing.",
+            "risk": "A repeated question."
+          }
+        }
+      ],
+      "bearing": "escalated",
+      "bearingReason": "A convenience for later rounds; it does not gate the spec.",
+      "rolledUp": [
+        "Gate 6 and gate 8 answers"
+      ]
+    }
+  ],
+  "mechanical": [],
+  "outstanding": [],
+  "rulings": [
+    {
+      "id": "R-1",
+      "created": "2026-10-12T14:00Z",
+      "updated": "2026-10-12T14:00Z",
+      "about": "What maintainer capacity can controls proposed against this repository count on?",
+      "said": "Impossible to say: it's an open repo.",
+      "source": "chat, 2026-10-12"
+    },
+    {
+      "id": "R-2",
+      "created": "2026-10-12T14:00Z",
+      "updated": "2026-10-12T14:00Z",
+      "about": "Who retunes a reviewer for one project: operators of this repository, or newcomers?",
+      "said": "Both, a small number overall.",
+      "source": "chat, 2026-10-12"
+    }
+  ]
+}
