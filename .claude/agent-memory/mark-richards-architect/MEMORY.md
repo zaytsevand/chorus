@@ -20,3 +20,4 @@
 - project-feature015-gateA-cycle2.md — feature 015 Gate A cycle-2 verdict; all 6 architecture 🔴 cleared, FC7-vs-FR006 read-vs-grep NIT
 - project-feature015-gateB-vote.md — feature 015 Gate B (plan/tasks) arch vote; sequencing sound, seam tasked right, RB1 🔴 FC4 baseline ordering gap
 - project-feature015-gateB-cycle2.md — feature 015 Gate B cycle-2; all RB cleared, Phase-2a/2b split clean, Gate B clears (no open 🔴)
+- project-pr32-exploratory.md — PR #32 + coryphaeus exploratory 2026-09-27; gate open, Stage-4 duplicate authority, schema pinning gap
