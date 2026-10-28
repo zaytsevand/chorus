@@ -56,6 +56,17 @@ test("review record shows bindings and recoveries once, at the top", () => {
   assert.match(md, /\*\*Recovered without asking\.\*\* retry — kent-beck-persona \(round-1\): /);
 });
 
+test("finding report renders its question ledger, one row per question", () => {
+  const md = render("finding-report", load("finding-report.valid.json"));
+  assert.ok(md.includes("## Question ledger"));
+  assert.match(md, /\| SQ-1 \| clear `tests\/export\/test_batch\.py:1-80` — .* \| finding F1 \|/);
+  assert.match(md, /\| SQ-2 \| .* \| gate G1 — /);
+  assert.match(md, /\| SQ-3 \| n\/a — /);
+  assert.match(md, /\| RQ-1: Does anything exercise the streaming writer under load\? \| — \| finding F2 \|/);
+  const old = load("finding-report.valid.json"); old.schema_version = "1"; delete old.ledger;
+  assert.match(render("finding-report", old), /Not recorded \(the report predates schema 1\.1\)/);
+});
+
 test("a secret filter that did not run reads as not run, never as zero", () => {
   const d = load("review-record.valid.json");
   const md = render("review-record", d);

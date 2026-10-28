@@ -5,7 +5,8 @@
  *   node render.mjs <kind> <file.json> <out.md>
  *
  *   kinds: review-record (the chorus-review artifact skeleton),
- *          sdlc-log (the per-feature ledger)
+ *          sdlc-log (the per-feature ledger),
+ *          finding-report (one persona's findings and question ledger)
  *   exit:  0 written · 1 input invalid (nothing written) · 2 usage
  *
  * The JSON is the record; the page is a projection of it. The layout is fixed
@@ -18,7 +19,7 @@ import { readFileSync, writeFileSync, realpathSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { validate } from "./validate.mjs";
 
-export const RENDER_KINDS = ["review-record", "sdlc-log"];
+export const RENDER_KINDS = ["review-record", "sdlc-log", "finding-report"];
 
 const cell = (v) => (v === undefined || v === null || v === "" ? "—" : String(v).replace(/\|/g, "\\|").replace(/\s*\n\s*/g, " "));
 const table = (head, rows) =>
@@ -212,10 +213,36 @@ export function renderSdlcLog(d) {
   return L.join("\n");
 }
 
+const answer = (e) => {
+  if (!e) return "—";
+  const what = e.outcome === "clear" ? `clear ${e.evidence.map((x) => `\`${x}\``).join(", ")}` : e.refs?.length ? `${e.outcome} ${e.refs.join(", ")}` : e.outcome;
+  return e.note ? `${what} — ${e.note}` : what;
+};
+
+/** The question ledger: one row per question, one column per altitude. */
+export function ledgerTable(ledger) {
+  const qs = [...new Set(ledger.map((e) => e.sq))];
+  return table(["Question", "Project", "Work"], qs.map((q) => {
+    const at = (alt) => ledger.find((e) => e.sq === q && e.altitude === alt);
+    const text = ledger.find((e) => e.sq === q && e.question)?.question;
+    return [text ? `${q}: ${text}` : q, answer(at("project")), answer(at("work"))];
+  }));
+}
+
+export function renderFindingReport(d) {
+  const L = [`# Finding report: ${d.persona} — ${d.round}`, "", `- **Lens**: ${d.lens}`, `- **Mode**: ${d.mode}`, `- **Tool uses**: ${d.tool_uses}`, ""];
+  L.push("## Findings", "", d.findings.length
+    ? d.findings.map((f) => `- **${f.id}** ${f.proposed_severity}${tagOf(f) ? ` ${tagOf(f)}` : ""} — ${quote(f.pull_quote)} \`${f.locator}\`${f.need_info ? ` (NEED_INFO: ${f.need_info_reason})` : ""}`).join("\n")
+    : "None.", "");
+  if (d.gate_questions?.length) L.push("## Gate questions", "", ...d.gate_questions.map((g) => `- ${g.id ? `**${g.id}** ` : ""}${g.need}: ${g.question}`), "");
+  L.push("## Question ledger", "", d.ledger ? ledgerTable(d.ledger) : "Not recorded (the report predates schema 1.1).", "");
+  return L.join("\n");
+}
+
 export function render(kind, data, opts = {}) {
   const r = validate(kind, data, opts);
   if (!r.valid) { const e = new Error("invalid input"); e.errors = r.errors; throw e; }
-  return kind === "review-record" ? renderReviewRecord(data) : renderSdlcLog(data);
+  return kind === "review-record" ? renderReviewRecord(data) : kind === "finding-report" ? renderFindingReport(data) : renderSdlcLog(data);
 }
 
 function main(argv) {

@@ -25,8 +25,10 @@ both. It owns four things:
    JSON. It checks the schema plus what a schema cannot express: the Stage-4
    tally arithmetic, unique ids, ungraded R2- findings, held findings kept out
    of the top five, word limits, recorded recoveries, and each `ruling_ref`
-   followed into the record it names.
-3. **The renderers** (`bin/render.mjs`): the review page and the ledger page,
+   followed into the record it names; in a finding report, the question
+   ledger (every signature question answered at project and work altitude).
+3. **The renderers** (`bin/render.mjs`): the review page, the ledger page and a
+   finding report with its question ledger,
    rendered from validated JSON. The JSON is the record; the page is a view.
 4. **The bindings**: which provider serves each port the chorus declares, and
    how data crosses from one to the other.
@@ -61,7 +63,7 @@ the project if present, else `~/.claude/skills/coryphaeus`.
 
 ```
 node <root>/bin/validate.mjs <kind> <file.json> [--json]   # 0 valid · 1 invalid · 2 usage · 3 version mismatch
-node <root>/bin/render.mjs   <review-record|sdlc-log> <file.json> <out.md>
+node <root>/bin/render.mjs   <review-record|sdlc-log|finding-report> <file.json> <out.md>
 ```
 
 Kinds: `rsvp`, `finding-report`, `vote-report`, `review-record`, `sdlc-log`,
