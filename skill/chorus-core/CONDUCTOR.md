@@ -165,7 +165,7 @@ implements this as a single chain of discipline:
 
     integration layer
        │  brief — a contract: lens identity, scope-exclusion, anchors,
-       │          numbered questions, evidence rule, required ending
+       │          signature questions (verbatim), evidence rule, required ending
        ▼
     persona
        │  artefact chain — why? why? why?
