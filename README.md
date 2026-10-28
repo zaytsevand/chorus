@@ -2,7 +2,7 @@
 
 A Claude Code skill suite that runs a structured multi-advisor review of **whatever
 you point it at** — most often a spec or a feature's design, occasionally a
-full-codebase sweep. Nine persona advisors, each reviewing the target through
+full-codebase sweep. Ten persona advisors, each reviewing the target through
 their lens:
 
 - **Eric Evans** — DDD / domain model
@@ -14,6 +14,7 @@ their lens:
 - **Delivery-and-Ops** — synthesized (Farley · Hightower · Majors)
 - **Security-and-Trust** — synthesized (Schneier · Shostack · Nather)
 - **Goldratt** — Eliyahu M. Goldratt (Theory of Constraints; deferral / opportunity cost), modernized by Reinertsen flow economics
+- **Test-Strategy** — synthesized (Cohn · Fowler & Vocke · Dodds · Rainsberger · Crispin & Gregory); where each risk is checked, at what price, with the test pyramid as one tool among several
 
 An optional **Guido** (Python) language lens joins only on rounds with Python in
 scope. Conflicts go to `advisor()`. Output is a durable markdown artifact you
@@ -211,11 +212,11 @@ cross-cutting concerns recur across every lens — they aren't a separate
 doctrine layered on top of the personas, they're how each persona
 *already* reads code through their own vocabulary:
 
-| Concern | Cooper / Norman read it as | Evans reads it as | Richards reads it as | Beck reads it as | Uncle Bob reads it as | Delivery-and-Ops reads it as | Security-and-Trust reads it as | Goldratt reads it as |
-|---|---|---|---|---|---|---|---|---|
-| **Interface contracts** | a promise the user can read | Published Language at a bounded-context boundary | the coupling-type decision at the seam | making the change easy before making the easy change | Dependency Inversion at the architectural seam | the surface a smoke test, canary, or rollback gate can assert against | the trust boundary — what crosses it, who's authoritative, what's enforced | the hypothesis the work is betting on — the boundary past which a non-constraint may be subordinated |
-| **Local purity / explicit effects** | hidden cost shifted onto the user | a Domain Event the model refuses to acknowledge | undocumented temporal or content coupling | a function that can't be cornered by a unit test | SRP and the principle of least astonishment, from two angles | three failure modes presented as one — blast radius compounds silently | a hidden grant of capability the threat model never accounted for | a deferral whose downstream cost is hidden — opportunity cost that must be priced, not buried |
-| **Behavioural assertions** | a promise nobody is keeping | an aggregate invariant nobody enforces | the cheapest fitness function | the red of red-green-refactor | a blocker, not a nit | the cheapest signal — the CI gate you can afford | a threat-model claim with no test = security theatre | a defer/cut claim with no settling experiment — an opinion, not a finding |
+| Concern | Cooper / Norman read it as | Evans reads it as | Richards reads it as | Beck reads it as | Uncle Bob reads it as | Delivery-and-Ops reads it as | Security-and-Trust reads it as | Goldratt reads it as | Test-Strategy reads it as |
+|---|---|---|---|---|---|---|---|---|---|
+| **Interface contracts** | a promise the user can read | Published Language at a bounded-context boundary | the coupling-type decision at the seam | making the change easy before making the easy change | Dependency Inversion at the architectural seam | the surface a smoke test, canary, or rollback gate can assert against | the trust boundary — what crosses it, who's authoritative, what's enforced | the hypothesis the work is betting on — the boundary past which a non-constraint may be subordinated | the seam a contract test pins from both sides, so the pair is proven without booting the pair |
+| **Local purity / explicit effects** | hidden cost shifted onto the user | a Domain Event the model refuses to acknowledge | undocumented temporal or content coupling | a function that can't be cornered by a unit test | SRP and the principle of least astonishment, from two angles | three failure modes presented as one — blast radius compounds silently | a hidden grant of capability the threat model never accounted for | a deferral whose downstream cost is hidden — opportunity cost that must be priced, not buried | a check forced up the stack — what a unit test can't corner gets bought with a slow, vague end-to-end one |
+| **Behavioural assertions** | a promise nobody is keeping | an aggregate invariant nobody enforces | the cheapest fitness function | the red of red-green-refactor | a blocker, not a nit | the cheapest signal — the CI gate you can afford | a threat-model claim with no test = security theatre | a defer/cut claim with no settling experiment — an opinion, not a finding | a risk placed at the cheapest check that can honestly catch it |
 
 Each persona carries these as their own concerns in their own voice — see
 the agent files under [`agents/`](agents/). Optional language lenses carry the
@@ -255,7 +256,8 @@ axis no single lens owns — structurally under-represented.
 | **Delivery-and-Ops** — Farley/Hightower/Majors | · | 1 | · | 2 | · | · | 2 | **3** | **3** | · | 1 | · |
 | **Security-and-Trust** — Schneier/Shostack/Nather | · | 1 | · | 1 | · | · | 2 | 1 | 1 | **3** | · | 2 |
 | **Goldratt** — ToC/Reinertsen | · | 1 | 1 | 1 | · | 2 | **3** | 2 | 1 | · | 1 | · |
-| **Breadth (Σ)** | 7 | 11 | 10 | 12 | 5 | 9 | 12 | 8 | 6 | 4 | 4 | 5 |
+| **Test-Strategy** — Cohn/Fowler/Dodds/Rainsberger | · | 2 | 1 | **3** | · | · | 2 | 2 | 1 | · | 1 | · |
+| **Breadth (Σ)** | 7 | 13 | 11 | 15 | 5 | 9 | 14 | 10 | 7 | 4 | 5 | 5 |
 | **Champion? (any 3)** | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | — | — |
 
 **Axis key:** **Dom** Domain modeling · **Arch** Architecture & evolvability ·
@@ -302,7 +304,7 @@ version of this matrix — heatmap, radar, and per-axis breakdown — is at
 The suite is named **chorus**. Both channels below
 deliver the same five skills (`chorus-core`, `chorus-review`, `chorus-sdlc`,
 `chorus-learn`, `coryphaeus`, including their subfolders such as the addendum
-template) and the ten persona agents. One install covers the whole suite.
+template) and the eleven persona agents. One install covers the whole suite.
 
 ### Clone + script
 

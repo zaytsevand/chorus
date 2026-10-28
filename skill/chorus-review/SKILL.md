@@ -1,9 +1,10 @@
 ---
 name: chorus-review
 description: >-
-  Runs a multi-advisor review of a project's state: up to nine persona lenses
+  Runs a multi-advisor review of a project's state: up to ten persona lenses
   (DDD, architecture, adversarial product, human-centred design, clean code,
-  TDD, delivery and ops, security, constraint and flow, plus Python) examine a
+  TDD, test strategy, delivery and ops, security, constraint and flow, plus
+  Python) examine a
   spec, feature design, PR approach or whole codebase, cross-check each other's
   findings, and leave a ranked review record in docs/reviews/. Use when the user
   says "spawn the chorus", "spawn the regular chorus", "chorus review" or
@@ -148,7 +149,8 @@ into every brief, and Security-and-Trust's scope override.
 
 The roster is the persona agents in `agents/`: Evans (DDD), Richards
 (architecture), Cooper (adversarial product), Norman (HCD), Uncle Bob (clean
-code/SOLID), Beck (TDD/simple design), Delivery-and-Ops, Security-and-Trust,
+code/SOLID), Beck (TDD/simple design), Test-Strategy (where each risk is
+checked and what the suite costs), Delivery-and-Ops, Security-and-Trust,
 Goldratt (constraint & flow), and the **optional language lens** Guido (Python),
 included when the anchor surface has recently-changed Python.
 

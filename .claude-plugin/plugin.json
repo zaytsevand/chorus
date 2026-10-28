@@ -1,7 +1,7 @@
 {
   "name": "chorus",
   "version": "1.0.0",
-  "description": "Multi-advisor review for Claude Code, packaged as a composable suite of five skills (chorus-core substrate, chorus-review project-state round, chorus-sdlc lifecycle, chorus-learn tutorial, coryphaeus schema, validator and provider bindings). Nine persona advisors (Evans, Richards, Cooper, Norman, Uncle Bob, Beck, Delivery-and-Ops, Security-and-Trust, Goldratt) plus an optional Guido Python lens run a structured, RSVP-gated review through their lenses; conflicts go to advisor(); output is a durable markdown artifact you commit.",
+  "description": "Multi-advisor review for Claude Code, packaged as a composable suite of five skills (chorus-core substrate, chorus-review project-state round, chorus-sdlc lifecycle, chorus-learn tutorial, coryphaeus schema, validator and provider bindings). Ten persona advisors (Evans, Richards, Cooper, Norman, Uncle Bob, Beck, Test-Strategy, Delivery-and-Ops, Security-and-Trust, Goldratt) plus an optional Guido Python lens run a structured, RSVP-gated review through their lenses; conflicts go to advisor(); output is a durable markdown artifact you commit.",
   "author": {
     "name": "Andrey Zaytsev"
   },
@@ -24,6 +24,7 @@
     "./agents/delivery-and-ops-advisor.md",
     "./agents/security-and-trust-advisor.md",
     "./agents/eliyahu-goldratt-advisor.md",
+    "./agents/test-strategy-advisor.md",
     "./agents/guido-python-reviewer.md"
   ]
 }
