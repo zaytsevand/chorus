@@ -28,6 +28,6 @@ Appendix: each lens's report, or links to it (file or memory-dir path).
 |---|---|
 | Findings dominated by legacy code | Scope exclusions in every brief (rows 9–10) |
 | All personas join every round | Tighten the round context: concrete deltas only |
-| Phase 2 takes longer than Phase 1 | Tighter numbered questions; own finding IDs listed explicitly |
+| Phase 2 takes longer than Phase 1 | Tighter round context (concrete deltas, short project baseline); own finding IDs listed explicitly |
 | Project-fact inference every round | Phase 5 offers to write `CHORUS-PROJECT.md` |
 | Artifact cites `Fn`/`Cn` with no description | Register (with pull-quotes) precedes the matrix; top five resolves to pull-quotes |

@@ -137,6 +137,45 @@ test("finding report word limit is 700 in review mode only", () => {
 });
 test("low confidence finding must raise NEED_INFO", () => { const d = load("finding-report.valid.json"); d.findings[1].need_info = false; expectError("finding-report", d, /need_info: must be true/); });
 
+/* ── question ledger (GATE-PRIMITIVE.md Stage 2) ────────────────────────── */
+
+const fr = () => load("finding-report.valid.json");
+const entry = (d, sq, alt) => d.ledger.find((e) => e.sq === sq && e.altitude === alt);
+test("ledger is required from schema 1.1, not before", () => {
+  const d = fr(); delete d.ledger; expectError("finding-report", d, /missing "ledger"/);
+  d.schema_version = "1";
+  const r = validate("finding-report", d);
+  assert.equal(r.valid, true, messages(r));
+  assert.ok(r.warnings.some((w) => /no question ledger/.test(w.message)));
+});
+test("every SQ is answered at both altitudes", () => { const d = fr(); d.ledger = d.ledger.filter((e) => !(e.sq === "SQ-3" && e.altitude === "work")); expectError("finding-report", d, /SQ-3 has no work-altitude answer/); });
+test("SQ ids run SQ-1..SQ-n with n from 3 to 5", () => {
+  const d = fr(); d.ledger = d.ledger.filter((e) => e.sq !== "SQ-2"); expectError("finding-report", d, /expected SQ-1\.\.SQ-n/);
+  const e = fr(); e.ledger = e.ledger.filter((x) => ["SQ-1", "SQ-2"].includes(x.sq)); expectError("finding-report", e, /expected SQ-1\.\.SQ-n/);
+});
+test("one answer per question per altitude", () => { const d = fr(); d.ledger.push({ ...entry(d, "SQ-3", "work") }); expectError("finding-report", d, /SQ-3 at work is answered twice/); });
+test("a finding answer cites an existing finding", () => { const d = fr(); entry(d, "SQ-1", "work").refs = ["F9"]; expectError("finding-report", d, /"F9" is not a finding in this report/); });
+test("a finding answer needs refs", () => { const d = fr(); delete entry(d, "SQ-1", "work").refs; expectError("finding-report", d, /missing "refs"/); });
+test("a gate answer cites an existing gate question", () => {
+  const d = fr(); entry(d, "SQ-2", "work").refs = ["G2"]; expectError("finding-report", d, /"G2" is not a gate question/);
+  const e = fr(); delete e.gate_questions[0].id; expectError("finding-report", e, /"G1" is not a gate question/);
+});
+test("a clear answer needs an evidence locator (honest null)", () => { const d = fr(); entry(d, "SQ-2", "project").evidence = []; expectError("finding-report", d, /evidence: needs at least 1/); });
+test("an n/a answer needs a note", () => { const d = fr(); delete entry(d, "SQ-3", "project").note; expectError("finding-report", d, /missing "note"/); });
+test("clear and n/a cite nothing", () => { const d = fr(); entry(d, "SQ-3", "work").refs = ["F1"]; expectError("finding-report", d, /a clear answer cites nothing/); });
+test("ledger notes are capped at 20 words", () => { const d = fr(); entry(d, "SQ-3", "project").note = "word ".repeat(21).trim(); expectError("finding-report", d, /21 words; the limit is 20/); });
+test("a round question carries its text; at most three", () => {
+  const d = fr(); delete d.ledger.at(-1).question; expectError("finding-report", d, /missing "question"/);
+  const e = fr(); for (const n of [2, 3, 4]) e.ledger.push({ sq: `RQ-${n}`, question: "Another question of my own?", altitude: "work", outcome: "finding", refs: ["F1"] });
+  expectError("finding-report", e, /4 round questions; at most 3/);
+});
+test("the ledger is outside the word limit", () => {
+  const d = fr(); d.findings[0].claim = "word ".repeat(600).trim();
+  for (const e of d.ledger) e.note = "word ".repeat(20).trim();
+  assert.equal(validate("finding-report", d).valid, true, messages(validate("finding-report", d)));
+});
+test("gate-question ids are unique", () => { const d = fr(); d.gate_questions.push({ ...d.gate_questions[0] }); expectError("finding-report", d, /duplicate gate-question id "G1"/); });
+
 /* ── ledger ─────────────────────────────────────────────────────────────── */
 
 const sl = () => load("sdlc-log.valid.json");

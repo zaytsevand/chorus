@@ -135,6 +135,7 @@ it must not make.**
 | "I'll summarize the vote as…" | synthesizing a vote (S9) | the tally arithmetic, verbatim |
 | "I'll guess the remediation for NEED_INFO" | resolving an information gap by invention (S11) | peer provision or operator provision; the orchestrator routes |
 | "I'll CONFIRM with hedges" | low-confidence severity vote dressed as agreement (S11) | declare `confidence_on_hand: low` and vote `NEED_INFO` |
+| "I'll give each lens a few questions to focus on" | speaking for a lens before it speaks (I6): the question picks the ground the lens examines | the lens's own signature questions, passed verbatim; round questions are the lens's to add (`GATE-PRIMITIVE.md` § Stage 2) |
 | "I'll summarize this finding as…" | restating a lens in the conductor's voice (I6) | the persona's **marked pull-quote**, relayed verbatim |
 | "I'll pick the best line from the report" | conductor excerpting — selecting a span is restating-lite | the persona marks its own pull-quote; route back if unmarked |
 | "Given the findings, the verdict is…" | judgment added to gating | post-tally 🔴 set, arithmetic only |
@@ -164,7 +165,7 @@ implements this as a single chain of discipline:
 
     integration layer
        │  brief — a contract: lens identity, scope-exclusion, anchors,
-       │          numbered questions, evidence rule, required ending
+       │          signature questions (verbatim), evidence rule, required ending
        ▼
     persona
        │  artefact chain — why? why? why?
@@ -237,7 +238,9 @@ repaired. Siblings reference these tokens; they never redefine them.
   work, ranking, or its own refusals. `advisor()` is for conflict
   arbitration and final sanity pass — not for skipping cognitive work.
 - **I6.** The integration layer never speaks for a lens it does not have.
-  Domain claims are routed to the lens that owns them.
+  Domain claims are routed to the lens that owns them, and a lens's questions
+  are its own: the conductor passes its signature questions verbatim and
+  writes none.
 - **I7.** The integration layer never optimizes the artifact at the
   procedure's expense. A "clean" doc that hides an aborted gate is a lie.
 - **I8.** The integration layer never accepts a Round-1 or Round-2 report

@@ -2,13 +2,13 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "finding-report.schema.json",
   "title": "Finding report",
-  "description": "One persona's authoring output (GATE-PRIMITIVE.md Stage 2; chorus-review Phase 1). Uncapped: no count target. In review mode the prose (claims, pull-quotes, reasons, gate questions) is at most 700 words.",
+  "description": "One persona's authoring output (GATE-PRIMITIVE.md Stage 2; chorus-review Phase 1). Uncapped: no count target. In review mode the prose (claims, pull-quotes, reasons, gate questions) is at most 700 words; the question ledger is outside that limit. From schema 1.1 the ledger is required; a report declaring 1 or 1.0 predates it and stays valid without one.",
   "type": "object",
   "additionalProperties": false,
   "required": ["kind", "schema_version", "mode", "round", "persona", "lens", "tool_uses", "findings"],
   "properties": {
     "kind": { "const": "finding-report", "description": "Record kind." },
-    "schema_version": { "$ref": "common.schema.json#/$defs/schema_version", "description": "Schema version; the major must be 1." },
+    "schema_version": { "$ref": "common.schema.json#/$defs/schema_version", "description": "Schema version; the major must be 1. Write 1.1: from 1.1 the ledger is required." },
     "mode": { "type": "string", "enum": ["review", "sdlc", "challenge"], "description": "review: a chorus-review round (700-word limit). sdlc: a lifecycle gate. challenge: chorus challenge." },
     "round": { "type": "string", "minLength": 1, "description": "The round date or gate/cycle this report is for." },
     "persona": { "$ref": "common.schema.json#/$defs/persona", "description": "The authoring persona." },
@@ -22,6 +22,7 @@
         "additionalProperties": false,
         "required": ["need", "question"],
         "properties": {
+          "id": { "type": "string", "pattern": "^G[1-9][0-9]*$", "description": "Gate-question id (G1, G2, …), unique within the report. A ledger entry with outcome gate cites it." },
           "need": { "type": "string", "minLength": 3, "description": "The declared gate need, e.g. 'who the user is and how many'." },
           "question": { "type": "string", "minLength": 5, "description": "The question for the operator." },
           "assumption": { "type": "string", "description": "The assumption dependent findings are conditional on meanwhile." }
@@ -32,6 +33,47 @@
       "type": "array",
       "items": { "$ref": "common.schema.json#/$defs/finding" },
       "description": "The findings, as many as the corpus honestly warrants. Ids are unique within the report."
+    },
+    "ledger": {
+      "type": "array",
+      "description": "The question ledger (GATE-PRIMITIVE.md Stage 2): each of the persona's signature questions SQ-1..SQ-n answered at both altitudes (the project as a whole, and the work under review), plus at most three round questions RQ-1..RQ-3 the persona wrote itself. Outside the word limit.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["sq", "altitude", "outcome"],
+        "description": "One question answered at one altitude.",
+        "properties": {
+          "sq": { "type": "string", "pattern": "^(SQ|RQ)-[1-9]$", "description": "SQ-n: the persona's signature question n, numbered as in its persona file. RQ-n: a round question the persona wrote itself." },
+          "question": { "type": "string", "minLength": 5, "description": "The round question's text, in the persona's words. Required for RQ-n; SQ-n text lives in the persona file." },
+          "altitude": { "type": "string", "enum": ["project", "work"], "description": "project: the question asked of the project as a whole. work: asked of the piece of work under review." },
+          "outcome": { "type": "string", "enum": ["finding", "clear", "n/a", "gate"], "description": "finding: answered by findings (refs). clear: looked and found nothing (evidence says where). n/a: does not apply at this altitude (note says why). gate: blocked on a gate question (refs)." },
+          "refs": {
+            "type": "array",
+            "items": { "type": "string", "pattern": "^(F[0-9]+|G[1-9][0-9]*)$", "description": "An Fn finding id or a Gn gate-question id in this report." },
+            "description": "The findings (outcome finding) or gate questions (outcome gate) this answer points to."
+          },
+          "evidence": {
+            "type": "array",
+            "items": { "$ref": "common.schema.json#/$defs/locator", "description": "A place the persona read." },
+            "description": "Where the persona looked. A clear needs at least one locator (the honest null)."
+          },
+          "note": { "type": "string", "minLength": 3, "description": "At most 20 words. Required for n/a: why the question does not apply at this altitude." }
+        },
+        "allOf": [
+          { "if": { "properties": { "outcome": { "enum": ["finding", "gate"] } }, "required": ["outcome"] },
+            "then": { "required": ["refs"], "properties": { "refs": { "minItems": 1 } } } },
+          { "if": { "properties": { "outcome": { "const": "clear" } }, "required": ["outcome"] },
+            "then": { "required": ["evidence"], "properties": { "evidence": { "minItems": 1 } } } },
+          { "if": { "properties": { "outcome": { "const": "n/a" } }, "required": ["outcome"] },
+            "then": { "required": ["note"] } },
+          { "if": { "properties": { "sq": { "pattern": "^RQ-" } }, "required": ["sq"] },
+            "then": { "required": ["question"] } }
+        ]
+      }
     }
-  }
+  },
+  "allOf": [
+    { "if": { "properties": { "schema_version": { "pattern": "^1\\.[1-9][0-9]*$" } }, "required": ["schema_version"] },
+      "then": { "required": ["ledger"] } }
+  ]
 }

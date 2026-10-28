@@ -156,7 +156,11 @@ included when the anchor surface has recently-changed Python.
 
 The **round context** is one paragraph of concrete since-last-chorus deltas
 (commits/PRs, specs, infra and release-path changes, incidents, anything excluded
-this round). It MUST name concrete deltas, not "general project state".
+this round). It MUST name concrete deltas, not "general project state". Beside
+the deltas it carries a short **project baseline** — the addendum's topology
+(item 1) and the last record's next-chorus baseline, quoted, not summarized — so
+each lens can answer its signature questions at project altitude as well as work
+altitude (`BRIEFS.md` item 6).
 
 ### Phase 0.5 — RSVP (per-round self-selection)
 

@@ -110,6 +110,13 @@ writes to `.claude/agent-memory/<persona>/` instead of returning it is read afte
 dispatch and validated the same way before it counts. A "version mismatch" is install
 drift, reported once, not a persona failure.
 
+**Author brief.** Each seated lens's Stage-2 brief carries its signature questions
+`SQ-1..SQ-n`, copied verbatim from its persona file, and a project baseline (the
+project base the exploratory phase reuses across gates) beside the gate's
+feature/spec deltas. The orchestrator writes no questions for a lens; the lens
+answers every SQ at project and work altitude in its report's question ledger and
+may add up to three of its own (`chorus-core/GATE-PRIMITIVE.md` § Stage 2).
+
 **Operator-facing decisions** in this layer — seating, block-on-🔴, gate sign-off —
 are banded by the **decision primitive** (`chorus-core/DECISION-PRIMITIVE.md`: 🟢
 auto-resolve / 🟡 proceed-with-recorded-default + async override / 🔴 hard-block +

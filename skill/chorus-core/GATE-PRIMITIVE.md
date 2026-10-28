@@ -60,7 +60,20 @@ flowchart TD
   with the persona's own **gates** satisfied (`EXPLORATORY-PHASE.md`): the
   answers it has declared it cannot honestly review without (who the user is and
   how many, the grading bar, the characteristic ranking, …), each resolved by
-  reference or operator confirmation, never invented.
+  reference or operator confirmation, never invented. The brief carries the
+  persona's **signature questions** `SQ-1..SQ-n`, copied verbatim from the
+  `## Signature questions` section of its persona file, and a project baseline
+  beside the deltas. The orchestrator writes no questions for a lens (I6).
+- **Question ledger** (this is the rule's one home): every seated persona
+  answers **every** SQ at **two altitudes** — **project** (the project as a
+  whole) and **work** (the piece of work under review) — and records each answer
+  as one ledger entry: `finding` (cites the finding ids it produced), `clear`
+  (cites at least one locator it read: the honest null, as in the premise pass),
+  `n/a` (a one-line reason, e.g. a language lens at project altitude), or `gate`
+  (cites the gate question it is blocked on). It may add up to three round
+  questions of its own (`RQ-1..RQ-3`), text included. A missing SQ × altitude
+  is an incomplete report, handled like any reply the record validator refuses.
+  The ledger is outside any word limit.
 - **Output**: **findings**, each:
   `{id, lens, evidence (file:line | [principle] | [principle:proposed]),
   proposed_severity (🔴/🟡/🟢), pull_quote (one short verbatim sentence in the

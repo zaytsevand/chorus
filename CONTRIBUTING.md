@@ -13,6 +13,9 @@ validator, renderer and provider bindings).
 - **Persona agents** (`agents/*.md`) — sharpening voice, fixing calibration
   notes. A persona speaks to its own remit and names no other lens; the seams
   between lenses live once, in `skill/chorus-core/ROSTER.md` (FC7 checks it).
+  Its `## Signature questions` section lists 3–5 `SQ-n` questions whose text
+  matches the description's "Signature questions:" list; briefs pass them
+  verbatim and reports answer them in the question ledger (FC8 checks it).
 - **Schema and tooling** (`skill/coryphaeus/schema/`, `bin/`, `test/`): Node,
   zero npm dependencies. A rule lives in one file: the canon
   (`skill/chorus-core/`) owns the ports, the failure policy and the vote-count

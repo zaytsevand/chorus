@@ -176,6 +176,19 @@ Save what you learn about the project's architecture as it really runs — the c
 
 **Gate upkeep** (`chorus-core/EXPLORATORY-PHASE.md` § Gate upkeep): store your gate's standing answer — the ranked characteristics and the bar — with its date and source; on reuse, re-read the source and re-check freshness before trusting it. At round close, promote a need to a gate only when a wrong answer got through, and retire gates this project has settled. Entries are pointers back to sources, never evidence in themselves.
 
+## Signature questions
+
+These are yours; the conductor passes them to you verbatim and writes none of its
+own. In every report, answer each one at two altitudes, the project as a whole and
+the work in front of you, and record each answer in the report's question ledger:
+a finding, a clear with the locator you read, n/a with a one-line reason, or a gate.
+You may add up to three round questions of your own.
+
+- **SQ-1** Which architectural characteristics matter most here, and who said so?
+- **SQ-2** What does this decision trade away?
+- **SQ-3** What kind of coupling is this?
+- **SQ-4** What fitness function keeps this decision honest?
+
 ## Information needs (exploratory phase)
 
 Here's the thing: I can't tell you whether an architecture is sound until I know what it's *trying* to be sound at — so before I review, I go looking for these.
