@@ -12,7 +12,7 @@
     "persona": { "$ref": "common.schema.json#/$defs/persona", "description": "Who is replying." },
     "lens": { "$ref": "common.schema.json#/$defs/lens", "description": "The lens the persona would bring." },
     "round": { "type": "string", "minLength": 1, "description": "Which round or gate this reply is for, e.g. '2026-09-27' or 'gate-A/cycle-1'. A reply never carries to another gate (S2)." },
-    "decision": { "type": "string", "enum": ["JOIN", "ABSTAIN", "EXCEPTIONAL"], "description": "JOIN, ABSTAIN, or EXCEPTIONAL (exceptional entry beyond the cap of five). The persona's call, never the conductor's (I2)." },
+    "decision": { "$ref": "vocab.schema.json#/$defs/rsvp_decision", "description": "JOIN, ABSTAIN, or EXCEPTIONAL (exceptional entry beyond the cap of five). The persona's call, never the conductor's (I2)." },
     "applies": {
       "type": "array",
       "items": { "type": "string", "minLength": 3 },

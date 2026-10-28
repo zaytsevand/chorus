@@ -230,7 +230,7 @@ can pin (`agents/guido-python-reviewer.md`). When two lenses independently judge
 finding **under-rated** (the `PRIORITIZE` vote) in a chorus round, it escalates one
 severity level. Mere agreement at the proposed severity (the `CONFIRM` vote) counts as
 convergence for *ranking* but does not escalate — so popular polish stays polish.
-(Vote vocabulary `PRIORITIZE` / `CONFIRM` / `OVER-RATE`; see `skill/chorus-core/GATE-PRIMITIVE.md`.)
+(Vote vocabulary `PRIORITIZE` / `CONFIRM` / `OVER-RATE` / `NEED_INFO`; see `skill/chorus-core/GATE-PRIMITIVE.md`.)
 
 Projects with stronger or more-specific principles (layer rules, language
 mandates, infrastructure constraints) declare them in section 4 of

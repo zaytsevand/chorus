@@ -12,8 +12,8 @@
     "feature": { "type": "string", "minLength": 2, "description": "Feature name." },
     "feature_dir": { "type": "string", "minLength": 2, "description": "specs/<feature>/." },
     "run_started": { "$ref": "common.schema.json#/$defs/date", "description": "When the run started." },
-    "mode": { "type": "string", "enum": ["agent-sdlc", "challenge"], "description": "agent-sdlc: the lifecycle. challenge: chorus challenge (premise pass standalone)." },
-    "status": { "type": "string", "enum": ["in-progress", "halted-awaiting-operator", "complete"], "description": "Run status." },
+    "mode": { "$ref": "vocab.schema.json#/$defs/sdlc_mode", "description": "agent-sdlc: the lifecycle. challenge: chorus challenge (premise pass standalone)." },
+    "status": { "$ref": "vocab.schema.json#/$defs/sdlc_status", "description": "Run status." },
     "gates": {
       "type": "array",
       "description": "Gate executions in order; a re-run appends a new cycle, never edits a prior one.",
@@ -22,8 +22,8 @@
         "additionalProperties": false,
         "required": ["gate", "name", "cycle", "corpus", "rsvp", "seating", "quorum", "register", "tally", "red_resolutions", "outcome"],
         "properties": {
-          "gate": { "type": "string", "enum": ["A", "B", "C", "challenge"], "description": "Gate A (design), B (plan/tasks), C (implementation), or a standalone challenge." },
-          "name": { "type": "string", "enum": ["design", "plan-tasks", "implementation", "premise"], "description": "The gate's name." },
+          "gate": { "$ref": "vocab.schema.json#/$defs/gate", "description": "Gate A (design), B (plan/tasks), C (implementation), or a standalone challenge." },
+          "name": { "$ref": "vocab.schema.json#/$defs/gate_name", "description": "The gate's name." },
           "cycle": { "type": "integer", "minimum": 1, "maximum": 3, "description": "Loop cycle; bounded at 3 (S7)." },
           "corpus": { "type": "array", "minItems": 1, "items": { "type": "string" }, "description": "Artefacts reviewed." },
           "rsvp": { "type": "array", "items": { "$ref": "common.schema.json#/$defs/rsvp_row" }, "description": "This gate's RSVP (never carried from another gate, S2)." },
@@ -33,11 +33,11 @@
             "required": ["band"],
             "description": "How the panel was seated.",
             "properties": {
-              "band": { "type": "string", "enum": ["🟢", "🟡"], "description": "🟢 strict sort or J ≤ 5; 🟡 tie at the cap → default panel." },
+              "band": { "$ref": "vocab.schema.json#/$defs/seating_band", "description": "🟢 strict sort or J ≤ 5; 🟡 tie at the cap → default panel." },
               "decision_ref": { "type": "string", "description": "🟡 only: id of the seating DecisionRecord in decisions." }
             }
           },
-          "quorum": { "type": "string", "enum": ["ok", "re-pinged", "aborted"], "description": "Quorum outcome." },
+          "quorum": { "$ref": "vocab.schema.json#/$defs/gate_quorum", "description": "Quorum outcome." },
           "premise_pass": {
             "type": "object",
             "additionalProperties": false,
@@ -54,7 +54,7 @@
                   "additionalProperties": false,
                   "required": ["item", "outcome"],
                   "properties": {
-                    "item": { "type": "string", "enum": ["RT-1", "RT-2", "RT-3", "RT-4", "RT-5", "RT-6"], "description": "Checklist item." },
+                    "item": { "$ref": "vocab.schema.json#/$defs/red_team_item", "description": "Checklist item." },
                     "outcome": { "type": "string", "minLength": 3, "description": "What the pass found for this item." }
                   }
                 }
@@ -75,7 +75,7 @@
                       "required": ["persona", "attack_form", "note"],
                       "properties": {
                         "persona": { "$ref": "common.schema.json#/$defs/persona", "description": "Who attacked." },
-                        "attack_form": { "type": "string", "enum": ["steelman-null", "reframe", "root-cause-doubt", "unvalidated-assumption"], "description": "The attack form." },
+                        "attack_form": { "$ref": "vocab.schema.json#/$defs/attack_form", "description": "The attack form." },
                         "note": { "type": "string", "minLength": 10, "description": "What was tried and why it did not land." }
                       }
                     }
@@ -100,7 +100,7 @@
               "required": ["finding", "disposition", "detail"],
               "properties": {
                 "finding": { "$ref": "common.schema.json#/$defs/finding_id", "description": "The gating finding." },
-                "disposition": { "type": "string", "enum": ["resolved", "waived", "open"], "description": "resolved (incorporation, verified by re-run), waived (operator only), or still open." },
+                "disposition": { "$ref": "vocab.schema.json#/$defs/red_disposition", "description": "resolved (incorporation, verified by re-run), waived (operator only), or still open." },
                 "detail": { "type": "string", "minLength": 5, "description": "How it was resolved, or where the waiver rationale lives." },
                 "ruling_ref": { "$ref": "common.schema.json#/$defs/ruling_ref", "description": "The operator's waiver ruling. Required when waived." }
               },
@@ -118,7 +118,7 @@
             "required": ["result"],
             "description": "How the gate execution ended.",
             "properties": {
-              "result": { "type": "string", "enum": ["pass", "halt", "bound-reached", "self-heal", "aborted"], "description": "pass: proceed. halt: awaiting operator. bound-reached: the third cycle left a 🔴 uncleared; it goes to the operator as a hard-block (S7). self-heal: 🟡 auto-incorporate and re-run. aborted: quorum failed." },
+              "result": { "$ref": "vocab.schema.json#/$defs/gate_result", "description": "pass: proceed. halt: awaiting operator. bound-reached: the third cycle left a 🔴 uncleared; it goes to the operator as a hard-block (S7). self-heal: 🟡 auto-incorporate and re-run. aborted: quorum failed." },
               "next": { "type": "string", "description": "pass: the next phase." },
               "awaiting": { "type": "array", "items": { "$ref": "common.schema.json#/$defs/finding_id" }, "description": "halt/bound-reached: the findings waiting on the operator." }
             }
@@ -143,12 +143,12 @@
             "properties": {
               "persona": { "$ref": "common.schema.json#/$defs/persona", "description": "The lens." },
               "written": { "type": "integer", "minimum": 0, "description": "Records written to its own memory." },
-              "noop": { "type": "string", "enum": ["no-locator", "does-not-generalize", "no-memory-dir"], "description": "Which test produced a no-op, when written is 0." }
+              "noop": { "$ref": "vocab.schema.json#/$defs/memory_noop", "description": "Which test produced a no-op, when written is 0." }
             }
           }
         },
         "project_wide_diff": { "type": "string", "description": "The proposed addendum diff, or its locator." },
-        "operator": { "type": "string", "enum": ["accepted", "rejected", "deferred", "lapsed", "none-proposed"], "description": "The operator's answer to the project-wide proposal." },
+        "operator": { "$ref": "vocab.schema.json#/$defs/memory_operator", "description": "The operator's answer to the project-wide proposal." },
         "operator_ref": { "$ref": "common.schema.json#/$defs/ruling_ref", "description": "Where the accept/reject was ruled." },
         "pending": { "type": "array", "items": { "type": "string" }, "description": "Pending proposals, re-offered at the next sign-off." },
         "secret_filter": { "$ref": "common.schema.json#/$defs/secret_filter", "description": "Whether the secret pre-filter ran over the sign-off writes, and its drops." }
@@ -162,7 +162,7 @@
         "additionalProperties": false,
         "required": ["rule", "pass", "evidence"],
         "properties": {
-          "rule": { "type": "string", "enum": ["S1", "S2", "S3", "S4", "S5", "S6", "S7", "S8", "S9", "S10", "S11"], "description": "The invariant." },
+          "rule": { "$ref": "vocab.schema.json#/$defs/sdlc_rule", "description": "The invariant." },
           "pass": { "type": "boolean", "description": "Whether it held." },
           "evidence": { "type": "string", "minLength": 3, "description": "Pointer to the evidence row, e.g. 'gates[1].tally'." }
         }

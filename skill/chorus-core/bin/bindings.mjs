@@ -17,6 +17,7 @@ import { existsSync, realpathSync } from "node:fs";
 import { homedir } from "node:os";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
+import { PORT } from "./vocab.mjs";
 
 /** The skill dirs searched, in order. */
 export function skillDirs({ cwd = process.cwd(), env = process.env } = {}) {
@@ -42,13 +43,13 @@ export function bindings(opts) {
     brief,
     block: {
       ports: [
-        { port: "decision-sink", provider: sink },
-        { port: "ruling-lookup", provider: sink },
-        { port: "record-validator", provider: "chorus-core" },
-        { port: "record-renderer", provider: "chorus-core" },
-        { port: "arbiter", provider: "default" },
-        { port: "fixed-viewpoint", provider: "default" },
-        { port: "memory-recall", provider: "default" },
+        { port: PORT.DECISION_SINK, provider: sink },
+        { port: PORT.RULING_LOOKUP, provider: sink },
+        { port: PORT.RECORD_VALIDATOR, provider: "chorus-core" },
+        { port: PORT.RECORD_RENDERER, provider: "chorus-core" },
+        { port: PORT.ARBITER, provider: "default" },
+        { port: PORT.FIXED_VIEWPOINT, provider: "default" },
+        { port: PORT.MEMORY_RECALL, provider: "default" },
       ],
       recoveries: [],
     },

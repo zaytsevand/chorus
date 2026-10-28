@@ -34,18 +34,15 @@
       "description": "A calendar day, YYYY-MM-DD."
     },
     "severity": {
-      "type": "string",
-      "enum": ["🔴", "🟡", "🟢"],
+      "$ref": "vocab.schema.json#/$defs/severity",
       "description": "The three-level scale owned by GATE-PRIMITIVE.md, shared by findings and decisions."
     },
     "final_severity": {
-      "type": "string",
-      "enum": ["🔴", "🟡", "🟢", "dropped"],
+      "$ref": "vocab.schema.json#/$defs/final_severity",
       "description": "Post-tally severity. 'dropped' is the demotion of a 🟢 (GATE-PRIMITIVE.md Stage 4: 🟢→drop)."
     },
     "confidence": {
-      "type": "string",
-      "enum": ["high", "low"],
+      "$ref": "vocab.schema.json#/$defs/confidence",
       "description": "Declared confidence_on_hand: epistemic sufficiency of the evidence on hand. low requires need_info (S11). Declared by the persona, never inferred."
     },
     "persona": {
@@ -83,8 +80,7 @@
       "description": "One piece of I8 evidence behind a finding or vote.",
       "properties": {
         "kind": {
-          "type": "string",
-          "enum": ["file_line", "principle", "principle_proposed"],
+          "$ref": "vocab.schema.json#/$defs/evidence_kind",
           "description": "file_line: a real anchor in the corpus. principle: an existing principle, ref says where it is established. principle_proposed: a principle named here for the first time."
         },
         "ref": {
@@ -112,7 +108,7 @@
       "properties": {
         "raiser": { "$ref": "#/$defs/persona", "description": "The persona that raised the flag." },
         "reason": { "type": "string", "minLength": 5, "description": "One sentence naming what is missing." },
-        "stage": { "type": "string", "enum": ["author", "vote"], "description": "Where the flag was raised: Stage 2 (author) or Stage 3 (vote)." }
+        "stage": { "$ref": "vocab.schema.json#/$defs/need_info_stage", "description": "Where the flag was raised: Stage 2 (author) or Stage 3 (vote)." }
       }
     },
     "finding": {
@@ -136,10 +132,9 @@
         "need_info": { "type": "boolean", "description": "Open NEED_INFO flag (S11). true blocks the tally for this finding." },
         "need_info_reason": { "type": "string", "minLength": 5, "description": "One sentence naming what is missing. Required when need_info is true." },
         "conditional_on": { "type": "string", "minLength": 5, "description": "The stated assumption this finding depends on while one of the persona's gates is unmet (S10)." },
-        "scope": { "type": "string", "enum": ["premise", "within-frame"], "description": "Gate A premise pass only: the author's declared scope, confirmed by the vote." },
+        "scope": { "$ref": "vocab.schema.json#/$defs/scope", "description": "Gate A premise pass only: the author's declared scope, confirmed by the vote." },
         "attack_form": {
-          "type": "string",
-          "enum": ["steelman-null", "reframe", "root-cause-doubt", "unvalidated-assumption"],
+          "$ref": "vocab.schema.json#/$defs/attack_form",
           "description": "Premise findings only: which of the four premise attack forms this finding carries (chorus-sdlc § Gate A · 1)."
         },
         "experiment": { "type": "string", "minLength": 5, "description": "The cheapest experiment that would settle it. Required with attack_form unvalidated-assumption." },
@@ -181,15 +176,15 @@
       "properties": {
         "persona": { "$ref": "#/$defs/persona", "description": "Who replied." },
         "lens": { "$ref": "#/$defs/lens", "description": "Their lens." },
-        "decision": { "type": "string", "enum": ["JOIN", "ABSTAIN", "EXCEPTIONAL"], "description": "The persona's own reply (I2). EXCEPTIONAL is exceptional entry beyond the cap." },
+        "decision": { "$ref": "vocab.schema.json#/$defs/rsvp_decision", "description": "The persona's own reply (I2). EXCEPTIONAL is exceptional entry beyond the cap." },
         "applies": { "type": "array", "items": { "type": "string", "minLength": 3 }, "description": "Axis A: cited round-context deltas." },
         "expected": { "$ref": "#/$defs/severity", "description": "Axis B: expected stakes (🔴 means 🔴-potential)." },
         "hook": { "type": "string", "description": "Axis B's one-line evidence hook." },
         "uncovered_delta": { "type": "string", "minLength": 3, "description": "EXCEPTIONAL only: the delta no seated ordinary lens covers." },
         "reason": { "type": "string", "minLength": 3, "description": "One-line reason, or the failure-rule reason (not installed, silent, past budget, malformed, over-length, no evidence)." },
-        "failure": { "type": "string", "enum": ["not-installed", "silent", "past-budget", "malformed", "over-length", "no-evidence"], "description": "Set when the persona counts as ABSTAIN under the one failure rule, after its one automatic retry also failed (not-installed has no retry)." },
+        "failure": { "$ref": "vocab.schema.json#/$defs/failure", "description": "Set when the persona counts as ABSTAIN under the one failure rule, after its one automatic retry also failed (not-installed has no retry)." },
         "seated": { "type": "boolean", "description": "Whether the persona holds a seat on this board." },
-        "seat": { "type": "string", "enum": ["ordinary", "exceptional"], "description": "Seat kind, when seated." }
+        "seat": { "$ref": "vocab.schema.json#/$defs/seat", "description": "Seat kind, when seated." }
       },
       "allOf": [
         { "if": { "properties": { "decision": { "const": "EXCEPTIONAL" } }, "required": ["decision"] },
@@ -217,7 +212,7 @@
         "need_info_reasons": { "type": "array", "items": { "$ref": "#/$defs/need_info_reason" }, "description": "One entry per raiser. Required when need_info is true." },
         "graded": { "type": "boolean", "description": "false for R2- derived findings (shown [ungraded])." },
         "derived_from": { "$ref": "#/$defs/finding_id", "description": "R2- only: the finding it was derived from." },
-        "scope": { "type": "string", "enum": ["premise", "within-frame"], "description": "Gate A only: premise or within-frame, as confirmed by the vote." },
+        "scope": { "$ref": "vocab.schema.json#/$defs/scope", "description": "Gate A only: premise or within-frame, as confirmed by the vote." },
         "parked": { "type": "boolean", "description": "Gate A only: a within-frame finding parked from the premise pass." },
         "convergence_notes": {
           "type": "array",
@@ -248,14 +243,14 @@
       "properties": {
         "finding": { "$ref": "#/$defs/finding_id", "description": "The register entry this row counts." },
         "authored_severity": { "$ref": "#/$defs/severity", "description": "Copied from the register." },
-        "status": { "type": "string", "enum": ["graded", "held", "ungraded", "unvoted", "minority-report"], "description": "graded: counted. held: NEED_INFO open, not counted (not movement unmoved, which is counted). ungraded: R2- derived. unvoted: every voter abstained. minority-report: exactly one non-author voter; not counted, keeps its authored severity, never gating, listed apart and out of the top five." },
+        "status": { "$ref": "vocab.schema.json#/$defs/tally_status", "description": "graded: counted. held: NEED_INFO open, not counted (not movement unmoved, which is counted). ungraded: R2- derived. unvoted: every voter abstained. minority-report: exactly one non-author voter; not counted, keeps its authored severity, never gating, listed apart and out of the top five." },
         "n": { "type": "integer", "minimum": 0, "description": "N: the count of non-author voters on the finding (GATE-PRIMITIVE.md Stage 4). A tally must not run at N < 2." },
         "p": { "type": "integer", "minimum": 0, "description": "PRIORITIZE count among non-author voters." },
         "c": { "type": "integer", "minimum": 0, "description": "CONFIRM count among non-author voters." },
         "o": { "type": "integer", "minimum": 0, "description": "OVER-RATE count among non-author voters." },
         "net": { "type": "integer", "description": "net = P − O. CONFIRM is excluded." },
         "threshold": { "type": "integer", "minimum": 1, "description": "T = max(1, floor(N / 2))." },
-        "movement": { "type": "string", "enum": ["escalate", "demote", "unmoved", "agreed", "unvoted"], "description": "escalate: net ≥ T, severity up one level. demote: net ≤ −T. agreed: unmoved, with CONFIRM votes. unmoved: counted, |net| < T, no CONFIRM; the authored severity stands. unvoted: all abstained." },
+        "movement": { "$ref": "vocab.schema.json#/$defs/movement", "description": "escalate: net ≥ T, severity up one level. demote: net ≤ −T. agreed: unmoved, with CONFIRM votes. unmoved: counted, |net| < T, no CONFIRM; the authored severity stands. unvoted: all abstained." },
         "final_severity": { "$ref": "#/$defs/final_severity", "description": "Post-tally severity: authored severity moved at most one level." },
         "convergence": { "type": "integer", "minimum": 0, "description": "Convergence = P + C, used to rank, never to escalate." },
         "gating": { "type": "boolean", "description": "true iff final_severity is 🔴." }
@@ -297,7 +292,7 @@
             "additionalProperties": false,
             "required": ["port", "provider"],
             "properties": {
-              "port": { "type": "string", "enum": ["decision-sink", "ruling-lookup", "record-validator", "record-renderer", "arbiter", "fixed-viewpoint", "memory-recall"], "description": "The port, as CONDUCTOR.md § Ports names it." },
+              "port": { "$ref": "vocab.schema.json#/$defs/port", "description": "The port, as CONDUCTOR.md § Ports names it." },
               "provider": { "type": "string", "minLength": 1, "description": "What served it, e.g. chorus-core or a registered provider, or 'default' when the port fell back to its recorded default." }
             }
           }
@@ -310,7 +305,7 @@
             "additionalProperties": false,
             "required": ["kind", "subject", "reason"],
             "properties": {
-              "kind": { "type": "string", "enum": ["retry", "fallback", "abstention"], "description": "retry: a failed persona reply sent back once. fallback: a missing optional tool replaced by its port's default. abstention: a persona counted ABSTAIN because its retry also failed." },
+              "kind": { "$ref": "vocab.schema.json#/$defs/recovery_kind", "description": "retry: a failed persona reply sent back once. fallback: a missing optional tool replaced by its port's default. abstention: a persona counted ABSTAIN because its retry also failed." },
               "subject": { "type": "string", "minLength": 2, "description": "The persona (retry, abstention) or the port (fallback)." },
               "phase": { "type": "string", "minLength": 2, "description": "Where it happened, e.g. rsvp, round-1, round-2." },
               "reason": { "type": "string", "minLength": 3, "description": "What failed, in one line, e.g. the validator's reason." }
@@ -326,8 +321,7 @@
       "description": "A conductor side-note: flag-only, routed to the operator, never changes severity or the tally (CONDUCTOR.md § Side-notes).",
       "properties": {
         "regime": {
-          "type": "string",
-          "enum": ["exceptional-seat", "threshold-boundary", "unanimous-same-brief", "missing-beneficiary-lens", "missing-scope-lens", "other"],
+          "$ref": "vocab.schema.json#/$defs/side_note_regime",
           "description": "The declared risk regime the procedure entered."
         },
         "note": { "type": "string", "minLength": 5, "description": "The side-note text." },

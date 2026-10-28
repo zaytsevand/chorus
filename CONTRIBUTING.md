@@ -63,8 +63,14 @@ scripts/check-suite-integrity.sh     # FC1–FC7: invariants, sibling isolation,
                                      # references, stale content, port boundary,
                                      # roster
 scripts/test-install-roundtrip.sh    # install -> verify -> uninstall -> verify
-node --test skill/chorus-core/test/*.test.mjs  # validator, renderer, bindings, canon drift
+node --test skill/chorus-core/test/*.test.mjs  # validator, renderer, bindings, canon drift,
+                                               # conductor scenarios, vocabulary lint
 ```
+
+A new token in a closed set (a status, a vote, a gate result, a persona) goes in
+`skill/chorus-core/schema/vocab.schema.json` first; schemas `$ref` it and code
+imports it from `bin/vocab.mjs`. The vocabulary lint fails on anything spelled by
+hand.
 
 CI (`.github/workflows/integrity.yml`) runs all three, and validates the
 committed review records, on every pull request and on pushes to `main`. The runner has no `claude` CLI, so CI skips
