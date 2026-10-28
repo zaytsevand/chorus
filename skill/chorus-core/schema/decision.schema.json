@@ -35,7 +35,7 @@
         "additionalProperties": false,
         "required": ["kind", "ref"],
         "properties": {
-          "kind": { "type": "string", "enum": ["code", "document", "finding", "run", "commit", "test", "measurement", "ruling"], "description": "What sort of thing is cited. A chorus finding is kind finding with ref '<record>#<Fn>'." },
+          "kind": { "$ref": "vocab.schema.json#/$defs/decision_evidence_kind", "description": "What sort of thing is cited. A chorus finding is kind finding with ref '<record>#<Fn>'." },
           "ref": { "type": "string", "minLength": 1, "description": "The citation: path:line, commit, finding id, ruling id." },
           "note": { "type": "string", "description": "What this citation shows, in one sentence." },
           "url": { "type": "string", "description": "Optional link." },
@@ -71,7 +71,7 @@
         }
       }
     },
-    "resolution": { "type": "string", "enum": ["auto-resolved", "default-applied", "in-progress", "hard-block"], "description": "DecisionRecord resolution. in-progress is a self-heal cycle in flight. hard-block: a 🔴 the chorus cannot pass until the operator rules (not the brief's bearing 'escalated', which means not blocking)." },
+    "resolution": { "$ref": "vocab.schema.json#/$defs/decision_resolution", "description": "DecisionRecord resolution. in-progress is a self-heal cycle in flight. hard-block: a 🔴 the chorus cannot pass until the operator rules (not the brief's bearing 'escalated', which means not blocking)." },
     "cycle": { "type": "integer", "minimum": 1, "maximum": 3, "description": "Self-heal only: cycle N of 3." },
     "override": {
       "type": "object",
@@ -83,7 +83,7 @@
         "cost": { "type": "string", "minLength": 3, "description": "What reversing costs." }
       }
     },
-    "status": { "type": "string", "enum": ["open", "decided", "complete", "superseded"], "description": "Same meanings as a brief entry's status (BINDINGS.md)." },
+    "status": { "$ref": "vocab.schema.json#/$defs/decision_status", "description": "Same meanings as a brief entry's status (BINDINGS.md)." },
     "decision": {
       "type": "object",
       "additionalProperties": false,

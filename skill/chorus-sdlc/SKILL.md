@@ -97,6 +97,16 @@ a success-criteria acceptance pass over it is low-yield. Gate C reviews the
 code's **own soundness** (bugs, drift, quality), which is where residual risk
 lives.
 
+## Run it with the conductor loop
+
+`bin/conduct.mjs` (`chorus-core/CONDUCTOR.md` § The conductor loop) drives the
+pipeline: `conduct init sdlc --feature 0NN-name` (or `init challenge --target …`),
+then `conduct next` until `done` or `halt`, then `conduct record`, which writes
+`agent-sdlc-log.json` and `.md`. It asks for each speckit step (`run-skill`),
+runs every gate's board, asks for the premise pass at Gate A, returns
+`incorporate` with the gate's cascade below the bound and an `ask-operator` at
+it, and writes the S1–S11 self-audit from the log.
+
 ## Gate mechanics
 
 Every gate runs the four-stage primitive (`chorus-core/GATE-PRIMITIVE.md`:

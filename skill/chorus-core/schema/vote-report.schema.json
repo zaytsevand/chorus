@@ -9,7 +9,7 @@
   "properties": {
     "kind": { "const": "vote-report", "description": "Record kind." },
     "schema_version": { "$ref": "common.schema.json#/$defs/schema_version", "description": "Schema version; the major must be 1." },
-    "mode": { "type": "string", "enum": ["review", "sdlc", "challenge"], "description": "review: chorus-review Round 2 (600-word limit). sdlc / challenge: a gate's vote stage." },
+    "mode": { "$ref": "vocab.schema.json#/$defs/report_mode", "description": "review: chorus-review Round 2 (600-word limit). sdlc / challenge: a gate's vote stage." },
     "round": { "type": "string", "minLength": 1, "description": "The round date or gate/cycle." },
     "persona": { "$ref": "common.schema.json#/$defs/persona", "description": "The voting persona." },
     "lens": { "$ref": "common.schema.json#/$defs/lens", "description": "Its lens." },
@@ -25,7 +25,7 @@
         "properties": {
           "finding": { "$ref": "common.schema.json#/$defs/finding_id", "description": "The finding voted on." },
           "confidence_on_hand": { "$ref": "common.schema.json#/$defs/confidence", "description": "Declared first. low → vote must be NEED_INFO." },
-          "vote": { "type": "string", "enum": ["PRIORITIZE", "CONFIRM", "OVER-RATE", "NEED_INFO"], "description": "PRIORITIZE: under-rated, escalate. CONFIRM: correctly rated. OVER-RATE: over-rated, wrong, out of scope or too vague. NEED_INFO: information gap." },
+          "vote": { "$ref": "vocab.schema.json#/$defs/vote", "description": "PRIORITIZE: under-rated, escalate. CONFIRM: correctly rated. OVER-RATE: over-rated, wrong, out of scope or too vague. NEED_INFO: information gap." },
           "reason": { "type": "string", "minLength": 5, "description": "One-line reason; for OVER-RATE a file:line or one-line reason; for NEED_INFO what is missing." },
           "evidence": { "type": "array", "items": { "$ref": "common.schema.json#/$defs/evidence" }, "description": "Citations for project-specific claims ('I read X.py:NN and confirm')." },
           "pull_quote": { "$ref": "common.schema.json#/$defs/pull_quote", "description": "Convergence note, marked PULL-QUOTE, relayed verbatim under the entry." }

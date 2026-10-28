@@ -110,8 +110,9 @@ inferred per-finding):
 - a finding is carried by **unanimous agreement among same-brief voters** — file the
   "one datum, not five" caution;
 - a corpus **defers cross-user or reuse value** (`DECISION-PRIMITIVE.md` § Deferral
-  checklist) and the board seats **no product lens**, or **no security lens** where trust
-  enforcement is server-bound — flag the missing beneficiary / trust review;
+  checklist) and the board seats **no product lens** (`missing-beneficiary-lens`), or **no
+  security lens** where trust enforcement is server-bound (`missing-trust-lens`) — flag the
+  missing beneficiary or trust review;
 - any further regime a consuming skill declares under the same rules.
 
 Side-notes are a human-catch layer **beside** the tally, never inside it; a side-note
@@ -290,13 +291,20 @@ What the chorus needs from outside. chorus-core serves the record validator and 
 the project if present, else `~/.claude/skills/chorus-core`.
 
 ```
+node <root>/bin/conduct.mjs  <command> …                   # the conductor loop, below
 node <root>/bin/bindings.mjs                               # the round's bindings block
 node <root>/bin/validate.mjs <kind> <file.json> [--json]   # 0 valid · 1 invalid · 2 usage · 3 version mismatch
 node <root>/bin/render.mjs   <review-record|sdlc-log> <file.json> <out.md>
 ```
 
 Kinds: `rsvp`, `finding-report`, `vote-report`, `review-record`, `sdlc-log`,
-`decision`, `ruling`. The schema is `schema/` (JSON Schema 2020-12); `examples/`
+`decision`, `ruling`, `run-log`. Every closed vocabulary (severities, votes,
+statuses, ports, gate results, phases, the persona roster…) lives once, in
+`schema/vocab.schema.json`; schemas `$ref` it and code imports it through
+`bin/vocab.mjs`. `test/vocab-lint.test.mjs` fails on an inline enum, a bare
+vocabulary literal in `bin/`, a near-miss spelling in skill or agent prose
+(an underscore where the registry has a hyphen), or a roster that disagrees with `plugin.json` and
+`agents/`. The schema is `schema/` (JSON Schema 2020-12); `examples/`
 holds a valid and an invalid sample of each kind; `test/` holds the tests,
 including `canon-drift.test.mjs`, which fails when the validator or schema stops
 matching this section or `GATE-PRIMITIVE.md` § Stage 4. The canon wins: fix the
@@ -322,6 +330,47 @@ root; `"#"` means the record itself (its `local_rulings`). The validator opens a
 local record and checks the id is there: an id it does not hold is an error; an
 absent or unreadable record is a warning, so a private brief kept outside the
 repository does not break validation.
+
+### The conductor loop
+
+The integration layer's mechanical work is a program, `bin/conduct.mjs`; the
+calling session keeps only what a program cannot do. Seating, quorum and the
+re-ask, the one-retry-then-ABSTAIN rule, the ballots (every finding but the
+voter's own, S8), the NEED_INFO hold and its peer-then-operator routing (S11),
+the Stage-4 count, gate cycles and the bound (S7), the side-notes a program can
+see, and the record itself are computed from an append-only run log
+(`<stem>.run.json`, committed beside the record). The rules stay defined here
+and in the primitives; `bin/engine.mjs` implements them as pure functions and
+names the section each one follows.
+
+```
+conduct init review --target <t> --context <deltas> [--pr <n>]   # or: init sdlc --feature <0NN-name> · init challenge --target <t>
+loop:
+  conduct next <run.json>                       # one action, as JSON
+  …do what it says…
+  conduct submit <run.json> <persona> <reply>   # each persona reply (validated, or logged as a failure)
+  conduct fail   <run.json> <persona> <failure> <reason>   # silent, past budget, not installed
+  conduct ack    <run.json> <persona>           # explore / memory step done
+  conduct answer <run.json> <topic> <data>      # an input the action asked for
+until the action is done or halt
+conduct record <run.json>                       # writes <stem>.json and <stem>.md, validated
+```
+
+| Action | The calling session |
+|---|---|
+| `dispatch` / `retry` | dispatches each listed persona with the brief for that phase (and the retry reason); a reply goes back through `submit` |
+| `ask-operator` | puts the question as a blocking choice (`AskUserQuestion`, at most four per call); the answer goes back through `answer` |
+| `provide` | supplies what only it can: conflicts framed for the arbiter, the top-five scores, the TL;DR and baseline, the premise-pass outcomes, a peer's provision, the memory update |
+| `incorporate` / `run-skill` | runs the named speckit skills (S5), then reports with `answer` |
+| `done` / `halt` | runs `record`; on halt the record says what awaits the operator |
+
+The script refuses a reply nobody asked for, a vote on one's own finding or off
+the ballot, a low-confidence vote that is not NEED_INFO, a ranking that holds a
+held or minority finding, and a waiver without the operator's ruling. It copies
+every pull-quote, locator and severity into the top five itself, so the
+conductor relays and never restates (I6). Exit codes: 0 ok · 1 refused (logged
+as a failure when it was a persona reply) · 2 not asked for / usage (nothing
+logged) · 3 version mismatch (nothing logged, never charged).
 
 ## Refusals (system boundaries, not modesty)
 

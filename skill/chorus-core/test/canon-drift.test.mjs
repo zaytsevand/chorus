@@ -53,8 +53,8 @@ const stage4 = section(read(join(CORE, "GATE-PRIMITIVE.md")), "Stage 4 — Tally
 
 test("the schema knows exactly the ports CONDUCTOR § Ports declares", () => {
   const canon = ports.map((r) => portId(r[0])).sort();
-  const common = JSON.parse(read(join(ROOT, "schema", "common.schema.json")));
-  const schema = [...common.$defs.bindings.properties.ports.items.properties.port.enum].sort();
+  const vocab = JSON.parse(read(join(ROOT, "schema", "vocab.schema.json")));
+  const schema = [...vocab.$defs.port.enum].sort();
   assert.deepEqual(schema, canon);
 });
 

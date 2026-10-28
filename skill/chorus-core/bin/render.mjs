@@ -17,8 +17,13 @@
 import { readFileSync, writeFileSync, realpathSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { validate } from "./validate.mjs";
+import {
+  CONFLICT_OUTCOME, EVIDENCE_KIND, GATE, GATE_RESULT, RECORD_KIND, REVIEW_MODE, RSVP, SDLC_MODE,
+  SEATING_BAND, SCOPE, SEVERITY, TALLY_STATUS, VOTE,
+} from "./vocab.mjs";
+import { CYCLE_BOUND } from "./engine.mjs";
 
-export const RENDER_KINDS = ["review-record", "sdlc-log"];
+export const RENDER_KINDS = [RECORD_KIND.REVIEW_RECORD, RECORD_KIND.SDLC_LOG];
 
 const cell = (v) => (v === undefined || v === null || v === "" ? "—" : String(v).replace(/\|/g, "\\|").replace(/\s*\n\s*/g, " "));
 const table = (head, rows) =>
@@ -28,9 +33,9 @@ const ref = (r) => (r ? `${r.id} (${r.record === "#" ? "this record" : r.record}
 const tagOf = (e) => {
   if (e.unsupported) return "[unsupported]";
   const kinds = new Set((e.evidence ?? []).map((x) => x.kind));
-  if (kinds.has("file_line")) return "";
-  if (kinds.has("principle")) return "[principle]";
-  if (kinds.has("principle_proposed")) return "[principle:proposed]";
+  if (kinds.has(EVIDENCE_KIND.FILE_LINE)) return "";
+  if (kinds.has(EVIDENCE_KIND.PRINCIPLE)) return "[principle]";
+  if (kinds.has(EVIDENCE_KIND.PRINCIPLE_PROPOSED)) return "[principle:proposed]";
   return "";
 };
 const needInfo = (e) => (e.need_info ? `open · ${(e.need_info_reasons ?? []).map((r) => `${r.raiser}: ${r.reason}`).join("; ")}` : "—");
@@ -73,14 +78,14 @@ function convergence(register) {
 function matrix(rows) {
   return table(
     ["ID", "Authored severity", "P", "C", "O", "net", "Final severity", "Convergence (P + C)", "Status"],
-    rows.map((r) => [r.finding, r.authored_severity, r.p, r.c, r.o, r.net, r.final_severity, r.convergence, r.status === "ungraded" ? "ungraded [ungraded]" : r.status]));
+    rows.map((r) => [r.finding, r.authored_severity, r.p, r.c, r.o, r.net, r.final_severity, r.convergence, r.status === TALLY_STATUS.UNGRADED ? "ungraded [ungraded]" : r.status]));
 }
 
 function rsvpTable(rows) {
   return table(
     ["Lens", "Persona", "Decision", "Applies (cited deltas)", "Expected stakes", "Seat", "Reason"],
     rows.map((r) => [r.lens, r.persona, r.decision, r.applies?.length ? r.applies.join("; ") : "—",
-      r.expected ? `${r.expected}${r.decision !== "ABSTAIN" ? "-potential" : ""}${r.hook ? ` — ${r.hook}` : ""}` : "—",
+      r.expected ? `${r.expected}${r.decision !== RSVP.ABSTAIN ? "-potential" : ""}${r.hook ? ` — ${r.hook}` : ""}` : "—",
       r.seated ? r.seat : "not seated", `${r.reason}${r.failure ? ` (failure rule: ${r.failure})` : ""}`]));
 }
 
@@ -105,7 +110,7 @@ function sideNotes(list) {
 export function renderReviewRecord(d) {
   const tallyBy = new Map(d.tally.map((r) => [r.finding, r]));
   const L = [];
-  L.push(`# Chorus review — ${d.date}`, "", `- **Target**: ${d.target}`, `- **Mode**: ${d.mode === "pr-design" ? "design review of the PR's approach, not a line-by-line diff review" : "project-state review"}`);
+  L.push(`# Chorus review — ${d.date}`, "", `- **Target**: ${d.target}`, `- **Mode**: ${d.mode === REVIEW_MODE.PR_DESIGN ? "design review of the PR's approach, not a line-by-line diff review" : "project-state review"}`);
   if (d.baseline_ref) L.push(`- **Baseline**: ${d.baseline_ref}`);
   L.push("", `**Round context.** ${d.round_context}`, "", bindingsBlock(d.bindings), "", `**Secret filter.** ${secretFilter(d.secret_filter)}`, "");
   L.push("## 1. TL;DR", "", d.tldr.join(" "), "");
@@ -117,20 +122,20 @@ export function renderReviewRecord(d) {
   if (!d.conflicts.length) L.push("No genuine conflicts this round; phase skipped.", "");
   for (const c of d.conflicts) {
     L.push(`- **${c.id}** — ${c.advisors.join(" vs ")} on ${c.findings.join(", ")}: ${c.disputed}`,
-      `  - ${c.outcome === "arbiter-ruled" ? `Arbiter ruling: ${c.arbiter_ruling}` : `Unresolved for the operator${c.decision_ref ? ` (${c.decision_ref})` : ""}`}`);
+      `  - ${c.outcome === CONFLICT_OUTCOME.ARBITER_RULED ? `Arbiter ruling: ${c.arbiter_ruling}` : `Unresolved for the operator${c.decision_ref ? ` (${c.decision_ref})` : ""}`}`);
   }
   if (d.conflicts.length) L.push("");
   L.push("## 6. Top five", "");
   if (!d.top_five.length) L.push("No findings ranked.");
   for (const t of d.top_five) {
-    const ungraded = tallyBy.get(t.finding)?.status === "ungraded" ? " [ungraded]" : "";
+    const ungraded = tallyBy.get(t.finding)?.status === TALLY_STATUS.UNGRADED ? " [ungraded]" : "";
     L.push(`${t.rank}. **${t.finding}**${ungraded} ${t.final_severity} — ${quote(t.pull_quote)} \`${t.locator}\``,
       `   Cost ${t.cost} · Value: ${t.value}${t.constitutional_roi ? ` · Constitutional ROI: ${t.constitutional_roi}` : ""} · Convergence ${t.convergence}${t.arbiter_note ? ` · ${t.arbiter_note}` : ""}`);
   }
   L.push("", "## 7. Held findings and minority reports", "");
   if (!d.held.length) L.push("None.");
   for (const h of d.held) L.push(`- **${h.finding}** (route: ${h.route}${h.decision_ref ? `, ${h.decision_ref}` : ""}): ${h.reasons.map((r) => `${r.raiser} — ${r.reason}`).join("; ")}`);
-  const minority = d.tally.filter((t) => t.status === "minority-report");
+  const minority = d.tally.filter((t) => t.status === TALLY_STATUS.MINORITY_REPORT);
   L.push("", "**Minority reports** (one voter each; not counted, never gating, authored severity kept):", "");
   if (!minority.length) L.push("None.");
   for (const t of minority) { const e = d.register.find((x) => x.id === t.finding); L.push(`- **${t.finding}** ${t.authored_severity} — ${e ? `${quote(e.pull_quote)} \`${e.locator}\`` : ""} (P ${t.p} · C ${t.c} · O ${t.o})`); }
@@ -149,12 +154,12 @@ export function renderReviewRecord(d) {
   return L.join("\n") + "\n";
 }
 
-const GATE_TITLE = { A: "Gate A — design", B: "Gate B — plan/tasks", C: "Gate C — implementation", challenge: "Chorus challenge — premise" };
+const GATE_TITLE = { [GATE.A]: "Gate A — design", [GATE.B]: "Gate B — plan/tasks", [GATE.C]: "Gate C — implementation", [GATE.CHALLENGE]: "Chorus challenge — premise" };
 
 export function renderSdlcLog(d) {
   const L = [];
   L.push(`# Agent-SDLC Ledger: ${d.feature}`, "", `- **Feature**: ${d.feature_dir}`, `- **Run started**: ${d.run_started}`,
-    `- **Mode**: ${d.mode === "challenge" ? "chorus challenge" : "agent-SDLC (lifecycle)"}`, `- **Status**: ${d.status}`, "");
+    `- **Mode**: ${d.mode === SDLC_MODE.CHALLENGE ? "chorus challenge" : "agent-SDLC (lifecycle)"}`, `- **Status**: ${d.status}`, "");
   for (const g of d.gates) {
     L.push(`## ${GATE_TITLE[g.gate]} — cycle ${g.cycle}`, "", `**Corpus**: ${g.corpus.join(", ")}`, "");
     if (g.premise_pass) {
@@ -165,20 +170,20 @@ export function renderSdlcLog(d) {
       L.push("");
     }
     L.push("### RSVP", "", rsvpTable(g.rsvp), "",
-      `Seated: ${g.rsvp.filter((r) => r.seated).map((r) => r.persona).join(", ") || "none"}. Seating decision: ${g.seating.band === "🟢" ? "🟢 strict sort" : `🟡 tie → default panel (${g.seating.decision_ref})`}. Quorum: ${g.quorum}.`, "");
+      `Seated: ${g.rsvp.filter((r) => r.seated).map((r) => r.persona).join(", ") || "none"}. Seating decision: ${g.seating.band === SEATING_BAND.GREEN ? "🟢 strict sort" : `🟡 tie → default panel (${g.seating.decision_ref})`}. Quorum: ${g.quorum}.`, "");
     const byId = new Map(g.tally.map((r) => [r.finding, r]));
-    const sections = g.gate === "A"
-      ? [["Premise findings", (e) => e.scope === "premise"], ["Within-frame findings", (e) => e.scope !== "premise" && !e.parked], ["Parked from premise", (e) => e.parked]]
+    const sections = g.gate === GATE.A
+      ? [["Premise findings", (e) => e.scope === SCOPE.PREMISE], ["Within-frame findings", (e) => e.scope !== SCOPE.PREMISE && !e.parked], ["Parked from premise", (e) => e.parked]]
       : [["Findings register", () => true]];
     for (const [title, pick] of sections) {
       const rows = g.register.filter(pick);
-      if (!rows.length && g.gate === "A") continue;
+      if (!rows.length && g.gate === GATE.A) continue;
       L.push(`### ${title}`, "", table(["ID", "Lens", "Evidence", "Proposed", "Post-tally", "Gating?", "Pull-quote"],
         rows.map((e) => { const r = byId.get(e.id); return [e.id, e.lens, `\`${e.locator}\`${tagOf(e) ? ` ${tagOf(e)}` : ""}`, e.authored_severity,
           r?.final_severity ?? (r?.status ?? "—"), r?.gating ? "yes" : "no", quote(e.pull_quote)]; })), "");
     }
     L.push("### Vote tally", "", "`net = PRIORITIZE − OVER-RATE` (CONFIRM excluded); `T = max(1, floor(N / 2))`; convergence = PRIORITIZE + CONFIRM.", "",
-      table(["ID", "N", "PRIORITIZE", "CONFIRM", "OVER-RATE", "net", "T", "Result"],
+      table(["ID", "N", VOTE.PRIORITIZE, VOTE.CONFIRM, VOTE.OVER_RATE, "net", "T", "Result"],
         g.tally.map((r) => [r.finding, r.n, r.p, r.c, r.o, r.net, r.threshold, r.movement ?? r.status])), "");
     L.push("### 🔴 resolution log", "");
     L.push(g.red_resolutions.length ? table(["ID", "Disposition", "Detail", "Operator ruling"], g.red_resolutions.map((r) => [r.finding, r.disposition, r.detail, ref(r.ruling_ref)])) : "No gating 🔴.", "");
@@ -187,13 +192,13 @@ export function renderSdlcLog(d) {
     }
     if (g.side_notes?.length) L.push("### Side-notes (flag-only)", "", sideNotes(g.side_notes), "");
     const o = g.outcome;
-    const text = { pass: `pass → proceeding to ${o.next ?? "next phase"}`, halt: `halt → awaiting operator on ${(o.awaiting ?? []).join(", ")}`,
-      "bound-reached": `bound reached after 3 cycles, 🔴 goes to the operator${o.awaiting?.length ? ` (${o.awaiting.join(", ")})` : ""}`,
-      "self-heal": "self-heal → incorporating and re-running", aborted: "aborted: quorum not met" }[o.result];
+    const text = { [GATE_RESULT.PASS]: `pass → proceeding to ${o.next ?? "next phase"}`, [GATE_RESULT.HALT]: `halt → awaiting operator on ${(o.awaiting ?? []).join(", ")}`,
+      [GATE_RESULT.BOUND_REACHED]: `bound reached after ${CYCLE_BOUND} cycles, 🔴 goes to the operator${o.awaiting?.length ? ` (${o.awaiting.join(", ")})` : ""}`,
+      [GATE_RESULT.SELF_HEAL]: "self-heal → incorporating and re-running", [GATE_RESULT.ABORTED]: "aborted: quorum not met" }[o.result];
     L.push("### Outcome", "", text, "");
   }
-  const provisional = d.decisions.filter((x) => x.band === "🟡");
-  const other = d.decisions.filter((x) => x.band !== "🟡");
+  const provisional = d.decisions.filter((x) => x.band === SEVERITY.YELLOW);
+  const other = d.decisions.filter((x) => x.band !== SEVERITY.YELLOW);
   L.push("## Provisional decisions (review & override)", "");
   L.push(provisional.length ? table(["id", "point", "band", "sensor.evidence", "resolution", "chosen / alternatives", "override (+ cost)"],
     provisional.map((x) => { const def = x.solutions.find((s) => s.recommended) ?? x.solutions[0];
@@ -215,7 +220,7 @@ export function renderSdlcLog(d) {
 export function render(kind, data, opts = {}) {
   const r = validate(kind, data, opts);
   if (!r.valid) { const e = new Error("invalid input"); e.errors = r.errors; throw e; }
-  return kind === "review-record" ? renderReviewRecord(data) : renderSdlcLog(data);
+  return kind === RECORD_KIND.REVIEW_RECORD ? renderReviewRecord(data) : renderSdlcLog(data);
 }
 
 function main(argv) {
