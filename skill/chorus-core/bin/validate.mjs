@@ -663,7 +663,7 @@ function versionMismatch(kind, data) {
   return {
     path: "schema_version",
     message: `version mismatch: the record declares schema ${v}, this validator supports major ${SCHEMA_MAJOR}`,
-    hint: major > SCHEMA_MAJOR ? "install the coryphaeus release for that major" : "the record predates this schema; re-emit it against the current major",
+    hint: major > SCHEMA_MAJOR ? "install the chorus release for that major" : "the record predates this schema; re-emit it against the current major",
   };
 }
 

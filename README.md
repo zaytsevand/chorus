@@ -20,12 +20,12 @@ An optional **Guido** (Python) language lens joins only on rounds with Python in
 scope. Conflicts go to `advisor()`. Output is a durable markdown artifact you
 commit; the most recent artifact is the next round's baseline.
 
-## The suite — five skills over one substrate
+## The suite — four skills over one substrate
 
-The chorus is packaged as a **composable suite** of five skills. The shared
-mechanics live once in a substrate skill; the two review modes compose it by
-name and never depend on each other, a tutorial skill teaches both, and a
-composition root binds them to the outside world:
+The chorus is packaged as a **composable suite** of four skills. The shared
+mechanics, the record tools and the bindings to the outside world live once in
+a substrate skill; the two review modes compose it by name and never depend on
+each other, and a tutorial skill teaches both:
 
 - **`chorus-core`** — substrate (not invoked directly). The four-stage gate
   primitive (`skill/chorus-core/GATE-PRIMITIVE.md`: extract → uncapped author →
@@ -34,7 +34,11 @@ composition root binds them to the outside world:
   the conductor discipline + the single `I1–I9` invariant catalog
   (`CONDUCTOR.md`). It also documents the **reserved seams** (extract-stage
   record, agent-memory layout, two-tier memory model) and the **findings→memory
-  contract** future skills compose.
+  contract** future skills compose. It holds the **record tools**: the JSON
+  schema for every chorus record, the zero-dependency validator and renderer
+  every round uses (`skill/chorus-core/bin/`), with a drift test that fails when
+  they stop matching the canon, and the **bindings** (`BINDINGS.md`): what
+  serves each port when a provider is installed.
 - **`chorus-review`** — the **project-state round**: a multi-lens review of a
   scope you choose (most often a spec or a feature's design; occasionally the
   whole codebase). Trigger: **"spawn the chorus."** Output:
@@ -56,12 +60,6 @@ composition root binds them to the outside world:
   addendum, which it can scaffold on request from the template it ships at
   `skill/chorus-learn/templates/CHORUS-PROJECT.template.md`) and both review
   modes. Trigger: **"chorus learn."**
-- **`coryphaeus`**, the **composition root**: the JSON schema for every
-  chorus record, the zero-dependency validator and renderer every round uses
-  (`skill/coryphaeus/bin/`), and the bindings of the chorus's ports to
-  providers, problem-brief by default. It enforces the canon's rules and
-  restates none of them; where the two disagree the canon wins, and a drift
-  test in its `test/` catches it. It is the only skill that names a provider.
 
 Both modes run the **same** gate primitive from `chorus-core`, so they cannot
 drift. Each sibling declares `REQUIRED: chorus-core` and carries a sibling-side
@@ -72,13 +70,19 @@ describes the project-state round (`chorus-review`).
 
 The chorus skills name no outside skill. They declare **ports** — decision sink, ruling
 lookup, record validator, record renderer, arbiter, fixed viewpoint, memory recall
-(`skill/chorus-core/CONDUCTOR.md` § Ports) — and a composition root binds them.
-Without one, each port's default applies (ask in chat, `advisor()`, hand-written
-pages marked unrendered, and so on) and the round record says which ran unbound.
-`coryphaeus` binds them: its validator and renderer serve the record ports, and
-with [problem-brief](https://github.com/zaytsevand/problem-brief) installed, the
-decision sink, ruling lookup and publishing go to a brief (`skill/coryphaeus/SKILL.md`
-§ Bindings).
+(`skill/chorus-core/CONDUCTOR.md` § Ports). chorus-core's own validator and
+renderer serve the record ports. At the start of each round or gate the conductor
+runs `bin/bindings.mjs`, which looks for an installed
+[problem-brief](https://github.com/zaytsevand/problem-brief): if one is there,
+the decision sink, ruling lookup and publishing go to a brief
+(`skill/chorus-core/BINDINGS.md`); if not, each port's default applies (ask in
+chat, rulings kept in the record, `advisor()`, and so on). The records are the
+same either way, so installing problem-brief later loses nothing. The round
+record says which provider served each port. `BINDINGS.md` is the only file that
+names a provider.
+
+Earlier releases shipped this layer as a separate `coryphaeus` skill. It is now
+part of chorus-core; re-running `install.sh` removes the old copy.
 
 ## Why
 
@@ -287,7 +291,7 @@ version of this matrix — heatmap, radar, and per-axis breakdown — is at
 - **The `advisor()` tool** — conflict reconciliation (Phase 3) routes disputes
   to it. Without it the chorus records each conflict, unresolved, for you to
   rule on.
-- **Node 18 or later**: coryphaeus's validator and renderer. No npm
+- **Node 18 or later**: chorus-core's validator and renderer. No npm
   dependencies. Without Node, rounds run unvalidated and pages are hand-written.
 
 **Optional:**
@@ -297,15 +301,15 @@ version of this matrix — heatmap, radar, and per-axis breakdown — is at
 - **memsearch** — recall of past-session context when the round context is
   drafted; the project's own memory surface works too.
 - **problem-brief**: the decision sink, ruling store and lookup, and publisher
-  coryphaeus binds to. Without it each port falls back to its default
+  chorus-core routes to when it is installed. Without it each port falls back to its default
   (questions in chat, answers kept in the record). Install:
   `git clone https://github.com/zaytsevand/problem-brief && cd problem-brief && ./install.sh`.
 
 ## Install
 
 The suite is named **chorus**. Both channels below
-deliver the same five skills (`chorus-core`, `chorus-review`, `chorus-sdlc`,
-`chorus-learn`, `coryphaeus`, including their subfolders such as the addendum
+deliver the same four skills (`chorus-core`, `chorus-review`, `chorus-sdlc`,
+`chorus-learn`, including their subfolders such as the addendum
 template) and the eleven persona agents. One install covers the whole suite.
 
 ### Clone + script
@@ -328,6 +332,13 @@ alone. `--force` overwrites every shipped file.
 Its closing message reports whether Node is present and whether problem-brief
 is installed, with the command to install it if not. It never installs
 problem-brief itself.
+At review time chorus-core looks for problem-brief in the project's
+`.claude/skills`, then `${CLAUDE_HOME:-~/.claude}/skills`; if you keep skills
+elsewhere, add those directories to `CHORUS_SKILL_PATH` (colon-separated).
+
+Upgrading from a release with the separate `coryphaeus` skill: the re-run prunes
+its files; a `coryphaeus/SKILL.md` you edited is kept as `SKILL.md.retired` so
+it no longer loads.
 
 **Per-project install** — install into one project's `.claude/` instead of your
 global config, by pointing `CLAUDE_HOME` at it (run from the project root):

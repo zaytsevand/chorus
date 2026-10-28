@@ -12,8 +12,8 @@
 #        indexes every core file
 #   FC5  stale-content guards: stale token ranges (I1–I8, S1–S9), the retired
 #        🟠 severity, the wrong persona-memory path (.agents/agent-memory)
-#   FC6  port boundary: the chorus skills and personas never name problem-brief
-#        and never cite a coryphaeus file; only coryphaeus binds providers
+#   FC6  port boundary: only chorus-core/BINDINGS.md (and its detector,
+#        chorus-core/bin/bindings.mjs, with its test) names problem-brief
 #   FC7  roster: chorus-core/ROSTER.md rows match agents/, and no persona
 #        names another lens (seams live once, in the roster)
 #
@@ -242,7 +242,7 @@ fc4=0
 #     resolves. References are backticked `*.md` names/paths and markdown link
 #     targets. Which references are suite files, and where they resolve:
 #       skill/… or agents/…            repo root
-#       chorus-{core,review,sdlc,learn}/…, coryphaeus/…  skill/
+#       chorus-{core,review,sdlc,learn}/…   skill/
 #       ./…  ../…  templates/…         the citing file's directory
 #       bare UPPER-CASE.md name        the citing file's directory, then
 #                                      chorus-core (every skill composes core)
@@ -261,7 +261,7 @@ while IFS= read -r line; do
   ok=skip
   case "$ref" in
     skill/*|agents/*)                    [[ -f "$ref" ]] && ok=1 || ok=0 ;;
-    chorus-core/*|chorus-review/*|chorus-sdlc/*|chorus-learn/*|coryphaeus/*)
+    chorus-core/*|chorus-review/*|chorus-sdlc/*|chorus-learn/*)
                                          [[ -f "$SKILL_DIR/$ref" ]] && ok=1 || ok=0 ;;
     ./*|../*|templates/*)                [[ -f "$dir/$ref" ]] && ok=1 || ok=0 ;;
     */*) ;;                              # docs/…, specs/…, .specify/… — target project
@@ -334,23 +334,16 @@ if [[ $fc5 -eq 0 ]]; then note "PASS — no stale token range, no 🟠, no .agen
 # ---------------------------------------------------------------------------
 section "FC6 — port boundary"
 fc6=0
-CHORUS_SIDE=("$SKILL_DIR"/chorus-* "$AGENTS_DIR")
-
-names="$(grep -rniE 'problem[- ]brief' "${CHORUS_SIDE[@]}" 2>/dev/null || true)"
+# Provider knowledge lives in one file plus the detector that finds it.
+BINDERS_RE="^($CORE/BINDINGS\.md|$CORE/bin/bindings\.mjs|$CORE/test/bindings\.test\.mjs):"
+names="$(grep -rniE 'problem[- ]brief' "$SKILL_DIR" "$AGENTS_DIR" 2>/dev/null | grep -vE "$BINDERS_RE" || true)"
 if [[ -n "$names" ]]; then
-  note "BOUNDARY VIOLATION: the chorus names problem-brief (only coryphaeus binds it):"
+  note "BOUNDARY VIOLATION: names problem-brief outside $CORE/BINDINGS.md (route through the ports instead):"
   printf '%s\n' "$names" | sed 's/^/    /'
   fc6=1
 fi
 
-leans="$(grep -rnE '(skill/)?coryphaeus/[A-Za-z0-9_./-]+' "${CHORUS_SIDE[@]}" 2>/dev/null || true)"
-if [[ -n "$leans" ]]; then
-  note "BOUNDARY VIOLATION: the chorus cites a coryphaeus file (refer to the bound port instead):"
-  printf '%s\n' "$leans" | sed 's/^/    /'
-  fc6=1
-fi
-
-if [[ $fc6 -eq 0 ]]; then note "PASS — the chorus names no provider and cites no coryphaeus file."; fi
+if [[ $fc6 -eq 0 ]]; then note "PASS — only $CORE/BINDINGS.md (and its detector) names a provider."; fi
 [[ $fc6 -ne 0 ]] && fail=1
 
 # ---------------------------------------------------------------------------

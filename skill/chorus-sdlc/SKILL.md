@@ -103,7 +103,7 @@ Every gate runs the four-stage primitive (`chorus-core/GATE-PRIMITIVE.md`:
 extract → uncapped author → real vote → deterministic tally). The lifecycle layer
 adds per-gate RSVP, gating, incorporation, and bound. Each persona returns JSON of
 the kind its stage names — `rsvp`, `finding-report`, `vote-report` — checked by the
-bound record validator (`chorus-core/CONDUCTOR.md` § Ports) before it counts; a
+chorus-core's record validator (`chorus-core/CONDUCTOR.md` § Ports) before it counts; a
 failing reply gets one automatic retry, then counts as ABSTAIN with the validator's
 reason in the ledger (`CONDUCTOR.md` § Ports: recover quietly). A report a persona
 writes to `.claude/agent-memory/<persona>/` instead of returning it is read after the
@@ -350,7 +350,7 @@ and rendered by the bound ports (`chorus-core/CONDUCTOR.md` § Ports) to the sib
 reviewer must be able to reconstruct the run from it, plus the decision references
 it cites (Ports: cite, don't copy). Its sections — RSVP, register, tally, 🔴
 resolutions, 🟡 provisional decisions, memory update (spec 010 FR-008), and the
-S1–S11 self-audit — are the bound schema's `sdlc-log`. It is **not** placed under
+S1–S11 self-audit — follow chorus-core's `sdlc-log` schema. It is **not** placed under
 `docs/reviews/` (periodic project-state rounds only). Older markdown-only ledgers
 stay as they are.
 

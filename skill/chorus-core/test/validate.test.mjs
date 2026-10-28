@@ -220,7 +220,7 @@ test("ruling_ref accepts one id spelling only", () => {
 });
 
 const repo = (brief) => {
-  const dir = mkdtempSync(join(tmpdir(), "coryphaeus-"));
+  const dir = mkdtempSync(join(tmpdir(), "chorus-"));
   mkdirSync(join(dir, ".git"));
   mkdirSync(join(dir, "docs/briefs/order-export"), { recursive: true });
   mkdirSync(join(dir, "docs/reviews"), { recursive: true });
@@ -243,7 +243,7 @@ test("remote ruling_ref: an id the brief does not hold is refused", () => {
   assert.match(messages(r), /R-3 is not among the rulings in docs\/briefs\/order-export\/brief.json/);
 });
 test("remote ruling_ref: an absent record warns and does not crash", () => {
-  const dir = mkdtempSync(join(tmpdir(), "coryphaeus-")); mkdirSync(join(dir, ".git"));
+  const dir = mkdtempSync(join(tmpdir(), "chorus-")); mkdirSync(join(dir, ".git"));
   const r = validate("review-record", rr(), { file: join(dir, "record.json") });
   assert.equal(r.valid, true, messages(r));
   assert.ok(warned(r, /docs\/briefs\/order-export\/brief.json is not here, so R-3 was not checked/));
@@ -297,7 +297,7 @@ test("an abstention recovery matches a failure on the roster", () => {
   expectError("review-record", d, /roster row names no failure/);
 });
 test("ports are listed once", () => { const d = rr(); d.bindings.ports.push({ port: "arbiter", provider: "default" }); expectError("review-record", d, /duplicate port "arbiter"/); });
-test("an unknown port is refused", () => { const d = rr(); d.bindings.ports.push({ port: "version-check", provider: "coryphaeus" }); expectError("review-record", d, /"version-check" is not allowed here/); });
+test("an unknown port is refused", () => { const d = rr(); d.bindings.ports.push({ port: "version-check", provider: "chorus-core" }); expectError("review-record", d, /"version-check" is not allowed here/); });
 
 /* ── schema major (Q-26) ───────────────────────────────────────────────── */
 

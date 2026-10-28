@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "ruling.schema.json",
   "title": "Ruling",
-  "description": "The shared shape of an operator ruling. Field-for-field the problem-brief ruling, so a ruling moves between a brief and a chorus fallback record without loss. Chorus records normally hold only a ruling_ref to it.",
+  "description": "The shared shape of an operator ruling. Field-for-field a brief's ruling (BINDINGS.md), so a ruling moves between a brief and a chorus fallback record without loss. Chorus records normally hold only a ruling_ref to it.",
   "type": "object",
   "additionalProperties": false,
   "required": ["id", "created", "updated", "about", "said", "source"],
