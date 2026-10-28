@@ -104,6 +104,11 @@ Two design choices worth knowing about:
   the user, and `advisor()`, but never holds a lens, never adds findings of
   its own, never substitutes `advisor()` for cognitive work. See
   `skill/chorus-core/CONDUCTOR.md`.
+- **Each lens asks its own questions.** Every persona file lists its
+  signature questions (`SQ-1..SQ-n`). The brief passes them verbatim, and the
+  persona answers each one twice, for the project as a whole and for the work
+  under review, in a question ledger on its report. The orchestrator writes no
+  questions for a lens (`skill/chorus-core/GATE-PRIMITIVE.md` § Stage 2).
 
 ## Lifecycle of a review
 

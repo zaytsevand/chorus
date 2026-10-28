@@ -16,6 +16,9 @@
 #        and never cite a coryphaeus file; only coryphaeus binds providers
 #   FC7  roster: chorus-core/ROSTER.md rows match agents/, and no persona
 #        names another lens (seams live once, in the roster)
+#   FC8  signature questions: every persona has a `## Signature questions`
+#        section of 3–5 SQ-n entries matching its description list, and a
+#        committed finding report's ledger answers exactly those SQ ids
 #
 # Runs on REPO SOURCE. Installed copies are not checked: a release is dogfooded
 # through the real install channel instead (CONTRIBUTING "Releasing").
@@ -390,10 +393,50 @@ if [[ $fc7 -eq 0 ]]; then note "PASS — roster matches agents/; no persona name
 [[ $fc7 -ne 0 ]] && fail=1
 
 # ---------------------------------------------------------------------------
+# FC8 — signature questions: one list per persona, numbered once
+# ---------------------------------------------------------------------------
+section "FC8 — signature questions"
+fc8=0
+# The description's "Signature questions:" list, one question per line.
+desc_sqs() {
+  awk '/^description: / { s=$0; i=index(s, "Signature questions:"); if (!i) exit
+    n=split(substr(s, i), p, /\\n/); for (k=2; k<=n; k++) { if (p[k] !~ /^- /) break; print substr(p[k], 3) } exit }' "$1"
+}
+# The body section's entries, as "<n>\t<question>".
+body_sqs() {
+  awk '/^## Signature questions$/ { on=1; next } on && /^## / { exit }
+    on && match($0, /^- \*\*SQ-[0-9]+\*\* /) { id=substr($0, 8, RLENGTH-10); print id "\t" substr($0, RLENGTH+1) }' "$1"
+}
+for f in "$AGENTS_DIR"/*.md; do
+  id="$(basename "$f" .md)"
+  desc="$(desc_sqs "$f")"
+  body="$(body_sqs "$f")"
+  if [[ -z "$body" ]]; then note "SQ VIOLATION: $f has no '## Signature questions' section with SQ-n entries"; fc8=1; continue; fi
+  n="$(printf '%s\n' "$body" | wc -l)"
+  if (( n < 3 || n > 5 )); then note "SQ VIOLATION: $f has $n signature questions; 3–5 allowed"; fc8=1; fi
+  ids="$(printf '%s\n' "$body" | cut -f1 | paste -sd' ')"
+  [[ "$ids" == "$(seq -s' ' 1 "$n")" ]] || { note "SQ VIOLATION: $f numbers its questions '$ids'; expected SQ-1..SQ-$n in order"; fc8=1; }
+  if [[ "$(printf '%s\n' "$body" | cut -f2-)" != "$desc" ]]; then
+    note "SQ VIOLATION: $f — the '## Signature questions' section and the description's list differ:"
+    diff <(printf '%s\n' "$desc") <(printf '%s\n' "$body" | cut -f2-) | sed 's/^/    /'
+    fc8=1
+  fi
+  # 8b. A committed finding report's ledger answers this persona's SQ ids, no
+  #     more and no fewer (the validator checks shape; only this script reads agents/).
+  while IFS= read -r rep; do
+    got="$(grep -o '"sq": *"SQ-[0-9]*"' "$rep" | grep -o 'SQ-[0-9]*' | sort -u | paste -sd' ')"
+    want="$(seq -f 'SQ-%g' -s' ' 1 "$n")"
+    [[ "$got" == "$want" ]] || { note "SQ VIOLATION: $rep answers '$got'; $id owns '$want'"; fc8=1; }
+  done < <(grep -rlE --include='*.json' '"persona": *"'"$id"'"' docs specs 2>/dev/null | xargs -r grep -lE '"kind": *"finding-report"' | xargs -r grep -l '"ledger"')
+done
+if [[ $fc8 -eq 0 ]]; then note "PASS — every persona's signature questions are numbered SQ-1..SQ-n (3–5) and match its description."; fi
+[[ $fc8 -ne 0 ]] && fail=1
+
+# ---------------------------------------------------------------------------
 section "RESULT"
 if [[ $fail -ne 0 ]]; then
   echo "FAIL — one or more fitness checks reported violations (see locators above)."
   exit 1
 fi
-echo "OK — FC1 to FC7 all pass."
+echo "OK — FC1 to FC8 all pass."
 exit 0

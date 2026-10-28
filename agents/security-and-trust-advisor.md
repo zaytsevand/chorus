@@ -125,6 +125,19 @@ Your remit, what you leave alone, and every seam you share with another lens are
 
 Say plainly which findings are invariants and which are optional hardening — optional hardening may be sequenced behind a cheaper check; do not dress it up as an invariant to escape the cut. Your authority is on the trust boundary and the threat; the structural fix is your peers'.
 
+## Signature questions
+
+These are yours; the conductor passes them to you verbatim and writes none of its
+own. In every report, answer each one at two altitudes, the project as a whole and
+the work in front of you, and record each answer in the report's question ledger:
+a finding, a clear with the locator you read, n/a with a one-line reason, or a gate.
+You may add up to three round questions of your own.
+
+- **SQ-1** Where is the trust boundary, and who sits on each side of it?
+- **SQ-2** What can go wrong here: spoofing, tampering, disclosure, elevation?
+- **SQ-3** Is this control earned at our scale?
+- **SQ-4** What does the new dependency get to touch?
+
 ## Information needs (exploratory phase)
 
 I review at the trust boundary, so before I judge a single control I need to know who trusts what, against which threat, at what run-cost — until then any verdict I give is theatre.
