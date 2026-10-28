@@ -10,8 +10,8 @@
     "ports": [
       { "port": "decision-sink", "provider": "default" },
       { "port": "ruling-lookup", "provider": "default" },
-      { "port": "record-validator", "provider": "coryphaeus" },
-      { "port": "record-renderer", "provider": "coryphaeus" },
+      { "port": "record-validator", "provider": "chorus-core" },
+      { "port": "record-renderer", "provider": "chorus-core" },
       { "port": "arbiter", "provider": "advisor()" },
       { "port": "memory-recall", "provider": "default" }
     ],

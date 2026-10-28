@@ -51,7 +51,7 @@ Brief sections per joiner (continued via `SendMessage`):
 ## Findings register (Phase 2, before the vote)
 
 The **single human-facing source of truth**, written before the vote; its fields
-are the bound schema's `review-record` register. An operator who has not read the
+are the `review-record` register of chorus-core's schema. An operator who has not read the
 reports must understand each entry alone.
 
 - The pull-quote is the persona's marked span, verbatim and attributed —
@@ -110,6 +110,6 @@ arithmetic over real votes, never the orchestrator's judgment (S9).
 **Convergence = `P + C`**, computed after the count.
 
 **Consolidation matrix** — produced **after the count**, a projection of the
-register plus the tally (fields: the bound schema's `review-record` matrix); it
+register plus the tally (fields: the `review-record` matrix of chorus-core's schema); it
 re-authors nothing. Status is `graded`, `held`, `ungraded` (`R2-`),
 `minority-report` (one voter), or `unvoted`.

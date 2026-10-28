@@ -266,7 +266,9 @@ this catalog, bind both modes where they apply, and are defined only in their ho
 
 ## Ports
 
-What the chorus needs from outside. A composition root may bind each port; unbound, the default applies and the round record says so. This table is the one statement of the ports, their contracts and their defaults: a composition root lists its bindings and refers here.
+What the chorus needs from outside. chorus-core serves the record validator and renderer itself (`bin/`, below); any other port is served by a registered provider or falls back to its default, and the round record says which. This table is the one statement of the ports, their contracts and their defaults. `BINDINGS.md` is the one file that knows a provider.
+
+**Routing rule.** Run `bin/bindings.mjs` once at the start of each round or gate and copy the `bindings` block it prints into the record. If a brief provider is registered, route decisions and ruling lookups per `BINDINGS.md`; otherwise the defaults below apply (the free-hand form, `BINDINGS.md` § Free-hand form). The records are the same either way.
 
 | Port | Contract | Default when unbound |
 |---|---|---|
@@ -281,6 +283,45 @@ What the chorus needs from outside. A composition root may bind each port; unbou
 - **Consult before raising.** No operator ask leaves the chorus until the ruling lookup has been consulted.
 - **Recover quietly.** A failed persona reply gets one automatic retry; a missing optional tool falls back to its port's default. Both are recorded in the round record's bindings (the provider behind each port, or `default`, and each recovery), never asked live. An operator question leaves the chorus only when the round cannot reach a valid result alone: quorum fails, or a lost seat leaves a 🔴 finding without enough voters to count it. A missing gate answer is not a recoverable failure: it blocks the round until the operator answers (`EXPLORATORY-PHASE.md` § Sessioned interview).
 - **Cite, don't copy.** A decision resolved through the bound sink enters the chorus record only as a reference (answer id + where it lives); operator rulings are never restated in chorus records; vote arithmetic lives only in chorus records.
+
+### Record tools
+
+`<root>` is the installed chorus-core directory: `.claude/skills/chorus-core` in
+the project if present, else `~/.claude/skills/chorus-core`.
+
+```
+node <root>/bin/bindings.mjs                               # the round's bindings block
+node <root>/bin/validate.mjs <kind> <file.json> [--json]   # 0 valid · 1 invalid · 2 usage · 3 version mismatch
+node <root>/bin/render.mjs   <review-record|sdlc-log> <file.json> <out.md>
+```
+
+Kinds: `rsvp`, `finding-report`, `vote-report`, `review-record`, `sdlc-log`,
+`decision`, `ruling`. The schema is `schema/` (JSON Schema 2020-12); `examples/`
+holds a valid and an invalid sample of each kind; `test/` holds the tests,
+including `canon-drift.test.mjs`, which fails when the validator or schema stops
+matching this section or `GATE-PRIMITIVE.md` § Stage 4. The canon wins: fix the
+code, not the test.
+
+**When to run it.** Validate every persona reply before it is counted and every
+record before it is published. The renderer validates again and refuses
+invalid input. What each exit code means for a persona reply (the record
+validator row above):
+
+| Exit | Meaning | Do |
+|---|---|---|
+| 0 | valid | count it |
+| 1 | invalid | one retry, then counts as ABSTAIN with the validator's reason logged; the retry is automatic and carries the reason |
+| 2 | usage | fix the command; the persona is not charged |
+| 3 | "version mismatch": the reply declares a schema major other than 1; nothing else is checked | install drift, reported once and never retried or counted against a persona |
+
+Write every retry, fallback and abstention to the record's
+`bindings.recoveries`; none of them is asked live.
+
+**Ruling references.** A `ruling_ref` record path is read from the repository
+root; `"#"` means the record itself (its `local_rulings`). The validator opens a
+local record and checks the id is there: an id it does not hold is an error; an
+absent or unreadable record is a warning, so a private brief kept outside the
+repository does not break validation.
 
 ## Refusals (system boundaries, not modesty)
 

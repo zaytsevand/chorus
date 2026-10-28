@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "decision.schema.json",
   "title": "Decision",
-  "description": "The shared shape of an operator-facing decision: the chorus DecisionRecord (DECISION-PRIMITIVE.md) with field names aligned to a problem-brief entry, so a brief entry can be derived from it without loss. Chorus-only fields (point, band, sensor, resolution, override, catalog_row) have no brief counterpart and stay in the chorus record.",
+  "description": "The shared shape of an operator-facing decision: the chorus DecisionRecord (DECISION-PRIMITIVE.md) with field names aligned to a brief entry (BINDINGS.md), so a brief entry can be derived from it without loss. Chorus-only fields (point, band, sensor, resolution, override, catalog_row) have no brief counterpart and stay in the chorus record.",
   "type": "object",
   "additionalProperties": false,
   "required": ["id", "point", "band", "title", "problem", "evidence", "solutions", "status", "resolution"],
@@ -29,7 +29,7 @@
     "evidence": {
       "type": "array",
       "minItems": 1,
-      "description": "Evidence, in the problem-brief evidence shape.",
+      "description": "Evidence, in the brief's evidence shape (BINDINGS.md).",
       "items": {
         "type": "object",
         "additionalProperties": false,
@@ -83,7 +83,7 @@
         "cost": { "type": "string", "minLength": 3, "description": "What reversing costs." }
       }
     },
-    "status": { "type": "string", "enum": ["open", "decided", "complete", "superseded"], "description": "Same meanings as a problem-brief entry's status." },
+    "status": { "type": "string", "enum": ["open", "decided", "complete", "superseded"], "description": "Same meanings as a brief entry's status (BINDINGS.md)." },
     "decision": {
       "type": "object",
       "additionalProperties": false,

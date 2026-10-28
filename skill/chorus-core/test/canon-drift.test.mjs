@@ -1,9 +1,9 @@
-// Drift between the chorus canon and what this skill encodes from it.
+// Drift between the chorus canon and what the code beside it encodes from it.
 //
 // The canon owns the rules (CONDUCTOR.md § Ports, GATE-PRIMITIVE.md § Stage 4);
 // the validator and schema re-encode some of them. These tests parse the
 // canon's tables and lists, never its prose, and fail when the two part ways.
-// The canon wins: fix this skill, not the test.
+// The canon wins: fix the code, not the test.
 
 import { test } from "node:test";
 import assert from "node:assert/strict";
@@ -13,16 +13,17 @@ import { fileURLToPath } from "node:url";
 import { validate, tally, SCHEMA_MAJOR } from "../bin/validate.mjs";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
-const CORE = join(ROOT, "..", "chorus-core");
+const CORE = ROOT;
 const read = (p) => readFileSync(p, "utf8");
 const load = (name) => JSON.parse(read(join(ROOT, "examples", name)));
 
-/** The lines of one `## ` section, heading excluded. */
-function section(text, heading) {
+/** The lines of one section (`## ` by default), heading excluded; it ends at the next heading of its level or above. */
+function section(text, heading, level = 2) {
   const lines = text.split("\n");
-  const start = lines.findIndex((l) => l.trim() === `## ${heading}`);
-  assert.ok(start >= 0, `canon section "## ${heading}" not found`);
-  const end = lines.findIndex((l, i) => i > start && /^## /.test(l));
+  const hashes = "#".repeat(level);
+  const start = lines.findIndex((l) => l.trim() === `${hashes} ${heading}`);
+  assert.ok(start >= 0, `canon section "${hashes} ${heading}" not found`);
+  const end = lines.findIndex((l, i) => i > start && new RegExp(`^#{1,${level}} `).test(l));
   return lines.slice(start + 1, end < 0 ? undefined : end);
 }
 
@@ -57,8 +58,8 @@ test("the schema knows exactly the ports CONDUCTOR § Ports declares", () => {
   assert.deepEqual(schema, canon);
 });
 
-test("SKILL.md binds exactly the ports CONDUCTOR § Ports declares", () => {
-  const skill = tableRows(section(read(join(ROOT, "SKILL.md")), "Bindings"));
+test("BINDINGS.md binds exactly the ports CONDUCTOR § Ports declares", () => {
+  const skill = tableRows(section(read(join(CORE, "BINDINGS.md")), "Bindings"));
   assert.deepEqual(skill.map((r) => portId(r[0])).sort(), ports.map((r) => portId(r[0])).sort());
 });
 
@@ -70,20 +71,20 @@ test("the validator supports the schema major the canon expects", () => {
   assert.equal(SCHEMA_MAJOR, Number(m[1]));
 });
 
-/* SKILL.md restates the record validator row's failure policy as an exit-code
-   table, because agents do not open the canon from a project. The restated
-   cells must carry the canon's own clauses, word for word. */
-test("SKILL.md's exit-code table carries the canon's failure policy verbatim", () => {
+/* § Record tools restates the record validator row's failure policy as an
+   exit-code table. The restated cells must carry the row's own clauses, word
+   for word. */
+test("the exit-code table carries the canon's failure policy verbatim", () => {
   const row = ports.find((r) => portId(r[0]) === "record-validator");
   assert.ok(row, "no record validator row in CONDUCTOR § Ports");
   const retry = row[1].match(/a failing persona reply gets (.+?)\.(?:\s|$)/);
   assert.ok(retry, "the record validator row states no retry rule for a failing reply");
   const drift = row[1].match(/a "version mismatch" is (.+?)\.?\s*$/);
   assert.ok(drift, "the record validator row states no rule for a version mismatch");
-  const exits = tableRows(section(read(join(ROOT, "SKILL.md")), "Finding the tools"));
+  const exits = tableRows(section(conductor, "Record tools", 3));
   const cell = (code) => {
     const r = exits.find((x) => x[0] === code);
-    assert.ok(r, `SKILL.md § Finding the tools has no exit ${code} row`);
+    assert.ok(r, `CONDUCTOR § Record tools has no exit ${code} row`);
     return r[r.length - 1];
   };
   assert.ok(cell("1").includes(retry[1]), `exit 1 row must contain the canon's "${retry[1]}"`);

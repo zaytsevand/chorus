@@ -132,8 +132,8 @@ Seating still follows the RSVP and the cap (Phase 0.5).
   the record validator like any other reply.
 - **Output format.** Each persona returns JSON of the kind its phase names —
   `rsvp` (0.5), `finding-report` (1, and Round-2 derives), `vote-report` (2) —
-  checked by the bound record validator (`chorus-core/CONDUCTOR.md` § Ports)
-  before it counts. Field shapes are the bound schema's.
+  checked by chorus-core's record validator (`chorus-core/CONDUCTOR.md` § Ports)
+  before it counts. Field shapes are chorus-core's schema.
 
 ## The procedure
 

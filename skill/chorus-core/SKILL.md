@@ -1,6 +1,6 @@
 ---
 name: chorus-core
-description: Shared substrate for the chorus suite — the gate / decision / exploratory primitives, the conductor discipline, and the single I1–I9 invariant catalog. Referenced by chorus-review and chorus-sdlc by name; it is not invoked directly by an operator and carries no trigger phrase. Composing skills declare REQUIRED chorus-core.
+description: Shared substrate for the chorus suite — the gate / decision / exploratory primitives, the conductor discipline, the single I1–I9 invariant catalog, and the record tools (JSON schema, validator, renderer, port bindings). Referenced by chorus-review and chorus-sdlc by name; it is not invoked directly by an operator and carries no trigger phrase. Composing skills declare REQUIRED chorus-core.
 ---
 
 # chorus-core — substrate router
@@ -51,6 +51,17 @@ Read the file whose mechanic you need; do not read all four eagerly.
 Alongside the four: `ROSTER.md` — the roster, each lens's remit, and every seam
 between two lenses, stated once. Personas and briefs point to it; read it when
 seating a panel or routing a handoff.
+
+`BINDINGS.md` — what serves each port when a brief provider is registered, the
+free-hand form when none is, and how a decision crosses to a brief and back. The
+only suite file that names a provider. Read it when a round or gate starts
+(after `bin/bindings.mjs`) and whenever a decision or question leaves the chorus.
+
+The record tools live beside these files: `schema/` (JSON Schema for every
+chorus record and the shared `decision` and `ruling` shapes), `bin/` (the
+zero-dependency `bindings.mjs`, `validate.mjs` and `render.mjs`; Node 18+),
+`examples/` and `test/`. How to run them and what each exit code means:
+`CONDUCTOR.md` § Ports, Record tools.
 
 ## Invariant residence (the single-source rule)
 

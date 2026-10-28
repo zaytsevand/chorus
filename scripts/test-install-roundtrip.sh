@@ -28,8 +28,8 @@ echo "not ours" > "$HOME_DIR/skills/other-skill/SKILL.md"
 MANIFEST="$HOME_DIR/.chorus-install-manifest"
 out="$("$REPO_DIR/install.sh")"
 [[ -f "$MANIFEST" ]] || fail "manifest not written"
-[[ -f "$HOME_DIR/skills/coryphaeus/bin/validate.mjs" ]] || fail "coryphaeus not installed with the suite"
-grep -qi "separate repository\|coryphaeus repository" <<<"$out" && fail "closing message still sends users to a separate coryphaeus repository"
+[[ -f "$HOME_DIR/skills/chorus-core/bin/validate.mjs" ]] || fail "record tools not installed with chorus-core"
+[[ ! -e "$HOME_DIR/skills/coryphaeus" ]] || fail "a fresh install still writes the retired coryphaeus skill"
 grep -q "^Node: " <<<"$out" || fail "closing message does not report Node"
 grep -q "^problem-brief: not found" <<<"$out" || fail "closing message does not report a missing problem-brief"
 grep -q "git clone https://github.com/zaytsevand/problem-brief" <<<"$out" || fail "closing message gives no problem-brief install command"
@@ -101,4 +101,19 @@ grep -qx "user customization" "$HOME_DIR/agents/kent-beck-persona.md" \
 [[ -f "$HOME_DIR/skills/other-skill/SKILL.md" ]] || fail "uninstall removed an unrelated file"
 grep -qx "someone else's skill" "$HOME_DIR/skills/problem-brief/SKILL.md" || fail "uninstall touched problem-brief"
 
-echo "PASS — install -> re-run -> refresh -> uninstall round trip into a temp CLAUDE_HOME."
+# Upgrade from a release that shipped coryphaeus: its unchanged files are
+# pruned with their directories, and an edited SKILL.md stops loading as a skill.
+OLD_HOME="$(mktemp -d)"
+trap 'rm -rf "$HOME_DIR" "$OLD_HOME"' EXIT
+mkdir -p "$OLD_HOME/skills/coryphaeus/bin"
+echo "old validator" > "$OLD_HOME/skills/coryphaeus/bin/validate.mjs"
+echo "old skill, edited" > "$OLD_HOME/skills/coryphaeus/SKILL.md"
+vhash="$( (sha256sum "$OLD_HOME/skills/coryphaeus/bin/validate.mjs" 2>/dev/null || shasum -a 256 "$OLD_HOME/skills/coryphaeus/bin/validate.mjs") | cut -d' ' -f1)"
+printf '%s  %s\n%s  %s\n' "$vhash" skills/coryphaeus/bin/validate.mjs "$(printf '0%.0s' {1..64})" skills/coryphaeus/SKILL.md > "$OLD_HOME/.chorus-install-manifest"
+out="$(CLAUDE_HOME="$OLD_HOME" "$REPO_DIR/install.sh")"
+grep -q "^  pruned         skills/coryphaeus/bin/validate.mjs" <<<"$out" || fail "stale coryphaeus file not pruned"
+[[ ! -e "$OLD_HOME/skills/coryphaeus/bin" ]] || fail "stale coryphaeus bin/ left behind"
+[[ ! -e "$OLD_HOME/skills/coryphaeus/SKILL.md" ]] || fail "edited coryphaeus SKILL.md still loads as a skill"
+grep -qx "old skill, edited" "$OLD_HOME/skills/coryphaeus/SKILL.md.retired" || fail "edited coryphaeus SKILL.md not kept as SKILL.md.retired"
+
+echo "PASS — install -> re-run -> refresh -> uninstall round trip, and the coryphaeus upgrade, into temp CLAUDE_HOMEs."

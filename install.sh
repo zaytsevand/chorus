@@ -2,8 +2,8 @@
 # chorus suite installer.
 #
 # Copies every suite skill directory (skill/*/: chorus-core, chorus-review,
-# chorus-sdlc, chorus-learn and coryphaeus, subfolders included) and the persona
-# agents into your Claude Code config.
+# chorus-sdlc and chorus-learn, subfolders included) and the persona agents
+# into your Claude Code config.
 #
 # Every file it writes is recorded, with the hash of what it wrote, in
 # $CLAUDE_HOME/.chorus-install-manifest. On a re-run each shipped file is:
@@ -13,7 +13,9 @@
 #   skip           exists but was never written by this installer; left alone
 #   installed      not there yet; written
 # Files an earlier run wrote that this version no longer ships are pruned when
-# unchanged, and reported as "differs, kept" when edited. --force overwrites
+# unchanged, and reported as "differs, kept" when edited. A retired skill's
+# edited SKILL.md (coryphaeus, folded into chorus-core) is renamed to
+# SKILL.md.retired instead, so it stops loading as a skill. --force overwrites
 # every shipped file regardless. uninstall.sh uses the same hashes. No sudo.
 #
 # Usage:
@@ -65,6 +67,18 @@ recorded_hash() {
 
 # A manifest path must stay inside CLAUDE_HOME (same guard as uninstall.sh).
 safe_rel() { [[ "$1" != /* && "$1" != *..* ]]; }
+
+# Skills an earlier release shipped and this one folded into another skill.
+RETIRED_SKILLS=" coryphaeus "
+
+# Remove a pruned file's now-empty parent directories, up to skills/ or agents/.
+rmdir_up() {
+  local d="$1"
+  while [[ "$d" == "$CLAUDE_HOME"/skills/* || "$d" == "$CLAUDE_HOME"/agents/* ]]; do
+    rmdir "$d" 2>/dev/null || break
+    d="$(dirname "$d")"
+  done
+}
 
 mkdir -p "$SKILLS_DST" "$AGENTS_DST"
 
@@ -147,8 +161,12 @@ if [[ -f "$MANIFEST" ]]; then
     [[ -f "$target" ]] || continue
     if [[ -n "$rec" && "$(hash_of "$target")" == "$rec" ]]; then
       rm -f "$target"
-      rmdir "$(dirname "$target")" 2>/dev/null || true
+      rmdir_up "$(dirname "$target")"
       echo "  pruned         $old  (no longer shipped)"
+    elif [[ "$old" =~ ^skills/([^/]+)/SKILL\.md$ && "$RETIRED_SKILLS" == *" ${BASH_REMATCH[1]} "* ]]; then
+      # An edited copy would keep loading as a skill; keep the text, stop the trigger.
+      mv -f "$target" "$target.retired"
+      echo "  retired        $old  (edited; kept as SKILL.md.retired so it no longer loads)"
     else
       echo "  differs, kept  $old  (no longer shipped, but edited or unhashed; now yours)"
     fi
@@ -165,16 +183,16 @@ echo "Differs, kept: $counts_kept. Skipped (not ours): $counts_skipped."
 echo "Manifest:  $MANIFEST"
 echo
 if command -v node >/dev/null 2>&1; then
-  echo "Node: $(node --version) (coryphaeus's validator and renderer need 18 or later)."
+  echo "Node: $(node --version) (chorus-core's validator and renderer need 18 or later)."
 else
-  echo "Node: not found. coryphaeus's validator and renderer need Node 18 or later;"
+  echo "Node: not found. chorus-core's validator and renderer need Node 18 or later;"
   echo "  until it is installed, rounds run unvalidated and pages are written by hand."
 fi
 if [[ -f "$SKILLS_DST/problem-brief/SKILL.md" ]]; then
-  echo "problem-brief: found at $SKILLS_DST/problem-brief (coryphaeus binds to it)."
+  echo "problem-brief: found at $SKILLS_DST/problem-brief (chorus-core routes decisions to it)."
 else
   echo "problem-brief: not found under $SKILLS_DST."
-  echo "  Optional: without it coryphaeus falls back to each port's default"
+  echo "  Optional: without it chorus-core uses each port's default"
   echo "  (questions in chat, answers kept in the record). To install it:"
   echo "    git clone https://github.com/zaytsevand/problem-brief"
   echo "    cd problem-brief && ./install.sh --dir \"$SKILLS_DST\""
