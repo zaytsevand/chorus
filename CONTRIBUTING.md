@@ -11,7 +11,8 @@ validator, renderer and provider bindings).
   `skill/chorus-core/GATE-PRIMITIVE.md`) — procedure refinements, phase-gate
   tightening, new failure-mode entries, clearer briefs.
 - **Persona agents** (`agents/*.md`) — sharpening voice, fixing calibration
-  notes, updating relationship sections.
+  notes. A persona speaks to its own remit and names no other lens; the seams
+  between lenses live once, in `skill/chorus-core/ROSTER.md` (FC7 checks it).
 - **Schema and tooling** (`skill/coryphaeus/schema/`, `bin/`, `test/`): Node,
   zero npm dependencies. A rule lives in one file: the canon
   (`skill/chorus-core/`) owns the ports, the failure policy and the vote-count
@@ -26,7 +27,7 @@ validator, renderer and provider bindings).
 
 ## What's out of scope
 
-- New personas beyond the roster of nine without prior discussion. The
+- New personas beyond the roster in `skill/chorus-core/ROSTER.md` without prior discussion. The
   roster is balanced deliberately; additions affect quorum math and brief
   templates.
 - Tooling for *running* the chorus outside Claude Code. The chorus

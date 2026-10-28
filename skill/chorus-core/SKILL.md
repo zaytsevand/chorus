@@ -48,6 +48,10 @@ Read the file whose mechanic you need; do not read all four eagerly.
 | `EXPLORATORY-PHASE.md` | per-lens persisted understanding; reference-first harvest; two-tier memory | — |
 | `CONDUCTOR.md` | EWD-340 methodology; conductor voice; "the chair decides nothing" + slippage table; discipline cascade; system-boundary refusals; **the single `I1–I9` invariant catalog**; reserved-seam + findings→memory contracts | `I1–I9` (single source) |
 
+Alongside the four: `ROSTER.md` — the roster, each lens's remit, and every seam
+between two lenses, stated once. Personas and briefs point to it; read it when
+seating a panel or routing a handoff.
+
 ## Invariant residence (the single-source rule)
 
 `chorus-core` is the **single home** of `I1–I9` (CONDUCTOR.md), `S8–S11`
