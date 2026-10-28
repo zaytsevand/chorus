@@ -14,6 +14,8 @@
 #        🟠 severity, the wrong persona-memory path (.agents/agent-memory)
 #   FC6  port boundary: the chorus skills and personas never name problem-brief
 #        and never cite a coryphaeus file; only coryphaeus binds providers
+#   FC7  roster: chorus-core/ROSTER.md rows match agents/, and no persona
+#        names another lens (seams live once, in the roster)
 #
 # Runs on REPO SOURCE. Installed copies are not checked: a release is dogfooded
 # through the real install channel instead (CONTRIBUTING "Releasing").
@@ -206,25 +208,28 @@ for f in "$AGENTS_DIR"/*.md; do
   if ! grep -q "\"\./$f\"" "$PLUGIN"; then note "MANIFEST VIOLATION: on-disk agent '$f' not listed in $PLUGIN agents[] (as \"./$f\")"; fc3=1; fi
 done
 
-# 3c. Advisor count in the manifest description matches the roster.
-#     Roster = nine default lenses + optional Guido = 10 agents on disk.
+# 3c. Advisor count in the manifest description and README matches the roster.
+#     The core-lens count is read from chorus-core/ROSTER.md (rows whose seat
+#     is "core"); optional lenses are named, not counted. FC7 keeps the roster
+#     itself in sync with agents/.
+ROSTER="$CORE/ROSTER.md"
 disk_agents="$(ls "$AGENTS_DIR"/*.md 2>/dev/null | wc -l | tr -d ' ')"
-# The description must not undercount: it must state the nine-lens roster
-# (and may name the optional Guido). We check it does not claim "seven"/"7"
-# advisors, and that it names the full roster scale.
+core_count="$(awk -F'|' '/^\| `[a-z0-9-]+` \|/ && $4 ~ /^ *core *$/' "$ROSTER" 2>/dev/null | wc -l | tr -d ' ')"
+count_words=(zero one two three four five six seven eight nine ten eleven twelve thirteen fourteen fifteen)
+core_word="${count_words[$core_count]:-$core_count}"
 desc="$(grep -oE '"description":\s*"[^"]*"' "$PLUGIN" | head -1)"
-if printf '%s' "$desc" | grep -qiE 'seven|[^0-9]7 (persona|advisor|agent|lens)'; then
-  note "ADVISOR-COUNT VIOLATION: description undercounts the roster (says 'seven'/'7'); disk holds $disk_agents agents."
+count_re="(^|[^a-z0-9])($core_word|$core_count) (persona|advisor|lens)"
+if ! printf '%s' "$desc" | grep -qiE "$count_re"; then
+  note "ADVISOR-COUNT VIOLATION: $PLUGIN description does not state the $core_word-lens core roster ($ROSTER)."
   note "    $desc"
   fc3=1
 fi
-if ! printf '%s' "$desc" | grep -qiE 'nine|9 (lens|advisor|persona)'; then
-  note "ADVISOR-COUNT VIOLATION: description does not state the nine-lens roster (disk holds $disk_agents agents)."
-  note "    $desc"
+if ! grep -qiE "$count_re" README.md; then
+  note "ADVISOR-COUNT VIOLATION: README.md does not state the $core_word-lens core roster ($ROSTER)."
   fc3=1
 fi
 
-if [[ $fc3 -eq 0 ]]; then note "PASS — manifest skills[]/agents[] match disk; advisor count matches the nine-lens roster ($disk_agents agents on disk)."; fi
+if [[ $fc3 -eq 0 ]]; then note "PASS — manifest skills[]/agents[] match disk; advisor count matches the $core_word-lens core roster ($disk_agents agents on disk)."; fi
 [[ $fc3 -ne 0 ]] && fail=1
 
 # ---------------------------------------------------------------------------
@@ -349,10 +354,46 @@ if [[ $fc6 -eq 0 ]]; then note "PASS — the chorus names no provider and cites 
 [[ $fc6 -ne 0 ]] && fail=1
 
 # ---------------------------------------------------------------------------
+# FC7 — roster: one owner for lens remits
+# ---------------------------------------------------------------------------
+section "FC7 — roster: one owner for lens remits"
+fc7=0
+# Rows of the roster table: "<agent-id>\t<display name>".
+roster_rows="$(awk -F'|' '/^\| `[a-z0-9-]+` \|/ { id=$2; gsub(/[ `]/, "", id); n=$3; gsub(/^ +| +$/, "", n); print id "\t" n }' "$ROSTER" 2>/dev/null)"
+if [[ -z "$roster_rows" ]]; then
+  note "ROSTER VIOLATION: no roster rows found in $ROSTER"
+  fc7=1
+else
+  # 7a. Every agent file has a roster row, and every row has an agent file.
+  roster_ids="$(printf '%s\n' "$roster_rows" | cut -f1)"
+  for f in "$AGENTS_DIR"/*.md; do
+    id="$(basename "$f" .md)"
+    printf '%s\n' "$roster_ids" | grep -qxF -- "$id" || { note "ROSTER VIOLATION: $f has no row in $ROSTER"; fc7=1; }
+  done
+  for id in $roster_ids; do
+    [[ -f "$AGENTS_DIR/$id.md" ]] || { note "ROSTER VIOLATION: $ROSTER row '$id' has no $AGENTS_DIR/$id.md"; fc7=1; }
+  done
+  # 7b. A persona speaks to its own remit only: it names no other lens. Who
+  #     owns what across a seam is stated once, in the roster.
+  while IFS=$'\t' read -r id name; do
+    for f in "$AGENTS_DIR"/*.md; do
+      [[ "$(basename "$f" .md)" == "$id" ]] && continue
+      hits="$(grep -nwF -- "$name" "$f" || true)"
+      if [[ -n "$hits" ]]; then
+        while IFS= read -r h; do note "PEER-NAME VIOLATION: $f:${h%%:*} names the $name lens; state the seam in $ROSTER instead."; done <<< "$hits"
+        fc7=1
+      fi
+    done
+  done <<< "$roster_rows"
+fi
+if [[ $fc7 -eq 0 ]]; then note "PASS — roster matches agents/; no persona names another lens."; fi
+[[ $fc7 -ne 0 ]] && fail=1
+
+# ---------------------------------------------------------------------------
 section "RESULT"
 if [[ $fail -ne 0 ]]; then
   echo "FAIL — one or more fitness checks reported violations (see locators above)."
   exit 1
 fi
-echo "OK — FC1 to FC6 all pass."
+echo "OK — FC1 to FC7 all pass."
 exit 0

@@ -241,7 +241,9 @@ neither — see [`skill/chorus-core/CONDUCTOR.md`](skill/chorus-core/CONDUCTOR.m
 
 ## Lens coverage
 
-Which agent owns which axis. Score per cell: **3** primary remit · **2**
+Which agent owns which axis. Each lens's remit and the seams between lenses are
+stated once, in [`skill/chorus-core/ROSTER.md`](skill/chorus-core/ROSTER.md); this
+matrix scores them. Score per cell: **3** primary remit · **2**
 secondary strength · **1** incidental · `·` none. A column with no `3` is an
 axis no single lens owns — structurally under-represented.
 
