@@ -10,7 +10,7 @@
  * the decision sink and ruling lookup route to it (BINDINGS.md); without, they
  * take the port defaults (CONDUCTOR.md § Ports). Where the brief was found, or
  * that it was not, goes to stderr. Exit 0 always: no brief is a normal state.
- * Zero dependencies; Node 18+.
+ * Zero dependencies; Node 20+.
  */
 
 import { existsSync, realpathSync } from "node:fs";

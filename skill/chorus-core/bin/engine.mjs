@@ -3,7 +3,7 @@
  * no model. The canon defines each rule once; each function names the section
  * it implements. conduct.mjs composes them; validate.mjs re-checks their output.
  *
- * Zero dependencies; Node 18+.
+ * Zero dependencies; Node 20+.
  */
 
 import {

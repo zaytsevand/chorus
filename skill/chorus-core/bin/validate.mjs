@@ -25,7 +25,7 @@
  *      of the top five, word limits, cross-references, ruling_ref shape, and
  *      each ruling_ref followed into the local record it names.
  *
- * A program, never a model reading the JSON. Zero dependencies; Node 18+.
+ * A program, never a model reading the JSON. Zero dependencies; Node 20+.
  * Only the JSON Schema keywords the bundled schemas use are implemented; any
  * other keyword is reported, not silently ignored.
  */

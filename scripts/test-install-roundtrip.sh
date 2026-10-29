@@ -17,6 +17,8 @@ export CLAUDE_HOME="$HOME_DIR"
 fail() { echo "FAIL: $*" >&2; exit 1; }
 # Is a path recorded in the manifest ("<sha256>  <path>" lines)?
 in_manifest() { awk -v r="$1" 'substr($0, 67) == r { f = 1 } END { exit !f }' "$MANIFEST"; }
+# Run an installer, keeping its output (stderr too) in $out and its exit code in $rc.
+run() { rc=0; out="$("$@" 2>&1)" || rc=$?; }
 
 # A pre-existing, user-customized agent.
 mkdir -p "$HOME_DIR/agents"
@@ -26,7 +28,9 @@ mkdir -p "$HOME_DIR/skills/other-skill"
 echo "not ours" > "$HOME_DIR/skills/other-skill/SKILL.md"
 
 MANIFEST="$HOME_DIR/.chorus-install-manifest"
-out="$("$REPO_DIR/install.sh")"
+run "$REPO_DIR/install.sh"
+[[ $rc -eq 1 ]] || fail "install exited $rc with a skipped agent (expected 1)"
+grep -q "^error: .*mixes versions" <<<"$out" || fail "skipped agent not reported as an error"
 [[ -f "$MANIFEST" ]] || fail "manifest not written"
 [[ -f "$HOME_DIR/skills/chorus-core/bin/validate.mjs" ]] || fail "record tools not installed with chorus-core"
 [[ ! -e "$HOME_DIR/skills/coryphaeus" ]] || fail "a fresh install still writes the retired coryphaeus skill"
@@ -39,7 +43,9 @@ mkdir -p "$HOME_DIR/skills/problem-brief"
 echo "someone else's skill" > "$HOME_DIR/skills/problem-brief/SKILL.md"
 
 # Re-run with nothing changed: every file of ours is current.
-out="$("$REPO_DIR/install.sh")"
+run "$REPO_DIR/install.sh"
+[[ $rc -eq 1 ]] || fail "install exited $rc with a skipped agent (expected 1)"
+grep -q "^error: .*mixes versions" <<<"$out" || fail "skipped agent not reported as an error"
 grep -q "^  updated\|^  installed\|^  differs" <<<"$out" && fail "unchanged re-run changed something"
 grep -q "^  current        agents/eric-evans-advisor.md" <<<"$out" || fail "unchanged file not reported current"
 grep -q "^problem-brief: found" <<<"$out" || fail "installed problem-brief not reported as found"
@@ -52,7 +58,9 @@ echo "last release's persona" > "$old"
 old_hash="$( (sha256sum "$old" 2>/dev/null || shasum -a 256 "$old") | cut -d' ' -f1)"
 awk -v h="$old_hash" 'substr($0, 67) == "agents/eric-evans-advisor.md" { $0 = h "  agents/eric-evans-advisor.md" } { print }' "$MANIFEST" > "$MANIFEST.t" && mv "$MANIFEST.t" "$MANIFEST"
 echo "my local note" >> "$edited"
-out="$("$REPO_DIR/install.sh")"
+run "$REPO_DIR/install.sh"
+[[ $rc -eq 1 ]] || fail "install exited $rc with a skipped agent (expected 1)"
+grep -q "^error: .*mixes versions" <<<"$out" || fail "skipped agent not reported as an error"
 grep -q "^  updated        agents/eric-evans-advisor.md" <<<"$out" || fail "stale installed file not updated"
 cmp -s "$REPO_DIR/agents/eric-evans-advisor.md" "$old" || fail "stale installed file not replaced"
 grep -q "^  differs, kept  skills/chorus-core/CONDUCTOR.md" <<<"$out" || fail "edited file not reported as differs, kept"
@@ -110,10 +118,29 @@ echo "old validator" > "$OLD_HOME/skills/coryphaeus/bin/validate.mjs"
 echo "old skill, edited" > "$OLD_HOME/skills/coryphaeus/SKILL.md"
 vhash="$( (sha256sum "$OLD_HOME/skills/coryphaeus/bin/validate.mjs" 2>/dev/null || shasum -a 256 "$OLD_HOME/skills/coryphaeus/bin/validate.mjs") | cut -d' ' -f1)"
 printf '%s  %s\n%s  %s\n' "$vhash" skills/coryphaeus/bin/validate.mjs "$(printf '0%.0s' {1..64})" skills/coryphaeus/SKILL.md > "$OLD_HOME/.chorus-install-manifest"
-out="$(CLAUDE_HOME="$OLD_HOME" "$REPO_DIR/install.sh")"
+run env CLAUDE_HOME="$OLD_HOME" "$REPO_DIR/install.sh"
+[[ $rc -eq 0 ]] || fail "coryphaeus upgrade exited $rc: $out"
 grep -q "^  pruned         skills/coryphaeus/bin/validate.mjs" <<<"$out" || fail "stale coryphaeus file not pruned"
 [[ ! -e "$OLD_HOME/skills/coryphaeus/bin" ]] || fail "stale coryphaeus bin/ left behind"
 [[ ! -e "$OLD_HOME/skills/coryphaeus/SKILL.md" ]] || fail "edited coryphaeus SKILL.md still loads as a skill"
 grep -qx "old skill, edited" "$OLD_HOME/skills/coryphaeus/SKILL.md.retired" || fail "edited coryphaeus SKILL.md not kept as SKILL.md.retired"
 
-echo "PASS — install -> re-run -> refresh -> uninstall round trip, and the coryphaeus upgrade, into temp CLAUDE_HOMEs."
+# Upgrade from a copy made before the manifest existed: a file whose content was
+# once shipped is ours and is replaced; a file never shipped fails the install loudly.
+PRE_HOME="$(mktemp -d)"
+trap 'rm -rf "$HOME_DIR" "$OLD_HOME" "$PRE_HOME"' EXIT
+older="$(git -C "$REPO_DIR" log --format=%H -- skill/chorus-review/SKILL.md | sed -n 2p)"
+[[ -n "$older" ]] || fail "no earlier version of chorus-review/SKILL.md in git history (shallow clone? fetch-depth: 0)"
+mkdir -p "$PRE_HOME/skills/chorus-review" "$PRE_HOME/skills/chorus-core"
+git -C "$REPO_DIR" show "$older:skill/chorus-review/SKILL.md" > "$PRE_HOME/skills/chorus-review/SKILL.md"
+run env CLAUDE_HOME="$PRE_HOME" "$REPO_DIR/install.sh"
+[[ $rc -eq 0 ]] || fail "pre-manifest upgrade exited $rc: $out"
+grep -q "^  updated        skills/chorus-review/SKILL.md  (an earlier shipped version)" <<<"$out" || fail "older shipped SKILL.md not recognised"
+cmp -s "$REPO_DIR/skill/chorus-review/SKILL.md" "$PRE_HOME/skills/chorus-review/SKILL.md" || fail "older shipped SKILL.md not replaced"
+echo "never shipped" > "$PRE_HOME/skills/chorus-core/CONDUCTOR.md"
+run env CLAUDE_HOME="$PRE_HOME" "$REPO_DIR/install.sh"
+[[ $rc -eq 1 ]] || fail "install exited $rc with a never-shipped CONDUCTOR.md (expected 1)"
+grep -q "^  $PRE_HOME/skills/chorus-core/CONDUCTOR.md$" <<<"$out" || fail "error does not name the file left alone"
+grep -qx "never shipped" "$PRE_HOME/skills/chorus-core/CONDUCTOR.md" || fail "install overwrote a file it never shipped"
+
+echo "PASS — install -> re-run -> refresh -> uninstall round trip, the coryphaeus upgrade and the pre-manifest upgrade, into temp CLAUDE_HOMEs."

@@ -44,6 +44,21 @@ if [[ ! -d "$SKILLS_SRC" || ! -d "$AGENTS_SRC" ]]; then
   exit 1
 fi
 
+# A round runs only through bin/conduct.mjs, so Node is required. Checked before
+# anything is written.
+NODE_MIN=20
+node_major="$(node -p 'process.versions.node.split(".")[0]' 2>/dev/null || true)"
+if [[ -z "$node_major" ]]; then
+  echo "error: Node not found. The chorus needs Node $NODE_MIN or later to run a round (bin/conduct.mjs)." >&2
+  echo "  fix: install Node $NODE_MIN+ and re-run ./install.sh. Nothing was written." >&2
+  exit 1
+fi
+if (( node_major < NODE_MIN )); then
+  echo "error: Node $(node --version) is too old. The chorus needs Node $NODE_MIN or later." >&2
+  echo "  fix: upgrade Node to $NODE_MIN+ and re-run ./install.sh. Nothing was written." >&2
+  exit 1
+fi
+
 if command -v sha256sum >/dev/null 2>&1; then
   hash_of() { sha256sum "$1" | cut -d' ' -f1; }
 elif command -v shasum >/dev/null 2>&1; then
@@ -63,6 +78,16 @@ recorded_hash() {
     length($1) == 64 && $1 ~ /^[0-9a-f]+$/ && NF >= 2 { if (substr($0, 67) == r) { print $1; exit } ; next }
     $0 == r { print "legacy"; exit }
   ' "$MANIFEST"
+}
+
+# Was this exact content ever committed in the repo we install from? Then a copy
+# with no manifest line is an older install of ours, not the user's file.
+# shortcut: needs a git checkout; from a tarball every such copy still fails loudly below.
+shipped_before() {
+  command -v git >/dev/null 2>&1 && git -C "$REPO_DIR" rev-parse --git-dir >/dev/null 2>&1 || return 1
+  local blob
+  blob="$(git hash-object "$1" 2>/dev/null)" || return 1
+  [[ -n "$(git -C "$REPO_DIR" log --all -1 --format=%h --find-object="$blob" 2>/dev/null)" ]]
 }
 
 # A manifest path must stay inside CLAUDE_HOME (same guard as uninstall.sh).
@@ -92,6 +117,7 @@ trap 'rm -f "$new_manifest" "$shipped"' EXIT
 } > "$new_manifest"
 
 counts_installed=0 counts_updated=0 counts_current=0 counts_kept=0 counts_skipped=0
+not_replaced=()
 
 # Place one shipped file. $1 source, $2 path relative to CLAUDE_HOME.
 place() {
@@ -117,7 +143,13 @@ place() {
     echo "  updated        $rel"
     counts_updated=$((counts_updated + 1))
     echo "$new  $rel" >> "$new_manifest"
+  elif [[ -z "$rec" || "$rec" == "legacy" ]] && shipped_before "$dst"; then
+    cp -f "$src" "$dst"
+    echo "  updated        $rel  (an earlier shipped version)"
+    counts_updated=$((counts_updated + 1))
+    echo "$new  $rel" >> "$new_manifest"
   elif [[ -n "$rec" ]]; then
+    not_replaced+=("$rel")
     if [[ "$rec" == "legacy" ]]; then
       echo "  differs, kept  $rel  (recorded before hashes were; pass --force to replace)"
       echo "$rel" >> "$new_manifest"
@@ -127,6 +159,7 @@ place() {
     fi
     counts_kept=$((counts_kept + 1))
   else
+    not_replaced+=("$rel")
     echo "  skip           $rel  (exists, not installed by this script; pass --force to overwrite)"
     counts_skipped=$((counts_skipped + 1))
   fi
@@ -182,12 +215,7 @@ echo "Installed: $counts_installed. Updated: $counts_updated. Current: $counts_c
 echo "Differs, kept: $counts_kept. Skipped (not ours): $counts_skipped."
 echo "Manifest:  $MANIFEST"
 echo
-if command -v node >/dev/null 2>&1; then
-  echo "Node: $(node --version) (chorus-core's validator and renderer need 18 or later)."
-else
-  echo "Node: not found. chorus-core's validator and renderer need Node 18 or later;"
-  echo "  until it is installed, rounds run unvalidated and pages are written by hand."
-fi
+echo "Node: $(node --version) (a round needs Node $NODE_MIN or later)."
 if [[ -f "$SKILLS_DST/problem-brief/SKILL.md" ]]; then
   echo "problem-brief: found at $SKILLS_DST/problem-brief (chorus-core routes decisions to it)."
 else
@@ -208,3 +236,12 @@ echo
 echo "chorus-review writes docs/reviews/YYYY-MM-DD-chorus-review.json, the record,"
 echo "and the page rendered from it. Commit both; the most recent record is the"
 echo "next round's baseline."
+
+# Anything we ship but left alone makes the install mixed-version: fail, and say how to fix it.
+if (( ${#not_replaced[@]} )); then
+  echo >&2
+  echo "error: ${#not_replaced[@]} shipped file(s) were left as they were, so this install mixes versions:" >&2
+  for r in "${not_replaced[@]}"; do echo "  $CLAUDE_HOME/$r" >&2; done
+  echo "  fix: if these are not your edits, re-run ./install.sh --force; to keep an edit, move the file aside first, then re-run." >&2
+  exit 1
+fi

@@ -24,7 +24,7 @@
  *
  * State is a pure function of the log: derive(log) → { action, ... }. No clock,
  * no randomness, so the same log always yields the same record.
- * Zero dependencies; Node 18+.
+ * Zero dependencies; Node 20+.
  */
 
 import { existsSync, readFileSync, readdirSync, realpathSync, writeFileSync, mkdirSync } from "node:fs";

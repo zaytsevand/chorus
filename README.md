@@ -291,8 +291,9 @@ version of this matrix — heatmap, radar, and per-axis breakdown — is at
 - **The `advisor()` tool** — conflict reconciliation (Phase 3) routes disputes
   to it. Without it the chorus records each conflict, unresolved, for you to
   rule on.
-- **Node 18 or later**: chorus-core's validator and renderer. No npm
-  dependencies. Without Node, rounds run unvalidated and pages are hand-written.
+- **Node 20 or later**: every round runs through chorus-core's conductor loop
+  (`bin/conduct.mjs`), validator and renderer. No npm dependencies. There is no
+  round without Node; `install.sh` refuses to install below Node 20.
 
 **Optional:**
 

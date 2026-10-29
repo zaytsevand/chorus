@@ -19,8 +19,8 @@ recoveries as they happen.
   the rules below.
 - **Not found:** the free-hand form below. The same records, nothing lost.
 
-Without Node, nothing is detected: every port takes its default and the record
-says "unvalidated" (`CONDUCTOR.md` § Ports).
+The free-hand form is about the brief only. Node 20+ is always required: a
+round runs through `bin/conduct.mjs`, and without Node it does not run.
 
 ## Free-hand form
 

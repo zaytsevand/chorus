@@ -11,7 +11,7 @@
  * The JSON is the record; the page is a projection of it. The layout is fixed
  * and nothing on the page is computed here: severities, counts and ranks are
  * printed as the validated record states them. Invalid input is refused.
- * Zero dependencies; Node 18+.
+ * Zero dependencies; Node 20+.
  */
 
 import { readFileSync, writeFileSync, realpathSync } from "node:fs";

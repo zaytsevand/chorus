@@ -61,7 +61,7 @@ The record tools live beside these files: `schema/` (JSON Schema for every
 chorus record and the shared `decision` and `ruling` shapes, and
 `vocab.schema.json`, the one home of every closed vocabulary), `bin/` (the
 zero-dependency `conduct.mjs` conductor loop and `engine.mjs` rules,
-`vocab.mjs`, `bindings.mjs`, `validate.mjs` and `render.mjs`; Node 18+),
+`vocab.mjs`, `bindings.mjs`, `validate.mjs` and `render.mjs`; Node 20+),
 `examples/` and `test/`. How to run them and what each exit code means:
 `CONDUCTOR.md` § Ports, Record tools and The conductor loop.
 

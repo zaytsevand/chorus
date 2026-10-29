@@ -45,5 +45,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          # install.sh recognises older shipped copies by their git history.
+          fetch-depth: 0
       - name: Round trip into a temp CLAUDE_HOME
         run: bash scripts/test-install-roundtrip.sh

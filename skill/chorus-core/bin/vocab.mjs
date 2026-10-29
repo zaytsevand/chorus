@@ -7,7 +7,7 @@
  *   VOTE.OVER_RATE        // "OVER-RATE"
  *   VOCAB.vote            // ["PRIORITIZE", "CONFIRM", "OVER-RATE", "NEED_INFO"]
  *
- * Zero dependencies; Node 18+.
+ * Zero dependencies; Node 20+.
  */
 
 import { readFileSync } from "node:fs";
