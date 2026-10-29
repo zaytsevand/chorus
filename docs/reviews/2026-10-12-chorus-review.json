@@ -1,0 +1,1972 @@
+{
+  "kind": "review-record",
+  "schema_version": "1",
+  "date": "2026-10-12",
+  "target": "specs/017-per-reviewer-run-settings/spec.md",
+  "mode": "project-state",
+  "round_context": "Since the last round: spec 017 (retuning a reviewer for one project) was written with plan, tasks and an accepted walkthrough; it was narrowed twice to files only, with no chorus mechanism, so a retune is a project-level agent file of the same name that Claude Code resolves; no code is built (the build is held by R-16); the suite-review brief was retired and issue 9 closed; spec 017 is in scope because the operator named it, though the addendum excludes specs.",
+  "baseline_ref": "docs/reviews/2026-09-27-chorus-review-pr32.json",
+  "bindings": {
+    "ports": [
+      {
+        "port": "decision-sink",
+        "provider": "default"
+      },
+      {
+        "port": "ruling-lookup",
+        "provider": "default"
+      },
+      {
+        "port": "record-validator",
+        "provider": "coryphaeus"
+      },
+      {
+        "port": "record-renderer",
+        "provider": "coryphaeus"
+      },
+      {
+        "port": "arbiter",
+        "provider": "default"
+      },
+      {
+        "port": "memory-recall",
+        "provider": "default"
+      }
+    ],
+    "recoveries": [
+      {
+        "kind": "retry",
+        "subject": "security-and-trust-advisor",
+        "phase": "round-1",
+        "reason": "finding report failed the validator: 45 errors (unknown fields, missing lens, locator and proposed_severity, evidence given as strings, confidence value outside high/low)"
+      },
+      {
+        "kind": "retry",
+        "subject": "eric-evans-advisor",
+        "phase": "round-1",
+        "reason": "finding report failed the validator on the same shape errors"
+      },
+      {
+        "kind": "retry",
+        "subject": "mark-richards-architect",
+        "phase": "round-1",
+        "reason": "finding report failed the validator on the same shape errors; the corrected report was then 778 words, over the 700 limit, and was cut"
+      },
+      {
+        "kind": "retry",
+        "subject": "alan-cooper-advisor",
+        "phase": "round-1",
+        "reason": "finding report failed the validator on the same shape errors; the corrected report was then 730 words, over the 700 limit, and was cut"
+      },
+      {
+        "kind": "retry",
+        "subject": "delivery-and-ops-advisor",
+        "phase": "round-1",
+        "reason": "finding report failed the validator on the same shape errors; the corrected report was then 704 words, over the 700 limit, and was cut"
+      },
+      {
+        "kind": "retry",
+        "subject": "security-and-trust-advisor",
+        "phase": "round-2",
+        "reason": "vote report failed the validator: unknown field proposed_severity on 5 votes"
+      },
+      {
+        "kind": "retry",
+        "subject": "mark-richards-architect",
+        "phase": "round-2",
+        "reason": "vote report failed the validator: evidence refs written as install.sh:37,131 instead of a single range"
+      },
+      {
+        "kind": "retry",
+        "subject": "alan-cooper-advisor",
+        "phase": "round-2",
+        "reason": "vote report was 887 words, over the 600 limit, and was cut"
+      },
+      {
+        "kind": "retry",
+        "subject": "delivery-and-ops-advisor",
+        "phase": "round-2",
+        "reason": "vote report was 778 words, over the 600 limit, and was cut"
+      },
+      {
+        "kind": "fallback",
+        "subject": "decision-sink",
+        "reason": "no decision sink bound; the two operator questions in the exploratory phase were asked in chat"
+      },
+      {
+        "kind": "fallback",
+        "subject": "ruling-lookup",
+        "reason": "no ruling sink bound; operator answers are held as local rulings in this record"
+      },
+      {
+        "kind": "fallback",
+        "subject": "arbiter",
+        "reason": "advisor() is not reachable from this session; the two conflicts are recorded unresolved for the operator"
+      }
+    ]
+  },
+  "secret_filter": {
+    "ran": false,
+    "note": "the secret pre-filter was not run; the personas wrote understanding records to agent memory"
+  },
+  "tldr": [
+    "The chorus found one real hole in spec 017: in a per-project install the retuned file and the installer's own file sit at the same path, so a re-run with --force silently erases the retune (F32, escalated to 🔴; the claim that the installer never reaches the copy was dropped after its own author corrected it).",
+    "Staleness is the other cluster: a copy never learns the plugin moved (F12, F16 escalated to 🔴). The cheapest zero-code fix is to stamp the shipped version in the reason comment, name the symptom, and give one diff command.",
+    "Three 🔴 findings block calling the spec ready: F32 (the --force erase), F16 (no shipped-version stamp in a copy) and F12 (silent staleness with no named symptom). Docs-only is the right size at no maintainer capacity (F36), but the README must stay short (R2-32); two conflicts are left for the operator: whether to record an ADR, and how many sentences the README section may hold."
+  ],
+  "roster": [
+    {
+      "persona": "delivery-and-ops-advisor",
+      "lens": "delivery and ops",
+      "decision": "JOIN",
+      "reason": "Cited three deltas: a docs-only recipe whose upkeep has no owner, install behaviour, and the smoke-run record.",
+      "seated": true,
+      "seat": "ordinary"
+    },
+    {
+      "persona": "security-and-trust-advisor",
+      "lens": "security",
+      "decision": "JOIN",
+      "reason": "Cited three deltas: a project copy that shadows a trusted reviewer, tools as a capability, and the public memory folder.",
+      "seated": true,
+      "seat": "ordinary"
+    },
+    {
+      "persona": "eric-evans-advisor",
+      "lens": "DDD",
+      "decision": "JOIN",
+      "reason": "The spec fixes one name for a reviewer across two files; ubiquitous language is in play.",
+      "seated": true,
+      "seat": "ordinary"
+    },
+    {
+      "persona": "mark-richards-architect",
+      "lens": "architecture",
+      "decision": "JOIN",
+      "reason": "A duplicate-authority seam between a shipped file and a project copy.",
+      "seated": true,
+      "seat": "ordinary"
+    },
+    {
+      "persona": "alan-cooper-advisor",
+      "lens": "adversarial product",
+      "decision": "JOIN",
+      "reason": "The cost of a stale copy falls on the newcomer, not the author.",
+      "seated": true,
+      "seat": "ordinary"
+    },
+    {
+      "persona": "don-norman-advisor",
+      "lens": "HCD",
+      "decision": "JOIN",
+      "reason": "Joined; cited two deltas; not seated at the cap of five (tie spanning the fifth seat, default panel by roster order).",
+      "seated": false
+    },
+    {
+      "persona": "kent-beck-persona",
+      "lens": "TDD / simple design",
+      "decision": "JOIN",
+      "reason": "Joined; cited two deltas; not seated at the cap of five (default panel by roster order).",
+      "seated": false
+    },
+    {
+      "persona": "uncle-bob-architect",
+      "lens": "clean code / SOLID",
+      "decision": "JOIN",
+      "reason": "Joined; cited two deltas; not seated at the cap of five (default panel by roster order).",
+      "seated": false
+    },
+    {
+      "persona": "eliyahu-goldratt-advisor",
+      "lens": "constraint and flow",
+      "decision": "JOIN",
+      "reason": "Joined; cited two deltas; not seated at the cap of five (default panel by roster order).",
+      "seated": false
+    },
+    {
+      "persona": "guido-python-reviewer",
+      "lens": "Python",
+      "decision": "ABSTAIN",
+      "reason": "No Python in the anchor surface.",
+      "seated": false
+    }
+  ],
+  "quorum": {
+    "joiners": 9,
+    "branch": "proceed"
+  },
+  "register": [
+    {
+      "id": "F1",
+      "author": "eric-evans-advisor",
+      "lens": "DDD",
+      "authored_severity": "🟡",
+      "locator": "specs/017-per-reviewer-run-settings/spec.md:74-76",
+      "pull_quote": "The copy shares the original's memory, so a stale persona quietly reads and writes the live one's records.",
+      "evidence": [
+        {
+          "kind": "file_line",
+          "ref": "skill/chorus-review/SKILL.md:112-135",
+          "note": "Dispatch and memory recovery are keyed by persona name, so a same-named copy is read as the same persona."
+        },
+        {
+          "kind": "file_line",
+          "ref": "skill/chorus-core/CONDUCTOR.md:343-346",
+          "note": "The agent-memory layout is .claude/agent-memory/<persona-name>/, keyed by name."
+        },
+        {
+          "kind": "principle",
+          "ref": "Ubiquitous Language: an exact-match key with two writers returns plausible wrong answers, not errors",
+          "note": "Two definitions behind one key never raise an error."
+        }
+      ],
+      "confidence_on_hand": "low",
+      "need_info": true,
+      "graded": true,
+      "need_info_reasons": [
+        {
+          "raiser": "eric-evans-advisor",
+          "reason": "I have not checked how Claude Code scopes 'memory: project' when a project-level file shadows a plugin file of the same name.",
+          "stage": "author"
+        },
+        {
+          "raiser": "alan-cooper-advisor",
+          "reason": "Held; host memory scoping unchecked.",
+          "stage": "vote"
+        }
+      ]
+    },
+    {
+      "id": "F2",
+      "author": "eric-evans-advisor",
+      "lens": "DDD",
+      "authored_severity": "🟢",
+      "locator": "specs/017-per-reviewer-run-settings/spec.md:95",
+      "pull_quote": "One word should name the thing a person retunes, and the README should define it once.",
+      "evidence": [
+        {
+          "kind": "file_line",
+          "ref": "skill/chorus-core/CONDUCTOR.md:16",
+          "note": "The canon speaks of persona and lens, not reviewer."
+        },
+        {
+          "kind": "file_line",
+          "ref": "specs/017-per-reviewer-run-settings/spec.md:74",
+          "note": "The spec switches between 'reviewer' and 'persona' within one edge case."
+        }
+      ],
+      "confidence_on_hand": "high",
+      "need_info": false,
+      "graded": true,
+      "convergence_notes": [
+        {
+          "persona": "alan-cooper-advisor",
+          "pull_quote": "A reader who meets four names for one thing assumes four things."
+        }
+      ]
+    },
+    {
+      "id": "F3",
+      "author": "eric-evans-advisor",
+      "lens": "DDD",
+      "authored_severity": "🟢",
+      "locator": "specs/017-per-reviewer-run-settings/spec.md:78",
+      "pull_quote": "The record will say 'Beck voted' when a modified Beck did.",
+      "evidence": [
+        {
+          "kind": "file_line",
+          "ref": "docs/reviews/CHORUS-PROJECT.md:108-111",
+          "note": "Core is the conductor's procedure and invariants; personas are supporting."
+        },
+        {
+          "kind": "file_line",
+          "ref": "specs/017-per-reviewer-run-settings/spec.md:78",
+          "note": "Record visibility is declared out of scope."
+        }
+      ],
+      "confidence_on_hand": "high",
+      "need_info": false,
+      "graded": true,
+      "convergence_notes": [
+        {
+          "persona": "alan-cooper-advisor",
+          "pull_quote": "The record will claim Beck voted when a modified Beck did."
+        },
+        {
+          "persona": "delivery-and-ops-advisor",
+          "pull_quote": "If the record stays silent, one README sentence has to speak for it."
+        },
+        {
+          "persona": "security-and-trust-advisor",
+          "pull_quote": "Tell the reader the record cannot show a retune, and the silence stops misleading."
+        }
+      ]
+    },
+    {
+      "id": "F11",
+      "author": "mark-richards-architect",
+      "lens": "architecture",
+      "authored_severity": "🟡",
+      "locator": "specs/017-per-reviewer-run-settings/spec.md:74",
+      "pull_quote": "A sanctioned copy without a drift detector is a fork with a better story.",
+      "evidence": [
+        {
+          "kind": "file_line",
+          "ref": "specs/017-per-reviewer-run-settings/spec.md:74",
+          "note": "The copy replaces the whole file and the installer will not update it."
+        },
+        {
+          "kind": "file_line",
+          "ref": "skill/chorus-review/SKILL.md:112-135",
+          "note": "Dispatch of roster personas whose replies are validated downstream."
+        }
+      ],
+      "confidence_on_hand": "high",
+      "need_info": false,
+      "graded": true,
+      "convergence_notes": [
+        {
+          "persona": "eric-evans-advisor",
+          "pull_quote": "A ruled divergence needs an owner and a date, or it is only a fork."
+        },
+        {
+          "persona": "alan-cooper-advisor",
+          "pull_quote": "A sanctioned copy nobody can diff is still a fork the newcomer pays for."
+        },
+        {
+          "persona": "delivery-and-ops-advisor",
+          "pull_quote": "A fork needs an age on its label, and a version stamp is the cheapest label."
+        },
+        {
+          "persona": "security-and-trust-advisor",
+          "pull_quote": "The fork is sanctioned, so what it owes is a legible source version."
+        }
+      ]
+    },
+    {
+      "id": "F12",
+      "author": "mark-richards-architect",
+      "lens": "architecture",
+      "authored_severity": "🟡",
+      "locator": "specs/017-per-reviewer-run-settings/plan.md:56-62",
+      "pull_quote": "Silent staleness is paid for later, by someone who no longer remembers the copy exists.",
+      "evidence": [
+        {
+          "kind": "file_line",
+          "ref": "specs/017-per-reviewer-run-settings/plan.md:56-62",
+          "note": "Risks table covers stale copies with prose and a manual re-compare only."
+        },
+        {
+          "kind": "file_line",
+          "ref": "specs/017-per-reviewer-run-settings/spec.md:74",
+          "note": "The fork cost is accepted as 'just the files'."
+        }
+      ],
+      "confidence_on_hand": "high",
+      "need_info": false,
+      "graded": true,
+      "convergence_notes": [
+        {
+          "persona": "alan-cooper-advisor",
+          "pull_quote": "A newcomer who is told the symptom can find the cause; one who is not calls it a chorus bug."
+        },
+        {
+          "persona": "delivery-and-ops-advisor",
+          "pull_quote": "Name the symptom in the recipe and the stale copy becomes the first suspect."
+        }
+      ]
+    },
+    {
+      "id": "F13",
+      "author": "mark-richards-architect",
+      "lens": "architecture",
+      "authored_severity": "🟡",
+      "locator": "skill/chorus-review/SKILL.md:114",
+      "pull_quote": "The feature stands on a dispatch rule the canon never states.",
+      "evidence": [
+        {
+          "kind": "file_line",
+          "ref": "skill/chorus-review/SKILL.md:114",
+          "note": "Dispatch rule says Agent tool, not dispatch by name."
+        },
+        {
+          "kind": "file_line",
+          "ref": "specs/017-per-reviewer-run-settings/spec.md:117",
+          "note": "Assumptions section states by-name dispatch as an assumption."
+        }
+      ],
+      "confidence_on_hand": "low",
+      "need_info": true,
+      "graded": true,
+      "need_info_reasons": [
+        {
+          "raiser": "mark-richards-architect",
+          "reason": "I did not read how the Round brief names the agent beyond SKILL.md line 135.",
+          "stage": "author"
+        },
+        {
+          "raiser": "alan-cooper-advisor",
+          "reason": "Held; canon dispatch wording is outside my lens.",
+          "stage": "vote"
+        }
+      ]
+    },
+    {
+      "id": "F14",
+      "author": "mark-richards-architect",
+      "lens": "architecture",
+      "authored_severity": "🟢",
+      "locator": "scripts/check-suite-integrity.sh:236-258",
+      "pull_quote": "Our CI can guard the recipe, not the copies, and that is the right line.",
+      "evidence": [
+        {
+          "kind": "file_line",
+          "ref": "scripts/check-suite-integrity.sh:236-258",
+          "note": "FC4 already validates markdown file references."
+        },
+        {
+          "kind": "file_line",
+          "ref": "specs/017-per-reviewer-run-settings/tasks.md:22",
+          "note": "T005 runs the integrity script."
+        }
+      ],
+      "confidence_on_hand": "high",
+      "need_info": false,
+      "graded": true,
+      "convergence_notes": [
+        {
+          "persona": "alan-cooper-advisor",
+          "pull_quote": "Guard the recipe we ship, leave the copies to their owners."
+        },
+        {
+          "persona": "delivery-and-ops-advisor",
+          "pull_quote": "Guard the recipe's links in CI and leave the copies to their owners."
+        }
+      ]
+    },
+    {
+      "id": "F15",
+      "author": "mark-richards-architect",
+      "lens": "architecture",
+      "authored_severity": "🟢",
+      "locator": "specs/017-per-reviewer-run-settings/plan.md:40-45",
+      "pull_quote": "The saved machinery is paid back in unseen fork drift.",
+      "evidence": [
+        {
+          "kind": "file_line",
+          "ref": "specs/017-per-reviewer-run-settings/plan.md:40-45",
+          "note": "Design decisions 3 and 4 accept the lost record visibility and the fork cost."
+        },
+        {
+          "kind": "principle",
+          "ref": "Architect worldview rule 8: ADRs let decisions survive their author",
+          "note": "Established in the architect persona's worldview."
+        }
+      ],
+      "confidence_on_hand": "high",
+      "need_info": false,
+      "graded": true,
+      "convergence_notes": [
+        {
+          "persona": "alan-cooper-advisor",
+          "pull_quote": "Writing down who pays is what makes accepting it honest."
+        }
+      ]
+    },
+    {
+      "id": "F16",
+      "author": "mark-richards-architect",
+      "lens": "architecture",
+      "authored_severity": "🟡",
+      "locator": "specs/017-per-reviewer-run-settings/spec.md:86-88",
+      "pull_quote": "Stamp the version in the copy, and the fork can at least tell you how old it is.",
+      "evidence": [
+        {
+          "kind": "file_line",
+          "ref": "specs/017-per-reviewer-run-settings/spec.md:86-88",
+          "note": "FR-003 and FR-004 ask for a reason comment and cost statement without a version stamp or symptom."
+        },
+        {
+          "kind": "file_line",
+          "ref": ".claude-plugin/plugin.json:3",
+          "note": "The plugin carries a version a copy can cite."
+        }
+      ],
+      "confidence_on_hand": "high",
+      "need_info": false,
+      "graded": true,
+      "convergence_notes": [
+        {
+          "persona": "eric-evans-advisor",
+          "pull_quote": "A version stamp tells a reader which persona the copy claims to be."
+        },
+        {
+          "persona": "alan-cooper-advisor",
+          "pull_quote": "The stamp turns an unknowable copy into one the reader can compare."
+        },
+        {
+          "persona": "delivery-and-ops-advisor",
+          "pull_quote": "A stamped version turns an invisible fork into a dated one."
+        }
+      ]
+    },
+    {
+      "id": "F21",
+      "author": "alan-cooper-advisor",
+      "lens": "adversarial product",
+      "authored_severity": "🟡",
+      "locator": "specs/017-per-reviewer-run-settings/spec.md:74",
+      "pull_quote": "The author who accepted the cost will never be the one who pays it.",
+      "evidence": [
+        {
+          "kind": "file_line",
+          "ref": "specs/017-per-reviewer-run-settings/spec.md:74",
+          "note": "The stale copy is called the accepted cost."
+        },
+        {
+          "kind": "file_line",
+          "ref": "specs/017-per-reviewer-run-settings/spec.md:87",
+          "note": "FR-003 gives re-compare with no trigger or command."
+        },
+        {
+          "kind": "file_line",
+          "ref": "install.sh:95-116",
+          "note": "The 'differs, kept' logic covers only manifest paths under CLAUDE_HOME."
+        },
+        {
+          "kind": "file_line",
+          "ref": "specs/017-per-reviewer-run-settings/acceptance.md:30",
+          "note": "The voice fork was waived by the author's ruling."
+        }
+      ],
+      "confidence_on_hand": "high",
+      "need_info": false,
+      "graded": true,
+      "convergence_notes": [
+        {
+          "persona": "mark-richards-architect",
+          "pull_quote": "A manual re-compare with no trigger is a step nobody remembers to take."
+        },
+        {
+          "persona": "delivery-and-ops-advisor",
+          "pull_quote": "Whoever accepts the cost on a newcomer's behalf should hand over the diff command too."
+        }
+      ]
+    },
+    {
+      "id": "F22",
+      "author": "alan-cooper-advisor",
+      "lens": "adversarial product",
+      "authored_severity": "🟡",
+      "locator": "specs/017-per-reviewer-run-settings/spec.md:55",
+      "pull_quote": "The recipe hands over the dangerous lever and keeps the label off it.",
+      "evidence": [
+        {
+          "kind": "file_line",
+          "ref": "specs/017-per-reviewer-run-settings/spec.md:55",
+          "note": "A changed tools list is a success scenario with no caution."
+        },
+        {
+          "kind": "file_line",
+          "ref": "specs/017-per-reviewer-run-settings/spec.md:85",
+          "note": "FR-001 means nothing validates a run setting."
+        },
+        {
+          "kind": "file_line",
+          "ref": "specs/017-per-reviewer-run-settings/acceptance.md:40",
+          "note": "Shipped agents carry memory: project and use no tools key today."
+        }
+      ],
+      "confidence_on_hand": "low",
+      "need_info": true,
+      "graded": true,
+      "need_info_reasons": [
+        {
+          "raiser": "alan-cooper-advisor",
+          "reason": "I did not verify which tools a persona's reply and memory writes actually need on the host.",
+          "stage": "author"
+        }
+      ]
+    },
+    {
+      "id": "F23",
+      "author": "alan-cooper-advisor",
+      "lens": "adversarial product",
+      "authored_severity": "🟡",
+      "locator": "specs/017-per-reviewer-run-settings/spec.md:109",
+      "pull_quote": "A record that hides who ran differently is cleaner for the builder and blinder for the reader.",
+      "evidence": [
+        {
+          "kind": "file_line",
+          "ref": "specs/017-per-reviewer-run-settings/spec.md:109",
+          "note": "Showing the difference in the record is out of scope, revisit with no owner."
+        },
+        {
+          "kind": "file_line",
+          "ref": "specs/017-per-reviewer-run-settings/spec.md:79",
+          "note": "The edge case states the record does not show a project copy ran."
+        }
+      ],
+      "confidence_on_hand": "high",
+      "need_info": false,
+      "graded": true,
+      "convergence_notes": [
+        {
+          "persona": "eric-evans-advisor",
+          "pull_quote": "The record's reader pays for what the retuner saved."
+        },
+        {
+          "persona": "delivery-and-ops-advisor",
+          "pull_quote": "The record's reader needs a pointer to where the retune lives."
+        }
+      ]
+    },
+    {
+      "id": "F24",
+      "author": "alan-cooper-advisor",
+      "lens": "adversarial product",
+      "authored_severity": "🟢",
+      "locator": "specs/017-per-reviewer-run-settings/spec.md:88",
+      "pull_quote": "Say what the reader loses, not what the repository did.",
+      "evidence": [
+        {
+          "kind": "file_line",
+          "ref": "specs/017-per-reviewer-run-settings/spec.md:88",
+          "note": "The cost statement uses the terms fork and installer."
+        },
+        {
+          "kind": "file_line",
+          "ref": "specs/017-per-reviewer-run-settings/acceptance.md:26",
+          "note": "SC-003 has no task behind it."
+        },
+        {
+          "kind": "file_line",
+          "ref": "README.md:300",
+          "note": "Install and Run a round are where a newcomer looks."
+        }
+      ],
+      "confidence_on_hand": "high",
+      "need_info": false,
+      "graded": true,
+      "convergence_notes": [
+        {
+          "persona": "delivery-and-ops-advisor",
+          "pull_quote": "Tell the reader what they lose, in their words."
+        }
+      ]
+    },
+    {
+      "id": "F31",
+      "author": "delivery-and-ops-advisor",
+      "lens": "delivery and ops",
+      "authored_severity": "🟡",
+      "locator": "specs/017-per-reviewer-run-settings/spec.md:87-91",
+      "pull_quote": "A check only one person ran once is a story, not a gate.",
+      "evidence": [
+        {
+          "kind": "file_line",
+          "ref": "specs/017-per-reviewer-run-settings/spec.md:91",
+          "note": "FR-007 requires one run recorded with host version, not a re-runnable block."
+        },
+        {
+          "kind": "file_line",
+          "ref": "specs/017-per-reviewer-run-settings/tasks.md:13",
+          "note": "T001 records the steps 'as run' and says nothing of re-running them."
+        }
+      ],
+      "confidence_on_hand": "high",
+      "need_info": false,
+      "graded": true,
+      "convergence_notes": [
+        {
+          "persona": "alan-cooper-advisor",
+          "pull_quote": "An instruction with no command is a wish."
+        }
+      ]
+    },
+    {
+      "id": "F32",
+      "author": "delivery-and-ops-advisor",
+      "lens": "delivery and ops",
+      "authored_severity": "🟡",
+      "locator": "install.sh:21-22,101",
+      "pull_quote": "The one flag that overwrites the copy lives in the same directory the copy lives in.",
+      "evidence": [
+        {
+          "kind": "file_line",
+          "ref": "install.sh:101",
+          "note": "--force copies over any existing destination file."
+        },
+        {
+          "kind": "file_line",
+          "ref": "scripts/test-install-roundtrip.sh:21-23",
+          "note": "Only a pre-existing global customization is tested, not a per-project copy."
+        },
+        {
+          "kind": "file_line",
+          "ref": "specs/017-per-reviewer-run-settings/spec.md:57",
+          "note": "The spec treats the installer as writing only under the Claude home."
+        }
+      ],
+      "confidence_on_hand": "high",
+      "need_info": false,
+      "graded": true,
+      "convergence_notes": [
+        {
+          "persona": "eric-evans-advisor",
+          "pull_quote": "The installer cannot see a copy under the global home, but it lands on one under a per-project home."
+        },
+        {
+          "persona": "mark-richards-architect",
+          "pull_quote": "In a per-project install the retune copy and the shipped file are the same path."
+        },
+        {
+          "persona": "alan-cooper-advisor",
+          "pull_quote": "The retune is only safe until someone passes the flag the README itself suggests."
+        },
+        {
+          "persona": "security-and-trust-advisor",
+          "pull_quote": "In per-project mode the installer and the copy share one path, and --force wins."
+        }
+      ]
+    },
+    {
+      "id": "F33",
+      "author": "delivery-and-ops-advisor",
+      "lens": "delivery and ops",
+      "authored_severity": "🟡",
+      "locator": "specs/017-per-reviewer-run-settings/spec.md:79,87",
+      "pull_quote": "If the record cannot say a copy ran, the README must at least say where to look and how to undo it.",
+      "evidence": [
+        {
+          "kind": "file_line",
+          "ref": "specs/017-per-reviewer-run-settings/spec.md:79",
+          "note": "The review record does not show that a reviewer ran from a copy."
+        },
+        {
+          "kind": "file_line",
+          "ref": "specs/017-per-reviewer-run-settings/spec.md:87",
+          "note": "FR-003 lists recipe steps but no check or rollback."
+        }
+      ],
+      "confidence_on_hand": "high",
+      "need_info": false,
+      "graded": true,
+      "convergence_notes": [
+        {
+          "persona": "alan-cooper-advisor",
+          "pull_quote": "If the record stays silent, the README must say how to look and how to go back."
+        }
+      ]
+    },
+    {
+      "id": "F34",
+      "author": "delivery-and-ops-advisor",
+      "lens": "delivery and ops",
+      "authored_severity": "🟡",
+      "locator": "specs/017-per-reviewer-run-settings/spec.md:74,110",
+      "pull_quote": "A copy that does not say what it was copied from cannot be compared with anything.",
+      "evidence": [
+        {
+          "kind": "file_line",
+          "ref": "specs/017-per-reviewer-run-settings/spec.md:110",
+          "note": "Keeping a copy current is out of scope with no staleness check."
+        },
+        {
+          "kind": "file_line",
+          "ref": "install.sh:9-17",
+          "note": "The manifest covers only files the installer wrote."
+        }
+      ],
+      "confidence_on_hand": "high",
+      "need_info": false,
+      "graded": true,
+      "convergence_notes": [
+        {
+          "persona": "mark-richards-architect",
+          "pull_quote": "A version stamp gives the drift check something to compare against."
+        },
+        {
+          "persona": "alan-cooper-advisor",
+          "pull_quote": "A copy that names its source can be checked; one that does not cannot."
+        },
+        {
+          "persona": "security-and-trust-advisor",
+          "pull_quote": "A recorded source version turns re-compare from a hope into a diff."
+        }
+      ]
+    },
+    {
+      "id": "F35",
+      "author": "delivery-and-ops-advisor",
+      "lens": "delivery and ops",
+      "authored_severity": "🟢",
+      "locator": "specs/017-per-reviewer-run-settings/spec.md:77,103",
+      "pull_quote": "Unowned docs rot; dating them lets the reader discount them.",
+      "evidence": [
+        {
+          "kind": "file_line",
+          "ref": "specs/017-per-reviewer-run-settings/spec.md:77",
+          "note": "The recipe names the host version the smoke ran on, and effort depends on it."
+        }
+      ],
+      "confidence_on_hand": "high",
+      "need_info": false,
+      "graded": true,
+      "convergence_notes": [
+        {
+          "persona": "alan-cooper-advisor",
+          "pull_quote": "A date lets the reader decide how far to trust the page."
+        }
+      ]
+    },
+    {
+      "id": "F36",
+      "author": "delivery-and-ops-advisor",
+      "lens": "delivery and ops",
+      "authored_severity": "🟢",
+      "locator": "specs/017-per-reviewer-run-settings/tasks.md:22",
+      "pull_quote": "The cheapest operability is the code you did not ship.",
+      "evidence": [
+        {
+          "kind": "file_line",
+          "ref": ".github/workflows/integrity.yml:3-20",
+          "note": "The existing integrity gate runs on push and PR and is reused unchanged."
+        },
+        {
+          "kind": "file_line",
+          "ref": "specs/017-per-reviewer-run-settings/spec.md:85",
+          "note": "FR-001 keeps chorus from reading, applying or validating any run setting."
+        }
+      ],
+      "confidence_on_hand": "high",
+      "need_info": false,
+      "graded": true,
+      "convergence_notes": [
+        {
+          "persona": "mark-richards-architect",
+          "pull_quote": "Right-sized: the cheapest architecture is the one that adds no coupling point."
+        },
+        {
+          "persona": "alan-cooper-advisor",
+          "pull_quote": "Fine to ship nothing, if the sentences that replace it are written."
+        },
+        {
+          "persona": "security-and-trust-advisor",
+          "pull_quote": "No code means nothing for an absent maintainer to forget to run."
+        }
+      ]
+    },
+    {
+      "id": "F41",
+      "author": "security-and-trust-advisor",
+      "lens": "security",
+      "authored_severity": "🟡",
+      "locator": "specs/017-per-reviewer-run-settings/spec.md:87-90",
+      "pull_quote": "The copy changes who the file is trusted as, and the recipe does not say so.",
+      "evidence": [
+        {
+          "kind": "file_line",
+          "ref": "specs/017-per-reviewer-run-settings/spec.md:87",
+          "note": "FR-003 limits changes to model, effort, tools but does not mark other keys as privileged."
+        },
+        {
+          "kind": "file_line",
+          "ref": "specs/017-per-reviewer-run-settings/tasks.md:17",
+          "note": "T003 repeats the recipe without the privileged-key line."
+        }
+      ],
+      "confidence_on_hand": "high",
+      "need_info": false,
+      "graded": true,
+      "convergence_notes": [
+        {
+          "persona": "mark-richards-architect",
+          "pull_quote": "The recipe's allow-list of three keys is a hope, not a guard."
+        },
+        {
+          "persona": "alan-cooper-advisor",
+          "pull_quote": "Telling people which three keys are safe says nothing about the rest."
+        },
+        {
+          "persona": "delivery-and-ops-advisor",
+          "pull_quote": "Privileged keys deserve one named sentence, never a scanner."
+        }
+      ]
+    },
+    {
+      "id": "F42",
+      "author": "security-and-trust-advisor",
+      "lens": "security",
+      "authored_severity": "🟢",
+      "locator": "specs/017-per-reviewer-run-settings/spec.md:55",
+      "pull_quote": "A grant you make to yourself needs a warning, not a detector.",
+      "evidence": [
+        {
+          "kind": "file_line",
+          "ref": "specs/017-per-reviewer-run-settings/spec.md:55",
+          "note": "The acceptance scenario lets the file set a tool list."
+        },
+        {
+          "kind": "file_line",
+          "ref": "specs/017-per-reviewer-run-settings/spec.md:74",
+          "note": "The accepted cost covers the fork but not the committed-copy case."
+        }
+      ],
+      "confidence_on_hand": "high",
+      "need_info": false,
+      "graded": true,
+      "convergence_notes": [
+        {
+          "persona": "alan-cooper-advisor",
+          "pull_quote": "A tools grant deserves a sentence of warning, not a detector."
+        },
+        {
+          "persona": "delivery-and-ops-advisor",
+          "pull_quote": "A README warning is the whole control, and it costs nothing to keep."
+        }
+      ]
+    },
+    {
+      "id": "F43",
+      "author": "security-and-trust-advisor",
+      "lens": "security",
+      "authored_severity": "🟡",
+      "locator": "agents/kent-beck-persona.md:6",
+      "pull_quote": "The retune changes the model, but the memory folder stays public.",
+      "evidence": [
+        {
+          "kind": "file_line",
+          "ref": "agents/kent-beck-persona.md:132",
+          "note": "The body directs memory writes to .claude/agent-memory/<name>/."
+        },
+        {
+          "kind": "principle",
+          "ref": "docs/reviews/CHORUS-PROJECT.md section 5",
+          "note": "Persona memory is public; records cite private material by reference only."
+        }
+      ],
+      "confidence_on_hand": "high",
+      "need_info": false,
+      "graded": true,
+      "convergence_notes": [
+        {
+          "persona": "eric-evans-advisor",
+          "pull_quote": "One name means one memory folder, whoever wrote the file behind it."
+        },
+        {
+          "persona": "alan-cooper-advisor",
+          "pull_quote": "Keeping the body also keeps the writes, and the recipe never says so."
+        },
+        {
+          "persona": "delivery-and-ops-advisor",
+          "pull_quote": "The retune does not change where findings get written, and the reader should know."
+        }
+      ]
+    },
+    {
+      "id": "F44",
+      "author": "security-and-trust-advisor",
+      "lens": "security",
+      "authored_severity": "🟢",
+      "locator": "install.sh:95-158",
+      "pull_quote": "The installer never reaches the copy, so the risk is staleness, not damage.",
+      "evidence": [
+        {
+          "kind": "file_line",
+          "ref": "install.sh:95-116",
+          "note": "Prune loop skips unrecorded paths and refuses paths outside CLAUDE_HOME."
+        },
+        {
+          "kind": "file_line",
+          "ref": "install.sh:134-158",
+          "note": "The differs-kept branch leaves edited files alone."
+        }
+      ],
+      "confidence_on_hand": "high",
+      "need_info": false,
+      "graded": true
+    },
+    {
+      "id": "F45",
+      "author": "security-and-trust-advisor",
+      "lens": "security",
+      "authored_severity": "🟡",
+      "locator": "specs/017-per-reviewer-run-settings/tasks.md:17",
+      "pull_quote": "Three sentences hold when no one maintains them; a checker does not.",
+      "evidence": [
+        {
+          "kind": "file_line",
+          "ref": "specs/017-per-reviewer-run-settings/tasks.md:17",
+          "note": "T003 is where the three sentences land."
+        },
+        {
+          "kind": "principle",
+          "ref": "Security poverty line (Nather), applied at gate #8: no countable maintainer capacity",
+          "note": "Price every control at no operator capacity."
+        }
+      ],
+      "confidence_on_hand": "high",
+      "need_info": false,
+      "graded": true,
+      "convergence_notes": [
+        {
+          "persona": "alan-cooper-advisor",
+          "pull_quote": "Plain sentences are the only control a stranger will actually see."
+        },
+        {
+          "persona": "delivery-and-ops-advisor",
+          "pull_quote": "Sentences survive neglect that a checker would not."
+        }
+      ]
+    },
+    {
+      "id": "R2-1",
+      "author": "eric-evans-advisor",
+      "lens": "DDD",
+      "authored_severity": "🟡",
+      "locator": "specs/017-per-reviewer-run-settings/spec.md:86-88",
+      "pull_quote": "In a per-project install there is no copy to make, only an edit the installer can undo.",
+      "evidence": [
+        {
+          "kind": "file_line",
+          "ref": "install.sh:21-22",
+          "note": "The per-project install target is the project's .claude, the same folder the recipe writes to."
+        },
+        {
+          "kind": "file_line",
+          "ref": "specs/017-per-reviewer-run-settings/spec.md:87",
+          "note": "FR-003 assumes a distinct copy beside a shipped file elsewhere."
+        }
+      ],
+      "confidence_on_hand": "high",
+      "need_info": false,
+      "graded": false,
+      "derived_from": "F32"
+    },
+    {
+      "id": "R2-11",
+      "author": "mark-richards-architect",
+      "lens": "architecture",
+      "authored_severity": "🟡",
+      "locator": "skill/chorus-review/SKILL.md:114-149",
+      "pull_quote": "The by-name dispatch the whole feature relies on is implied by the roster, not stated.",
+      "evidence": [
+        {
+          "kind": "file_line",
+          "ref": "skill/chorus-review/SKILL.md:114",
+          "note": "Dispatch rule names the Agent tool only."
+        },
+        {
+          "kind": "file_line",
+          "ref": "skill/chorus-review/SKILL.md:149",
+          "note": "The roster is defined as the persona agents in agents/."
+        }
+      ],
+      "confidence_on_hand": "high",
+      "need_info": false,
+      "graded": false,
+      "derived_from": "F13"
+    },
+    {
+      "id": "R2-12",
+      "author": "mark-richards-architect",
+      "lens": "architecture",
+      "authored_severity": "🟡",
+      "locator": "install.sh:21-117",
+      "pull_quote": "In a per-project install there is no override at all, only an edit of the installed file.",
+      "evidence": [
+        {
+          "kind": "file_line",
+          "ref": "install.sh:21-22",
+          "note": "Per-project install sets CLAUDE_HOME to the project's .claude."
+        },
+        {
+          "kind": "file_line",
+          "ref": "install.sh:37",
+          "note": "AGENTS_DST is $CLAUDE_HOME/agents."
+        },
+        {
+          "kind": "file_line",
+          "ref": "install.sh:115-117",
+          "note": "Unrecorded existing file is skipped; --force replaces it."
+        }
+      ],
+      "confidence_on_hand": "high",
+      "need_info": false,
+      "graded": false,
+      "derived_from": "F32"
+    },
+    {
+      "id": "R2-21",
+      "author": "alan-cooper-advisor",
+      "lens": "adversarial product",
+      "authored_severity": "🟡",
+      "locator": "agents/kent-beck-persona.md:132",
+      "pull_quote": "The body orders a write that the narrowed tools list forbids, and nobody hears about it.",
+      "evidence": [
+        {
+          "kind": "file_line",
+          "ref": "agents/kent-beck-persona.md:132",
+          "note": "Body orders a Write-tool memory write"
+        },
+        {
+          "kind": "file_line",
+          "ref": "agents/kent-beck-persona.md:6",
+          "note": "memory: project"
+        }
+      ],
+      "confidence_on_hand": "high",
+      "need_info": false,
+      "graded": false,
+      "derived_from": "F22"
+    },
+    {
+      "id": "R2-22",
+      "author": "alan-cooper-advisor",
+      "lens": "adversarial product",
+      "authored_severity": "🟡",
+      "locator": "install.sh:21-22",
+      "pull_quote": "The installer's own hint on a kept file is the command that erases the retune.",
+      "evidence": [
+        {
+          "kind": "file_line",
+          "ref": "install.sh:21",
+          "note": "Per-project install target"
+        },
+        {
+          "kind": "file_line",
+          "ref": "install.sh:111",
+          "note": "Hint recommends --force"
+        }
+      ],
+      "confidence_on_hand": "high",
+      "need_info": false,
+      "graded": false,
+      "derived_from": "F32"
+    },
+    {
+      "id": "R2-31",
+      "author": "delivery-and-ops-advisor",
+      "lens": "delivery and ops",
+      "authored_severity": "🟡",
+      "locator": "install.sh:21-22,37,83-118",
+      "pull_quote": "Only the per-project install can reach the copy, and only --force can destroy it.",
+      "evidence": [
+        {
+          "kind": "file_line",
+          "ref": "install.sh:116",
+          "note": "Unrecorded differing file: skip."
+        },
+        {
+          "kind": "file_line",
+          "ref": "install.sh:101",
+          "note": "--force overwrites regardless of record."
+        },
+        {
+          "kind": "file_line",
+          "ref": "install.sh:136",
+          "note": "Prune walks only manifest entries."
+        }
+      ],
+      "confidence_on_hand": "high",
+      "need_info": false,
+      "graded": false,
+      "derived_from": "F32"
+    },
+    {
+      "id": "R2-32",
+      "author": "delivery-and-ops-advisor",
+      "lens": "delivery and ops",
+      "authored_severity": "🟡",
+      "locator": "specs/017-per-reviewer-run-settings/spec.md:63,102",
+      "pull_quote": "Ten warnings are read as none; rank them and keep four.",
+      "evidence": [
+        {
+          "kind": "file_line",
+          "ref": "specs/017-per-reviewer-run-settings/spec.md:63",
+          "note": "US3 promises one short section."
+        },
+        {
+          "kind": "file_line",
+          "ref": "specs/017-per-reviewer-run-settings/spec.md:102",
+          "note": "SC-003 needs a reader to act from it alone."
+        }
+      ],
+      "confidence_on_hand": "high",
+      "need_info": false,
+      "graded": false,
+      "derived_from": "F45"
+    },
+    {
+      "id": "R2-33",
+      "author": "delivery-and-ops-advisor",
+      "lens": "delivery and ops",
+      "authored_severity": "🟡",
+      "locator": "scripts/check-suite-integrity.sh:201",
+      "pull_quote": "A diff needs two paths, and the recipe names neither.",
+      "evidence": [
+        {
+          "kind": "file_line",
+          "ref": "scripts/check-suite-integrity.sh:201",
+          "note": "The plugin manifest lists agents separately from install.sh."
+        },
+        {
+          "kind": "file_line",
+          "ref": "specs/017-per-reviewer-run-settings/tasks.md:13",
+          "note": "T001 says 'copy one shipped reviewer' without a source."
+        }
+      ],
+      "confidence_on_hand": "high",
+      "need_info": false,
+      "graded": false,
+      "derived_from": "F31"
+    },
+    {
+      "id": "R2-41",
+      "author": "security-and-trust-advisor",
+      "lens": "security",
+      "authored_severity": "🟡",
+      "locator": "install.sh:21-22,36,134-158",
+      "pull_quote": "My claim that the installer never reaches the copy fails when the install is per-project and --force is used.",
+      "evidence": [
+        {
+          "kind": "file_line",
+          "ref": "install.sh:21-22",
+          "note": "Per-project install sets CLAUDE_HOME=$PWD/.claude."
+        },
+        {
+          "kind": "file_line",
+          "ref": "install.sh:36",
+          "note": "AGENTS_DST is $CLAUDE_HOME/agents."
+        },
+        {
+          "kind": "file_line",
+          "ref": "install.sh:134-158",
+          "note": "Edited files are kept and unrecorded files are skipped, unless FORCE=1 applies."
+        },
+        {
+          "kind": "file_line",
+          "ref": "uninstall.sh:41-49",
+          "note": "Uninstall refuses paths outside CLAUDE_HOME and removes only recorded paths."
+        }
+      ],
+      "confidence_on_hand": "high",
+      "need_info": false,
+      "graded": false,
+      "derived_from": "F44"
+    },
+    {
+      "id": "R2-42",
+      "author": "security-and-trust-advisor",
+      "lens": "security",
+      "authored_severity": "🟡",
+      "locator": "specs/017-per-reviewer-run-settings/tasks.md:17",
+      "pull_quote": "A cloned repo can replace a trusted reviewer by giving a file the same name.",
+      "evidence": [
+        {
+          "kind": "file_line",
+          "ref": "specs/017-per-reviewer-run-settings/spec.md:55",
+          "note": "The acceptance scenario confirms the file sets the dispatched reviewer's tools."
+        }
+      ],
+      "confidence_on_hand": "high",
+      "need_info": false,
+      "graded": false,
+      "derived_from": "F42"
+    }
+  ],
+  "tally": [
+    {
+      "finding": "F1",
+      "authored_severity": "🟡",
+      "status": "held"
+    },
+    {
+      "finding": "F2",
+      "authored_severity": "🟢",
+      "status": "minority-report",
+      "n": 1,
+      "p": 0,
+      "c": 1,
+      "o": 0,
+      "final_severity": "🟢"
+    },
+    {
+      "finding": "F3",
+      "authored_severity": "🟢",
+      "status": "graded",
+      "n": 3,
+      "p": 0,
+      "c": 3,
+      "o": 0,
+      "net": 0,
+      "threshold": 1,
+      "movement": "agreed",
+      "final_severity": "🟢",
+      "convergence": 3,
+      "gating": false
+    },
+    {
+      "finding": "F11",
+      "authored_severity": "🟡",
+      "status": "graded",
+      "n": 4,
+      "p": 0,
+      "c": 4,
+      "o": 0,
+      "net": 0,
+      "threshold": 2,
+      "movement": "agreed",
+      "final_severity": "🟡",
+      "convergence": 4,
+      "gating": false
+    },
+    {
+      "finding": "F12",
+      "authored_severity": "🟡",
+      "status": "graded",
+      "n": 2,
+      "p": 1,
+      "c": 1,
+      "o": 0,
+      "net": 1,
+      "threshold": 1,
+      "movement": "escalate",
+      "final_severity": "🔴",
+      "convergence": 2,
+      "gating": true
+    },
+    {
+      "finding": "F13",
+      "authored_severity": "🟡",
+      "status": "held"
+    },
+    {
+      "finding": "F14",
+      "authored_severity": "🟢",
+      "status": "graded",
+      "n": 2,
+      "p": 0,
+      "c": 2,
+      "o": 0,
+      "net": 0,
+      "threshold": 1,
+      "movement": "agreed",
+      "final_severity": "🟢",
+      "convergence": 2,
+      "gating": false
+    },
+    {
+      "finding": "F15",
+      "authored_severity": "🟢",
+      "status": "graded",
+      "n": 2,
+      "p": 0,
+      "c": 1,
+      "o": 1,
+      "net": -1,
+      "threshold": 1,
+      "movement": "demote",
+      "final_severity": "dropped",
+      "convergence": 1,
+      "gating": false
+    },
+    {
+      "finding": "F16",
+      "authored_severity": "🟡",
+      "status": "graded",
+      "n": 3,
+      "p": 1,
+      "c": 2,
+      "o": 0,
+      "net": 1,
+      "threshold": 1,
+      "movement": "escalate",
+      "final_severity": "🔴",
+      "convergence": 3,
+      "gating": true
+    },
+    {
+      "finding": "F21",
+      "authored_severity": "🟡",
+      "status": "graded",
+      "n": 2,
+      "p": 0,
+      "c": 2,
+      "o": 0,
+      "net": 0,
+      "threshold": 1,
+      "movement": "agreed",
+      "final_severity": "🟡",
+      "convergence": 2,
+      "gating": false
+    },
+    {
+      "finding": "F22",
+      "authored_severity": "🟡",
+      "status": "held"
+    },
+    {
+      "finding": "F23",
+      "authored_severity": "🟡",
+      "status": "graded",
+      "n": 2,
+      "p": 0,
+      "c": 2,
+      "o": 0,
+      "net": 0,
+      "threshold": 1,
+      "movement": "agreed",
+      "final_severity": "🟡",
+      "convergence": 2,
+      "gating": false
+    },
+    {
+      "finding": "F24",
+      "authored_severity": "🟢",
+      "status": "minority-report",
+      "n": 1,
+      "p": 0,
+      "c": 1,
+      "o": 0,
+      "final_severity": "🟢"
+    },
+    {
+      "finding": "F31",
+      "authored_severity": "🟡",
+      "status": "minority-report",
+      "n": 1,
+      "p": 0,
+      "c": 1,
+      "o": 0,
+      "final_severity": "🟡"
+    },
+    {
+      "finding": "F32",
+      "authored_severity": "🟡",
+      "status": "graded",
+      "n": 4,
+      "p": 3,
+      "c": 1,
+      "o": 0,
+      "net": 3,
+      "threshold": 2,
+      "movement": "escalate",
+      "final_severity": "🔴",
+      "convergence": 4,
+      "gating": true
+    },
+    {
+      "finding": "F33",
+      "authored_severity": "🟡",
+      "status": "minority-report",
+      "n": 1,
+      "p": 0,
+      "c": 1,
+      "o": 0,
+      "final_severity": "🟡"
+    },
+    {
+      "finding": "F34",
+      "authored_severity": "🟡",
+      "status": "graded",
+      "n": 3,
+      "p": 0,
+      "c": 3,
+      "o": 0,
+      "net": 0,
+      "threshold": 1,
+      "movement": "agreed",
+      "final_severity": "🟡",
+      "convergence": 3,
+      "gating": false
+    },
+    {
+      "finding": "F35",
+      "authored_severity": "🟢",
+      "status": "minority-report",
+      "n": 1,
+      "p": 0,
+      "c": 1,
+      "o": 0,
+      "final_severity": "🟢"
+    },
+    {
+      "finding": "F36",
+      "authored_severity": "🟢",
+      "status": "graded",
+      "n": 3,
+      "p": 0,
+      "c": 3,
+      "o": 0,
+      "net": 0,
+      "threshold": 1,
+      "movement": "agreed",
+      "final_severity": "🟢",
+      "convergence": 3,
+      "gating": false
+    },
+    {
+      "finding": "F41",
+      "authored_severity": "🟡",
+      "status": "graded",
+      "n": 3,
+      "p": 0,
+      "c": 3,
+      "o": 0,
+      "net": 0,
+      "threshold": 1,
+      "movement": "agreed",
+      "final_severity": "🟡",
+      "convergence": 3,
+      "gating": false
+    },
+    {
+      "finding": "F42",
+      "authored_severity": "🟢",
+      "status": "graded",
+      "n": 2,
+      "p": 0,
+      "c": 2,
+      "o": 0,
+      "net": 0,
+      "threshold": 1,
+      "movement": "agreed",
+      "final_severity": "🟢",
+      "convergence": 2,
+      "gating": false
+    },
+    {
+      "finding": "F43",
+      "authored_severity": "🟡",
+      "status": "graded",
+      "n": 3,
+      "p": 0,
+      "c": 3,
+      "o": 0,
+      "net": 0,
+      "threshold": 1,
+      "movement": "agreed",
+      "final_severity": "🟡",
+      "convergence": 3,
+      "gating": false
+    },
+    {
+      "finding": "F44",
+      "authored_severity": "🟢",
+      "status": "graded",
+      "n": 4,
+      "p": 0,
+      "c": 0,
+      "o": 4,
+      "net": -4,
+      "threshold": 2,
+      "movement": "demote",
+      "final_severity": "dropped",
+      "convergence": 0,
+      "gating": false
+    },
+    {
+      "finding": "F45",
+      "authored_severity": "🟡",
+      "status": "graded",
+      "n": 2,
+      "p": 0,
+      "c": 2,
+      "o": 0,
+      "net": 0,
+      "threshold": 1,
+      "movement": "agreed",
+      "final_severity": "🟡",
+      "convergence": 2,
+      "gating": false
+    },
+    {
+      "finding": "R2-1",
+      "authored_severity": "🟡",
+      "status": "ungraded",
+      "final_severity": "🟡"
+    },
+    {
+      "finding": "R2-11",
+      "authored_severity": "🟡",
+      "status": "ungraded",
+      "final_severity": "🟡"
+    },
+    {
+      "finding": "R2-12",
+      "authored_severity": "🟡",
+      "status": "ungraded",
+      "final_severity": "🟡"
+    },
+    {
+      "finding": "R2-21",
+      "authored_severity": "🟡",
+      "status": "ungraded",
+      "final_severity": "🟡"
+    },
+    {
+      "finding": "R2-22",
+      "authored_severity": "🟡",
+      "status": "ungraded",
+      "final_severity": "🟡"
+    },
+    {
+      "finding": "R2-31",
+      "authored_severity": "🟡",
+      "status": "ungraded",
+      "final_severity": "🟡"
+    },
+    {
+      "finding": "R2-32",
+      "authored_severity": "🟡",
+      "status": "ungraded",
+      "final_severity": "🟡"
+    },
+    {
+      "finding": "R2-33",
+      "authored_severity": "🟡",
+      "status": "ungraded",
+      "final_severity": "🟡"
+    },
+    {
+      "finding": "R2-41",
+      "authored_severity": "🟡",
+      "status": "ungraded",
+      "final_severity": "🟡"
+    },
+    {
+      "finding": "R2-42",
+      "authored_severity": "🟡",
+      "status": "ungraded",
+      "final_severity": "🟡"
+    }
+  ],
+  "conflicts": [
+    {
+      "id": "C1",
+      "advisors": [
+        "mark-richards-architect",
+        "delivery-and-ops-advisor"
+      ],
+      "disputed": "Whether the trade (no config layer, in exchange for forks the installer never refreshes) needs an architecture decision record, or whether the spec Clarifications already hold it; an ADR is one more file nobody maintains.",
+      "outcome": "unresolved",
+      "findings": [
+        "F15"
+      ]
+    },
+    {
+      "id": "C2",
+      "advisors": [
+        "delivery-and-ops-advisor",
+        "security-and-trust-advisor",
+        "alan-cooper-advisor"
+      ],
+      "disputed": "How many sentences the README section may carry: one lens wants the section capped at the recipe plus four ranked bullets, while others each ask for their own sentence (privileged keys, committed copies, public memory, tools minimum, record silence); a newcomer who reads fewer warnings sees fewer of the safety ones.",
+      "outcome": "unresolved",
+      "findings": [
+        "R2-32",
+        "F45"
+      ]
+    }
+  ],
+  "top_five": [
+    {
+      "rank": 1,
+      "finding": "F32",
+      "pull_quote": "The one flag that overwrites the copy lives in the same directory the copy lives in.",
+      "locator": "install.sh:21-22,101",
+      "final_severity": "🔴",
+      "cost": "low",
+      "value": "Stops a per-project install with --force from silently erasing a reviewer retune; one README sentence, no code.",
+      "convergence": 4
+    },
+    {
+      "rank": 2,
+      "finding": "F16",
+      "pull_quote": "Stamp the version in the copy, and the fork can at least tell you how old it is.",
+      "locator": "specs/017-per-reviewer-run-settings/spec.md:86-88",
+      "final_severity": "🔴",
+      "cost": "low",
+      "value": "A shipped-version stamp in the reason comment gives every copy an owner, a reason and a cheap age signal; zero chorus code.",
+      "convergence": 3
+    },
+    {
+      "rank": 3,
+      "finding": "F12",
+      "pull_quote": "Silent staleness is paid for later, by someone who no longer remembers the copy exists.",
+      "locator": "specs/017-per-reviewer-run-settings/plan.md:56-62",
+      "final_severity": "🔴",
+      "cost": "low",
+      "value": "Naming the symptom (validation failures after an update: check your copy first) gives a newcomer a recovery path.",
+      "convergence": 2,
+      "arbiter_note": "Escalated at exactly net = T on two voters (side-note)."
+    },
+    {
+      "rank": 4,
+      "finding": "F11",
+      "pull_quote": "A sanctioned copy without a drift detector is a fork with a better story.",
+      "locator": "specs/017-per-reviewer-run-settings/spec.md:74",
+      "final_severity": "🟡",
+      "cost": "low",
+      "value": "Rules the copy a sanctioned divergence with an owner, a reason and a manual drift check; four of four voters agree.",
+      "convergence": 4
+    },
+    {
+      "rank": 5,
+      "finding": "F41",
+      "pull_quote": "The copy changes who the file is trusted as, and the recipe does not say so.",
+      "locator": "specs/017-per-reviewer-run-settings/spec.md:87-90",
+      "final_severity": "🟡",
+      "cost": "low",
+      "value": "One sentence that hooks, mcpServers and permissionMode run with the user's authority in a project-level copy.",
+      "convergence": 3
+    }
+  ],
+  "held": [
+    {
+      "finding": "F1",
+      "reasons": [
+        {
+          "raiser": "eric-evans-advisor",
+          "reason": "I have not checked how Claude Code scopes 'memory: project' when a project-level file shadows a plugin file of the same name.",
+          "stage": "author"
+        },
+        {
+          "raiser": "alan-cooper-advisor",
+          "reason": "Held; host memory scoping unchecked.",
+          "stage": "vote"
+        }
+      ],
+      "route": "operator",
+      "decision_ref": "phase2-need-info-routing-1"
+    },
+    {
+      "finding": "F13",
+      "reasons": [
+        {
+          "raiser": "mark-richards-architect",
+          "reason": "I did not read how the Round brief names the agent beyond SKILL.md line 135.",
+          "stage": "author"
+        },
+        {
+          "raiser": "alan-cooper-advisor",
+          "reason": "Held; canon dispatch wording is outside my lens.",
+          "stage": "vote"
+        }
+      ],
+      "route": "peer"
+    },
+    {
+      "finding": "F22",
+      "reasons": [
+        {
+          "raiser": "alan-cooper-advisor",
+          "reason": "I did not verify which tools a persona's reply and memory writes actually need on the host.",
+          "stage": "author"
+        }
+      ],
+      "route": "peer"
+    }
+  ],
+  "baseline": {
+    "assume_closed": [
+      "F44 installer-never-reaches-the-copy (dropped, corrected by its author in R2-41)"
+    ],
+    "in_progress": [
+      "F32 per-project install and --force",
+      "F16 shipped-version stamp in the reason comment",
+      "F12 name the staleness symptom"
+    ],
+    "re_evaluate": [
+      "F1 memory scoping under shadowing, once the host doc is read",
+      "F13 and R2-11 whether dispatch by agent name needs a stated sentence",
+      "F22 and R2-21 minimum tools list",
+      "C1 ADR or not; C2 README length"
+    ]
+  },
+  "appendix": [
+    {
+      "persona": "eric-evans-advisor",
+      "reports": [
+        "docs/reviews/2026-10-12-spec017-reports/r1-evans.json",
+        "docs/reviews/2026-10-12-spec017-reports/r2-evans.json"
+      ]
+    },
+    {
+      "persona": "mark-richards-architect",
+      "reports": [
+        "docs/reviews/2026-10-12-spec017-reports/r1-richards.json",
+        "docs/reviews/2026-10-12-spec017-reports/r2-richards.json"
+      ]
+    },
+    {
+      "persona": "alan-cooper-advisor",
+      "reports": [
+        "docs/reviews/2026-10-12-spec017-reports/r1-cooper.json",
+        "docs/reviews/2026-10-12-spec017-reports/r2-cooper.json"
+      ]
+    },
+    {
+      "persona": "delivery-and-ops-advisor",
+      "reports": [
+        "docs/reviews/2026-10-12-spec017-reports/r1-dops.json",
+        "docs/reviews/2026-10-12-spec017-reports/r2-dops.json"
+      ]
+    },
+    {
+      "persona": "security-and-trust-advisor",
+      "reports": [
+        "docs/reviews/2026-10-12-spec017-reports/r1-security.json",
+        "docs/reviews/2026-10-12-spec017-reports/r2-security.json"
+      ]
+    }
+  ],
+  "side_notes": [
+    {
+      "regime": "threshold-boundary",
+      "note": "F12 and F16 were escalated to 🔴 at net = 1 with a threshold of 1, on two and three voters; F32 escalated clearly (net 3, threshold 2).",
+      "findings": [
+        "F12",
+        "F16"
+      ]
+    },
+    {
+      "regime": "missing-beneficiary-lens",
+      "note": "The human-centred-design lens (Norman) joined but was not seated at the cap of five; the newcomer reader was carried by Cooper alone."
+    },
+    {
+      "regime": "other",
+      "note": "Beck, Uncle Bob and Goldratt also joined and were not seated; an async override is possible. Five findings with a single non-author voter are listed as minority reports: F2, F24, F31, F33, F35 (F31 is the delivery lens's own top recommendation).",
+      "findings": [
+        "F2",
+        "F24",
+        "F31",
+        "F33",
+        "F35"
+      ]
+    }
+  ],
+  "seating_decision": "phase05-seating-tie-1",
+  "decisions": [
+    {
+      "id": "phase05-seating-tie-1",
+      "point": "RSVP seating tie at the cap",
+      "catalog_row": 2,
+      "band": "🟡",
+      "title": "Who takes the fifth seat when six lenses tie",
+      "problem": "Nine lenses joined and the cap is five; Delivery-and-Ops and Security cited three deltas each, six others cited two, so the tie spans the fifth seat.",
+      "sensor": {
+        "signal": "tie at the cap boundary",
+        "evidence": [
+          "roster"
+        ],
+        "reading": "🟡: recorded default panel by roster order, async override"
+      },
+      "evidence": [
+        {
+          "kind": "document",
+          "ref": "docs/reviews/CHORUS-PROJECT.md",
+          "note": "The addendum holds the standing panel order."
+        }
+      ],
+      "solutions": [
+        {
+          "id": "roster-order",
+          "label": "Seat the first tied lenses in roster order",
+          "recommended": true,
+          "reversible": true,
+          "summary": "Evans, Richards and Cooper take the remaining seats with Delivery-and-Ops and Security.",
+          "cost": {
+            "work": "None.",
+            "risk": "Norman, Beck, Uncle Bob and Goldratt are not heard this round."
+          }
+        },
+        {
+          "id": "seat-norman",
+          "label": "Swap in the human-centred-design lens for one seat",
+          "reversible": true,
+          "summary": "A newcomer-reader lens joins, at the price of one of the DDD, architecture or adversarial lenses.",
+          "cost": {
+            "work": "A re-run of the round."
+          }
+        }
+      ],
+      "resolution": "default-applied",
+      "override": {
+        "how": "Name the lens to swap in and re-run the round.",
+        "cost": "One more round of dispatches."
+      },
+      "status": "open"
+    },
+    {
+      "id": "phase2-need-info-routing-1",
+      "point": "NEED_INFO resolution routing",
+      "catalog_row": 14,
+      "band": "🟡",
+      "title": "How the host scopes memory for a shadowed reviewer",
+      "problem": "Finding F1 cannot be graded until someone reads how Claude Code scopes the memory folder when a project agent file shadows a plugin one of the same name.",
+      "sensor": {
+        "signal": "open NEED_INFO with confidence_on_hand low",
+        "evidence": [
+          "register F1"
+        ],
+        "reading": "operator path: no seated persona holds the host fact"
+      },
+      "evidence": [
+        {
+          "kind": "document",
+          "ref": "specs/017-per-reviewer-run-settings/spec.md:74-76",
+          "note": "The finding concerns the same-name shadowing."
+        }
+      ],
+      "solutions": [
+        {
+          "id": "read-host-doc",
+          "label": "Read the host sub-agent documentation on memory scope",
+          "recommended": true,
+          "reversible": true,
+          "summary": "The finding stays held until the fact is read; then Evans revises or confirms it.",
+          "cost": {
+            "work": "One document read."
+          }
+        },
+        {
+          "id": "accept-as-is",
+          "label": "Leave the finding held and cite it as open in the spec",
+          "reversible": true,
+          "summary": "The round proceeds; the README carries the public-memory sentence regardless.",
+          "cost": {
+            "work": "None.",
+            "risk": "The scoping stays unverified."
+          }
+        }
+      ],
+      "resolution": "default-applied",
+      "override": {
+        "how": "Ask for the host document to be read now.",
+        "cost": "One lookup."
+      },
+      "status": "open"
+    }
+  ],
+  "local_rulings": [
+    {
+      "id": "R-1",
+      "created": "2026-10-12T00:00Z",
+      "updated": "2026-10-12T00:00Z",
+      "about": "What maintainer capacity can controls proposed against this repository count on?",
+      "said": "Impossible to say: it's an open repo.",
+      "source": "chat, 2026-10-12 (exploratory-phase interview)"
+    },
+    {
+      "id": "R-2",
+      "created": "2026-10-12T00:00Z",
+      "updated": "2026-10-12T00:00Z",
+      "about": "Who retunes a reviewer for one project: operators of this repository, or newcomers?",
+      "said": "Both, a small number overall.",
+      "source": "chat, 2026-10-12 (exploratory-phase interview)"
+    }
+  ]
+}
