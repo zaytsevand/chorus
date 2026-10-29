@@ -20,6 +20,12 @@ Breaking: `conduct.mjs` exit codes changed, the `coryphaeus` skill is folded int
   of its own; findings at the same locator are grouped (`co_authors`); held
   findings are revised in one dispatch and re-voted on one ballot; an
   unresolved conflict becomes an open decision (catalog row 15).
+- **Rules live in the engine.** S11 routing, revision, the S10 gate wait, the
+  post-evidence quorum check and the failure rule (`unseat`) are pure engine
+  functions with unit tests; the sequencer (`replayGate`) only orders phases and
+  never edits engine output. A joiner the seat cap left out is marked `capped`.
+  Self-audit rows and gate names are keyed by name; the speckit skills a
+  lifecycle may run are a registry list.
 - **`coryphaeus` folded into `chorus-core`** (schema, validator, renderer,
   provider bindings in `BINDINGS.md` and `bin/bindings.mjs`).
 - **Installer.** Refuses Node below 20; recognises copies from before the

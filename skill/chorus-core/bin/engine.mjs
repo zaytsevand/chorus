@@ -7,8 +7,8 @@
  */
 
 import {
-  FINAL_SEVERITY, NEED_INFO_STAGE, GATE, GATE_RESULT, MOVEMENT, RSVP, SEAT, SEATING_BAND,
-  SEVERITY, SEVERITY_LADDER, SIDE_NOTE, TALLY_STATUS, VOTE,
+  FINAL_SEVERITY, NEED_INFO_STAGE, GATE, GATE_RESULT, HELD_ROUTE, MOVEMENT, RSVP, SEAT, SEATING_BAND,
+  SEVERITY, SEVERITY_LADDER, SIDE_NOTE, SPECKIT, TALLY_STATUS, VOTE,
 } from "./vocab.mjs";
 
 /** Ordinary seats per board (DECISION-PRIMITIVE.md § Seating). */
@@ -61,6 +61,7 @@ export function seat(replies) {
     seatedJoins = sorted.slice(0, SEAT_CAP);
   }
   const ordinary = new Set(seatedJoins.map((r) => r.persona));
+  for (const r of rows) if (r.decision === RSVP.JOIN && !ordinary.has(r.persona)) r.capped = true;
   const deltas = new Set();
   for (const r of rows) {
     if (r.decision === RSVP.JOIN && ordinary.has(r.persona)) Object.assign(r, { seated: true, seat: SEAT.ORDINARY });
@@ -74,6 +75,31 @@ export function seat(replies) {
 
 /** Whether a board may proceed (I3): J ≥ 3. */
 export const quorate = (joiners) => joiners >= QUORUM;
+
+/**
+ * The one failure rule (CONDUCTOR.md § Ports): a seated persona that fails counts
+ * as ABSTAIN, its reason recorded, its seat given up and never refilled. Returns new rows.
+ */
+export function unseat(rows, persona, failure) {
+  return rows.map((r) => {
+    if (r.persona !== persona) return r;
+    const { seat: _seat, ...rest } = r;
+    return { ...rest, decision: RSVP.ABSTAIN, failure: failure.failure, reason: failure.reason, seated: false };
+  });
+}
+
+/** I3 after the evidence check (chorus-review Phase 1 post): fewer than QUORUM authors left aborts the board. */
+export const quorateAfterEvidence = (authors) => authors >= QUORUM;
+
+/**
+ * S10: where one author's round stands. reply: its validated finding-report, or
+ * undefined; answered: whether the operator answered that round's gate questions.
+ * → "final" (findings count), "ask" (the round waits on the operator), "next" (re-author at round + 1).
+ */
+export function gateWait(reply, answered) {
+  if (!reply.gate_questions?.length) return "final";
+  return answered ? "next" : "ask";
+}
 
 /* ── Register (GATE-PRIMITIVE.md § Stage 2, I8) ──────────────────────────── */
 
@@ -125,6 +151,34 @@ export function register(reports) {
 
 /** Every persona who authored an entry: its author and any co-author (none of them votes on it, S8). */
 export const authorsOf = (e) => [e.author, ...(e.co_authors ?? []).map((c) => c.persona)];
+
+/**
+ * S11 routing for one held finding (GATE-PRIMITIVE.md § S11, catalog row 14).
+ * Peers are the active personas that neither authored the finding nor raised the
+ * flag; the peer path comes first, then the operator. provisions: this finding's
+ * logged provision answers, oldest first.
+ * → { ask: route, peers } while a provision is outstanding, else
+ *   { route, supplied } with supplied the provision that closed the gap, or null.
+ */
+export function provisionRoute(entry, reasons, active, provisions) {
+  const raisers = new Set(reasons.map((x) => x.raiser));
+  const peers = active.filter((p) => !authorsOf(entry).includes(p) && !raisers.has(p));
+  const last = (route) => provisions.filter((x) => x.route === route).at(-1);
+  const peer = last(HELD_ROUTE.PEER), op = last(HELD_ROUTE.OPERATOR);
+  if (peers.length && !peer) return { ask: HELD_ROUTE.PEER, peers };
+  if (peer?.supplied) return { route: HELD_ROUTE.PEER, supplied: peer };
+  if (!op) return { ask: HELD_ROUTE.OPERATOR, peers };
+  return { route: HELD_ROUTE.OPERATOR, supplied: op.supplied ? op : null };
+}
+
+/** S11: an author's revised finding applied to its register entry. Returns a new entry; the flag is cleared. */
+export function applyRevision(entry, revised) {
+  const { need_info_reasons: _r, unsupported: _u, ...rest } = entry;
+  const e = { ...rest, authored_severity: revised.proposed_severity, locator: revised.locator, pull_quote: revised.pull_quote,
+    evidence: revised.evidence ?? [], confidence_on_hand: revised.confidence_on_hand, need_info: false };
+  if (!e.evidence.length) e.unsupported = true;
+  return e;
+}
 
 /** Register R2- derived findings from vote reports (Round 2): ungraded, never voted. */
 export function registerDerived(entries, reports) {
@@ -213,10 +267,10 @@ export function gateOutcome(cycle, gating) {
 
 /** The speckit cascade that incorporates a gate's 🔴 (chorus-sdlc § Incorporation loop, S5). */
 export const CASCADE = Object.freeze({
-  [GATE.A]: ["speckit-clarify", "speckit-plan"],
-  [GATE.B]: ["speckit-clarify", "speckit-plan", "speckit-tasks"],
-  [GATE.C]: ["speckit-clarify", "speckit-implement"],
+  [GATE.A]: [SPECKIT.SPECKIT_CLARIFY, SPECKIT.SPECKIT_PLAN],
+  [GATE.B]: [SPECKIT.SPECKIT_CLARIFY, SPECKIT.SPECKIT_PLAN, SPECKIT.SPECKIT_TASKS],
+  [GATE.C]: [SPECKIT.SPECKIT_CLARIFY, SPECKIT.SPECKIT_IMPLEMENT],
 });
 
 /** What a lifecycle runs before each gate (chorus-sdlc § The pipeline). */
-export const BEFORE_GATE = Object.freeze({ [GATE.A]: "speckit-plan", [GATE.B]: "speckit-tasks", [GATE.C]: "speckit-implement" });
+export const BEFORE_GATE = Object.freeze({ [GATE.A]: SPECKIT.SPECKIT_PLAN, [GATE.B]: SPECKIT.SPECKIT_TASKS, [GATE.C]: SPECKIT.SPECKIT_IMPLEMENT });

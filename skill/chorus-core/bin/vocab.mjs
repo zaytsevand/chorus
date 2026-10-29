@@ -61,6 +61,8 @@ export const PHASE = named("phase");
 export const ACTION = named("action");
 export const EVENT = named("event");
 export const TOPIC = named("answer_topic");
+export const SDLC_RULE = named("sdlc_rule");
+export const SPECKIT = named("speckit_skill");
 /** exit meaning → process exit code (x-codes), e.g. EXIT.NOT_ASKED === 4. */
 export const EXIT = Object.freeze(Object.fromEntries(DEFS.exit.enum.map((m) => [codeName(m), DEFS.exit["x-codes"][m]])));
 
@@ -68,8 +70,8 @@ export const EXIT = Object.freeze(Object.fromEntries(DEFS.exit.enum.map((m) => [
 export const LENS_OF = Object.freeze({ ...DEFS.roster["x-lens"] });
 export const OPTIONAL_LENSES = Object.freeze([...DEFS.roster["x-optional"]]);
 
-/** gate id → gate name, paired by position in the registry. */
-export const GATE_NAME_OF = Object.freeze(Object.fromEntries(VOCAB.gate.map((g, i) => [g, VOCAB.gate_name[i]])));
+/** gate id → gate name, by key (vocab gate.x-name). */
+export const GATE_NAME_OF = Object.freeze({ ...DEFS.gate["x-name"] });
 
 /** Severity ladder, low to high: index arithmetic for one-level moves. */
 export const SEVERITY_LADDER = Object.freeze([SEVERITY.GREEN, SEVERITY.YELLOW, SEVERITY.RED]);

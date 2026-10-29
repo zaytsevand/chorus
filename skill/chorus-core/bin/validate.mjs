@@ -408,7 +408,7 @@ class Semantics {
     });
     if (ordinary > SEAT_CAP) this.err(path, `${ordinary} ordinary seats; the cap is ${SEAT_CAP}`, "DECISION-PRIMITIVE.md § Seating");
     const joins = (roster ?? []).filter((r) => r.decision === RSVP.JOIN);
-    if (joins.length <= SEAT_CAP) joins.forEach((r) => { if (r.seated === false) this.err(path, `"${r.persona}" joined but is not seated`, `${QUORUM} ≤ J ≤ ${SEAT_CAP} seats every joiner`); });
+    if (joins.length <= SEAT_CAP) joins.forEach((r) => { if (r.seated === false && !r.capped) this.err(path, `"${r.persona}" joined but is not seated`, `${QUORUM} ≤ J ≤ ${SEAT_CAP} seats every joiner`); });
     return { seated, joiners: joins.length };
   }
 }

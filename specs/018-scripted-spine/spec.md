@@ -192,7 +192,8 @@ determinism test replays the same log twice and compares bytes.
 - If more than five join and a seated joiner later fails (author or vote), the
   out-seated JOIN rows remain while the final JOIN count can drop to five; the
   validator's "joined but not seated" rule then fires. The script and the rule
-  disagree only in that corner.
+  disagree only in that corner. (Resolved 2026-10-29: seat() marks a joiner the
+  cap left out as `capped`, and the rule exempts it.)
 - S11 resolution makes one provision attempt per route; a re-vote that raises
   NEED_INFO again leaves the finding held. (Resolved 2026-10-29: held findings
   are now revised in one dispatch and re-voted on one ballot.)

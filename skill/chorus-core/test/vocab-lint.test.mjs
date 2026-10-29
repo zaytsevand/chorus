@@ -50,7 +50,9 @@ test("every registry vocabulary is a non-empty list of unique strings with uniqu
     assert.equal(new Set(names).size, names.length, `${name}: two members share a code name`);
     for (const n of names) assert.match(n, /^[A-Z][A-Z0-9_]*$/, `${name}: "${n}" is not a usable code name; add x-names`);
   }
-  assert.equal(VOCAB.gate.length, VOCAB.gate_name.length, "gate and gate_name pair by position");
+  const nameOf = vocab.gate["x-name"];
+  assert.deepEqual(Object.keys(nameOf).sort(), [...VOCAB.gate].sort(), "every gate has exactly one name in gate.x-name");
+  assert.deepEqual(Object.values(nameOf).sort(), [...VOCAB.gate_name].sort(), "every gate_name is used once");
 });
 
 /* ── code: no hand-rolled vocabulary literals in bin/ ────────────────────── */

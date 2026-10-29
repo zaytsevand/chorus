@@ -362,3 +362,12 @@ test("review: an unresolved conflict is carried to the decision sink", () => {
   assert.equal(rec.decisions.find((d) => d.id === "conflict-1").status, "open");
   assert.equal(validate(rec.kind, rec).warnings?.length ?? 0, 0, "no 'not carried to the decision sink' warning");
 });
+
+test("review: six join, a seated one fails twice; the capped joiner stays out and the record validates", () => {
+  const run = newRun(RUN_MODE.REVIEW, { roster: ROSTER6 });
+  const seatedFails = ROSTER6[0];
+  drive(run, { author: (p, a) => (p === seatedFails ? { ...report(p, a, [finding()]), tool_uses: 0 } : report(p, a, [finding({ locator: `src/${p}.py:1` })])) });
+  const rec = valid(assemble(run.log));
+  assert.equal(rec.roster.find((r) => r.persona === seatedFails).decision, RSVP.ABSTAIN);
+  assert.equal(rec.roster.filter((r) => r.capped).length, 1, "the joiner the cap left out is marked, not seated in its place");
+});

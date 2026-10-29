@@ -31,13 +31,13 @@ import { existsSync, readFileSync, readdirSync, realpathSync, renameSync, writeF
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import {
-  ACTION, CONFIDENCE, CONFLICT_OUTCOME, DECISION_EVIDENCE, EXIT, DECISION_RESOLUTION, DECISION_STATUS, EVENT, FAILURE, GATE, GATE_NAME_OF,
+  ACTION, CONFIDENCE, CONFLICT_OUTCOME, SDLC_RULE, DECISION_EVIDENCE, EXIT, DECISION_RESOLUTION, DECISION_STATUS, EVENT, FAILURE, GATE, GATE_NAME_OF,
   GATE_QUORUM, GATE_RESULT, HELD_ROUTE, LENS_OF, OPTIONAL_LENSES, PHASE, RECORD_KIND, RECOVERY, RED_DISPOSITION,
   REVIEW_MODE, REVIEW_QUORUM, RSVP, RUN_MODE, SCOPE, SDLC_MODE, SDLC_STATUS, SEAT, SEATING_BAND, SEVERITY, TALLY_STATUS,
   TOPIC, VOCAB, VOTE,
 } from "./vocab.mjs";
 import {
-  BEFORE_GATE, CASCADE, CYCLE_BOUND, QUORUM, RETRIES, SEAT_CAP, authorsOf, ballot, count, gateOutcome, gatingSet, quorate, rankable,
+  BEFORE_GATE, CASCADE, CYCLE_BOUND, QUORUM, RETRIES, SEAT_CAP, applyRevision, authorsOf, ballot, gateWait, provisionRoute, quorateAfterEvidence, unseat, count, gateOutcome, gatingSet, quorate, rankable,
   register, registerDerived, seat, sideNotes,
 } from "./engine.mjs";
 import { SCHEMA_MAJOR, conforms, validate } from "./validate.mjs";
@@ -131,7 +131,7 @@ function rsvpRow(rosterRow, reply, abst) {
  * Run one board as far as the log allows. Returns { action } while work is
  * outstanding, else { board } with everything the record needs.
  */
-function board(log, ctx) {
+function replayGate(log, ctx) {
   const evs = log.events.filter(sameCtx(ctx));
   const roster = log.header.roster;
   const recoveries = [];
@@ -154,17 +154,13 @@ function board(log, ctx) {
     for (const [p, s] of g2.abstained) abst.set(p, s);
     seating = seat(rowsNow());
   }
-  const rows = seating.rows;
+  let rows = seating.rows;
   const quorum = !quorate(seating.joiners) ? REVIEW_QUORUM.ABORTED : reasked ? REVIEW_QUORUM.RE_ASKED_PROCEED : REVIEW_QUORUM.PROCEED;
   const base = { rows, seating, quorum, recoveries, evs };
-  if (quorum === REVIEW_QUORUM.ABORTED) return { board: { ...base, aborted: true, entries: [], tally: [], held: [], notes: [] } };
+  if (quorum === REVIEW_QUORUM.ABORTED) return { board: { ...base, rows, aborted: true, entries: [], tally: [], held: [], notes: [] } };
 
   const seated = rows.filter((r) => r.seated).map((r) => r.persona);
-  const drop = (persona, s) => {
-    const row = rows.find((r) => r.persona === persona);
-    Object.assign(row, { decision: RSVP.ABSTAIN, failure: s.failure, reason: s.reason, seated: false });
-    delete row.seat;
-  };
+  const drop = (persona, s) => { rows = unseat(rows, persona, s); };
 
   // Phase 0.7 — exploratory phase: each seated persona builds its understanding (free-form, acked).
   const ge = group(evs, PHASE.EXPLORE, seated.map((p) => ({ persona: p })));
@@ -191,11 +187,9 @@ function board(log, ctx) {
       }
       if (s.st === RETRYING) { retr.push({ persona: p, round: r, reason: s.reason }); break; }
       if (s.st === ABSTAINED) { drop(p, s); break; }
-      if (s.reply.gate_questions?.length) {
-        const answered = answersOf(evs, TOPIC.GATE_ANSWERS).some((x) => x.persona === p && x.round === r);
-        if (!answered) { asks.push(...s.reply.gate_questions.map((q) => ({ persona: p, round: r, ...q }))); break; }
-        continue;
-      }
+      const wait = gateWait(s.reply, answersOf(evs, TOPIC.GATE_ANSWERS).some((x) => x.persona === p && x.round === r));
+      if (wait === "ask") { asks.push(...s.reply.gate_questions.map((q) => ({ persona: p, round: r, ...q }))); break; }
+      if (wait === "next") continue;
       finals.set(p, s.reply);
       break;
     }
@@ -207,7 +201,7 @@ function board(log, ctx) {
       rule: "S10: blocking questions; at most four per AskUserQuestion call; the round waits. Answer one persona's round at a time." } };
   }
   active = active.filter((p) => finals.has(p));
-  if (active.length < QUORUM) return { board: { ...base, aborted: true, entries: [], tally: [], held: [], notes: [], afterEvidence: true } };
+  if (!quorateAfterEvidence(active.length)) return { board: { ...base, rows, aborted: true, entries: [], tally: [], held: [], notes: [], afterEvidence: true } };
 
   let entries = register(active.map((p) => ({ persona: p, findings: finals.get(p).findings }))).map((x) => x.entry);
 
@@ -227,22 +221,16 @@ function board(log, ctx) {
     const f = row.finding;
     const e = entries.find((x) => x.id === f);
     const reasons = [...(e.need_info_reasons ?? []), ...(first.raised.get(f) ?? [])];
-    const raisers = new Set(reasons.map((x) => x.raiser));
-    const peers = active.filter((p) => !authorsOf(e).includes(p) && !raisers.has(p));
-    const prov = answersOf(evs, TOPIC.PROVISION).filter((x) => x.finding === f);
-    const peer = prov.filter((x) => x.route === HELD_ROUTE.PEER).at(-1);
-    const op = prov.filter((x) => x.route === HELD_ROUTE.OPERATOR).at(-1);
+    const rt = provisionRoute(e, reasons, active, answersOf(evs, TOPIC.PROVISION).filter((x) => x.finding === f));
     const supply = (route) => ({ action: { action: route === HELD_ROUTE.PEER ? ACTION.PROVIDE : ACTION.ASK_OPERATOR, phase: PHASE.NEED_INFO, ...ctxOf(ctx),
-      topic: TOPIC.PROVISION, finding: f, route, reasons, ...(route === HELD_ROUTE.PEER ? { peers } : {}),
+      topic: TOPIC.PROVISION, finding: f, route, reasons, ...(route === HELD_ROUTE.PEER ? { peers: rt.peers } : {}),
       rule: "S11: route, never resolve. Relay the reasons verbatim; record what was supplied, or supplied: false. Held findings are provisioned one after another before any revision is dispatched, so operator questions can go out together." } });
-    if (peers.length && !peer) return supply(HELD_ROUTE.PEER);
-    let got = peer?.supplied ? peer : null;
-    routes.set(f, { route: got ? HELD_ROUTE.PEER : HELD_ROUTE.OPERATOR, reasons });
-    if (!got) {
-      if (!op) return supply(HELD_ROUTE.OPERATOR);
-      got = op.supplied ? op : null;
+    if (rt.ask) {
+      if (rt.ask === HELD_ROUTE.OPERATOR) routes.set(f, { route: HELD_ROUTE.OPERATOR, reasons });
+      return supply(rt.ask);
     }
-    if (got) supplied.set(f, got);
+    routes.set(f, { route: rt.route, reasons });
+    if (rt.supplied) supplied.set(f, rt.supplied);
   }
   const revAsks = [], revRetries = [], released = [];
   for (const [f, got] of supplied) {
@@ -255,11 +243,11 @@ function board(log, ctx) {
   a = outstanding({ pending: revAsks, retries: revRetries }, PHASE.NEED_INFO, ctx,
     { rule: "each author revises or confirms its held finding, one finding-report per finding holding exactly that finding" });
   if (a) return { action: a };
-  for (const [e, revised] of released) {
-    Object.assign(e, { authored_severity: revised.proposed_severity, locator: revised.locator, pull_quote: revised.pull_quote,
-      evidence: revised.evidence, confidence_on_hand: revised.confidence_on_hand, need_info: false });
-    delete e.need_info_reasons;
-    if (!e.evidence.length) e.unsupported = true;
+  for (let i = 0; i < released.length; i++) {
+    const [e, revised] = released[i];
+    const next = applyRevision(e, revised);
+    entries = entries.map((x) => (x === e ? next : x));
+    released[i] = [next, revised];
   }
   if (released.length) {
     const ids = released.map(([e]) => e.id);
@@ -283,7 +271,7 @@ function board(log, ctx) {
     return { finding: r.finding, reasons: e.need_info_reasons, route: routes.get(r.finding)?.route ?? HELD_ROUTE.OPERATOR };
   });
   const notes = sideNotes(final.rows, rows.filter((r) => r.seated));
-  return { board: { ...base, active, finals, voteReplies: gv.replies, entries, tally: final.rows, held, notes } };
+  return { board: { ...base, rows, active, finals, voteReplies: gv.replies, entries, tally: final.rows, held, notes } };
 }
 
 const publicEntry = (e) => ({ id: e.id, author: e.author, lens: e.lens, authored_severity: e.authored_severity, locator: e.locator, pull_quote: e.pull_quote, ...(e.co_authors ? { co_authors: e.co_authors } : {}) });
@@ -296,7 +284,7 @@ export function derive(log) {
 }
 
 function deriveReview(log) {
-  const b = board(log, {});
+  const b = replayGate(log, {});
   if (b.action) return { action: b.action };
   const B = b.board;
   if (B.aborted) return { action: { action: ACTION.DONE, aborted: true, reason: B.afterEvidence ? `fewer than ${QUORUM} joiners passed the evidence check` : `fewer than ${QUORUM} joiners after one re-ask (I3)` }, board: B };
@@ -338,7 +326,7 @@ function deriveLifecycle(log) {
     }
     for (let cycle = 1; cycle <= CYCLE_BOUND; cycle++) {
       const ctx = { gate, cycle };
-      const b = board(log, ctx);
+      const b = replayGate(log, ctx);
       if (b.action) return { action: b.action, cycles };
       const B = b.board;
       const entry = { gate, cycle, board: B };
@@ -452,11 +440,11 @@ function selfHealDecision(gate, cycle, gating, incorporated, date) {
     problem: `The tally left ${gating.join(", ")} gating at cycle ${cycle} of ${CYCLE_BOUND}; below the bound the default is to incorporate through speckit and re-run the gate.`,
     sensor: { signal: "cycle < 3 (DECISION-PRIMITIVE.md § The self-heal loop)", evidence: gating, reading: `cycle ${cycle}` },
     evidence: gating.map((f) => ({ kind: DECISION_EVIDENCE.FINDING, ref: f })),
-    solutions: [{ id: "incorporate", label: "Incorporate and re-run", recommended: true, summary: incorporated.detail, cost: { work: incorporated.skills.join(" → ") } },
+    solutions: [{ id: "incorporate-and-rerun", label: "Incorporate and re-run", recommended: true, summary: incorporated.detail, cost: { work: incorporated.skills.join(" → ") } },
       { id: "waive", label: "Waive", summary: "The operator waives the 🔴 with a recorded rationale.", cost: { work: "an operator ruling", risk: "a real concern ships" } }],
     resolution: DECISION_RESOLUTION.IN_PROGRESS, cycle,
     override: { how: "Rule a waiver for the finding instead; the gate passes on the ruling.", cost: "the concern ships unresolved" },
-    status: DECISION_STATUS.COMPLETE, decision: { chose: "incorporate", date },
+    status: DECISION_STATUS.COMPLETE, decision: { chose: "incorporate-and-rerun", date },
   };
 }
 
@@ -575,19 +563,18 @@ function selfAudit(log, d) {
   const heldCounted = d.cycles.flatMap((c) => c.board.tally.filter((r) => r.status === TALLY_STATUS.HELD && r.final_severity !== undefined));
   const gateQs = answersOf(evs, TOPIC.GATE_ANSWERS).length;
   const ownVotes = d.cycles.flatMap((c) => [...(c.board.voteReplies ?? new Map())].flatMap(([p, rep]) => rep.votes.filter((v) => c.board.entries.find((e) => e.id === v.finding)?.author === p)));
-  const rule = VOCAB.sdlc_rule;
   return [
-    { rule: rule[0], pass: true, evidence: `${incorporations.length} incorporation(s), each through a speckit cascade; the conductor authored no artefact.` },
-    { rule: rule[1], pass: rsvpPerGate, evidence: `RSVP logged at each of ${gates.size} gate cycle(s).` },
-    { rule: rule[2], pass: d.cycles.every((c) => c.board.rows.filter((r) => r.seat === SEAT.ORDINARY).length <= SEAT_CAP), evidence: "Seated by engine.seat(): cap of five ordinary seats, exceptional entries by distinct cited delta." },
-    { rule: rule[3], pass: passedOpen.length === 0, evidence: passedOpen.length ? `passed with open 🔴 at ${passedOpen.map((c) => `${c.gate}#${c.cycle}`).join(", ")}` : "No gate passed with a gating 🔴." },
-    { rule: rule[4], pass: incorporations.every((x) => x.skills.every((s) => s.startsWith("speckit-"))), evidence: "Every incorporation ran speckit skills only." },
-    { rule: rule[5], pass: unsupportedCounted.length === 0, evidence: "Findings without evidence were registered unsupported and left out of the count." },
-    { rule: rule[6], pass: maxCycle <= CYCLE_BOUND, evidence: `Most cycles at one gate: ${maxCycle} of ${CYCLE_BOUND}.` },
-    { rule: rule[7], pass: ownVotes.length === 0, evidence: "Every ballot excluded the voter's own findings; no own-finding vote was logged." },
-    { rule: rule[8], pass: true, evidence: "Every counted vote is a logged, validated vote-report from a dispatched persona." },
-    { rule: rule[9], pass: true, evidence: `${gateQs} gate-question answer(s) from the operator; no finding was authored past an open gate.` },
-    { rule: rule[10], pass: heldCounted.length === 0, evidence: "Held findings carry no post-tally severity." },
+    { rule: SDLC_RULE.S1, pass: true, evidence: `${incorporations.length} incorporation(s), each through a speckit cascade; the conductor authored no artefact.` },
+    { rule: SDLC_RULE.S2, pass: rsvpPerGate, evidence: `RSVP logged at each of ${gates.size} gate cycle(s).` },
+    { rule: SDLC_RULE.S3, pass: d.cycles.every((c) => c.board.rows.filter((r) => r.seat === SEAT.ORDINARY).length <= SEAT_CAP), evidence: "Seated by engine.seat(): cap of five ordinary seats, exceptional entries by distinct cited delta." },
+    { rule: SDLC_RULE.S4, pass: passedOpen.length === 0, evidence: passedOpen.length ? `passed with open 🔴 at ${passedOpen.map((c) => `${c.gate}#${c.cycle}`).join(", ")}` : "No gate passed with a gating 🔴." },
+    { rule: SDLC_RULE.S5, pass: incorporations.every((x) => x.skills.every((s) => VOCAB.speckit_skill.includes(s))), evidence: "Every incorporation ran speckit skills only." },
+    { rule: SDLC_RULE.S6, pass: unsupportedCounted.length === 0, evidence: "Findings without evidence were registered unsupported and left out of the count." },
+    { rule: SDLC_RULE.S7, pass: maxCycle <= CYCLE_BOUND, evidence: `Most cycles at one gate: ${maxCycle} of ${CYCLE_BOUND}.` },
+    { rule: SDLC_RULE.S8, pass: ownVotes.length === 0, evidence: "Every ballot excluded the voter's own findings; no own-finding vote was logged." },
+    { rule: SDLC_RULE.S9, pass: true, evidence: "Every counted vote is a logged, validated vote-report from a dispatched persona." },
+    { rule: SDLC_RULE.S10, pass: true, evidence: `${gateQs} gate-question answer(s) from the operator; no finding was authored past an open gate.` },
+    { rule: SDLC_RULE.S11, pass: heldCounted.length === 0, evidence: "Held findings carry no post-tally severity." },
   ];
 }
 
@@ -748,7 +735,7 @@ function flags(argv) {
 
 const readJson = (f) => JSON.parse(readFileSync(f, "utf8"));
 const today = () => new Date().toISOString().slice(0, 10);
-const text = (v) => (v?.startsWith("@") ? readFileSync(v.slice(1), "utf8").trim() : v);
+const argOrFile = (v) => (v?.startsWith("@") ? readFileSync(v.slice(1), "utf8").trim() : v);
 
 function usage(msg) {
   if (msg) process.stderr.write(`${msg}\n`);
@@ -763,7 +750,7 @@ function main(argv) {
     const mode = f._[0];
     if (!VOCAB.run_mode.includes(mode)) usage(`init needs a mode: ${VOCAB.run_mode.join(", ")}`);
     const date = f.date ?? today();
-    const opts = { date, target: f.target, feature: f.feature, pr: f.pr, python: f.python, context: text(f.context),
+    const opts = { date, target: f.target, feature: f.feature, pr: f.pr, python: f.python, context: argOrFile(f.context),
       roster: f.roster?.split(",").filter(Boolean), corpus: f.corpus?.split(",").filter(Boolean), bindings: bindings().block };
     if (mode === RUN_MODE.SDLC) {
       if (!f.feature) usage("init sdlc needs --feature");
@@ -772,7 +759,7 @@ function main(argv) {
       if (!f.target) usage(`init ${mode} needs --target`);
       if (mode === RUN_MODE.REVIEW && !opts.context) usage("init review needs --context (the round's concrete deltas)");
       opts.dir = f.dir ?? "docs/reviews";
-      opts.stem = freeStem(opts.dir, `${date}-chorus-${mode === RUN_MODE.REVIEW ? "review" : "challenge"}${f.pr ? `-pr${f.pr}` : ""}`);
+      opts.stem = freeStem(opts.dir, `${date}-chorus-${mode}${f.pr ? `-pr${f.pr}` : ""}`);
     }
     let log;
     try { log = initLog(mode, opts); } catch (e) { process.stderr.write(`init refused, nothing written:\n${e.message}\n`); return EXIT.BAD_INIT; }

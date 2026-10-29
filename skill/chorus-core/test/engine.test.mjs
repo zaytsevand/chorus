@@ -1,7 +1,9 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { ballot, count, gateOutcome, quorate, rankable, register, seat, sideNotes, tally } from "../bin/engine.mjs";
-import { FINAL_SEVERITY, GATE_RESULT, MOVEMENT, RSVP, SEAT, SEATING_BAND, SEVERITY, SIDE_NOTE, TALLY_STATUS, VOTE } from "../bin/vocab.mjs";
+import * as engine from "../bin/engine.mjs";
+import { applyRevision, ballot, count, gateOutcome, gateWait, provisionRoute, quorate, quorateAfterEvidence, rankable, register, seat, sideNotes, tally, unseat } from "../bin/engine.mjs";
+import { readFileSync } from "node:fs";
+import { FAILURE, FINAL_SEVERITY, GATE_RESULT, HELD_ROUTE, MOVEMENT, RSVP, SEAT, SEATING_BAND, SEVERITY, SIDE_NOTE, TALLY_STATUS, VOTE } from "../bin/vocab.mjs";
 
 const { RED, YELLOW, GREEN } = SEVERITY;
 const join = (persona, applies = 1, stakes = YELLOW) => ({ persona, decision: RSVP.JOIN, applies: Array.from({ length: applies }, (_, i) => `delta ${i}`), expected: stakes });
@@ -142,4 +144,56 @@ test("gate outcome: pass when nothing gates, self-heal below the bound, bound-re
   assert.equal(gateOutcome(1, []), GATE_RESULT.PASS);
   assert.equal(gateOutcome(2, ["F1"]), GATE_RESULT.SELF_HEAL);
   assert.equal(gateOutcome(3, ["F1"]), GATE_RESULT.BOUND_REACHED);
+});
+
+/* ── rules extracted from the sequencer (S10, S11, I3, the failure rule) ── */
+
+test("S11: peers first (not an author, not a raiser), then the operator", () => {
+  const e = { id: "F1", author: "a", co_authors: [{ persona: "b" }] };
+  const reasons = [{ raiser: "c" }];
+  assert.deepEqual(provisionRoute(e, reasons, ["a", "b", "c", "d"], []), { ask: HELD_ROUTE.PEER, peers: ["d"] });
+  const peerNo = { route: HELD_ROUTE.PEER, supplied: false };
+  assert.equal(provisionRoute(e, reasons, ["a", "b", "c", "d"], [peerNo]).ask, HELD_ROUTE.OPERATOR);
+  const peerYes = { route: HELD_ROUTE.PEER, supplied: true, note: "10k rows" };
+  assert.deepEqual(provisionRoute(e, reasons, ["a", "b", "c", "d"], [peerYes]), { route: HELD_ROUTE.PEER, supplied: peerYes });
+  assert.equal(provisionRoute(e, reasons, ["a", "b", "c"], []).ask, HELD_ROUTE.OPERATOR, "no peer left: straight to the operator");
+  const opNo = { route: HELD_ROUTE.OPERATOR, supplied: false };
+  assert.deepEqual(provisionRoute(e, reasons, ["a", "b", "c"], [opNo]), { route: HELD_ROUTE.OPERATOR, supplied: null });
+});
+
+test("S11: a revision returns a new entry, clears the flag, and marks evidence-free revisions unsupported", () => {
+  const e = { id: "F1", author: "a", authored_severity: YELLOW, locator: "a.py:1", pull_quote: "old", evidence: [{ kind: "file_line", ref: "a.py:1" }], need_info: true, need_info_reasons: [{ raiser: "a" }], graded: true };
+  const next = applyRevision(e, { proposed_severity: GREEN, locator: "a.py:2", pull_quote: "new", evidence: [], confidence_on_hand: "high" });
+  assert.equal(e.pull_quote, "old", "the original entry is untouched");
+  assert.deepEqual([next.authored_severity, next.locator, next.need_info, next.need_info_reasons, next.unsupported], [GREEN, "a.py:2", false, undefined, true]);
+});
+
+test("S10: an author round with gate questions waits until answered, then re-authors", () => {
+  assert.equal(gateWait({ findings: [] }, false), "final");
+  assert.equal(gateWait({ gate_questions: [{ need: "n", question: "q?" }] }, false), "ask");
+  assert.equal(gateWait({ gate_questions: [{ need: "n", question: "q?" }] }, true), "next");
+});
+
+test("I3 after evidence, and the failure rule: unseat returns new rows and never refills the seat", () => {
+  assert.equal(quorateAfterEvidence(2), false);
+  assert.equal(quorateAfterEvidence(3), true);
+  const rows = [{ persona: "a", decision: RSVP.JOIN, seated: true, seat: SEAT.ORDINARY }, { persona: "b", decision: RSVP.JOIN, seated: false, capped: true }];
+  const out = unseat(rows, "a", { failure: FAILURE.SILENT, reason: "no reply" });
+  assert.equal(rows[0].seated, true, "input untouched");
+  assert.deepEqual([out[0].decision, out[0].seated, out[0].seat, out[0].failure], [RSVP.ABSTAIN, false, undefined, FAILURE.SILENT]);
+  assert.equal(out[1].seated, false, "the capped joiner is not seated in its place");
+});
+
+test("seat marks joiners the cap left out as capped", () => {
+  const rows = ["a", "b", "c", "d", "e", "f"].map((p, i) => ({ persona: p, decision: RSVP.JOIN, applies: Array(6 - i).fill("d"), expected: "🟡" }));
+  const s = seat(rows);
+  assert.deepEqual(s.rows.filter((r) => r.capped).map((r) => r.persona), ["f"]);
+});
+
+test("every rule the conductor loop names has its engine export", () => {
+  const loop = readFileSync(new URL("../CONDUCTOR.md", import.meta.url), "utf8");
+  assert.match(loop, /### The conductor loop/);
+  for (const name of ["seat", "quorate", "unseat", "ballot", "provisionRoute", "applyRevision", "count", "tally", "gateOutcome", "gateWait", "quorateAfterEvidence", "sideNotes"]) {
+    assert.equal(typeof engine[name], "function", `engine.mjs exports ${name}`);
+  }
 });

@@ -184,6 +184,7 @@
         "reason": { "type": "string", "minLength": 3, "description": "One-line reason, or the failure-rule reason (not installed, silent, past budget, malformed, over-length, no evidence)." },
         "failure": { "$ref": "vocab.schema.json#/$defs/failure", "description": "Set when the persona counts as ABSTAIN under the one failure rule, after its one automatic retry also failed (not-installed has no retry)." },
         "seated": { "type": "boolean", "description": "Whether the persona holds a seat on this board." },
+        "capped": { "type": "boolean", "description": "true: a JOIN the seat cap left unseated (DECISION-PRIMITIVE.md § Seating). It stays unseated when a seated persona later fails; no substitute lens." },
         "seat": { "$ref": "vocab.schema.json#/$defs/seat", "description": "Seat kind, when seated." }
       },
       "allOf": [
