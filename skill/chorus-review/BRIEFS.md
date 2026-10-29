@@ -61,7 +61,9 @@ reports must understand each entry alone.
   by the two S11 paths (peer or operator provision; the orchestrator routes and
   never invents).
 - **Duplicates** are grouped under one entry **only when they cite the same
-  locator**; each author and each author's severity is kept on the entry.
+  locator**; each author and each author's severity is kept on the entry
+  (`co_authors`), the entry is counted at its most severe author's proposal, and
+  no author of it votes on it. `conduct.mjs` does the grouping.
 - Under each finding, list converging lenses, each with its **own** verbatim
   Round-2 note: *which lenses and in whose words*, not a bare count.
 

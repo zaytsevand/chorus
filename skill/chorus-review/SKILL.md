@@ -208,7 +208,9 @@ reply and revisit at next cadence. Record joiners and abstainers under
 
 The mechanic is `chorus-core/EXPLORATORY-PHASE.md`. The conductor owns the
 interview in resumable sessions of ≤ 5 questions; advisors never interview
-directly. Persisted memory is an index of locators, never a finding's evidence —
+directly. `conduct.mjs` asks for it as an `interview` step once every seated
+persona has acknowledged exploration, and refuses an answer that leaves a
+`[gate]` question unanswered. Persisted memory is an index of locators, never a finding's evidence —
 findings re-ground in the live source. Abstainers skip this phase.
 
 ### Phase 1 — Round 1 (joiners only)

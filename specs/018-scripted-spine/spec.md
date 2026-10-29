@@ -193,8 +193,9 @@ determinism test replays the same log twice and compares bytes.
   out-seated JOIN rows remain while the final JOIN count can drop to five; the
   validator's "joined but not seated" rule then fires. The script and the rule
   disagree only in that corner.
-- S11 resolution runs one held finding at a time, and one provision attempt per
-  route; a re-vote that raises NEED_INFO again leaves the finding held.
+- S11 resolution makes one provision attempt per route; a re-vote that raises
+  NEED_INFO again leaves the finding held. (Resolved 2026-10-29: held findings
+  are now revised in one dispatch and re-voted on one ballot.)
 - The self-audit's S1, S9 and S10 rows pass by construction of the loop (the
   script authors nothing and counts only logged, validated votes); they are not
   independent evidence that the calling session never hand-edited an artefact.

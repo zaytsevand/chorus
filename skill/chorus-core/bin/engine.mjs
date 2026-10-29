@@ -86,6 +86,22 @@ export function register(reports) {
   const out = [];
   for (const rep of reports) {
     for (const f of rep.findings ?? []) {
+      // BRIEFS.md § Findings register: duplicates group only when they cite the same locator.
+      const same = out.find((x) => x.entry.locator === f.locator && x.entry.author !== rep.persona && !x.entry.co_authors?.some((c) => c.persona === rep.persona));
+      if (same) {
+        const e = same.entry;
+        (e.co_authors ??= []).push({ persona: rep.persona, lens: f.lens, authored_severity: f.proposed_severity, pull_quote: f.pull_quote });
+        // The entry is counted at its most severe author's proposal; every author's own stays on the entry.
+        if (SEVERITY_LADDER.indexOf(f.proposed_severity) > SEVERITY_LADDER.indexOf(e.authored_severity)) e.authored_severity = f.proposed_severity;
+        e.evidence = e.evidence.concat(f.evidence ?? []);
+        if (e.evidence.length) delete e.unsupported;
+        if (f.need_info === true) {
+          e.need_info = true;
+          (e.need_info_reasons ??= []).push({ raiser: rep.persona, reason: f.need_info_reason, stage: NEED_INFO_STAGE.AUTHOR });
+        }
+        same.sources.push({ persona: rep.persona, source: f.id });
+        continue;
+      }
       const e = {
         id: `F${out.length + 1}`,
         author: rep.persona,
@@ -101,11 +117,14 @@ export function register(reports) {
       if (!e.evidence.length) e.unsupported = true;
       if (e.need_info) e.need_info_reasons = [{ raiser: rep.persona, reason: f.need_info_reason, stage: NEED_INFO_STAGE.AUTHOR }];
       if (f.scope !== undefined) e.scope = f.scope;
-      out.push({ entry: e, source: f.id, claim: f.claim });
+      out.push({ entry: e, source: f.id, claim: f.claim, sources: [{ persona: rep.persona, source: f.id }] });
     }
   }
   return out;
 }
+
+/** Every persona who authored an entry: its author and any co-author (none of them votes on it, S8). */
+export const authorsOf = (e) => [e.author, ...(e.co_authors ?? []).map((c) => c.persona)];
 
 /** Register R2- derived findings from vote reports (Round 2): ungraded, never voted. */
 export function registerDerived(entries, reports) {
@@ -125,7 +144,7 @@ export function registerDerived(entries, reports) {
 }
 
 /** Findings a voter may vote on: supported, graded, not its own (S8, I8). */
-export const ballot = (entries, voter) => entries.filter((e) => e.author !== voter && !e.unsupported && e.graded);
+export const ballot = (entries, voter) => entries.filter((e) => !authorsOf(e).includes(voter) && !e.unsupported && e.graded);
 
 /* ── Count (GATE-PRIMITIVE.md § Stage 3–4, settled cases) ────────────────── */
 
@@ -142,7 +161,7 @@ export function count(entries, votes) {
   for (const e of entries) {
     if (e.unsupported) continue;
     if (!e.graded) { rows.push({ finding: e.id, authored_severity: e.authored_severity, status: TALLY_STATUS.UNGRADED, final_severity: e.authored_severity }); continue; }
-    const mine = votes.filter((v) => v.finding === e.id && v.voter !== e.author);
+    const mine = votes.filter((v) => v.finding === e.id && !authorsOf(e).includes(v.voter));
     const needs = mine.filter((v) => v.vote === VOTE.NEED_INFO);
     if (needs.length) raised.set(e.id, needs.map((v) => ({ raiser: v.voter, reason: v.reason, stage: NEED_INFO_STAGE.VOTE })));
     if (e.need_info || needs.length) { rows.push({ finding: e.id, authored_severity: e.authored_severity, status: TALLY_STATUS.HELD }); continue; }

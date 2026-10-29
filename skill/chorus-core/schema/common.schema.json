@@ -214,6 +214,7 @@
         "derived_from": { "$ref": "#/$defs/finding_id", "description": "R2- only: the finding it was derived from." },
         "scope": { "$ref": "vocab.schema.json#/$defs/scope", "description": "Gate A only: premise or within-frame, as confirmed by the vote." },
         "parked": { "type": "boolean", "description": "Gate A only: a within-frame finding parked from the premise pass." },
+        "co_authors": { "type": "array", "description": "Other personas who raised a finding at the same locator, grouped under this entry (BRIEFS.md § Findings register); each keeps its own severity and quote, and none of them votes on it (S8).", "items": { "type": "object", "additionalProperties": false, "required": ["persona", "lens", "authored_severity", "pull_quote"], "properties": { "persona": { "$ref": "#/$defs/persona", "description": "The co-author." }, "lens": { "$ref": "#/$defs/lens", "description": "Its lens." }, "authored_severity": { "$ref": "#/$defs/severity", "description": "Its own proposed severity." }, "pull_quote": { "$ref": "#/$defs/pull_quote", "description": "Its own marked span, verbatim." } } } },
         "convergence_notes": {
           "type": "array",
           "description": "Converging lenses, each in its own Round-2 words.",

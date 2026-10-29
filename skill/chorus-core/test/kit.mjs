@@ -58,8 +58,9 @@ export const DEFAULT = {
   author: (persona, action) => report(persona, action, [finding({ locator: `src/${persona}.py:1`, evidence: [{ kind: EVIDENCE_KIND.FILE_LINE, ref: `src/${persona}.py:1` }] })]),
   vote: (persona, action, ask) => votes(persona, action, ask.ballot.map((f) => [f, VOTE.CONFIRM])),
   revise: (persona, action, ask) => report(persona, action, [finding({ need_info: false })]),
-  revote: (persona, action, ask) => votes(persona, action, [[ask.finding, VOTE.CONFIRM]]),
+  revote: (persona, action, ask) => votes(persona, action, ask.ballot.map((f) => [f, VOTE.CONFIRM])),
   answers: {
+    [TOPIC.INTERVIEW]: () => ({ sessions: 0, questions: [] }),
     [TOPIC.GATE_ANSWERS]: (a) => { const q = a.questions[0]; return { persona: q.persona, round: q.round, answers: a.questions.filter((x) => x.persona === q.persona && x.round === q.round).map((x) => ({ question: x.question, answer: "Internal tool, ten users." })) }; },
     [TOPIC.PROVISION]: (a) => ({ finding: a.finding, route: a.route, supplied: true, ...(a.peers ? { by: a.peers[0] } : {}), note: "Exports are capped at 10k rows by the spec." }),
     [TOPIC.CONFLICTS]: () => [],

@@ -31,13 +31,13 @@ import { existsSync, readFileSync, readdirSync, realpathSync, renameSync, writeF
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import {
-  ACTION, CONFIDENCE, DECISION_EVIDENCE, EXIT, DECISION_RESOLUTION, DECISION_STATUS, EVENT, FAILURE, GATE, GATE_NAME_OF,
+  ACTION, CONFIDENCE, CONFLICT_OUTCOME, DECISION_EVIDENCE, EXIT, DECISION_RESOLUTION, DECISION_STATUS, EVENT, FAILURE, GATE, GATE_NAME_OF,
   GATE_QUORUM, GATE_RESULT, HELD_ROUTE, LENS_OF, OPTIONAL_LENSES, PHASE, RECORD_KIND, RECOVERY, RED_DISPOSITION,
   REVIEW_MODE, REVIEW_QUORUM, RSVP, RUN_MODE, SCOPE, SDLC_MODE, SDLC_STATUS, SEAT, SEATING_BAND, SEVERITY, TALLY_STATUS,
   TOPIC, VOCAB, VOTE,
 } from "./vocab.mjs";
 import {
-  BEFORE_GATE, CASCADE, CYCLE_BOUND, QUORUM, RETRIES, SEAT_CAP, ballot, count, gateOutcome, gatingSet, quorate, rankable,
+  BEFORE_GATE, CASCADE, CYCLE_BOUND, QUORUM, RETRIES, SEAT_CAP, authorsOf, ballot, count, gateOutcome, gatingSet, quorate, rankable,
   register, registerDerived, seat, sideNotes,
 } from "./engine.mjs";
 import { SCHEMA_MAJOR, conforms, validate } from "./validate.mjs";
@@ -61,6 +61,7 @@ const RUN = "run-log.schema.json#/$defs/";
 const ANSWER_SCHEMA = {
   [TOPIC.GATE_ANSWERS]: `${RUN}gate_answers`,
   [TOPIC.PROVISION]: `${RUN}provision`,
+  [TOPIC.INTERVIEW]: "review-record.schema.json#/properties/interview",
   [TOPIC.CONFLICTS]: "review-record.schema.json#/properties/conflicts",
   [TOPIC.RANKING]: `${RUN}ranking`,
   [TOPIC.SIGNOFF]: `${RUN}signoff`,
@@ -172,6 +173,12 @@ function board(log, ctx) {
   for (const [p, s] of ge.abstained) drop(p, s);
   let active = seated.filter((p) => !ge.abstained.has(p));
 
+  // EXPLORATORY-PHASE.md step 7: one batched, sessioned operator interview before anyone authors.
+  if (!lastAnswer(evs, TOPIC.INTERVIEW)) {
+    return { action: { action: ACTION.PROVIDE, phase: PHASE.EXPLORE, ...ctxOf(ctx), topic: TOPIC.INTERVIEW, personas: active,
+      rule: "EXPLORATORY-PHASE.md step 7: collect every seated persona's gap-questions, dedupe, and ask the operator in sessions of at most five (AskUserQuestion, at most four per call). Every [gate] question needs an answer; others may be deferred with a degradation note. Answer { sessions: 0, questions: [] } when nobody raised one." } };
+  }
+
   // Stage 2 — author, uncapped; an unmet gate returns its questions and the round waits (S10).
   const finals = new Map(), pend = [], retr = [], asks = [];
   for (const p of active) {
@@ -212,47 +219,56 @@ function board(log, ctx) {
   let votes = voters.flatMap((p) => gv.replies.get(p).votes.map((v) => ({ voter: p, ...v })));
   entries = entries.concat(registerDerived(entries, voters.map((p) => ({ persona: p, derived: gv.replies.get(p).derived }))).map((x) => x.entry));
 
-  // S11 — each held finding: peer provision, else operator; then the author revises and the others re-vote.
+  // S11, batched: provision for every held finding first (peer, else operator), then one
+  // dispatch of every revision, then one re-vote per voter on every released finding.
   const first = count(entries, votes);
-  const routes = new Map();
+  const routes = new Map(), supplied = new Map();
   for (const row of first.rows.filter((r) => r.status === TALLY_STATUS.HELD)) {
     const f = row.finding;
     const e = entries.find((x) => x.id === f);
-    const raisers = new Set([...(e.need_info_reasons ?? []), ...(first.raised.get(f) ?? [])].map((x) => x.raiser));
     const reasons = [...(e.need_info_reasons ?? []), ...(first.raised.get(f) ?? [])];
-    const peers = active.filter((p) => p !== e.author && !raisers.has(p));
+    const raisers = new Set(reasons.map((x) => x.raiser));
+    const peers = active.filter((p) => !authorsOf(e).includes(p) && !raisers.has(p));
     const prov = answersOf(evs, TOPIC.PROVISION).filter((x) => x.finding === f);
     const peer = prov.filter((x) => x.route === HELD_ROUTE.PEER).at(-1);
     const op = prov.filter((x) => x.route === HELD_ROUTE.OPERATOR).at(-1);
     const supply = (route) => ({ action: { action: route === HELD_ROUTE.PEER ? ACTION.PROVIDE : ACTION.ASK_OPERATOR, phase: PHASE.NEED_INFO, ...ctxOf(ctx),
       topic: TOPIC.PROVISION, finding: f, route, reasons, ...(route === HELD_ROUTE.PEER ? { peers } : {}),
-      rule: "S11: route, never resolve. Relay the reasons verbatim; record what was supplied, or supplied: false." } });
+      rule: "S11: route, never resolve. Relay the reasons verbatim; record what was supplied, or supplied: false. Held findings are provisioned one after another before any revision is dispatched, so operator questions can go out together." } });
     if (peers.length && !peer) return supply(HELD_ROUTE.PEER);
-    let supplied = peer?.supplied ? peer : null;
-    routes.set(f, { route: supplied ? HELD_ROUTE.PEER : HELD_ROUTE.OPERATOR, reasons });
-    if (!supplied) {
+    let got = peer?.supplied ? peer : null;
+    routes.set(f, { route: got ? HELD_ROUTE.PEER : HELD_ROUTE.OPERATOR, reasons });
+    if (!got) {
       if (!op) return supply(HELD_ROUTE.OPERATOR);
-      supplied = op.supplied ? op : null;
+      got = op.supplied ? op : null;
     }
-    if (!supplied) continue;
+    if (got) supplied.set(f, got);
+  }
+  const revAsks = [], revRetries = [], released = [];
+  for (const [f, got] of supplied) {
+    const e = entries.find((x) => x.id === f);
     const rev = status(evs, PHASE.NEED_INFO, e.author, 1, f);
-    if (rev.st === PENDING || rev.st === RETRYING) {
-      return { action: { action: rev.st === PENDING ? ACTION.DISPATCH : ACTION.RETRY, phase: PHASE.NEED_INFO, ...ctxOf(ctx),
-        asks: [{ kind: RECORD_KIND.FINDING_REPORT, persona: e.author, round: 1, finding: f, provision: supplied.note, ...(rev.reason ? { reason: rev.reason } : {}) }],
-        rule: "the author revises or confirms this one finding, in one finding-report holding exactly that finding" } };
-    }
-    if (rev.st === ABSTAINED) continue;
-    const revised = rev.reply.findings[0];
-    if (revised.need_info) continue;
+    if (rev.st === PENDING) revAsks.push({ persona: e.author, round: 1, finding: f, provision: got.note });
+    else if (rev.st === RETRYING) revRetries.push({ persona: e.author, round: 1, finding: f, provision: got.note, reason: rev.reason });
+    else if (rev.st === REPLIED && !rev.reply.findings[0].need_info) released.push([e, rev.reply.findings[0]]);
+  }
+  a = outstanding({ pending: revAsks, retries: revRetries }, PHASE.NEED_INFO, ctx,
+    { rule: "each author revises or confirms its held finding, one finding-report per finding holding exactly that finding" });
+  if (a) return { action: a };
+  for (const [e, revised] of released) {
     Object.assign(e, { authored_severity: revised.proposed_severity, locator: revised.locator, pull_quote: revised.pull_quote,
       evidence: revised.evidence, confidence_on_hand: revised.confidence_on_hand, need_info: false });
     delete e.need_info_reasons;
     if (!e.evidence.length) e.unsupported = true;
-    const gr = group(evs, PHASE.NEED_INFO, active.filter((p) => p !== e.author).map((p) => ({ persona: p, round: 2, finding: f, ballot: [f] })));
-    a = outstanding(gr, PHASE.NEED_INFO, ctx, { register: [publicEntry(e)] });
+  }
+  if (released.length) {
+    const ids = released.map(([e]) => e.id);
+    const voterBallot = (p) => released.filter(([e]) => !authorsOf(e).includes(p)).map(([e]) => e.id);
+    const gr = group(evs, PHASE.NEED_INFO, active.filter((p) => voterBallot(p).length).map((p) => ({ persona: p, round: 2, ballot: voterBallot(p) })));
+    a = outstanding(gr, PHASE.NEED_INFO, ctx, { register: released.map(([e]) => publicEntry(e)) });
     if (a) return { action: a };
-    votes = votes.filter((v) => v.finding !== f).concat([...gr.replies].flatMap(([p, rep]) => rep.votes.filter((v) => v.finding === f).map((v) => ({ voter: p, ...v }))));
-    routes.delete(f);
+    votes = votes.filter((v) => !ids.includes(v.finding)).concat([...gr.replies].flatMap(([p, rep]) => rep.votes.filter((v) => ids.includes(v.finding)).map((v) => ({ voter: p, ...v }))));
+    for (const f of ids) routes.delete(f);
   }
 
   // Stage 4 — the count.
@@ -270,7 +286,7 @@ function board(log, ctx) {
   return { board: { ...base, active, finals, voteReplies: gv.replies, entries, tally: final.rows, held, notes } };
 }
 
-const publicEntry = (e) => ({ id: e.id, author: e.author, lens: e.lens, authored_severity: e.authored_severity, locator: e.locator, pull_quote: e.pull_quote });
+const publicEntry = (e) => ({ id: e.id, author: e.author, lens: e.lens, authored_severity: e.authored_severity, locator: e.locator, pull_quote: e.pull_quote, ...(e.co_authors ? { co_authors: e.co_authors } : {}) });
 
 /* ── modes ───────────────────────────────────────────────────────────────── */
 
@@ -414,6 +430,21 @@ function seatingDecision(id, B, date) {
   };
 }
 
+/** An unresolved conflict, carried to the decision sink: counted severity stands unless the operator rules. */
+function conflictDecision(c) {
+  return {
+    id: `conflict-${c.id.slice(1)}`, point: "Unresolved conflict (Phase 3)", catalog_row: 15, band: SEVERITY.YELLOW,
+    title: `${c.id}: ${c.advisors.join(", ")} disagree on ${c.findings.join(", ")}`,
+    problem: c.disputed,
+    evidence: c.findings.map((f) => ({ kind: DECISION_EVIDENCE.FINDING, ref: f })),
+    solutions: [{ id: "counted-stands", label: "Let the counted severity stand", recommended: true, summary: "The vote's arithmetic stands; nothing changes in the ranking.", cost: { work: "none" } },
+      { id: "operator-rules", label: "Rule on the disagreement", summary: "The operator decides which reading holds; the ruling annotates the ranking.", cost: { work: "one operator ruling" } }],
+    resolution: DECISION_RESOLUTION.DEFAULT_APPLIED,
+    override: { how: "Rule on the conflict; the ruling annotates the ranking and never changes counted severity.", cost: "one operator ruling" },
+    status: DECISION_STATUS.OPEN,
+  };
+}
+
 function selfHealDecision(gate, cycle, gating, incorporated, date) {
   return {
     id: `${gate}-self-heal-${cycle}`, point: "Gating 🔴 finding", catalog_row: 5, band: SEVERITY.YELLOW,
@@ -435,6 +466,13 @@ function assembleReview(log) {
   const h = log.header, B = d.board;
   const decisions = [];
   if (B.seating.joiners > SEAT_CAP) decisions.push(seatingDecision("seating-1", B, h.date));
+  const conflicts = (d.conflicts ?? []).map((c) => {
+    if (c.outcome !== CONFLICT_OUTCOME.UNRESOLVED || c.decision_ref) return c;
+    const dec = conflictDecision(c);
+    decisions.push(dec);
+    return { ...c, decision_ref: dec.id };
+  });
+  const interview = lastAnswer(log.events, TOPIC.INTERVIEW);
   const byId = new Map(B.entries.map((e) => [e.id, e]));
   const tallyBy = new Map(B.tally.map((r) => [r.finding, r]));
   const quorum = { joiners: B.rows.filter((r) => r.decision === RSVP.JOIN).length,
@@ -447,10 +485,11 @@ function assembleReview(log) {
     tldr: d.signoff?.tldr ?? abortedTldr(B),
     roster: B.rows,
     quorum,
-    ...(decisions.length ? { seating_decision: decisions[0].id } : {}),
+    ...(B.seating.joiners > SEAT_CAP ? { seating_decision: decisions[0].id } : {}),
     register: B.entries,
     tally: B.tally,
-    conflicts: d.conflicts ?? [],
+    ...(interview ? { interview } : {}),
+    conflicts,
     top_five: (d.ranking ?? []).map((t, i) => {
       const e = byId.get(t.finding), r = tallyBy.get(t.finding);
       return { rank: i + 1, finding: t.finding, pull_quote: e?.pull_quote, locator: e?.locator, final_severity: r?.final_severity,
@@ -578,7 +617,7 @@ function contractErrors(action, ask, persona, data) {
       if (!allowed.has(v.finding)) errs.push(`votes on "${v.finding}", which is not on its ballot (S8: never its own finding; only supported, graded findings)`);
       if (v.confidence_on_hand === CONFIDENCE.LOW && v.vote !== VOTE.NEED_INFO) errs.push(`a low-confidence vote on "${v.finding}" must be NEED_INFO (S11)`);
     }
-    if (action.phase === PHASE.NEED_INFO && (data.votes.length !== 1 || data.derived.length)) errs.push("a re-vote holds exactly one vote, on the held finding, and derives nothing");
+    if (action.phase === PHASE.NEED_INFO && (data.votes.length !== ask.ballot.length || data.derived.length)) errs.push(`a re-vote holds one vote on each released finding (${ask.ballot.join(", ")}) and derives nothing`);
   }
   if (ask.kind === RECORD_KIND.FINDING_REPORT && action.phase === PHASE.NEED_INFO && data.findings.length !== 1) errs.push("a revision holds exactly the one held finding");
   return errs;
@@ -645,6 +684,14 @@ export function answer(file, log, topic, data) {
   const { action } = derive(log);
   if (action.topic !== topic) return { exit: EXIT.NOT_ASKED, message: `the current action does not ask for "${topic}"; it is ${action.action}${action.topic ? ` (${action.topic})` : ""}; run: ${action.topic ? `conduct answer ${file} ${action.topic} <data.json>` : `conduct next ${file}`}` };
   const errors = conforms(ANSWER_SCHEMA[topic], data);
+  if (topic === TOPIC.INTERVIEW && !errors.length) {
+    data.questions.forEach((q, i) => {
+      if (q.gate && (q.deferred || !q.answer)) errors.push({ path: `questions[${i}]`, message: "a [gate] question needs the operator's answer; the round waits (S10)" });
+      if (!q.gate && !q.answer && !q.deferred) errors.push({ path: `questions[${i}]`, message: "give the answer, or mark it deferred" });
+      if (!action.personas.includes(q.persona)) errors.push({ path: `questions[${i}].persona`, message: `${q.persona} is not seated` });
+    });
+    if (data.questions.some((q) => q.deferred) && !data.degradation) errors.push({ path: "degradation", message: "deferred answers need a degradation note" });
+  }
   if (topic === TOPIC.GATE_ANSWERS && !errors.length && !action.questions.some((q) => q.persona === data.persona && q.round === data.round)) {
     errors.push({ path: "persona", message: `no open gate questions from ${data.persona} at round ${data.round}` });
   }

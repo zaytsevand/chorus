@@ -365,7 +365,7 @@ conduct record <run.json>                       # writes <stem>.json and <stem>.
 |---|---|
 | `dispatch` / `retry` | dispatches each listed persona with the brief for that phase (and the retry reason), then runs the `command` each ask carries: `submit` for a reply, `ack` for a step with no reply (exploration) |
 | `ask-operator` | puts the question as a blocking choice (`AskUserQuestion`, at most four per call); the answer goes back through `answer` |
-| `provide` | supplies what only it can: conflicts framed for the arbiter, the top-five scores, the TL;DR and baseline, the premise-pass outcomes, a peer's provision, the memory update |
+| `provide` | supplies what only it can: the exploratory interview's outcome (`EXPLORATORY-PHASE.md` step 7), conflicts framed for the arbiter, the top-five scores, the TL;DR and baseline, the premise-pass outcomes, a peer's provision, the memory update |
 | `incorporate` / `run-skill` | runs the named speckit skills (S5), then reports with `answer` |
 | `done` / `halt` | runs `record`; on halt the record says what awaits the operator |
 

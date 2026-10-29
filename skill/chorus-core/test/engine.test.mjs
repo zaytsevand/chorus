@@ -48,16 +48,25 @@ test("quorum is three joiners", () => {
 const f = (over) => ({ id: "F1", lens: "l", locator: "a.py:1", claim: "a claim here", evidence: [{ kind: "file_line", ref: "a.py:1" }], proposed_severity: YELLOW, pull_quote: "a quote", confidence_on_hand: "high", need_info: false, ...over });
 
 test("register renumbers across personas and marks evidence-free findings unsupported (I8)", () => {
-  const r = register([{ persona: "a", findings: [f(), f({ evidence: [] })] }, { persona: "b", findings: [f()] }]).map((x) => x.entry);
+  const r = register([{ persona: "a", findings: [f(), f({ evidence: [] })] }, { persona: "b", findings: [f({ locator: "b.py:2" })] }]).map((x) => x.entry);
   assert.deepEqual(r.map((e) => e.id), ["F1", "F2", "F3"]);
   assert.equal(r[1].unsupported, true);
   assert.deepEqual(r.map((e) => e.author), ["a", "a", "b"]);
 });
 
 test("a ballot never holds the voter's own findings or unsupported ones (S8, I8)", () => {
-  const r = register([{ persona: "a", findings: [f(), f({ evidence: [] })] }, { persona: "b", findings: [f()] }]).map((x) => x.entry);
+  const r = register([{ persona: "a", findings: [f(), f({ evidence: [] })] }, { persona: "b", findings: [f({ locator: "b.py:2" })] }]).map((x) => x.entry);
   assert.deepEqual(ballot(r, "a").map((e) => e.id), ["F3"]);
   assert.deepEqual(ballot(r, "c").map((e) => e.id), ["F1", "F3"]);
+});
+
+test("findings at the same locator group under one entry; every author keeps its severity and none votes on it", () => {
+  const r = register([{ persona: "a", findings: [f()] }, { persona: "b", findings: [f({ proposed_severity: RED, pull_quote: "b's quote" })] }, { persona: "c", findings: [f({ locator: "c.py:3" })] }]).map((x) => x.entry);
+  assert.deepEqual(r.map((e) => e.id), ["F1", "F2"]);
+  assert.equal(r[0].author, "a");
+  assert.deepEqual(r[0].co_authors, [{ persona: "b", lens: "l", authored_severity: RED, pull_quote: "b's quote" }]);
+  assert.equal(r[0].authored_severity, RED, "counted at the most severe author's proposal");
+  assert.deepEqual(ballot(r, "b").map((e) => e.id), ["F2"], "a co-author never votes on the grouped entry (S8)");
 });
 
 /* ── the count (GATE-PRIMITIVE.md § Stage 4) ─────────────────────────────── */

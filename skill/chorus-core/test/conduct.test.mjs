@@ -4,7 +4,7 @@ import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { spawnSync } from "node:child_process";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { ack, assemble, derive, freeStem, submit } from "../bin/conduct.mjs";
+import { ack, answer, assemble, derive, freeStem, submit } from "../bin/conduct.mjs";
 import { validate } from "../bin/validate.mjs";
 import { ACTION, EXIT, FAILURE, GATE, GATE_RESULT, PHASE, RECOVERY, REVIEW_QUORUM, RSVP, RUN_MODE, SDLC_STATUS, SEVERITY, TALLY_STATUS, TOPIC, VOTE } from "../bin/vocab.mjs";
 import { ROSTER6, drive, finding, newRun, report, rsvp, votes } from "./kit.mjs";
@@ -22,7 +22,7 @@ const valid = (rec) => {
 test("review: the default round runs the phases in order and its record validates", () => {
   const run = newRun(RUN_MODE.REVIEW);
   const { transcript } = drive(run);
-  assert.deepEqual(steps(transcript), ["dispatch:rsvp", "dispatch:explore", "dispatch:author", "dispatch:vote", "provide:conflicts", "provide:rank", "provide:signoff", "done:"]);
+  assert.deepEqual(steps(transcript), ["dispatch:rsvp", "dispatch:explore", "provide:explore", "dispatch:author", "dispatch:vote", "provide:conflicts", "provide:rank", "provide:signoff", "done:"]);
   const rec = valid(assemble(run.log));
   assert.equal(rec.register.length, 5, "six tied joiners seat five, each authoring one finding");
   assert.equal(rec.top_five[0].pull_quote, rec.register.find((e) => e.id === rec.top_five[0].finding).pull_quote, "the script copies the quote (I6)");
@@ -323,4 +323,42 @@ test("freeStem takes the lowest free -N", () => {
   const run = newRun(RUN_MODE.REVIEW, { roster: ROSTER6.slice(0, 3) });
   assert.equal(freeStem(run.dir, "2026-10-28-chorus-review"), "2026-10-28-chorus-review-2");
   assert.equal(freeStem(run.dir, "2026-10-29-chorus-review"), "2026-10-29-chorus-review");
+});
+
+test("review: the interview runs once after exploration; an unanswered [gate] question is refused", () => {
+  const run = newRun(RUN_MODE.REVIEW, { roster: ROSTER6.slice(0, 3) });
+  let a = derive(run.log).action;
+  for (const x of a.asks) submit(run.file, run.log, x.persona, rsvp(x.persona, a));
+  for (const x of derive(run.log).action.asks) ack(run.file, run.log, x.persona);
+  a = derive(run.log).action;
+  assert.equal(a.topic, TOPIC.INTERVIEW);
+  const q = { persona: a.personas[0], scope: "project-wide", gate: true, question: "Who installs this?" };
+  assert.equal(answer(run.file, run.log, TOPIC.INTERVIEW, { sessions: 1, questions: [{ ...q, deferred: true }], degradation: "Findings assume strangers." }).exit, EXIT.REFUSED);
+  assert.equal(answer(run.file, run.log, TOPIC.INTERVIEW, { sessions: 1, questions: [{ ...q, answer: "Strangers, via install.sh." }] }).exit, EXIT.OK);
+  assert.equal(derive(run.log).action.phase, PHASE.AUTHOR);
+  drive(run);
+  assert.equal(valid(assemble(run.log)).interview.questions[0].answer, "Strangers, via install.sh.");
+});
+
+test("review: held findings are revised in one dispatch and re-voted on one ballot (S11, batched)", () => {
+  const run = newRun(RUN_MODE.REVIEW, { roster: ROSTER6.slice(0, 4) });
+  const { transcript } = drive(run, {
+    vote: (p, a, ask) => votes(p, a, ask.ballot.map((f) => [f, ["F1", "F2"].includes(f) && p === ROSTER6[3] ? VOTE.NEED_INFO : VOTE.CONFIRM])),
+  });
+  const revise = transcript.filter((a) => a.phase === PHASE.NEED_INFO && a.action === ACTION.DISPATCH && a.asks[0].round === 1);
+  assert.equal(revise.length, 1, "one revision dispatch");
+  assert.deepEqual(revise[0].asks.map((x) => x.finding).sort(), ["F1", "F2"]);
+  const revote = transcript.filter((a) => a.phase === PHASE.NEED_INFO && a.action === ACTION.DISPATCH && a.asks[0].round === 2);
+  assert.equal(revote.length, 1, "one re-vote dispatch");
+  const rec = valid(assemble(run.log));
+  assert.deepEqual(rec.held, []);
+});
+
+test("review: an unresolved conflict is carried to the decision sink", () => {
+  const run = newRun(RUN_MODE.REVIEW, { roster: ROSTER6.slice(0, 3) });
+  drive(run, { answers: { [TOPIC.CONFLICTS]: () => [{ id: "C1", advisors: [ROSTER6[0], ROSTER6[1]], disputed: "Whether the cap is real, which changes the fix.", outcome: "unresolved", findings: ["F1"] }] } });
+  const rec = valid(assemble(run.log));
+  assert.equal(rec.conflicts[0].decision_ref, "conflict-1");
+  assert.equal(rec.decisions.find((d) => d.id === "conflict-1").status, "open");
+  assert.equal(validate(rec.kind, rec).warnings?.length ?? 0, 0, "no 'not carried to the decision sink' warning");
 });

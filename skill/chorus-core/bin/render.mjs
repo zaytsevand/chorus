@@ -60,8 +60,8 @@ function decisionBlock(d) {
 function registerTable(register) {
   return table(
     ["ID", "Advisor · Lens", "Authored severity", "Target (locator)", "Pull-quote (verbatim)", "confidence_on_hand", "need_info · reason", "graded"],
-    register.map((e) => [e.id, `${e.author} · ${e.lens}`, e.authored_severity, `\`${e.locator}\``,
-      `${quote(e.pull_quote)}${tagOf(e) ? ` ${tagOf(e)}` : ""}${e.scope ? ` (${e.scope}${e.parked ? ", parked" : ""})` : ""}`,
+    register.map((e) => [e.id, [`${e.author} · ${e.lens}`, ...(e.co_authors ?? []).map((c) => `${c.persona} · ${c.lens} (${c.authored_severity})`)].join("<br>"), e.authored_severity, `\`${e.locator}\``,
+      `${quote(e.pull_quote)}${tagOf(e) ? ` ${tagOf(e)}` : ""}${e.scope ? ` (${e.scope}${e.parked ? ", parked" : ""})` : ""}${(e.co_authors ?? []).map((c) => `<br>${c.persona}: ${quote(c.pull_quote)}`).join("")}`,
       e.confidence_on_hand, needInfo(e), e.graded ? "true" : "false [ungraded]"]));
 }
 
@@ -116,6 +116,13 @@ export function renderReviewRecord(d) {
   L.push("## 1. TL;DR", "", d.tldr.join(" "), "");
   L.push("## 2. Roster (this round)", "", rsvpTable(d.roster), "",
     `Joiners: ${d.quorum.joiners}. Quorum: ${d.quorum.branch}.${d.seating_decision ? ` Seating decision: ${d.seating_decision}.` : ""}`, "");
+  if (d.interview) {
+    const iq = d.interview.questions;
+    L.push(`**Operator interview.** ${d.interview.sessions} session(s), ${iq.length} question(s), ${iq.filter((q) => q.gate).length} of them gates.`, "");
+    for (const q of iq) L.push(`- ${q.gate ? "[gate] " : ""}${q.persona} (${q.scope}): ${q.question} — ${q.answer ? quote(q.answer) : "deferred"}`);
+    if (iq.length) L.push("");
+    if (d.interview.degradation) L.push(`Deferred answers cost: ${d.interview.degradation}`, "");
+  }
   L.push("## 3. Findings register", "", registerTable(d.register), convergence(d.register), "");
   L.push("## 4. Consolidation matrix", "", "`net = P − O` over non-author voters (CONFIRM excluded); `T = max(1, floor(N / 2))`; convergence = P + C.", "", matrix(d.tally), "");
   L.push("## 5. Conflicts", "");
