@@ -1,12 +1,12 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { spawnSync } from "node:child_process";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { assemble, derive, freeStem, submit } from "../bin/conduct.mjs";
+import { ack, assemble, derive, freeStem, submit } from "../bin/conduct.mjs";
 import { validate } from "../bin/validate.mjs";
-import { ACTION, FAILURE, GATE, GATE_RESULT, PHASE, RECOVERY, REVIEW_QUORUM, RSVP, RUN_MODE, SDLC_STATUS, SEVERITY, TALLY_STATUS, TOPIC, VOTE } from "../bin/vocab.mjs";
+import { ACTION, EXIT, FAILURE, GATE, GATE_RESULT, PHASE, RECOVERY, REVIEW_QUORUM, RSVP, RUN_MODE, SDLC_STATUS, SEVERITY, TALLY_STATUS, TOPIC, VOTE } from "../bin/vocab.mjs";
 import { ROSTER6, drive, finding, newRun, report, rsvp, votes } from "./kit.mjs";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
@@ -161,8 +161,22 @@ test("review: a reply nobody asked for is refused and nothing is logged", () => 
   const run = newRun(RUN_MODE.REVIEW, { roster: ROSTER6.slice(0, 3) });
   const action = derive(run.log).action;
   const r = submit(run.file, run.log, "not-on-the-roster", rsvp("not-on-the-roster", action));
-  assert.equal(r.exit, 2);
+  assert.equal(r.exit, EXIT.NOT_ASKED);
+  assert.match(r.message, /run: conduct next /, "a refusal names the command to run next");
   assert.equal(run.log.events.length, 0);
+});
+
+test("review: a reply sent where an acknowledgement is asked names the ack command", () => {
+  const run = newRun(RUN_MODE.REVIEW, { roster: ROSTER6.slice(0, 3) });
+  let a = derive(run.log).action;
+  for (const x of a.asks) submit(run.file, run.log, x.persona, rsvp(x.persona, a));
+  a = derive(run.log).action;
+  assert.equal(a.phase, PHASE.EXPLORE);
+  const who = a.asks[0].persona;
+  const r = submit(run.file, run.log, who, rsvp(who, a));
+  assert.equal(r.exit, EXIT.NOT_ASKED);
+  assert.ok(r.message.includes(`run: conduct ack ${run.file} ${who}`), r.message);
+  assert.equal(ack(run.file, run.log, who).exit, EXIT.OK);
 });
 
 test("review: a version mismatch is exit 3, logged nowhere, never charged", () => {
@@ -259,11 +273,31 @@ test("cli: next prints the action; record writes JSON and page once the run is d
   const run = newRun(RUN_MODE.REVIEW, { roster: ROSTER6.slice(0, 3) });
   const first = JSON.parse(cli("next", run.file).stdout);
   assert.equal(first.action, ACTION.DISPATCH);
-  assert.equal(cli("record", run.file).status, 2, "refuses before the run is done");
+  assert.ok(first.asks.every((x) => x.command === `conduct submit ${run.file} ${x.persona} <${x.kind}.json>`), "each ask carries its command");
+  assert.equal(cli("record", run.file).status, EXIT.NOT_FINISHED, "refuses before the run is done");
   drive(run);
   const r = cli("record", run.file);
   assert.equal(r.status, 0, r.stderr);
   assert.ok(existsSync(join(run.dir, "2026-10-28-chorus-review.md")));
+});
+
+test("cli: each failure has its own exit code", () => {
+  const run = newRun(RUN_MODE.REVIEW, { roster: ROSTER6.slice(0, 3) });
+  assert.equal(cli("bogus", run.file).status, EXIT.USAGE);
+  writeFileSync(run.file, readFileSync(run.file, "utf8").slice(0, 40));
+  const torn = cli("next", run.file);
+  assert.equal(torn.status, EXIT.UNREADABLE_LOG, "a torn log is not a usage error");
+  assert.match(torn.stderr, /git checkout --/);
+  const bad = spawnSync(process.execPath, [join(ROOT, "bin", "conduct.mjs"), "init", "review", "--target", "x", "--context", "short ctx", "--dir", run.dir, "--date", "2026-10-30"], { encoding: "utf8" });
+  assert.equal(bad.status, EXIT.BAD_INIT, bad.stderr);
+  assert.match(bad.stderr, /^init refused, nothing written/);
+  assert.ok(!existsSync(join(run.dir, "2026-10-30-chorus-review.run.json")), "a refused init writes nothing");
+});
+
+test("the run log is written whole: no temp file is left behind", () => {
+  const run = newRun(RUN_MODE.REVIEW, { roster: ROSTER6.slice(0, 3) });
+  drive(run);
+  assert.ok(!existsSync(`${run.file}.tmp`));
 });
 
 test("freeStem takes the lowest free -N", () => {

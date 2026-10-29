@@ -18,20 +18,20 @@
  *   conduct status <run.json>
  *   conduct record <run.json>                         # write <stem>.json and <stem>.md
  *
- *   exit: 0 ok · 1 refused (a reply failed validation: logged as a failure) ·
- *         2 usage, or input the current action did not ask for (nothing logged) ·
- *         3 version mismatch (nothing logged, never charged to the persona)
+ *   exit: one code per meaning, from the registry (vocab.schema.json $defs.exit,
+ *         EXIT in vocab.mjs): ok, refused, usage, version-mismatch, not-asked,
+ *         unreadable-log, not-finished, bad-init. CONDUCTOR.md § The conductor loop.
  *
  * State is a pure function of the log: derive(log) → { action, ... }. No clock,
  * no randomness, so the same log always yields the same record.
  * Zero dependencies; Node 20+.
  */
 
-import { existsSync, readFileSync, readdirSync, realpathSync, writeFileSync, mkdirSync } from "node:fs";
+import { existsSync, readFileSync, readdirSync, realpathSync, renameSync, writeFileSync, mkdirSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import {
-  ACTION, CONFIDENCE, DECISION_EVIDENCE, DECISION_RESOLUTION, DECISION_STATUS, EVENT, FAILURE, GATE, GATE_NAME_OF,
+  ACTION, CONFIDENCE, DECISION_EVIDENCE, EXIT, DECISION_RESOLUTION, DECISION_STATUS, EVENT, FAILURE, GATE, GATE_NAME_OF,
   GATE_QUORUM, GATE_RESULT, HELD_ROUTE, LENS_OF, OPTIONAL_LENSES, PHASE, RECORD_KIND, RECOVERY, RED_DISPOSITION,
   REVIEW_MODE, REVIEW_QUORUM, RSVP, RUN_MODE, SCOPE, SDLC_MODE, SDLC_STATUS, SEAT, SEATING_BAND, SEVERITY, TALLY_STATUS,
   TOPIC, VOCAB, VOTE,
@@ -586,7 +586,22 @@ function appendTo(file, log, event) {
   log.events.push(event);
   const r = validate(RECORD_KIND.RUN_LOG, log);
   if (!r.valid) throw new Error(`refusing to write an invalid run log: ${r.errors.map((e) => `${e.path}: ${e.message}`).join("; ")}`);
-  writeFileSync(file, JSON.stringify(log, null, 2) + "\n");
+  // Write then rename, so an interrupted write never leaves a torn log.
+  writeFileSync(`${file}.tmp`, JSON.stringify(log, null, 2) + "\n");
+  renameSync(`${file}.tmp`, file);
+}
+
+/** The command that answers one ask, ready to run. */
+const commandFor = (file, ask) => (ask.kind ? `conduct submit ${file} ${ask.persona} <${ask.kind}.json>` : `conduct ack ${file} ${ask.persona}`);
+
+/** Why this persona is not asked for `what` now, and the command to run instead. */
+function notAsked(file, log, action, persona, what) {
+  const ask = askFor(action, persona);
+  if (ask) return `${persona} is asked for ${ask.kind ? `a ${ask.kind}` : "an acknowledgement"} now, not ${what}; run: ${commandFor(file, ask)}`;
+  const where = `the current action is ${action.action}${action.phase ? ` (${action.phase})` : ""}`;
+  const last = log.events.filter((e) => e.persona === persona && e.phase === action.phase).at(-1);
+  if (last?.type === EVENT.FAILURE) return `${persona}'s last reply was refused; its one retry comes in a retry action once the rest of this batch is in. ${where}; run: conduct next ${file}`;
+  return `nothing is asked of ${persona} now; ${where}; run: conduct next ${file}`;
 }
 
 const eventCtx = (action, ask) => ({ phase: action.phase, ...pick(action, ["gate", "cycle"]), ...(ask && (ask.round ?? 1) > 1 ? { round: ask.round } : {}), ...(ask?.finding ? { finding: ask.finding } : {}) });
@@ -594,39 +609,39 @@ const eventCtx = (action, ask) => ({ phase: action.phase, ...pick(action, ["gate
 export function submit(file, log, persona, data) {
   const { action } = derive(log);
   const ask = askFor(action, persona);
-  if (!ask || !ask.kind) return { exit: 2, message: `nothing asks ${persona} for a reply now; the next action is ${action.action}${action.phase ? ` (${action.phase})` : ""}` };
+  if (!ask || !ask.kind) return { exit: EXIT.NOT_ASKED, message: notAsked(file, log, action, persona, "a reply") };
   const r = validate(ask.kind, data);
-  if (r.reason === "version mismatch") return { exit: 3, message: `version mismatch: ${r.errors[0].message}. Install drift: reported once, not charged to ${persona}.` };
+  if (r.reason === "version mismatch") return { exit: EXIT.VERSION_MISMATCH, message: `version mismatch: ${r.errors[0].message}. Install drift: reported once, not charged to ${persona}.` };
   const errs = r.valid ? contractErrors(action, ask, persona, data) : [];
   if (!r.valid || errs.length) {
     const reason = (r.valid ? errs : r.errors.slice(0, 3).map((e) => `${e.path}: ${e.message}`)).join("; ");
     appendTo(file, log, { type: EVENT.FAILURE, ...eventCtx(action, ask), persona, failure: r.valid ? FAILURE.MALFORMED : failureKind(r.errors), reason });
-    return { exit: 1, message: `${persona}: refused — ${reason}` };
+    return { exit: EXIT.REFUSED, message: `${persona}: refused — ${reason}. Logged; its one retry comes in a later retry action (conduct next ${file}).` };
   }
   appendTo(file, log, { type: EVENT.REPLY, ...eventCtx(action, ask), persona, data });
-  return { exit: 0, message: `${persona}: ${ask.kind} logged` };
+  return { exit: EXIT.OK, message: `${persona}: ${ask.kind} logged` };
 }
 
 export function fail(file, log, persona, failure, reason) {
   const { action } = derive(log);
   const ask = askFor(action, persona);
-  if (!ask) return { exit: 2, message: `nothing asks ${persona} for anything now` };
-  if (!VOCAB.failure.includes(failure)) return { exit: 2, message: `unknown failure "${failure}"; one of: ${VOCAB.failure.join(", ")}` };
+  if (!ask) return { exit: EXIT.NOT_ASKED, message: notAsked(file, log, action, persona, "a failure") };
+  if (!VOCAB.failure.includes(failure)) return { exit: EXIT.USAGE, message: `unknown failure "${failure}"; one of: ${VOCAB.failure.join(", ")}` };
   appendTo(file, log, { type: EVENT.FAILURE, ...eventCtx(action, ask), persona, failure, reason });
-  return { exit: 0, message: `${persona}: ${failure} logged` };
+  return { exit: EXIT.OK, message: `${persona}: ${failure} logged` };
 }
 
 export function ack(file, log, persona) {
   const { action } = derive(log);
   const ask = askFor(action, persona);
-  if (!ask || ask.kind) return { exit: 2, message: `nothing asks ${persona} for an acknowledgement now` };
+  if (!ask || ask.kind) return { exit: EXIT.NOT_ASKED, message: notAsked(file, log, action, persona, "an acknowledgement") };
   appendTo(file, log, { type: EVENT.ACK, ...eventCtx(action, ask), persona });
-  return { exit: 0, message: `${persona}: ${action.phase} done` };
+  return { exit: EXIT.OK, message: `${persona}: ${action.phase} done` };
 }
 
 export function answer(file, log, topic, data) {
   const { action } = derive(log);
-  if (action.topic !== topic) return { exit: 2, message: `the current action does not ask for "${topic}"; it is ${action.action}${action.topic ? ` (${action.topic})` : ""}` };
+  if (action.topic !== topic) return { exit: EXIT.NOT_ASKED, message: `the current action does not ask for "${topic}"; it is ${action.action}${action.topic ? ` (${action.topic})` : ""}; run: ${action.topic ? `conduct answer ${file} ${action.topic} <data.json>` : `conduct next ${file}`}` };
   const errors = conforms(ANSWER_SCHEMA[topic], data);
   if (topic === TOPIC.GATE_ANSWERS && !errors.length && !action.questions.some((q) => q.persona === data.persona && q.round === data.round)) {
     errors.push({ path: "persona", message: `no open gate questions from ${data.persona} at round ${data.round}` });
@@ -642,9 +657,9 @@ export function answer(file, log, topic, data) {
     const ok = new Set(action.eligible.map((e) => e.id));
     data.forEach((t, i) => { if (!ok.has(t.finding)) errors.push({ path: `[${i}]`, message: `"${t.finding}" is not rankable (held, minority report, unsupported or unknown)` }); });
   }
-  if (errors.length) return { exit: 1, message: `refused: ${errors.map((e) => `${e.path}: ${e.message}`).join("; ")}` };
+  if (errors.length) return { exit: EXIT.REFUSED, message: `refused, nothing logged: ${errors.map((e) => `${e.path}: ${e.message}`).join("; ")}; fix the data and run conduct answer ${file} ${topic} again` };
   appendTo(file, log, { type: EVENT.ANSWER, phase: action.phase, ...pick(action, ["gate", "cycle"]), topic, data });
-  return { exit: 0, message: `${topic} logged` };
+  return { exit: EXIT.OK, message: `${topic} logged` };
 }
 
 /* ── init ────────────────────────────────────────────────────────────────── */
@@ -689,7 +704,7 @@ const text = (v) => (v?.startsWith("@") ? readFileSync(v.slice(1), "utf8").trim(
 function usage(msg) {
   if (msg) process.stderr.write(`${msg}\n`);
   process.stderr.write("usage: conduct init <review|sdlc|challenge> … | next|status|record <run.json> | submit <run.json> <persona> <reply.json> | fail <run.json> <persona> <failure> <reason> | ack <run.json> <persona> | answer <run.json> <topic> <data.json>\n");
-  process.exit(2);
+  process.exit(EXIT.USAGE);
 }
 
 function main(argv) {
@@ -710,29 +725,40 @@ function main(argv) {
       opts.dir = f.dir ?? "docs/reviews";
       opts.stem = freeStem(opts.dir, `${date}-chorus-${mode === RUN_MODE.REVIEW ? "review" : "challenge"}${f.pr ? `-pr${f.pr}` : ""}`);
     }
-    const log = initLog(mode, opts);
+    let log;
+    try { log = initLog(mode, opts); } catch (e) { process.stderr.write(`init refused, nothing written:\n${e.message}\n`); return EXIT.BAD_INIT; }
     const file = join(opts.dir, `${opts.stem}.run.json`);
     if (existsSync(file)) usage(`${file} exists; continue it with: conduct next ${file}`);
     mkdirSync(opts.dir, { recursive: true });
     writeFileSync(file, JSON.stringify(log, null, 2) + "\n");
     process.stdout.write(`${file}\n`);
-    return 0;
+    return EXIT.OK;
   }
   const file = f._[0];
   if (!file) usage();
   let log;
-  try { log = readJson(file); } catch (e) { usage(`cannot read ${file}: ${e.message}`); }
+  const unreadable = (why) => { process.stderr.write(`${why}. Restore it from git (git checkout -- ${file}) or start a new run with conduct init.\n`); return EXIT.UNREADABLE_LOG; };
+  if (!existsSync(file)) usage(`no run log at ${file}; start one with conduct init, or check the path`);
+  try { log = readJson(file); } catch (e) { return unreadable(`cannot read the run log ${file}: ${e.message}`); }
   const shape = validate(RECORD_KIND.RUN_LOG, log);
-  if (!shape.valid) usage(`${file} is not a valid run log: ${shape.errors.map((e) => `${e.path}: ${e.message}`).join("; ")}`);
+  if (!shape.valid) return unreadable(`${file} is not a valid run log: ${shape.errors.map((e) => `${e.path}: ${e.message}`).join("; ")}`);
   const say = (r) => { (r.exit === 0 ? process.stdout : process.stderr).write(`${r.message}\n`); return r.exit; };
   const input = (path) => { try { return readJson(path); } catch (e) { return usage(`cannot read ${path}: ${e.message}`); } };
   // CLI verbs are their own vocabulary; keys here, never compared as strings.
   const COMMANDS = {
-    next: () => { process.stdout.write(JSON.stringify(derive(log).action, null, 2) + "\n"); return 0; },
+    next: () => {
+      // Each ask, and any input or record step, carries the exact command that answers it.
+      const a = derive(log).action;
+      if (a.asks) a.asks = a.asks.map((x) => ({ ...x, command: commandFor(file, x) }));
+      if (a.topic) a.command = `conduct answer ${file} ${a.topic} <data.json>`;
+      if ([ACTION.DONE, ACTION.HALT].includes(a.action)) a.command = `conduct record ${file}`;
+      process.stdout.write(JSON.stringify(a, null, 2) + "\n");
+      return EXIT.OK;
+    },
     status: () => {
       const d = derive(log);
       process.stdout.write(`${log.mode} · ${log.header.target} · ${log.events.length} event(s) · next: ${d.action.action}${d.action.phase ? ` (${d.action.phase})` : ""}\n`);
-      return 0;
+      return EXIT.OK;
     },
     submit: ([persona, reply]) => (persona && reply ? say(submit(file, log, persona, input(reply))) : usage()),
     fail: ([persona, failure, ...why]) => (persona && failure && why.length ? say(fail(file, log, persona, failure, why.join(" "))) : usage()),
@@ -743,17 +769,17 @@ function main(argv) {
     },
     record: () => {
       let rec;
-      try { rec = assemble(log); } catch (e) { process.stderr.write(`${e.message}\n`); return 2; }
+      try { rec = assemble(log); } catch (e) { process.stderr.write(`${e.message}; run: conduct next ${file}\n`); return EXIT.NOT_FINISHED; }
       const r = validate(rec.kind, rec, { file });
       if (!r.valid) {
         process.stderr.write(`the assembled ${rec.kind} is invalid — not written:\n${r.errors.map((e) => `  ✗ ${e.path}: ${e.message}`).join("\n")}\n`);
-        return 1;
+        return EXIT.REFUSED;
       }
       const out = join(dirname(file), log.header.stem);
       writeFileSync(`${out}.json`, JSON.stringify(rec, null, 2) + "\n");
       writeFileSync(`${out}.md`, render(rec.kind, rec, { file: `${out}.json` }));
       process.stdout.write(`${out}.json\n${out}.md\n`);
-      return 0;
+      return EXIT.OK;
     },
   };
   if (!Object.hasOwn(COMMANDS, cmd)) usage(cmd ? `unknown command "${cmd}"` : undefined);

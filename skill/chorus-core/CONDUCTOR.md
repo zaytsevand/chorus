@@ -361,7 +361,7 @@ conduct record <run.json>                       # writes <stem>.json and <stem>.
 
 | Action | The calling session |
 |---|---|
-| `dispatch` / `retry` | dispatches each listed persona with the brief for that phase (and the retry reason); a reply goes back through `submit` |
+| `dispatch` / `retry` | dispatches each listed persona with the brief for that phase (and the retry reason), then runs the `command` each ask carries: `submit` for a reply, `ack` for a step with no reply (exploration) |
 | `ask-operator` | puts the question as a blocking choice (`AskUserQuestion`, at most four per call); the answer goes back through `answer` |
 | `provide` | supplies what only it can: conflicts framed for the arbiter, the top-five scores, the TL;DR and baseline, the premise-pass outcomes, a peer's provision, the memory update |
 | `incorporate` / `run-skill` | runs the named speckit skills (S5), then reports with `answer` |
@@ -371,9 +371,23 @@ The script refuses a reply nobody asked for, a vote on one's own finding or off
 the ballot, a low-confidence vote that is not NEED_INFO, a ranking that holds a
 held or minority finding, and a waiver without the operator's ruling. It copies
 every pull-quote, locator and severity into the top five itself, so the
-conductor relays and never restates (I6). Exit codes: 0 ok · 1 refused (logged
-as a failure when it was a persona reply) · 2 not asked for / usage (nothing
-logged) · 3 version mismatch (nothing logged, never charged).
+conductor relays and never restates (I6). Every refusal names this persona's
+own state and the exact command to run next.
+
+**Exit codes.** One code per meaning; the registry owns them
+(`schema/vocab.schema.json` `$defs.exit`, `EXIT` in `bin/vocab.mjs`), and
+`test/canon-drift.test.mjs` fails when this table disagrees with it.
+
+| Exit | Meaning | Do |
+|---|---|---|
+| 0 | ok | the next `conduct next` |
+| 1 | refused | the reply or answer failed validation; a persona reply is logged as a failure and its one retry comes in a `retry` action |
+| 2 | usage | fix the command or its arguments |
+| 3 | version-mismatch | install drift: report once; never retried or charged |
+| 4 | not-asked | nothing logged; run the command the message names |
+| 5 | unreadable-log | the run log is torn or invalid; restore it from git or start a new run |
+| 6 | not-finished | `record` before `done` or `halt`; run `conduct next` |
+| 7 | bad-init | `init` input the run log rejects; nothing written |
 
 ## Refusals (system boundaries, not modesty)
 

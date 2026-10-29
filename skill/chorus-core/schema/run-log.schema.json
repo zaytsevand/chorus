@@ -90,11 +90,11 @@
       "description": "What init fixed. Nothing here changes after init.",
       "properties": {
         "date": { "$ref": "common.schema.json#/$defs/date", "description": "The run's date stamp." },
-        "target": { "type": "string", "minLength": 1, "description": "What is reviewed: a spec, PR, path or idea." },
+        "target": { "$ref": "review-record.schema.json#/properties/target", "description": "What is reviewed: a spec, PR, path or idea. The record's limits, so init refuses what record would." },
         "dir": { "type": "string", "minLength": 1, "description": "Where the record is written, from the repository root." },
         "stem": { "type": "string", "pattern": "^[A-Za-z0-9._-]+$", "description": "The record's file stem: <stem>.json, <stem>.md, <stem>.run.json." },
         "review_mode": { "$ref": "vocab.schema.json#/$defs/review_mode", "description": "Review runs only." },
-        "round_context": { "type": "string", "minLength": 10, "description": "Review runs: the concrete since-last-chorus deltas." },
+        "round_context": { "$ref": "review-record.schema.json#/properties/round_context", "description": "Review runs: the concrete since-last-chorus deltas. The record's limits." },
         "feature": { "type": "string", "minLength": 1, "description": "Lifecycle runs: the feature id, e.g. 018-scripted-spine." },
         "corpus": { "type": "array", "items": { "type": "string", "minLength": 1 }, "description": "Lifecycle and challenge runs: the artefacts each gate reviews." },
         "roster": {

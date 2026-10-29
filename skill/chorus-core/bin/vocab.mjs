@@ -61,6 +61,8 @@ export const PHASE = named("phase");
 export const ACTION = named("action");
 export const EVENT = named("event");
 export const TOPIC = named("answer_topic");
+/** exit meaning → process exit code (x-codes), e.g. EXIT.NOT_ASKED === 4. */
+export const EXIT = Object.freeze(Object.fromEntries(DEFS.exit.enum.map((m) => [codeName(m), DEFS.exit["x-codes"][m]])));
 
 /** persona → lens, and the optional (language) lenses, from the roster registry. */
 export const LENS_OF = Object.freeze({ ...DEFS.roster["x-lens"] });

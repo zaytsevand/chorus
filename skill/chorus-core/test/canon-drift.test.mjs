@@ -12,6 +12,7 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { validate, tally, SCHEMA_MAJOR } from "../bin/validate.mjs";
 import { SEAT_CAP, QUORUM, CYCLE_BOUND } from "../bin/engine.mjs";
+import { EXIT, codeName } from "../bin/vocab.mjs";
 import { readdirSync } from "node:fs";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
@@ -196,4 +197,11 @@ test("prose restating the seat cap, quorum or cycle bound matches bin/engine.mjs
     });
   }
   checks.forEach((c, k) => assert.ok(hits.get(k) > 0, `no prose restates the ${c.what} with ${c.re}; drop the pattern or the test is vacuous`));
+});
+
+test("the conductor loop's exit table matches the registry's exit codes", () => {
+  const rows = tableRows(section(read(join(CORE, "CONDUCTOR.md")), "The conductor loop", 3).slice(
+    section(read(join(CORE, "CONDUCTOR.md")), "The conductor loop", 3).findIndex((l) => l.startsWith("**Exit codes.**"))));
+  const doc = Object.fromEntries(rows.map(([code, meaning]) => [codeName(meaning), Number(code)]));
+  assert.deepEqual(doc, { ...EXIT });
 });
