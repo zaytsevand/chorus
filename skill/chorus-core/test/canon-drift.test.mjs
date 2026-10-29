@@ -1,9 +1,9 @@
 // Drift between the chorus canon and what the code beside it encodes from it.
 //
-// The canon owns the rules (CONDUCTOR.md § Ports, GATE-PRIMITIVE.md § Stage 4);
-// the validator and schema re-encode some of them. These tests parse the
-// canon's tables and lists, never its prose, and fail when the two part ways.
-// The canon wins: fix the code, not the test.
+// The canon owns the ports and the failure policy (CONDUCTOR.md § Ports); the
+// engine owns the mechanical rules (bin/engine.mjs: seat cap, quorum, cycle
+// bound, the Stage-4 count). These tests fail when the two part ways. When one
+// fails, fix whichever side does not own the rule, never the test.
 
 import { test } from "node:test";
 import assert from "node:assert/strict";
@@ -11,6 +11,8 @@ import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { validate, tally, SCHEMA_MAJOR } from "../bin/validate.mjs";
+import { SEAT_CAP, QUORUM, CYCLE_BOUND } from "../bin/engine.mjs";
+import { readdirSync } from "node:fs";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const CORE = ROOT;
@@ -160,3 +162,38 @@ test("every settled case in the canon is accounted for here", () => {
 for (const [n, check] of Object.entries(SETTLED)) {
   if (check) test(`settled case ${n} is held by the validator`, check);
 }
+
+// Prose that restates an engine value must say the same number (the engine wins).
+test("prose restating the seat cap, quorum or cycle bound matches bin/engine.mjs", () => {
+  const WORDS = { one: 1, two: 2, three: 3, four: 4, five: 5, six: 6, seven: 7, eight: 8, nine: 9, ten: 10 };
+  const num = (t) => WORDS[t.toLowerCase()] ?? Number(t);
+  const checks = [
+    { what: "seat cap", re: /cap of (\w+)/gi, want: () => SEAT_CAP },
+    { what: "seat cap", re: /(\w+) ordinary seats/gi, want: () => SEAT_CAP },
+    { what: "quorum and cap", re: /(\d+) ≤ J ≤ (\d+)/g, want: (i) => (i === 1 ? QUORUM : SEAT_CAP) },
+    { what: "quorum", re: /J < (\d+)/g, want: () => QUORUM },
+    { what: "quorum", re: /fewer than (\w+) joiners/gi, want: () => QUORUM },
+    { what: "quorum or cap + 1", re: /J ≥ (\d+)/g, want: (_, n) => ([QUORUM, SEAT_CAP + 1].includes(n) ? n : QUORUM) },
+    { what: "cycle bound", re: /N = (\d+) cycles/g, want: () => CYCLE_BOUND },
+    { what: "cycle bound", re: /past (\d+) cycles/g, want: () => CYCLE_BOUND },
+  ];
+  const SUITE = join(ROOT, "..");
+  const files = readdirSync(SUITE).flatMap((d) => {
+    try { return readdirSync(join(SUITE, d)).filter((f) => f.endsWith(".md")).map((f) => join(SUITE, d, f)); } catch { return []; }
+  });
+  const hits = new Map(checks.map((c, k) => [k, 0]));
+  for (const f of files) {
+    const text = read(f);
+    checks.forEach((c, k) => {
+      for (const m of text.matchAll(c.re)) {
+        for (let i = 1; i < m.length; i++) {
+          const n = num(m[i]);
+          if (Number.isNaN(n)) continue;
+          hits.set(k, hits.get(k) + 1);
+          assert.equal(n, c.want(i, n), `${f}: "${m[0]}" restates the ${c.what} as ${n}; bin/engine.mjs holds ${c.want(i, n)} (fix the prose)`);
+        }
+      }
+    });
+  }
+  checks.forEach((c, k) => assert.ok(hits.get(k) > 0, `no prose restates the ${c.what} with ${c.re}; drop the pattern or the test is vacuous`));
+});

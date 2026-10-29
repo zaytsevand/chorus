@@ -406,9 +406,9 @@ class Semantics {
         else deltas.set(d, i);
       }
     });
-    if (ordinary > SEAT_CAP) this.err(path, `${ordinary} ordinary seats; the cap is five`, "DECISION-PRIMITIVE.md § Seating");
+    if (ordinary > SEAT_CAP) this.err(path, `${ordinary} ordinary seats; the cap is ${SEAT_CAP}`, "DECISION-PRIMITIVE.md § Seating");
     const joins = (roster ?? []).filter((r) => r.decision === RSVP.JOIN);
-    if (joins.length <= SEAT_CAP) joins.forEach((r) => { if (r.seated === false) this.err(path, `"${r.persona}" joined but is not seated`, "3 ≤ J ≤ 5 seats every joiner"); });
+    if (joins.length <= SEAT_CAP) joins.forEach((r) => { if (r.seated === false) this.err(path, `"${r.persona}" joined but is not seated`, `${QUORUM} ≤ J ≤ ${SEAT_CAP} seats every joiner`); });
     return { seated, joiners: joins.length };
   }
 }
@@ -477,11 +477,11 @@ function checkReviewRecord(d, s) {
   if (d.quorum) {
     if (d.quorum.joiners !== joiners) s.err("quorum → joiners", `says ${d.quorum.joiners}, the roster has ${joiners} JOIN replies`);
     const ok = d.quorum.joiners >= QUORUM;
-    if (d.quorum.branch === REVIEW_QUORUM.ABORTED && ok) s.err("quorum → branch", "aborted with J ≥ 3");
-    if (d.quorum.branch !== REVIEW_QUORUM.ABORTED && !ok) s.err("quorum → branch", `${d.quorum.branch} with J < 3`, "below quorum the round aborts (I3)");
+    if (d.quorum.branch === REVIEW_QUORUM.ABORTED && ok) s.err("quorum → branch", `aborted with J ≥ ${QUORUM}`);
+    if (d.quorum.branch !== REVIEW_QUORUM.ABORTED && !ok) s.err("quorum → branch", `${d.quorum.branch} with J < ${QUORUM}`, "below quorum the round aborts (I3)");
   }
   const decisions = checkDecisions(d.decisions, "decisions", s);
-  if (joiners > SEAT_CAP && !d.seating_decision) s.err("", "J ≥ 6 needs a seating decision", "set seating_decision to the DecisionRecord id");
+  if (joiners > SEAT_CAP && !d.seating_decision) s.err("", `J ≥ ${SEAT_CAP + 1} needs a seating decision`, "set seating_decision to the DecisionRecord id");
   if (d.seating_decision && !decisions.has(d.seating_decision)) s.err("seating_decision", `"${d.seating_decision}" is not in decisions`);
   const { byId, rows } = s.board(d.register, d.tally, seated, "register", "tally");
 

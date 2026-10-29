@@ -14,10 +14,12 @@ validator, renderer and provider bindings, `chorus-review`, `chorus-sdlc` and
   notes. A persona speaks to its own remit and names no other lens; the seams
   between lenses live once, in `skill/chorus-core/ROSTER.md` (FC7 checks it).
 - **Schema and tooling** (`skill/chorus-core/schema/`, `bin/`, `test/`): Node,
-  zero npm dependencies. A rule lives in one file: the canon (the markdown in
-  `skill/chorus-core/`) owns the ports, the failure policy and the vote-count
-  rule; the validator encodes them. When they disagree, fix the code;
-  `test/canon-drift.test.mjs` should have caught it. Only
+  zero npm dependencies. A rule lives in one file. The mechanical rules (seat cap, quorum,
+  retries, ballots, routing, the vote count, the cycle bound) live in
+  `bin/engine.mjs`, and prose that restates one is fixed when they disagree.
+  The ports and the failure policy live in the canon (the markdown in
+  `skill/chorus-core/`), and the validator is fixed when they disagree.
+  `test/canon-drift.test.mjs` should catch either. Only
   `skill/chorus-core/BINDINGS.md` (and its detector `bin/bindings.mjs`) names a
   provider such as problem-brief (FC6).
 - **Templates** (`skill/chorus-learn/templates/CHORUS-PROJECT.template.md`, the

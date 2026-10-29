@@ -281,7 +281,7 @@ function deriveReview(log) {
   const b = board(log, {});
   if (b.action) return { action: b.action };
   const B = b.board;
-  if (B.aborted) return { action: { action: ACTION.DONE, aborted: true, reason: B.afterEvidence ? "fewer than three joiners passed the evidence check" : "fewer than three joiners after one re-ask (I3)" }, board: B };
+  if (B.aborted) return { action: { action: ACTION.DONE, aborted: true, reason: B.afterEvidence ? `fewer than ${QUORUM} joiners passed the evidence check` : `fewer than ${QUORUM} joiners after one re-ask (I3)` }, board: B };
   const evs = log.events;
   const conflicts = lastAnswer(evs, TOPIC.CONFLICTS);
   if (!conflicts) {
@@ -400,8 +400,8 @@ function seatingDecision(id, B, date) {
   const seated = B.rows.filter((r) => r.seated).map((r) => r.persona);
   return {
     id, point: tie ? "RSVP seating — tie at the cap" : "RSVP seating — clean two-axis sort", catalog_row: tie ? 2 : 1, band: tie ? SEVERITY.YELLOW : SEVERITY.GREEN,
-    title: tie ? "Seating tie at the fifth seat: default panel seated" : "More than five joined: seated by the two-axis sort",
-    problem: `${B.seating.joiners} personas joined for five ordinary seats; the two-axis signal (cited deltas, then expected stakes) ${tie ? "ties across the fifth seat" : "orders them strictly"}.`,
+    title: tie ? `Seating tie at seat ${SEAT_CAP}: default panel seated` : `More than ${SEAT_CAP} joined: seated by the two-axis sort`,
+    problem: `${B.seating.joiners} personas joined for ${SEAT_CAP} ordinary seats; the two-axis signal (cited deltas, then expected stakes) ${tie ? `ties across seat ${SEAT_CAP}` : "orders them strictly"}.`,
     sensor: { signal: "strict order at the cap boundary (DECISION-PRIMITIVE.md § Seating)", evidence: seated, reading: tie ? "tie" : "strict" },
     evidence: [{ kind: DECISION_EVIDENCE.RUN, ref: "conduct.mjs seat()" }],
     solutions: [{ id: "sorted-panel", label: "Seat the sorted panel", recommended: true, summary: `Seat ${seated.join(", ")}.`, cost: { work: "none" } },

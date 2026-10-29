@@ -65,8 +65,10 @@ procedure: `conduct init review --target … --context …`, then `conduct next`
 until `done`, doing what each action says, then `conduct record`. The phases
 below say what each step means and which brief to send; the script decides when
 a phase's post-condition holds, who is seated, who votes on what, and the count.
-Where this file and the script disagree, the canon decides and the script is
-fixed.
+For those mechanical rules the script is the authority, and this file says
+what each step is for. If the two seem to disagree mid-round, follow the
+script, finish the round, and report the disagreement to the operator; never
+edit the installed script.
 
 ## Rules that hold in every phase
 

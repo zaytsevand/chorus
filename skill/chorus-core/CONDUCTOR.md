@@ -307,8 +307,10 @@ vocabulary literal in `bin/`, a near-miss spelling in skill or agent prose
 `agents/`. The schema is `schema/` (JSON Schema 2020-12); `examples/`
 holds a valid and an invalid sample of each kind; `test/` holds the tests,
 including `canon-drift.test.mjs`, which fails when the validator or schema stops
-matching this section or `GATE-PRIMITIVE.md` § Stage 4. The canon wins: fix the
-code, not the test.
+matching this section or `GATE-PRIMITIVE.md` § Stage 4, or when prose restates a
+seat cap, quorum or cycle bound that `bin/engine.mjs` does not hold. For the
+mechanical rules the engine is the authority, so fix the prose; for the ports
+and the failure policy this section is, so fix the code.
 
 **When to run it.** Validate every persona reply before it is counted and every
 record before it is published. The renderer validates again and refuses
@@ -339,9 +341,10 @@ re-ask, the one-retry-then-ABSTAIN rule, the ballots (every finding but the
 voter's own, S8), the NEED_INFO hold and its peer-then-operator routing (S11),
 the Stage-4 count, gate cycles and the bound (S7), the side-notes a program can
 see, and the record itself are computed from an append-only run log
-(`<stem>.run.json`, committed beside the record). The rules stay defined here
-and in the primitives; `bin/engine.mjs` implements them as pure functions and
-names the section each one follows.
+(`<stem>.run.json`, committed beside the record). For these mechanical rules
+`bin/engine.mjs` is the authority: it implements them as pure functions and
+names the section that says what each one is for. Where the prose restates a
+value the engine holds, the engine wins and the prose is fixed.
 
 ```
 conduct init review --target <t> --context <deltas> [--pr <n>]   # or: init sdlc --feature <0NN-name> · init challenge --target <t>
