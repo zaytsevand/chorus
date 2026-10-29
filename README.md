@@ -327,19 +327,32 @@ Every file it writes is recorded, with a hash of what it wrote, in
 `~/.claude/.chorus-install-manifest`. Re-running it is safe and is how you
 upgrade: a file still as installed is updated, a file you edited is reported as
 "differs, kept" and left alone, and files an earlier version shipped but this
-one does not are pruned unless you edited them. Files it did not write are left
-alone. `--force` overwrites every shipped file.
+one does not are pruned unless you edited them. A copy installed before the
+manifest existed is recognised as ours when its content matches a version this
+repository once shipped, and is updated. Files it did not write are left alone.
+`--force` overwrites every shipped file. Tests and fixtures (`test/`,
+`examples/`) stay in the repository and are not installed.
 
-Its closing message reports whether Node is present and whether problem-brief
-is installed, with the command to install it if not. It never installs
-problem-brief itself.
+**Exit status.** `install.sh` refuses Node older than 20 before writing anything.
+If any shipped file is left as it was (yours, or unrecognised), it lists each
+path with the fix and exits 1, because the install then mixes two versions.
+Exit 0 means every shipped file is current.
+
+Its closing message reports the version it installed (also in
+`~/.claude/skills/chorus-core/VERSION`), the Node version, and whether
+problem-brief is installed, with the command to install it if not. It never
+installs problem-brief itself.
 At review time chorus-core looks for problem-brief in the project's
 `.claude/skills`, then `${CLAUDE_HOME:-~/.claude}/skills`; if you keep skills
 elsewhere, add those directories to `CHORUS_SKILL_PATH` (colon-separated).
 
-Upgrading from a release with the separate `coryphaeus` skill: the re-run prunes
-its files; a `coryphaeus/SKILL.md` you edited is kept as `SKILL.md.retired` so
-it no longer loads.
+Upgrading from a release with the separate `coryphaeus` skill: the installer
+never removes it. It warns that the retired skill is still installed and still
+loads, and prints the command to remove it; whether to run it is your choice.
+
+**Downgrade** by checking out an older commit and re-running `./install.sh`. A
+run log (`<stem>.run.json`) is replayed only by the version that started it;
+another version refuses it with exit 8 and says which version to use.
 
 **Per-project install** — install into one project's `.claude/` instead of your
 global config, by pointing `CLAUDE_HOME` at it (run from the project root):
@@ -424,6 +437,13 @@ A markdown artifact structured as:
 The chorus is usually pointed at a spec or a feature's design; a full-codebase
 sweep is the occasional periodic case, not the default. For the full sweep,
 cadence is typically quarterly or after a major release.
+
+## Reporting a problem
+
+Open an issue at https://github.com/zaytsevand/chorus/issues. Include the
+installed version (`cat ~/.claude/skills/chorus-core/VERSION`), the full output
+and exit code of `./install.sh` or of the failing `conduct` command, and, for a
+round, the run log (`docs/reviews/<stem>.run.json`) if you can share it.
 
 ## License
 
