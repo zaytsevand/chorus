@@ -72,7 +72,8 @@ while IFS= read -r f; do
   [[ -f "$HOME_DIR/$rel" ]] || fail "missing installed file $rel"
   [[ "$rel" == skills/chorus-core/CONDUCTOR.md ]] || cmp -s "$REPO_DIR/skill/${f#./}" "$HOME_DIR/$rel" || fail "installed $rel differs from source"
   in_manifest "$rel" || fail "$rel not recorded in manifest"
-done < <(cd "$REPO_DIR/skill" && find . -type f)
+done < <(cd "$REPO_DIR/skill" && find . -type f -not -path '*/test/*' -not -path '*/examples/*')
+[[ ! -e "$HOME_DIR/skills/chorus-core/test" && ! -e "$HOME_DIR/skills/chorus-core/examples" ]] || fail "repo-only test/ or examples/ was installed"
 
 [[ -f "$HOME_DIR/skills/chorus-learn/templates/CHORUS-PROJECT.template.md" ]] \
   || fail "addendum template not installed"
@@ -109,8 +110,8 @@ grep -qx "user customization" "$HOME_DIR/agents/kent-beck-persona.md" \
 [[ -f "$HOME_DIR/skills/other-skill/SKILL.md" ]] || fail "uninstall removed an unrelated file"
 grep -qx "someone else's skill" "$HOME_DIR/skills/problem-brief/SKILL.md" || fail "uninstall touched problem-brief"
 
-# Upgrade from a release that shipped coryphaeus: its unchanged files are
-# pruned with their directories, and an edited SKILL.md stops loading as a skill.
+# Upgrade from a release that shipped coryphaeus: the retired skill is never
+# removed (the operator's choice); the install warns with the removal command.
 OLD_HOME="$(mktemp -d)"
 trap 'rm -rf "$HOME_DIR" "$OLD_HOME"' EXIT
 mkdir -p "$OLD_HOME/skills/coryphaeus/bin"
@@ -120,10 +121,15 @@ vhash="$( (sha256sum "$OLD_HOME/skills/coryphaeus/bin/validate.mjs" 2>/dev/null 
 printf '%s  %s\n%s  %s\n' "$vhash" skills/coryphaeus/bin/validate.mjs "$(printf '0%.0s' {1..64})" skills/coryphaeus/SKILL.md > "$OLD_HOME/.chorus-install-manifest"
 run env CLAUDE_HOME="$OLD_HOME" "$REPO_DIR/install.sh"
 [[ $rc -eq 0 ]] || fail "coryphaeus upgrade exited $rc: $out"
-grep -q "^  pruned         skills/coryphaeus/bin/validate.mjs" <<<"$out" || fail "stale coryphaeus file not pruned"
-[[ ! -e "$OLD_HOME/skills/coryphaeus/bin" ]] || fail "stale coryphaeus bin/ left behind"
-[[ ! -e "$OLD_HOME/skills/coryphaeus/SKILL.md" ]] || fail "edited coryphaeus SKILL.md still loads as a skill"
-grep -qx "old skill, edited" "$OLD_HOME/skills/coryphaeus/SKILL.md.retired" || fail "edited coryphaeus SKILL.md not kept as SKILL.md.retired"
+grep -qx "old validator" "$OLD_HOME/skills/coryphaeus/bin/validate.mjs" || fail "install removed a retired skill's file"
+grep -qx "old skill, edited" "$OLD_HOME/skills/coryphaeus/SKILL.md" || fail "install touched a retired skill's SKILL.md"
+grep -q "^warning: the retired skill 'coryphaeus' is still installed" <<<"$out" || fail "no warning about the retired coryphaeus skill"
+grep -q "rm -rf \"$OLD_HOME/skills/coryphaeus\"" <<<"$out" || fail "warning gives no removal command"
+grep -q "skills/coryphaeus/bin/validate.mjs" "$OLD_HOME/.chorus-install-manifest" || fail "retired file dropped from the manifest, so uninstall could not remove it"
+# Without a manifest the retired skill is still found and warned about.
+rm -f "$OLD_HOME/.chorus-install-manifest"
+run env CLAUDE_HOME="$OLD_HOME" "$REPO_DIR/install.sh"
+grep -q "^warning: the retired skill 'coryphaeus'" <<<"$out" || fail "retired skill not warned about without a manifest"
 
 # Upgrade from a copy made before the manifest existed: a file whose content was
 # once shipped is ours and is replaced; a file never shipped fails the install loudly.

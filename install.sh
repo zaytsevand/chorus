@@ -13,9 +13,10 @@
 #   skip           exists but was never written by this installer; left alone
 #   installed      not there yet; written
 # Files an earlier run wrote that this version no longer ships are pruned when
-# unchanged, and reported as "differs, kept" when edited. A retired skill's
-# edited SKILL.md (coryphaeus, folded into chorus-core) is renamed to
-# SKILL.md.retired instead, so it stops loading as a skill. --force overwrites
+# unchanged, and reported as "differs, kept" when edited. A retired skill
+# (coryphaeus, folded into chorus-core) is never removed: the installer warns,
+# with the removal command, and leaves the choice to you. Tests and fixtures
+# (test/, examples/) stay in the repo and are not installed. --force overwrites
 # every shipped file regardless. uninstall.sh uses the same hashes. No sudo.
 #
 # Usage:
@@ -170,7 +171,7 @@ for skill_src in "$SKILLS_SRC"/*/; do
   echo "Skill $name -> $SKILLS_DST/$name"
   while IFS= read -r f; do
     place "$SKILLS_SRC/$f" "skills/$f"
-  done < <(cd "$SKILLS_SRC" && find "$name" -type f | LC_ALL=C sort)
+  done < <(cd "$SKILLS_SRC" && find "$name" -type f -not -path '*/test/*' -not -path '*/examples/*' | LC_ALL=C sort)
 done
 
 echo "Persona agents -> $AGENTS_DST"
@@ -192,14 +193,15 @@ if [[ -f "$MANIFEST" ]]; then
     fi
     target="$CLAUDE_HOME/$old"
     [[ -f "$target" ]] || continue
+    if [[ "$old" =~ ^skills/([^/]+)/ && "$RETIRED_SKILLS" == *" ${BASH_REMATCH[1]} "* ]]; then
+      # A retired skill is warned about below, never removed: that is the operator's choice.
+      echo "$line" >> "$new_manifest"
+      continue
+    fi
     if [[ -n "$rec" && "$(hash_of "$target")" == "$rec" ]]; then
       rm -f "$target"
       rmdir_up "$(dirname "$target")"
       echo "  pruned         $old  (no longer shipped)"
-    elif [[ "$old" =~ ^skills/([^/]+)/SKILL\.md$ && "$RETIRED_SKILLS" == *" ${BASH_REMATCH[1]} "* ]]; then
-      # An edited copy would keep loading as a skill; keep the text, stop the trigger.
-      mv -f "$target" "$target.retired"
-      echo "  retired        $old  (edited; kept as SKILL.md.retired so it no longer loads)"
     else
       echo "  differs, kept  $old  (no longer shipped, but edited or unhashed; now yours)"
     fi
@@ -236,6 +238,15 @@ echo
 echo "chorus-review writes docs/reviews/YYYY-MM-DD-chorus-review.json, the record,"
 echo "and the page rendered from it. Commit both; the most recent record is the"
 echo "next round's baseline."
+
+# A retired skill still installed keeps loading beside its replacement. Warn, with
+# the removal command; whether to remove it is the operator's choice.
+for retired in $RETIRED_SKILLS; do
+  [[ -d "$SKILLS_DST/$retired" ]] || continue
+  echo >&2
+  echo "warning: the retired skill '$retired' is still installed at $SKILLS_DST/$retired and still loads." >&2
+  echo "  chorus-core replaces it. To remove it (your choice): rm -rf \"$SKILLS_DST/$retired\"" >&2
+done
 
 # Anything we ship but left alone makes the install mixed-version: fail, and say how to fix it.
 if (( ${#not_replaced[@]} )); then
