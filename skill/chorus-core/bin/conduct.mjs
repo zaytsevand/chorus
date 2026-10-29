@@ -45,6 +45,8 @@ import { bindings } from "./bindings.mjs";
 import { render } from "./render.mjs";
 
 const SCHEMA_VERSION = `${SCHEMA_MAJOR}.0`;
+/** The chorus-core release that runs this code; stamped into every run log at init. */
+export const ENGINE_VERSION = readFileSync(join(dirname(fileURLToPath(import.meta.url)), "..", "VERSION"), "utf8").trim();
 
 /** The reply kind each phase expects; need-info expects a revision (round 1) then a re-vote (round 2). */
 const KIND_OF = {
@@ -673,7 +675,7 @@ export function freeStem(dir, base) {
 
 export function initLog(mode, opts) {
   const roster = (opts.roster ?? VOCAB.roster.filter((p) => opts.python || !OPTIONAL_LENSES.includes(p))).map((p) => ({ persona: p, lens: LENS_OF[p] ?? "unlisted lens" }));
-  const header = { date: opts.date, target: opts.target ?? opts.feature, dir: opts.dir, stem: opts.stem, roster, bindings: opts.bindings };
+  const header = { date: opts.date, engine: ENGINE_VERSION, target: opts.target ?? opts.feature, dir: opts.dir, stem: opts.stem, roster, bindings: opts.bindings };
   if (mode === RUN_MODE.REVIEW) Object.assign(header, { review_mode: opts.pr ? REVIEW_MODE.PR_DESIGN : REVIEW_MODE.PROJECT_STATE, round_context: opts.context });
   if (mode !== RUN_MODE.REVIEW) Object.assign(header, { corpus: opts.corpus ?? [opts.target ?? opts.feature] });
   if (mode === RUN_MODE.SDLC) header.feature = opts.feature;
@@ -742,6 +744,11 @@ function main(argv) {
   try { log = readJson(file); } catch (e) { return unreadable(`cannot read the run log ${file}: ${e.message}`); }
   const shape = validate(RECORD_KIND.RUN_LOG, log);
   if (!shape.valid) return unreadable(`${file} is not a valid run log: ${shape.errors.map((e) => `${e.path}: ${e.message}`).join("; ")}`);
+  // A log is replayed only by the engine that wrote it (operator ruling, 2026-10-29).
+  if (log.header.engine !== ENGINE_VERSION) {
+    process.stderr.write(`${file} was started by chorus-core ${log.header.engine ?? "before run logs were stamped"}; this is ${ENGINE_VERSION}. A run log is replayed only by the version that wrote it. Finish it with that version (git checkout the matching commit and ./install.sh), or start a new run with conduct init.\n`);
+    return EXIT.ENGINE_MISMATCH;
+  }
   const say = (r) => { (r.exit === 0 ? process.stdout : process.stderr).write(`${r.message}\n`); return r.exit; };
   const input = (path) => { try { return readJson(path); } catch (e) { return usage(`cannot read ${path}: ${e.message}`); } };
   // CLI verbs are their own vocabulary; keys here, never compared as strings.

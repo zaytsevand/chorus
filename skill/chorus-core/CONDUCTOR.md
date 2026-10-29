@@ -341,7 +341,9 @@ re-ask, the one-retry-then-ABSTAIN rule, the ballots (every finding but the
 voter's own, S8), the NEED_INFO hold and its peer-then-operator routing (S11),
 the Stage-4 count, gate cycles and the bound (S7), the side-notes a program can
 see, and the record itself are computed from an append-only run log
-(`<stem>.run.json`, committed beside the record). For these mechanical rules
+(`<stem>.run.json`, committed beside the record). `init` stamps the log with the
+chorus-core version (`VERSION`), and every later command refuses a log stamped
+by another version: a log is replayed only by the engine that wrote it. For these mechanical rules
 `bin/engine.mjs` is the authority: it implements them as pure functions and
 names the section that says what each one is for. Where the prose restates a
 value the engine holds, the engine wins and the prose is fixed.
@@ -388,6 +390,7 @@ own state and the exact command to run next.
 | 5 | unreadable-log | the run log is torn or invalid; restore it from git or start a new run |
 | 6 | not-finished | `record` before `done` or `halt`; run `conduct next` |
 | 7 | bad-init | `init` input the run log rejects; nothing written |
+| 8 | engine-mismatch | the run log was started by another chorus-core version (or before logs were stamped): finish it with that version, or start a new run |
 
 ## Refusals (system boundaries, not modesty)
 

@@ -90,6 +90,7 @@
       "description": "What init fixed. Nothing here changes after init.",
       "properties": {
         "date": { "$ref": "common.schema.json#/$defs/date", "description": "The run's date stamp." },
+        "engine": { "type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$", "description": "The chorus-core version (VERSION) that started this run. conduct refuses a log from any other version, or one without this stamp." },
         "target": { "$ref": "review-record.schema.json#/properties/target", "description": "What is reviewed: a spec, PR, path or idea. The record's limits, so init refuses what record would." },
         "dir": { "type": "string", "minLength": 1, "description": "Where the record is written, from the repository root." },
         "stem": { "type": "string", "pattern": "^[A-Za-z0-9._-]+$", "description": "The record's file stem: <stem>.json, <stem>.md, <stem>.run.json." },

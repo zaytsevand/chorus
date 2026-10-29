@@ -294,6 +294,25 @@ test("cli: each failure has its own exit code", () => {
   assert.ok(!existsSync(join(run.dir, "2026-10-30-chorus-review.run.json")), "a refused init writes nothing");
 });
 
+test("cli: a run log from another engine version is refused, never replayed", () => {
+  const run = newRun(RUN_MODE.REVIEW, { roster: ROSTER6.slice(0, 3) });
+  const log = JSON.parse(readFileSync(run.file, "utf8"));
+  assert.equal(log.header.engine, readFileSync(join(ROOT, "VERSION"), "utf8").trim(), "init stamps the engine version");
+  for (const engine of ["0.0.1", undefined]) {
+    const h = { ...log.header, engine };
+    if (engine === undefined) delete h.engine;
+    writeFileSync(run.file, JSON.stringify({ ...log, header: h }));
+    const r = cli("next", run.file);
+    assert.equal(r.status, EXIT.ENGINE_MISMATCH, r.stderr);
+    assert.match(r.stderr, /replayed only by the version that wrote it/);
+  }
+});
+
+test("plugin.json and chorus-core/VERSION name the same release", () => {
+  const plugin = JSON.parse(readFileSync(join(ROOT, "..", "..", ".claude-plugin", "plugin.json"), "utf8"));
+  assert.equal(plugin.version, readFileSync(join(ROOT, "VERSION"), "utf8").trim());
+});
+
 test("the run log is written whole: no temp file is left behind", () => {
   const run = newRun(RUN_MODE.REVIEW, { roster: ROSTER6.slice(0, 3) });
   drive(run);

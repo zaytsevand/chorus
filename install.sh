@@ -217,6 +217,7 @@ echo "Installed: $counts_installed. Updated: $counts_updated. Current: $counts_c
 echo "Differs, kept: $counts_kept. Skipped (not ours): $counts_skipped."
 echo "Manifest:  $MANIFEST"
 echo
+echo "chorus $(cat "$SKILLS_SRC/chorus-core/VERSION") installed (the version lives in $SKILLS_DST/chorus-core/VERSION)."
 echo "Node: $(node --version) (a round needs Node $NODE_MIN or later)."
 if [[ -f "$SKILLS_DST/problem-brief/SKILL.md" ]]; then
   echo "problem-brief: found at $SKILLS_DST/problem-brief (chorus-core routes decisions to it)."
