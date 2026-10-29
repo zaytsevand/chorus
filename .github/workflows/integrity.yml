@@ -34,7 +34,10 @@ jobs:
       - name: Committed review records validate
         run: |
           for f in docs/reviews/*.json; do
-            node skill/chorus-core/bin/validate.mjs review-record "$f"
+            case "$f" in
+              *.run.json) node skill/chorus-core/bin/validate.mjs run-log "$f" ;;
+              *) node skill/chorus-core/bin/validate.mjs review-record "$f" ;;
+            esac
           done
 
   install-roundtrip:
