@@ -52,7 +52,7 @@ test("review record shows bindings and recoveries once, at the top", () => {
   const md = render("review-record", load("review-record.valid.json"));
   assert.equal(md.split("**Bindings.**").length, 2);
   assert.ok(md.indexOf("**Bindings.**") < md.indexOf("## 1. TL;DR"));
-  assert.match(md, /decision-sink: default · ruling-lookup: default · record-validator: coryphaeus/);
+  assert.match(md, /decision-sink: default · ruling-lookup: default · record-validator: chorus-core/);
   assert.match(md, /\*\*Recovered without asking\.\*\* retry — kent-beck-persona \(round-1\): /);
 });
 

@@ -110,8 +110,9 @@ inferred per-finding):
 - a finding is carried by **unanimous agreement among same-brief voters** — file the
   "one datum, not five" caution;
 - a corpus **defers cross-user or reuse value** (`DECISION-PRIMITIVE.md` § Deferral
-  checklist) and the board seats **no product lens**, or **no security lens** where trust
-  enforcement is server-bound — flag the missing beneficiary / trust review;
+  checklist) and the board seats **no product lens** (`missing-beneficiary-lens`), or **no
+  security lens** where trust enforcement is server-bound (`missing-trust-lens`) — flag the
+  missing beneficiary or trust review;
 - any further regime a consuming skill declares under the same rules.
 
 Side-notes are a human-catch layer **beside** the tally, never inside it; a side-note
@@ -266,14 +267,16 @@ this catalog, bind both modes where they apply, and are defined only in their ho
 
 ## Ports
 
-What the chorus needs from outside. A composition root may bind each port; unbound, the default applies and the round record says so. This table is the one statement of the ports, their contracts and their defaults: a composition root lists its bindings and refers here.
+What the chorus needs from outside. chorus-core serves the record validator and renderer itself (`bin/`, below); any other port is served by a registered provider or falls back to its default, and the round record says which. This table is the one statement of the ports, their contracts and their defaults. `BINDINGS.md` is the one file that knows a provider.
+
+**Routing rule.** Run `bin/bindings.mjs` once at the start of each round or gate and copy the `bindings` block it prints into the record. If a brief provider is registered, route decisions and ruling lookups per `BINDINGS.md`; otherwise the defaults below apply (the free-hand form, `BINDINGS.md` § Free-hand form). The records are the same either way.
 
 | Port | Contract | Default when unbound |
 |---|---|---|
 | decision sink | takes a decision record; returns the choice and a ruling reference, or deferred | ask in chat; a 🔴 ask (an unanswered gate included) is a blocking choice question put with `AskUserQuestion`, at most four per call, and the round waits; keep the answer in the record's local rulings and return its local reference |
 | ruling lookup | before any operator ask (catalog rows that ask the operator, NEED_INFO to the operator, gate interview questions), find a standing ruling; a fitting one resolves the ask 🟢 and is cited | the record's local rulings and earlier records |
-| record validator | validates every persona reply and every chorus record against the bound schema before it is counted or published; a failing persona reply gets one retry, then counts as ABSTAIN with the validator's reason logged. Expects schema major 1: a "version mismatch" is install drift, reported once and never retried or counted against a persona | none; the round runs and its record says "unvalidated" |
-| record renderer / publisher | the durable record is JSON; its markdown page is rendered from it, never hand-written | commit the JSON; write the markdown by hand, marked "unrendered" |
+| record validator | validates every persona reply and every chorus record against the bound schema before it is counted or published; a failing persona reply gets one retry, then counts as ABSTAIN with the validator's reason logged. Expects schema major 1: a "version mismatch" is install drift, reported once and never retried or counted against a persona | none: Node 20+ is required, and without it the round does not run |
+| record renderer / publisher | the durable record is JSON; its markdown page is rendered from it, never hand-written | none: Node 20+ is required; the page is always rendered from the JSON |
 | arbiter | resolves framed conflicts (I5) | `advisor()`; if unavailable, record the conflict unresolved for the operator |
 | fixed viewpoint | the spec-walkthrough lens chorus-sdlc runs at its gates | skipped, and the skip logged |
 | memory recall | prior findings and rulings for the target | none |
@@ -281,6 +284,113 @@ What the chorus needs from outside. A composition root may bind each port; unbou
 - **Consult before raising.** No operator ask leaves the chorus until the ruling lookup has been consulted.
 - **Recover quietly.** A failed persona reply gets one automatic retry; a missing optional tool falls back to its port's default. Both are recorded in the round record's bindings (the provider behind each port, or `default`, and each recovery), never asked live. An operator question leaves the chorus only when the round cannot reach a valid result alone: quorum fails, or a lost seat leaves a 🔴 finding without enough voters to count it. A missing gate answer is not a recoverable failure: it blocks the round until the operator answers (`EXPLORATORY-PHASE.md` § Sessioned interview).
 - **Cite, don't copy.** A decision resolved through the bound sink enters the chorus record only as a reference (answer id + where it lives); operator rulings are never restated in chorus records; vote arithmetic lives only in chorus records.
+
+### Record tools
+
+`<root>` is the installed chorus-core directory: `.claude/skills/chorus-core` in
+the project if present, else `~/.claude/skills/chorus-core`.
+
+```
+node <root>/bin/conduct.mjs  <command> …                   # the conductor loop, below
+node <root>/bin/bindings.mjs                               # the round's bindings block
+node <root>/bin/validate.mjs <kind> <file.json> [--json]   # 0 valid · 1 invalid · 2 usage · 3 version mismatch
+node <root>/bin/render.mjs   <review-record|sdlc-log> <file.json> <out.md>
+```
+
+Kinds: `rsvp`, `finding-report`, `vote-report`, `review-record`, `sdlc-log`,
+`decision`, `ruling`, `run-log`. Every closed vocabulary (severities, votes,
+statuses, ports, gate results, phases, the persona roster…) lives once, in
+`schema/vocab.schema.json`; schemas `$ref` it and code imports it through
+`bin/vocab.mjs`. `test/vocab-lint.test.mjs` fails on an inline enum, a bare
+vocabulary literal in `bin/`, a near-miss spelling in skill or agent prose
+(an underscore where the registry has a hyphen), or a roster that disagrees with `plugin.json` and
+`agents/`. The schema is `schema/` (JSON Schema 2020-12); `examples/`
+holds a valid and an invalid sample of each kind; `test/` holds the tests,
+including `canon-drift.test.mjs`, which fails when the validator or schema stops
+matching this section or `GATE-PRIMITIVE.md` § Stage 4, or when prose restates a
+seat cap, quorum or cycle bound that `bin/engine.mjs` does not hold. For the
+mechanical rules the engine is the authority, so fix the prose; for the ports
+and the failure policy this section is, so fix the code.
+
+**When to run it.** Validate every persona reply before it is counted and every
+record before it is published. The renderer validates again and refuses
+invalid input. What each exit code means for a persona reply (the record
+validator row above):
+
+| Exit | Meaning | Do |
+|---|---|---|
+| 0 | valid | count it |
+| 1 | invalid | one retry, then counts as ABSTAIN with the validator's reason logged; the retry is automatic and carries the reason |
+| 2 | usage | fix the command; the persona is not charged |
+| 3 | "version mismatch": the reply declares a schema major other than 1; nothing else is checked | install drift, reported once and never retried or counted against a persona |
+
+Write every retry, fallback and abstention to the record's
+`bindings.recoveries`; none of them is asked live.
+
+**Ruling references.** A `ruling_ref` record path is read from the repository
+root; `"#"` means the record itself (its `local_rulings`). The validator opens a
+local record and checks the id is there: an id it does not hold is an error; an
+absent or unreadable record is a warning, so a private brief kept outside the
+repository does not break validation.
+
+### The conductor loop
+
+The integration layer's mechanical work is a program, `bin/conduct.mjs`; the
+calling session keeps only what a program cannot do. Seating, quorum and the
+re-ask, the one-retry-then-ABSTAIN rule, the ballots (every finding but the
+voter's own, S8), the NEED_INFO hold and its peer-then-operator routing (S11),
+the Stage-4 count, gate cycles and the bound (S7), the side-notes a program can
+see, and the record itself are computed from an append-only run log
+(`<stem>.run.json`, committed beside the record). `init` stamps the log with the
+chorus-core version (`VERSION`), and every later command refuses a log stamped
+by another version: a log is replayed only by the engine that wrote it. For these mechanical rules
+`bin/engine.mjs` is the authority: it implements them as pure functions and
+names the section that says what each one is for. Where the prose restates a
+value the engine holds, the engine wins and the prose is fixed.
+
+```
+conduct init review --target <t> --context <deltas> [--pr <n>]   # or: init sdlc --feature <0NN-name> · init challenge --target <t>
+loop:
+  conduct next <run.json>                       # one action, as JSON
+  …do what it says…
+  conduct submit <run.json> <persona> <reply>   # each persona reply (validated, or logged as a failure)
+  conduct fail   <run.json> <persona> <failure> <reason>   # silent, past budget, not installed
+  conduct ack    <run.json> <persona>           # explore / memory step done
+  conduct answer <run.json> <topic> <data>      # an input the action asked for
+until the action is done or halt
+conduct record <run.json>                       # writes <stem>.json and <stem>.md, validated
+```
+
+| Action | The calling session |
+|---|---|
+| `dispatch` / `retry` | dispatches each listed persona with the brief for that phase (and the retry reason), then runs the `command` each ask carries: `submit` for a reply, `ack` for a step with no reply (exploration) |
+| `ask-operator` | puts the question as a blocking choice (`AskUserQuestion`, at most four per call); the answer goes back through `answer` |
+| `provide` | supplies what only it can: the exploratory interview's outcome (`EXPLORATORY-PHASE.md` step 7), conflicts framed for the arbiter, the top-five scores, the TL;DR and baseline, the premise-pass outcomes, a peer's provision, the memory update |
+| `incorporate` / `run-skill` | runs the named speckit skills (S5), then reports with `answer` |
+| `done` / `halt` | runs `record`; on halt the record says what awaits the operator |
+
+The script refuses a reply nobody asked for, a vote on one's own finding or off
+the ballot, a low-confidence vote that is not NEED_INFO, a ranking that holds a
+held or minority finding, and a waiver without the operator's ruling. It copies
+every pull-quote, locator and severity into the top five itself, so the
+conductor relays and never restates (I6). Every refusal names this persona's
+own state and the exact command to run next.
+
+**Exit codes.** One code per meaning; the registry owns them
+(`schema/vocab.schema.json` `$defs.exit`, `EXIT` in `bin/vocab.mjs`), and
+`test/canon-drift.test.mjs` fails when this table disagrees with it.
+
+| Exit | Meaning | Do |
+|---|---|---|
+| 0 | ok | the next `conduct next` |
+| 1 | refused | the reply or answer failed validation; a persona reply is logged as a failure and its one retry comes in a `retry` action |
+| 2 | usage | fix the command or its arguments |
+| 3 | version-mismatch | install drift: report once; never retried or charged |
+| 4 | not-asked | nothing logged; run the command the message names |
+| 5 | unreadable-log | the run log is torn or invalid; restore it from git or start a new run |
+| 6 | not-finished | `record` before `done` or `halt`; run `conduct next` |
+| 7 | bad-init | `init` input the run log rejects; nothing written |
+| 8 | engine-mismatch | the run log was started by another chorus-core version (or before logs were stamped): finish it with that version, or start a new run |
 
 ## Refusals (system boundaries, not modesty)
 

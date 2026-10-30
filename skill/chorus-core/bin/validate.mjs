@@ -8,8 +8,8 @@
  *   A ruling_ref record path is read from the repository root (the nearest
  *   folder above the file that holds .git). An absent record is a warning.
  *
- *   kinds: rsvp, finding-report, vote-report, review-record, sdlc-log,
- *          decision, ruling
+ *   kinds: schema/vocab.schema.json record_kind (rsvp, finding-report,
+ *          vote-report, review-record, sdlc-log, decision, ruling, run-log)
  *   exit:  0 valid · 1 invalid · 2 usage or unreadable input
  *          3 version mismatch (the record's schema major is not the one supported)
  *
@@ -25,7 +25,7 @@
  *      of the top five, word limits, cross-references, ruling_ref shape, and
  *      each ruling_ref followed into the local record it names.
  *
- * A program, never a model reading the JSON. Zero dependencies; Node 18+.
+ * A program, never a model reading the JSON. Zero dependencies; Node 20+.
  * Only the JSON Schema keywords the bundled schemas use are implemented; any
  * other keyword is reported, not silently ignored.
  */
@@ -33,6 +33,14 @@
 import { existsSync, readFileSync, readdirSync, realpathSync } from "node:fs";
 import { dirname, isAbsolute, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import {
+  DECISION_RESOLUTION, DECISION_STATUS, GATE, GATE_NAME_OF, GATE_RESULT, HELD_ROUTE,
+  RECOVERY, RED_DISPOSITION, REPORT_MODE, REVIEW_QUORUM, RSVP, SDLC_MODE, SDLC_STATUS, SEAT, SEVERITY,
+  SEATING_BAND, TALLY_STATUS, VOCAB, CONFLICT_OUTCOME, RECORD_KIND, RULING_STATUS,
+} from "./vocab.mjs";
+import { QUORUM, SEAT_CAP, CYCLE_BOUND, tally } from "./engine.mjs";
+
+export { tally };
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const SCHEMA_DIR = join(HERE, "..", "schema");
@@ -40,7 +48,7 @@ const SCHEMA_DIR = join(HERE, "..", "schema");
 /** The schema major this validator supports. The chorus states the major it expects (CONDUCTOR.md § Ports). */
 export const SCHEMA_MAJOR = 1;
 
-export const KINDS = ["rsvp", "finding-report", "vote-report", "review-record", "sdlc-log", "decision", "ruling"];
+export const KINDS = VOCAB.record_kind;
 
 /* ── schemas ─────────────────────────────────────────────────────────────── */
 
@@ -120,7 +128,7 @@ class SchemaWalker {
       return;
     }
     for (const k of Object.keys(schema)) {
-      if (!KNOWN_KEYWORDS.has(k)) this.add(path, `the schema uses "${k}", which this validator does not implement`, "extend the validator or simplify the schema");
+      if (!KNOWN_KEYWORDS.has(k) && !k.startsWith("x-")) this.add(path, `the schema uses "${k}", which this validator does not implement`, "extend the validator or simplify the schema");
     }
     if (schema.type && !matchesType(value, schema.type)) {
       this.add(path, `should be ${article(schema.type)}, but is ${article(typeOf(value))}`);
@@ -177,21 +185,6 @@ class SchemaWalker {
 }
 
 /* ── semantic checks ─────────────────────────────────────────────────────── */
-
-const SEV = ["🟢", "🟡", "🔴"];
-
-/** The Stage-4 rule, GATE-PRIMITIVE.md § Stage 4. Returns what a tally row must say. */
-export function tally(authored, n, p, c, o) {
-  const net = p - o;
-  const threshold = Math.max(1, Math.floor(n / 2));
-  const voted = p + c + o;
-  let final = authored, movement;
-  if (voted === 0) movement = "unvoted";
-  else if (net >= threshold) { movement = "escalate"; final = SEV[Math.min(2, SEV.indexOf(authored) + 1)]; }
-  else if (net <= -threshold) { movement = "demote"; const i = SEV.indexOf(authored); final = i === 0 ? "dropped" : SEV[i - 1]; }
-  else movement = c > 0 ? "agreed" : "unmoved";
-  return { net, threshold, final_severity: final, movement, convergence: p + c, gating: final === "🔴", status: voted === 0 ? "unvoted" : "graded" };
-}
 
 function words(...texts) {
   return texts.flat(Infinity).filter((t) => typeof t === "string").join(" ").split(/\s+/).filter(Boolean).length;
@@ -284,17 +277,17 @@ class Semantics {
     const entry = (Array.isArray(doc.decisions) ? doc.decisions : []).find((e) => e?.id === ref.id);
     if (!entry) return this.err(path, `${ref.id} is not among the entries in ${ref.record}`, "a citation that names nothing carries no authority; check the id");
     if (!cites) return;
-    const status = entry.status ?? "open";
-    if (status === "superseded") this.warn(path, `${ref.id} is superseded in ${ref.record}: nothing was carried out, so it settles nothing`, "cite what overtook it, or drop the citation");
-    else if (status === "open") this.warn(path, `${ref.id} is still open in ${ref.record}, so it settles nothing yet`, "wait for the ruling, or cite a standing one");
+    const status = entry.status ?? DECISION_STATUS.OPEN;
+    if (status === DECISION_STATUS.SUPERSEDED) this.warn(path, `${ref.id} is superseded in ${ref.record}: nothing was carried out, so it settles nothing`, "cite what overtook it, or drop the citation");
+    else if (status === DECISION_STATUS.OPEN) this.warn(path, `${ref.id} is still open in ${ref.record}, so it settles nothing yet`, "wait for the ruling, or cite a standing one");
   }
 
   /** A replaced ruling warns and names the ruling that holds now, following the chain. */
   replaced(r, rulings, path) {
-    if (r.status !== "replaced") return;
+    if (r.status !== RULING_STATUS.REPLACED) return;
     let cur = r;
     const seen = new Set([r.id]);
-    while (cur.status === "replaced" && cur.replacedBy && !seen.has(cur.replacedBy)) {
+    while (cur.status === RULING_STATUS.REPLACED && cur.replacedBy && !seen.has(cur.replacedBy)) {
       seen.add(cur.replacedBy);
       cur = rulings.get(cur.replacedBy) ?? { id: cur.replacedBy };
     }
@@ -308,11 +301,11 @@ class Semantics {
     const rec = sols.map((s, i) => (s.recommended ? i : -1)).filter((i) => i >= 0);
     if (rec.length > 1) this.err(join2(path, "solutions"), "more than one solution is recommended", "exactly one default");
     if (rec.length === 1 && rec[0] !== 0) this.err(join2(path, `solutions[${rec[0]}]`), "the recommended (default) solution must be listed first", "move it to the top — a brief entry derived from this requires it");
-    if ((d.band === "🟡" || d.band === "🔴") && rec.length === 0) this.err(join2(path, "solutions"), `a ${d.band} decision needs a default marked recommended: true`, "DECISION-PRIMITIVE.md § Review surfaces");
-    if (d.catalog_row === undefined && d.band && d.band !== "🔴") this.err(join2(path, "band"), `an unlisted decision point is ${d.band}, but no catalog row means 🔴`, "set catalog_row, or band 🔴 (DECISION-PRIMITIVE.md § The sensor)");
+    if ((d.band === SEVERITY.YELLOW || d.band === SEVERITY.RED) && rec.length === 0) this.err(join2(path, "solutions"), `a ${d.band} decision needs a default marked recommended: true`, "DECISION-PRIMITIVE.md § Review surfaces");
+    if (d.catalog_row === undefined && d.band && d.band !== SEVERITY.RED) this.err(join2(path, "band"), `an unlisted decision point is ${d.band}, but no catalog row means 🔴`, "set catalog_row, or band 🔴 (DECISION-PRIMITIVE.md § The sensor)");
     if (d.decision && !sols.some((s) => s.id === d.decision.chose)) this.err(join2(path, "decision → chose"), `"${d.decision.chose}" is not one of this decision's solutions`, `use one of: ${sols.map((s) => s.id).join(", ")}`);
-    if (d.resolution === "in-progress" && d.cycle === undefined) this.err(path, "an in-progress (self-heal) decision must say which cycle", "set cycle: N of 3");
-    if (d.band === "🔴" && d.status && !["open", "superseded"].includes(d.status) && !d.ruling_ref) this.err(path, "a 🔴 decision that is no longer open must cite the operator's ruling", "add ruling_ref (only the operator settles a 🔴, D2)");
+    if (d.resolution === DECISION_RESOLUTION.IN_PROGRESS && d.cycle === undefined) this.err(path, "an in-progress (self-heal) decision must say which cycle", "set cycle: N of 3");
+    if (d.band === SEVERITY.RED && d.status && ![DECISION_STATUS.OPEN, DECISION_STATUS.SUPERSEDED].includes(d.status) && !d.ruling_ref) this.err(path, "a 🔴 decision that is no longer open must cite the operator's ruling", "add ruling_ref (only the operator settles a 🔴, D2)");
   }
 
   /** Register + tally for one board. seated: Set of seated personas, or null. */
@@ -350,20 +343,20 @@ class Semantics {
 
   tallyRow(r, e, seated, p) {
     const derived = e.id?.startsWith("R2-");
-    if (derived && r.status !== "ungraded") this.err(p, `R2- finding "${e.id}" must have status ungraded`, "no second lens has voted on it (graded: false)");
-    if (!derived && r.status === "ungraded") this.err(p, "only R2- derived findings are ungraded");
-    if (r.status === "held") {
+    if (derived && r.status !== TALLY_STATUS.UNGRADED) this.err(p, `R2- finding "${e.id}" must have status ungraded`, "no second lens has voted on it (graded: false)");
+    if (!derived && r.status === TALLY_STATUS.UNGRADED) this.err(p, "only R2- derived findings are ungraded");
+    if (r.status === TALLY_STATUS.HELD) {
       if (!e.need_info) this.err(p, "status held, but the register shows no open NEED_INFO", "held means need_info is still open (S11)");
       if (r.final_severity !== undefined || r.gating !== undefined) this.err(p, "a held finding has no post-tally severity", "S11: it must not tally until need_info clears");
       return;
     }
     if (e.need_info && !derived) this.err(p, `"${e.id}" has an open NEED_INFO but was counted`, "set status held; tally only after the flag clears (S11)");
-    if (r.status === "ungraded") {
+    if (r.status === TALLY_STATUS.UNGRADED) {
       if (r.final_severity !== undefined && r.final_severity !== e.authored_severity) this.err(p, "an ungraded finding keeps its author's severity", `final_severity must be ${e.authored_severity}`);
       for (const k of ["p", "c", "o", "net"]) if (r[k] !== undefined) this.err(p, `an ungraded finding carries no vote count ("${k}")`);
       return;
     }
-    if (r.status === "minority-report") {
+    if (r.status === TALLY_STATUS.MINORITY_REPORT) {
       const { n, p: P, c: C, o: O } = r;
       if ([n, P, C, O].every(Number.isInteger) && (n !== 1 || P + C + O !== 1)) this.err(p, `a minority report has exactly one voter (N = ${n}, P + C + O = ${P + C + O})`, "GATE-PRIMITIVE.md § Stage 4, settled case 7");
       if (r.final_severity !== undefined && r.final_severity !== e.authored_severity) this.err(p, "a minority report keeps its author's severity", `final_severity must be ${e.authored_severity}`);
@@ -376,7 +369,7 @@ class Semantics {
     if (P + C + O !== n) this.err(p, `N = ${n}, but P + C + O = ${P + C + O}`, "N counts exactly the non-author voters on this finding: N = P + C + O (GATE-PRIMITIVE.md § Stage 4, settled case 1)");
     if (seated && n > seated.size - 1) this.err(p, `N = ${n} exceeds the seated non-author personas (${seated.size - 1})`, "S8: the author never votes on its own finding");
     const want = tally(r.authored_severity, n, P, C, O);
-    if (want.status === "graded" && n < 2) this.err(p, `a tally must not run at N < 2 (N = ${n})`, n === 1 ? "set status minority-report (GATE-PRIMITIVE.md § Stage 4, settled case 7)" : "GATE-PRIMITIVE.md § Stage 4");
+    if (want.status === TALLY_STATUS.GRADED && n < 2) this.err(p, `a tally must not run at N < 2 (N = ${n})`, n === 1 ? "set status minority-report (GATE-PRIMITIVE.md § Stage 4, settled case 7)" : "GATE-PRIMITIVE.md § Stage 4");
     if (r.status !== want.status) this.err(p, `status is ${r.status}, but ${P + C + O === 0 ? "no votes were cast (unvoted)" : "votes were cast (graded)"}`, `set status ${want.status}`);
     for (const k of ["net", "threshold", "movement", "final_severity", "convergence", "gating"]) {
       if (r[k] !== undefined && r[k] !== want[k]) {
@@ -399,23 +392,23 @@ class Semantics {
     let ordinary = 0; const deltas = new Map();
     (roster ?? []).forEach((r, i) => {
       const p = `${path}[${i}]`;
-      if (r.failure && r.decision !== "ABSTAIN") this.err(p, `a failure-rule persona (${r.failure}) counts as ABSTAIN`, "set decision ABSTAIN");
+      if (r.failure && r.decision !== RSVP.ABSTAIN) this.err(p, `a failure-rule persona (${r.failure}) counts as ABSTAIN`, "set decision ABSTAIN");
       if (r.seated) {
-        if (r.decision === "ABSTAIN") this.err(p, "an abstainer is seated", "I3: never draft an abstainer");
-        if (r.decision === "JOIN" && r.seat !== "ordinary") this.err(p, "a JOIN takes an ordinary seat");
-        if (r.decision === "EXCEPTIONAL" && r.seat !== "exceptional") this.err(p, "an exceptional entry takes an exceptional seat");
+        if (r.decision === RSVP.ABSTAIN) this.err(p, "an abstainer is seated", "I3: never draft an abstainer");
+        if (r.decision === RSVP.JOIN && r.seat !== SEAT.ORDINARY) this.err(p, "a JOIN takes an ordinary seat");
+        if (r.decision === RSVP.EXCEPTIONAL && r.seat !== SEAT.EXCEPTIONAL) this.err(p, "an exceptional entry takes an exceptional seat");
         seated.add(r.persona);
-        if (r.seat === "ordinary") ordinary++;
+        if (r.seat === SEAT.ORDINARY) ordinary++;
       }
-      if (r.decision === "EXCEPTIONAL" && r.uncovered_delta) {
+      if (r.decision === RSVP.EXCEPTIONAL && r.uncovered_delta) {
         const d = r.uncovered_delta.trim().toLowerCase();
         if (deltas.has(d)) this.err(p, "two exceptional entries cite the same uncovered delta", `already cited at ${path}[${deltas.get(d)}]; distinct entries need distinct deltas`);
         else deltas.set(d, i);
       }
     });
-    if (ordinary > 5) this.err(path, `${ordinary} ordinary seats; the cap is five`, "DECISION-PRIMITIVE.md § Seating");
-    const joins = (roster ?? []).filter((r) => r.decision === "JOIN");
-    if (joins.length <= 5) joins.forEach((r) => { if (r.seated === false) this.err(path, `"${r.persona}" joined but is not seated`, "3 ≤ J ≤ 5 seats every joiner"); });
+    if (ordinary > SEAT_CAP) this.err(path, `${ordinary} ordinary seats; the cap is ${SEAT_CAP}`, "DECISION-PRIMITIVE.md § Seating");
+    const joins = (roster ?? []).filter((r) => r.decision === RSVP.JOIN);
+    if (joins.length <= SEAT_CAP) joins.forEach((r) => { if (r.seated === false && !r.capped) this.err(path, `"${r.persona}" joined but is not seated`, `${QUORUM} ≤ J ≤ ${SEAT_CAP} seats every joiner`); });
     return { seated, joiners: joins.length };
   }
 }
@@ -423,8 +416,8 @@ class Semantics {
 function checkRsvp(d, s) {
   const n = words(d.reason, d.expected?.hook, d.applies ?? [], d.uncovered_delta);
   if (n > 80) s.err("", `the reply is ${n} words; the limit is 80`, "chorus-review Phase 0.5; an over-length reply counts as ABSTAIN");
-  if (d.decision === "ABSTAIN" && (d.applies?.length || d.expected)) s.warn("", "an ABSTAIN carries applicability or stakes", "fine, but the reply will not be seated");
-  if (d.decision === "EXCEPTIONAL" && d.uncovered_delta && !(d.applies ?? []).includes(d.uncovered_delta)) s.warn("uncovered_delta", "the uncovered delta is not among the cited applies deltas");
+  if (d.decision === RSVP.ABSTAIN && (d.applies?.length || d.expected)) s.warn("", "an ABSTAIN carries applicability or stakes", "fine, but the reply will not be seated");
+  if (d.decision === RSVP.EXCEPTIONAL && d.uncovered_delta && !(d.applies ?? []).includes(d.uncovered_delta)) s.warn("uncovered_delta", "the uncovered delta is not among the cited applies deltas");
 }
 
 function reportFindings(list, path, s, { derived }) {
@@ -448,13 +441,13 @@ function reportWords(d, list) {
 function checkFindingReport(d, s) {
   reportFindings(d.findings, "findings", s, { derived: false });
   if (d.tool_uses === 0) s.err("tool_uses", "a report with zero tool uses fails the evidence check", "re-dispatch once with the artefacts to read first (chorus-review Phase 1 evidence check)");
-  if (d.mode === "review") {
+  if (d.mode === REPORT_MODE.REVIEW) {
     const n = reportWords(d, d.findings);
     if (n > 700) s.err("", `the report is ${n} words of prose; the limit is 700`, "the limit bounds prose per finding, not the number of findings");
   }
   (d.findings ?? []).forEach((f, i) => {
     if (f.conditional_on && !(d.gate_questions ?? []).length) s.err(`findings[${i}]`, "a conditional finding needs the gate question it is conditional on", "add it to gate_questions (S10)");
-    if ((f.scope || f.attack_form) && d.mode === "review") s.warn(`findings[${i}]`, "scope and attack_form belong to the premise pass (sdlc Gate A or challenge)");
+    if ((f.scope || f.attack_form) && d.mode === REPORT_MODE.REVIEW) s.warn(`findings[${i}]`, "scope and attack_form belong to the premise pass (sdlc Gate A or challenge)");
   });
 }
 
@@ -467,7 +460,7 @@ function checkVoteReport(d, s) {
   });
   reportFindings(d.derived, "derived", s, { derived: true });
   if (d.tool_uses === 0) s.err("tool_uses", "a report with zero tool uses fails the evidence check");
-  if (d.mode === "review") {
+  if (d.mode === REPORT_MODE.REVIEW) {
     const n = reportWords(d, d.derived);
     if (n > 600) s.err("", `the report is ${n} words of prose; the limit is 600`, "chorus-review Phase 2");
   }
@@ -483,12 +476,12 @@ function checkReviewRecord(d, s) {
   const { seated, joiners } = s.roster(d.roster, "roster");
   if (d.quorum) {
     if (d.quorum.joiners !== joiners) s.err("quorum → joiners", `says ${d.quorum.joiners}, the roster has ${joiners} JOIN replies`);
-    const ok = d.quorum.joiners >= 3;
-    if (d.quorum.branch === "aborted" && ok) s.err("quorum → branch", "aborted with J ≥ 3");
-    if (d.quorum.branch !== "aborted" && !ok) s.err("quorum → branch", `${d.quorum.branch} with J < 3`, "below quorum the round aborts (I3)");
+    const ok = d.quorum.joiners >= QUORUM;
+    if (d.quorum.branch === REVIEW_QUORUM.ABORTED && ok) s.err("quorum → branch", `aborted with J ≥ ${QUORUM}`);
+    if (d.quorum.branch !== REVIEW_QUORUM.ABORTED && !ok) s.err("quorum → branch", `${d.quorum.branch} with J < ${QUORUM}`, "below quorum the round aborts (I3)");
   }
   const decisions = checkDecisions(d.decisions, "decisions", s);
-  if (joiners >= 6 && !d.seating_decision) s.err("", "J ≥ 6 needs a seating decision", "set seating_decision to the DecisionRecord id");
+  if (joiners > SEAT_CAP && !d.seating_decision) s.err("", `J ≥ ${SEAT_CAP + 1} needs a seating decision`, "set seating_decision to the DecisionRecord id");
   if (d.seating_decision && !decisions.has(d.seating_decision)) s.err("seating_decision", `"${d.seating_decision}" is not in decisions`);
   const { byId, rows } = s.board(d.register, d.tally, seated, "register", "tally");
 
@@ -497,11 +490,11 @@ function checkReviewRecord(d, s) {
     const p = `conflicts[${i}]`;
     for (const f of c.findings ?? []) if (!byId.has(f)) s.err(p, `touches "${f}", which is not in the register`);
     if (c.decision_ref && !decisions.has(c.decision_ref)) s.err(join2(p, "decision_ref"), `"${c.decision_ref}" is not in decisions`);
-    if (c.outcome === "unresolved" && !c.decision_ref) s.warn(p, "unresolved for the operator but not carried to the decision sink", "add a decision and decision_ref");
+    if (c.outcome === CONFLICT_OUTCOME.UNRESOLVED && !c.decision_ref) s.warn(p, "unresolved for the operator but not carried to the decision sink", "add a decision and decision_ref");
   });
 
-  const heldRows = new Set([...rows.values()].filter((r) => r.status === "held").map((r) => r.finding));
-  const minorityRows = new Set([...rows.values()].filter((r) => r.status === "minority-report").map((r) => r.finding));
+  const heldRows = new Set([...rows.values()].filter((r) => r.status === TALLY_STATUS.HELD).map((r) => r.finding));
+  const minorityRows = new Set([...rows.values()].filter((r) => r.status === TALLY_STATUS.MINORITY_REPORT).map((r) => r.finding));
   s.unique(d.top_five, "finding", "top_five", "top-five finding");
   s.unique(d.top_five, "rank", "top_five", "rank");
   (d.top_five ?? []).forEach((t, i) => {
@@ -524,11 +517,11 @@ function checkReviewRecord(d, s) {
   (d.held ?? []).forEach((h, i) => {
     if (!heldRows.has(h.finding)) s.err(`held[${i}]`, `"${h.finding}" is listed as held, but its tally row is not held`);
     if (h.decision_ref && !decisions.has(h.decision_ref)) s.err(`held[${i}] → decision_ref`, `"${h.decision_ref}" is not in decisions`);
-    if (h.route === "operator" && !h.decision_ref) s.warn(`held[${i}]`, "routed to the operator but not carried to the decision sink", "add a decision and decision_ref");
+    if (h.route === HELD_ROUTE.OPERATOR && !h.decision_ref) s.warn(`held[${i}]`, "routed to the operator but not carried to the decision sink", "add a decision and decision_ref");
   });
 
   const redBlocking = [...rows.values()].filter((r) => r.gating).length;
-  if (redBlocking && d.tldr && !/🔴/.test(d.tldr[2] ?? "")) s.warn("tldr[2]", "the third TL;DR sentence should name the 🔴 findings that block rollout");
+  if (redBlocking && d.tldr && !(d.tldr[2] ?? "").includes(SEVERITY.RED)) s.warn("tldr[2]", "the third TL;DR sentence should name the 🔴 findings that block rollout");
   s.unique(d.appendix, "persona", "appendix", "appendix persona");
   for (const p of seated) if (!(d.appendix ?? []).some((a) => a.persona === p)) s.warn("appendix", `no report link for seated persona "${p}"`);
   s.unique(d.local_rulings, "id", "local_rulings", "ruling id");
@@ -550,13 +543,13 @@ function checkBindings(b, roster, s) {
   const retried = new Map(), abstained = new Set();
   (b.recoveries ?? []).forEach((x, i) => {
     const p = `bindings → recoveries[${i}]`;
-    if (x.kind === "fallback" && !defaults.has(x.subject)) s.err(p, `a fallback on "${x.subject}", which is not a port served by "default"`, "list the port under bindings → ports with provider default");
-    if (x.kind === "retry") {
+    if (x.kind === RECOVERY.FALLBACK && !defaults.has(x.subject)) s.err(p, `a fallback on "${x.subject}", which is not a port served by "default"`, "list the port under bindings → ports with provider default");
+    if (x.kind === RECOVERY.RETRY) {
       const k = `${x.subject}@${x.phase ?? ""}`;
       if (retried.has(k)) s.err(p, `a second retry for "${x.subject}"${x.phase ? ` in ${x.phase}` : ""}`, "one automatic retry, then the persona counts as ABSTAIN");
       else retried.set(k, i);
     }
-    if (x.kind === "abstention") {
+    if (x.kind === RECOVERY.ABSTENTION) {
       abstained.add(x.subject);
       if (!failed.has(x.subject)) s.err(p, `"${x.subject}" is recorded as abstaining by failure, but its roster row names no failure`, "set failure on the roster row");
     }
@@ -572,13 +565,13 @@ function checkSdlcLog(d, s) {
     const expect = (lastCycle[g.gate] ?? 0) + 1;
     if (g.cycle !== expect) s.err(join2(gp, "cycle"), `gate ${g.gate} is at cycle ${g.cycle} where cycle ${expect} was expected`, "cycles are numbered 1, 2, 3 and appended, never edited away");
     lastCycle[g.gate] = g.cycle;
-    const names = { A: "design", B: "plan-tasks", C: "implementation", challenge: "premise" };
-    if (names[g.gate] && g.name !== names[g.gate]) s.err(join2(gp, "name"), `gate ${g.gate} is "${names[g.gate]}", not "${g.name}"`);
-    if (g.premise_pass && !["A", "challenge"].includes(g.gate)) s.err(join2(gp, "premise_pass"), "only Gate A (or a challenge) runs the premise pass");
-    if (g.gate === "A" && !g.premise_pass) s.err(gp, "Gate A records its premise pass first", "chorus-sdlc § The ledger");
+    const name = GATE_NAME_OF[g.gate];
+    if (name && g.name !== name) s.err(join2(gp, "name"), `gate ${g.gate} is "${name}", not "${g.name}"`);
+    if (g.premise_pass && ![GATE.A, GATE.CHALLENGE].includes(g.gate)) s.err(join2(gp, "premise_pass"), "only Gate A (or a challenge) runs the premise pass");
+    if (g.gate === GATE.A && !g.premise_pass) s.err(gp, "Gate A records its premise pass first", "chorus-sdlc § The ledger");
     if (g.premise_pass) s.unique(g.premise_pass.red_team, "item", join2(gp, "premise_pass → red_team"), "checklist item");
     const { seated } = s.roster(g.rsvp, join2(gp, "rsvp"));
-    if (g.seating?.band === "🟡") {
+    if (g.seating?.band === SEATING_BAND.YELLOW) {
       if (!g.seating.decision_ref) s.err(join2(gp, "seating"), "a 🟡 seating tie needs its DecisionRecord", "set decision_ref");
       else if (!decisions.has(g.seating.decision_ref)) s.err(join2(gp, "seating → decision_ref"), `"${g.seating.decision_ref}" is not in decisions`);
     }
@@ -590,23 +583,24 @@ function checkSdlcLog(d, s) {
       res.set(r.finding, r.disposition);
     });
     const gating = [...rows.values()].filter((r) => r.gating).map((r) => r.finding);
-    const uncleared = gating.filter((f) => !["resolved", "waived"].includes(res.get(f)));
-    if (d.status === "complete") for (const f of gating) if (!["resolved", "waived"].includes(res.get(f))) s.err(join2(gp, "red_resolutions"), `gating 🔴 "${f}" has no resolved/waived row, yet the run is complete`, "S4: no gate passes with an open 🔴");
+    const cleared = [RED_DISPOSITION.RESOLVED, RED_DISPOSITION.WAIVED];
+    const uncleared = gating.filter((f) => !cleared.includes(res.get(f)));
+    if (d.status === SDLC_STATUS.COMPLETE) for (const f of gating) if (!cleared.includes(res.get(f))) s.err(join2(gp, "red_resolutions"), `gating 🔴 "${f}" has no resolved/waived row, yet the run is complete`, "S4: no gate passes with an open 🔴");
     const result = g.outcome?.result;
-    if (result === "pass" && uncleared.length) s.err(join2(gp, "outcome"), `passes with open 🔴: ${uncleared.join(", ")}`, "S4");
-    if (g.cycle === 3 && uncleared.length && !["bound-reached", "halt"].includes(result)) s.err(join2(gp, "outcome"), "the third cycle left a 🔴 uncleared and did not go to the operator", "S7: record bound-reached");
-    if (result === "bound-reached" && g.cycle !== 3) s.err(join2(gp, "outcome"), "bound-reached before the third cycle", "S7: the bound is 3 cycles; a waiver-only path is a halt");
-    if (result === "self-heal" && g.cycle === 3) s.err(join2(gp, "outcome"), "no self-heal past the third cycle", "S7");
+    if (result === GATE_RESULT.PASS && uncleared.length) s.err(join2(gp, "outcome"), `passes with open 🔴: ${uncleared.join(", ")}`, "S4: no gate passes with an open 🔴");
+    if (g.cycle === CYCLE_BOUND && uncleared.length && ![GATE_RESULT.BOUND_REACHED, GATE_RESULT.HALT].includes(result)) s.err(join2(gp, "outcome"), "the third cycle left a 🔴 uncleared and did not go to the operator", "S7: record bound-reached");
+    if (result === GATE_RESULT.BOUND_REACHED && g.cycle !== CYCLE_BOUND) s.err(join2(gp, "outcome"), "bound-reached before the third cycle", "S7: the bound is 3 cycles; a waiver-only path is a halt");
+    if (result === GATE_RESULT.SELF_HEAL && g.cycle === CYCLE_BOUND) s.err(join2(gp, "outcome"), "no self-heal past the third cycle", "S7: the loop is bounded at three cycles; the third uncleared cycle is bound-reached");
     for (const f of g.outcome?.awaiting ?? []) if (!byId.has(f)) s.err(join2(gp, "outcome → awaiting"), `"${f}" is not in this gate's register`);
   });
   s.unique(d.self_audit, "rule", "self_audit", "self-audit rule");
-  if (d.status === "complete") {
+  if (d.status === SDLC_STATUS.COMPLETE) {
     const have = new Set((d.self_audit ?? []).map((a) => a.rule));
-    const missing = Array.from({ length: 11 }, (_, i) => `S${i + 1}`).filter((r) => !have.has(r));
+    const missing = VOCAB.sdlc_rule.filter((r) => !have.has(r));
     if (missing.length) s.err("self_audit", `a complete run audits S1–S11; missing ${missing.join(", ")}`);
-    if (d.mode === "agent-sdlc" && !d.memory_update) s.err("", "a complete lifecycle records its memory update (sign-off)", "chorus-sdlc § Memory update phase");
-    const lastC = [...(d.gates ?? [])].reverse().find((g) => g.gate === "C");
-    if (d.mode === "agent-sdlc" && lastC?.outcome?.result !== "pass") s.err("status", "complete, but Gate C has not passed");
+    if (d.mode === SDLC_MODE.AGENT_SDLC && !d.memory_update) s.err("", "a complete lifecycle records its memory update (sign-off)", "chorus-sdlc § Memory update phase");
+    const lastC = [...(d.gates ?? [])].reverse().find((g) => g.gate === GATE.C);
+    if (d.mode === SDLC_MODE.AGENT_SDLC && lastC?.outcome?.result !== GATE_RESULT.PASS) s.err("status", "complete, but Gate C has not passed");
   }
   (d.self_audit ?? []).forEach((a, i) => { if (a.pass === false) s.warn(`self_audit[${i}]`, `${a.rule} did not hold`); });
   (d.memory_update?.personas ?? []).forEach((m, i) => {
@@ -617,14 +611,23 @@ function checkSdlcLog(d, s) {
 }
 
 const SEMANTIC = {
-  rsvp: checkRsvp,
-  "finding-report": checkFindingReport,
-  "vote-report": checkVoteReport,
-  "review-record": checkReviewRecord,
-  "sdlc-log": checkSdlcLog,
-  decision: (d, s) => s.decision(d, ""),
-  ruling: (d, s) => { if (d.replacedBy && d.replacedBy === d.id) s.err("replacedBy", "a ruling cannot replace itself"); },
+  [RECORD_KIND.RSVP]: checkRsvp,
+  [RECORD_KIND.FINDING_REPORT]: checkFindingReport,
+  [RECORD_KIND.VOTE_REPORT]: checkVoteReport,
+  [RECORD_KIND.REVIEW_RECORD]: checkReviewRecord,
+  [RECORD_KIND.SDLC_LOG]: checkSdlcLog,
+  [RECORD_KIND.DECISION]: (d, s) => s.decision(d, ""),
+  [RECORD_KIND.RULING]: (d, s) => { if (d.replacedBy && d.replacedBy === d.id) s.err("replacedBy", "a ruling cannot replace itself"); },
+  // The run log's meaning is conduct.mjs's derive(); here only its shape is checked.
+  [RECORD_KIND.RUN_LOG]: () => {},
 };
+
+/** Schema errors of data against one schema fragment, e.g. "run-log.schema.json#/$defs/provision". */
+export function conforms(ref, data) {
+  const w = new SchemaWalker();
+  w.check(data, { $ref: ref }, "", ref.split("#")[0]);
+  return w.errors;
+}
 
 /**
  * Validate parsed data as <kind>. Returns { valid, errors, warnings }.
@@ -663,7 +666,7 @@ function versionMismatch(kind, data) {
   return {
     path: "schema_version",
     message: `version mismatch: the record declares schema ${v}, this validator supports major ${SCHEMA_MAJOR}`,
-    hint: major > SCHEMA_MAJOR ? "install the coryphaeus release for that major" : "the record predates this schema; re-emit it against the current major",
+    hint: major > SCHEMA_MAJOR ? "install the chorus release for that major" : "the record predates this schema; re-emit it against the current major",
   };
 }
 

@@ -1,9 +1,9 @@
-// Drift between the chorus canon and what this skill encodes from it.
+// Drift between the chorus canon and what the code beside it encodes from it.
 //
-// The canon owns the rules (CONDUCTOR.md § Ports, GATE-PRIMITIVE.md § Stage 4);
-// the validator and schema re-encode some of them. These tests parse the
-// canon's tables and lists, never its prose, and fail when the two part ways.
-// The canon wins: fix this skill, not the test.
+// The canon owns the ports and the failure policy (CONDUCTOR.md § Ports); the
+// engine owns the mechanical rules (bin/engine.mjs: seat cap, quorum, cycle
+// bound, the Stage-4 count). These tests fail when the two part ways. When one
+// fails, fix whichever side does not own the rule, never the test.
 
 import { test } from "node:test";
 import assert from "node:assert/strict";
@@ -11,18 +11,22 @@ import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { validate, tally, SCHEMA_MAJOR } from "../bin/validate.mjs";
+import { SEAT_CAP, QUORUM, CYCLE_BOUND } from "../bin/engine.mjs";
+import { EXIT, codeName } from "../bin/vocab.mjs";
+import { readdirSync } from "node:fs";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
-const CORE = join(ROOT, "..", "chorus-core");
+const CORE = ROOT;
 const read = (p) => readFileSync(p, "utf8");
 const load = (name) => JSON.parse(read(join(ROOT, "examples", name)));
 
-/** The lines of one `## ` section, heading excluded. */
-function section(text, heading) {
+/** The lines of one section (`## ` by default), heading excluded; it ends at the next heading of its level or above. */
+function section(text, heading, level = 2) {
   const lines = text.split("\n");
-  const start = lines.findIndex((l) => l.trim() === `## ${heading}`);
-  assert.ok(start >= 0, `canon section "## ${heading}" not found`);
-  const end = lines.findIndex((l, i) => i > start && /^## /.test(l));
+  const hashes = "#".repeat(level);
+  const start = lines.findIndex((l) => l.trim() === `${hashes} ${heading}`);
+  assert.ok(start >= 0, `canon section "${hashes} ${heading}" not found`);
+  const end = lines.findIndex((l, i) => i > start && new RegExp(`^#{1,${level}} `).test(l));
   return lines.slice(start + 1, end < 0 ? undefined : end);
 }
 
@@ -52,13 +56,13 @@ const stage4 = section(read(join(CORE, "GATE-PRIMITIVE.md")), "Stage 4 — Tally
 
 test("the schema knows exactly the ports CONDUCTOR § Ports declares", () => {
   const canon = ports.map((r) => portId(r[0])).sort();
-  const common = JSON.parse(read(join(ROOT, "schema", "common.schema.json")));
-  const schema = [...common.$defs.bindings.properties.ports.items.properties.port.enum].sort();
+  const vocab = JSON.parse(read(join(ROOT, "schema", "vocab.schema.json")));
+  const schema = [...vocab.$defs.port.enum].sort();
   assert.deepEqual(schema, canon);
 });
 
-test("SKILL.md binds exactly the ports CONDUCTOR § Ports declares", () => {
-  const skill = tableRows(section(read(join(ROOT, "SKILL.md")), "Bindings"));
+test("BINDINGS.md binds exactly the ports CONDUCTOR § Ports declares", () => {
+  const skill = tableRows(section(read(join(CORE, "BINDINGS.md")), "Bindings"));
   assert.deepEqual(skill.map((r) => portId(r[0])).sort(), ports.map((r) => portId(r[0])).sort());
 });
 
@@ -70,20 +74,20 @@ test("the validator supports the schema major the canon expects", () => {
   assert.equal(SCHEMA_MAJOR, Number(m[1]));
 });
 
-/* SKILL.md restates the record validator row's failure policy as an exit-code
-   table, because agents do not open the canon from a project. The restated
-   cells must carry the canon's own clauses, word for word. */
-test("SKILL.md's exit-code table carries the canon's failure policy verbatim", () => {
+/* § Record tools restates the record validator row's failure policy as an
+   exit-code table. The restated cells must carry the row's own clauses, word
+   for word. */
+test("the exit-code table carries the canon's failure policy verbatim", () => {
   const row = ports.find((r) => portId(r[0]) === "record-validator");
   assert.ok(row, "no record validator row in CONDUCTOR § Ports");
   const retry = row[1].match(/a failing persona reply gets (.+?)\.(?:\s|$)/);
   assert.ok(retry, "the record validator row states no retry rule for a failing reply");
   const drift = row[1].match(/a "version mismatch" is (.+?)\.?\s*$/);
   assert.ok(drift, "the record validator row states no rule for a version mismatch");
-  const exits = tableRows(section(read(join(ROOT, "SKILL.md")), "Finding the tools"));
+  const exits = tableRows(section(conductor, "Record tools", 3));
   const cell = (code) => {
     const r = exits.find((x) => x[0] === code);
-    assert.ok(r, `SKILL.md § Finding the tools has no exit ${code} row`);
+    assert.ok(r, `CONDUCTOR § Record tools has no exit ${code} row`);
     return r[r.length - 1];
   };
   assert.ok(cell("1").includes(retry[1]), `exit 1 row must contain the canon's "${retry[1]}"`);
@@ -159,3 +163,45 @@ test("every settled case in the canon is accounted for here", () => {
 for (const [n, check] of Object.entries(SETTLED)) {
   if (check) test(`settled case ${n} is held by the validator`, check);
 }
+
+// Prose that restates an engine value must say the same number (the engine wins).
+test("prose restating the seat cap, quorum or cycle bound matches bin/engine.mjs", () => {
+  const WORDS = { one: 1, two: 2, three: 3, four: 4, five: 5, six: 6, seven: 7, eight: 8, nine: 9, ten: 10 };
+  const num = (t) => WORDS[t.toLowerCase()] ?? Number(t);
+  const checks = [
+    { what: "seat cap", re: /cap of (\w+)/gi, want: () => SEAT_CAP },
+    { what: "seat cap", re: /(\w+) ordinary seats/gi, want: () => SEAT_CAP },
+    { what: "quorum and cap", re: /(\d+) ≤ J ≤ (\d+)/g, want: (i) => (i === 1 ? QUORUM : SEAT_CAP) },
+    { what: "quorum", re: /J < (\d+)/g, want: () => QUORUM },
+    { what: "quorum", re: /fewer than (\w+) joiners/gi, want: () => QUORUM },
+    { what: "quorum or cap + 1", re: /J ≥ (\d+)/g, want: (_, n) => ([QUORUM, SEAT_CAP + 1].includes(n) ? n : QUORUM) },
+    { what: "cycle bound", re: /N = (\d+) cycles/g, want: () => CYCLE_BOUND },
+    { what: "cycle bound", re: /past (\d+) cycles/g, want: () => CYCLE_BOUND },
+  ];
+  const SUITE = join(ROOT, "..");
+  const files = readdirSync(SUITE).flatMap((d) => {
+    try { return readdirSync(join(SUITE, d)).filter((f) => f.endsWith(".md")).map((f) => join(SUITE, d, f)); } catch { return []; }
+  });
+  const hits = new Map(checks.map((c, k) => [k, 0]));
+  for (const f of files) {
+    const text = read(f);
+    checks.forEach((c, k) => {
+      for (const m of text.matchAll(c.re)) {
+        for (let i = 1; i < m.length; i++) {
+          const n = num(m[i]);
+          if (Number.isNaN(n)) continue;
+          hits.set(k, hits.get(k) + 1);
+          assert.equal(n, c.want(i, n), `${f}: "${m[0]}" restates the ${c.what} as ${n}; bin/engine.mjs holds ${c.want(i, n)} (fix the prose)`);
+        }
+      }
+    });
+  }
+  checks.forEach((c, k) => assert.ok(hits.get(k) > 0, `no prose restates the ${c.what} with ${c.re}; drop the pattern or the test is vacuous`));
+});
+
+test("the conductor loop's exit table matches the registry's exit codes", () => {
+  const rows = tableRows(section(read(join(CORE, "CONDUCTOR.md")), "The conductor loop", 3).slice(
+    section(read(join(CORE, "CONDUCTOR.md")), "The conductor loop", 3).findIndex((l) => l.startsWith("**Exit codes.**"))));
+  const doc = Object.fromEntries(rows.map(([code, meaning]) => [codeName(meaning), Number(code)]));
+  assert.deepEqual(doc, { ...EXIT });
+});

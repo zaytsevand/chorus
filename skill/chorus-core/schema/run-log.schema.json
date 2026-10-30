@@ -1,0 +1,147 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "run-log.schema.json",
+  "title": "Conductor run log",
+  "description": "The append-only log bin/conduct.mjs keeps for one review round, lifecycle run or challenge. Run state is a pure function of it; the record is assembled from it. Commit it beside the record: it is the audit trail that each gate fired.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["kind", "schema_version", "mode", "header", "events"],
+  "$defs": {
+    "gate_answers": {
+      "type": "object", "additionalProperties": false, "required": ["persona", "round", "answers"],
+      "description": "The operator's answers to one persona's gate questions (S10).",
+      "properties": {
+        "persona": { "$ref": "common.schema.json#/$defs/persona", "description": "Whose gate questions." },
+        "round": { "type": "integer", "minimum": 1, "description": "The author round that asked them." },
+        "answers": { "type": "array", "minItems": 1, "items": { "type": "object", "additionalProperties": false, "required": ["question", "answer"],
+          "properties": { "question": { "type": "string", "minLength": 3, "description": "The question as asked." }, "answer": { "type": "string", "minLength": 1, "description": "The operator's answer, verbatim." } } }, "description": "One per question." }
+      }
+    },
+    "provision": {
+      "type": "object", "additionalProperties": false, "required": ["finding", "route", "supplied", "note"],
+      "description": "The outcome of one S11 provision attempt.",
+      "properties": {
+        "finding": { "$ref": "common.schema.json#/$defs/finding_id", "description": "The held finding." },
+        "route": { "$ref": "vocab.schema.json#/$defs/held_route", "description": "Peer or operator provision." },
+        "supplied": { "type": "boolean", "description": "Whether the gap was closed." },
+        "by": { "$ref": "common.schema.json#/$defs/persona", "description": "Peer route: the persona that supplied it." },
+        "note": { "type": "string", "minLength": 3, "description": "What was supplied, verbatim, or why nothing was." }
+      }
+    },
+    "ranking": {
+      "type": "array", "maxItems": 5,
+      "description": "The conductor's top five, in rank order: only the scores. The script fills pull-quote, locator, final severity and convergence from the register and tally.",
+      "items": { "type": "object", "additionalProperties": false, "required": ["finding", "cost", "value"],
+        "properties": {
+          "finding": { "$ref": "common.schema.json#/$defs/finding_id", "description": "A rankable finding." },
+          "cost": { "$ref": "vocab.schema.json#/$defs/cost", "description": "Cost to fix." },
+          "value": { "type": "string", "minLength": 3, "description": "Risk reduced, friction removed, decisions unblocked." },
+          "constitutional_roi": { "type": "string", "minLength": 3, "description": "Only when the addendum lists principles." },
+          "arbiter_note": { "type": "string", "minLength": 3, "description": "An arbiter ruling that annotates this entry." }
+        } }
+    },
+    "signoff": {
+      "type": "object", "additionalProperties": false,
+      "description": "Review: the TL;DR and baseline (required). Lifecycle: the operator's sign-off ruling.",
+      "properties": {
+        "tldr": { "$ref": "review-record.schema.json#/properties/tldr", "description": "Three sentences." },
+        "baseline": { "$ref": "review-record.schema.json#/properties/baseline", "description": "What the next round assumes." },
+        "baseline_ref": { "type": "string", "minLength": 1, "description": "The prior record this round baselines against." },
+        "secret_filter": { "$ref": "common.schema.json#/$defs/secret_filter", "description": "Whether the filter ran over this run's memory writes; default not run." },
+        "ruling_ref": { "$ref": "common.schema.json#/$defs/ruling_ref", "description": "Lifecycle: the operator's sign-off ruling." }
+      }
+    },
+    "incorporated": {
+      "type": "object", "additionalProperties": false, "required": ["skills", "detail"],
+      "description": "A self-heal incorporation done through speckit (S5).",
+      "properties": {
+        "skills": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 3 }, "description": "The speckit skills run, in order." },
+        "detail": { "type": "string", "minLength": 5, "description": "What changed in the spec and what was regenerated." }
+      }
+    },
+    "skill_done": {
+      "type": "object", "additionalProperties": false, "required": ["skill"],
+      "description": "A pipeline step ran.",
+      "properties": { "skill": { "type": "string", "minLength": 3, "description": "The skill run." }, "note": { "type": "string", "description": "Anything worth recording." } }
+    },
+    "operator_ruling": {
+      "type": "object", "additionalProperties": false, "required": ["findings"],
+      "description": "The operator's ruling on a gate's uncleared 🔴 at the bound (S7, D2).",
+      "properties": {
+        "findings": { "type": "array", "minItems": 1, "items": { "type": "object", "additionalProperties": false, "required": ["finding", "disposition", "detail"],
+          "properties": {
+            "finding": { "$ref": "common.schema.json#/$defs/finding_id", "description": "The gating finding." },
+            "disposition": { "$ref": "vocab.schema.json#/$defs/red_disposition", "description": "waived lets the gate pass; open halts the run." },
+            "detail": { "type": "string", "minLength": 3, "description": "The rationale, as recorded." }
+          } }, "description": "One per gating finding." },
+        "ruling_ref": { "$ref": "common.schema.json#/$defs/ruling_ref", "description": "Where the ruling lives. Required when any finding is waived." },
+        "local_ruling": { "$ref": "ruling.schema.json", "description": "Decision sink unbound: the ruling itself, kept in the ledger's local_rulings and cited as record \"#\"." }
+      }
+    }
+  },
+  "properties": {
+    "kind": { "const": "run-log", "description": "Record kind." },
+    "schema_version": { "$ref": "common.schema.json#/$defs/schema_version", "description": "Schema version; the major must be 1." },
+    "mode": { "$ref": "vocab.schema.json#/$defs/run_mode", "description": "What the run drives." },
+    "header": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["date", "target", "dir", "stem", "roster", "bindings"],
+      "description": "What init fixed. Nothing here changes after init.",
+      "properties": {
+        "date": { "$ref": "common.schema.json#/$defs/date", "description": "The run's date stamp." },
+        "engine": { "type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$", "description": "The chorus-core version (VERSION) that started this run. conduct refuses a log from any other version, or one without this stamp." },
+        "target": { "$ref": "review-record.schema.json#/properties/target", "description": "What is reviewed: a spec, PR, path or idea. The record's limits, so init refuses what record would." },
+        "dir": { "type": "string", "minLength": 1, "description": "Where the record is written, from the repository root." },
+        "stem": { "type": "string", "pattern": "^[A-Za-z0-9._-]+$", "description": "The record's file stem: <stem>.json, <stem>.md, <stem>.run.json." },
+        "review_mode": { "$ref": "vocab.schema.json#/$defs/review_mode", "description": "Review runs only." },
+        "round_context": { "$ref": "review-record.schema.json#/properties/round_context", "description": "Review runs: the concrete since-last-chorus deltas. The record's limits." },
+        "feature": { "type": "string", "minLength": 1, "description": "Lifecycle runs: the feature id, e.g. 018-scripted-spine." },
+        "corpus": { "type": "array", "items": { "type": "string", "minLength": 1 }, "description": "Lifecycle and challenge runs: the artefacts each gate reviews." },
+        "roster": {
+          "type": "array",
+          "minItems": 1,
+          "description": "Who is asked to RSVP, in roster order.",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["persona", "lens"],
+            "properties": {
+              "persona": { "$ref": "common.schema.json#/$defs/persona", "description": "The persona's agent name." },
+              "lens": { "$ref": "common.schema.json#/$defs/lens", "description": "Its lens." }
+            }
+          }
+        },
+        "bindings": { "$ref": "common.schema.json#/$defs/bindings", "description": "The bindings block bin/bindings.mjs printed at init." }
+      }
+    },
+    "events": {
+      "type": "array",
+      "description": "Append-only, in the order they happened.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["type", "phase"],
+        "properties": {
+          "type": { "$ref": "vocab.schema.json#/$defs/event", "description": "reply: a validated persona reply. failure: a persona failed this step. ack: a free-form step done. answer: an agent or operator input." },
+          "phase": { "$ref": "vocab.schema.json#/$defs/phase", "description": "The phase the event belongs to." },
+          "gate": { "$ref": "vocab.schema.json#/$defs/gate", "description": "Lifecycle runs: the gate." },
+          "cycle": { "type": "integer", "minimum": 1, "maximum": 3, "description": "Lifecycle runs: the gate cycle." },
+          "persona": { "$ref": "common.schema.json#/$defs/persona", "description": "reply, failure, ack: who." },
+          "round": { "type": "integer", "minimum": 1, "description": "The persona's ask within the phase: 2 for an RSVP re-ask, n+1 for a re-author after gate answers; need-info uses 1 for the author's revision and 2 for the re-vote. Absent means 1." },
+          "finding": { "$ref": "common.schema.json#/$defs/finding_id", "description": "need-info replies: the held finding they answer." },
+          "failure": { "$ref": "vocab.schema.json#/$defs/failure", "description": "failure: which failure-rule reason." },
+          "reason": { "type": "string", "minLength": 3, "description": "failure: the validator's reason or what happened." },
+          "topic": { "$ref": "vocab.schema.json#/$defs/answer_topic", "description": "answer: which input." },
+          "data": { "description": "reply: the persona's JSON. answer: the input, validated against the fragment its topic fills." }
+        },
+        "allOf": [
+          { "if": { "properties": { "type": { "const": "reply" } }, "required": ["type"] }, "then": { "required": ["persona", "data"] } },
+          { "if": { "properties": { "type": { "const": "failure" } }, "required": ["type"] }, "then": { "required": ["persona", "failure", "reason"] } },
+          { "if": { "properties": { "type": { "const": "ack" } }, "required": ["type"] }, "then": { "required": ["persona"] } },
+          { "if": { "properties": { "type": { "const": "answer" } }, "required": ["type"] }, "then": { "required": ["topic", "data"] } }
+        ]
+      }
+    }
+  }
+}

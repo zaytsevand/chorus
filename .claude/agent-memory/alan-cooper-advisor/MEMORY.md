@@ -5,3 +5,4 @@
 - feedback-merged-is-not-fixed.md — a feature can pass a gate green while the reported user defect is still live; name the merged-vs-fixed gap (general lesson)
 - feedback-roster-growth-is-excise.md — adding personas to fill coverage cells is excise; gate roster growth on observed unmet need (general lesson)
 - understanding-chorus-review.md — Cooper-lens persisted understanding of the chorus-review repo (project facts + per-feature Gate deltas)
+- understanding-2026-10-29-pr47.md — Cooper-lens record for the PR #45+#47 round (scripted spine): audience gate referenced, promise surfaces, F-UV owed

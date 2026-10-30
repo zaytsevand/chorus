@@ -8,3 +8,4 @@
 - project-014-substrate-guard-gatec.md — feature 014 suite-decomposition Gate C verify of sibling-side chorus-core substrate guard message
 - project-015-fitness-harness-gatea.md — feature 015 Gate A: FR-004 violation-vs-env distinction promised by harness but contradicted by the script's exit/stderr contract (N1 🔴)
 - understanding-chorus-review-007.md — Norman-lens exploratory understanding of chorus-review repo + feature 007, Gate A
+- understanding-2026-10-29-pr47.md — Norman-lens exploratory record, 2026-10-29 review of PR #45+#47 (scripted spine, conduct.mjs)

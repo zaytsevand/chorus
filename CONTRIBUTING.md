@@ -1,9 +1,9 @@
 # Contributing
 
 Thanks for considering a contribution to **chorus**, the multi-advisor review
-suite (five skills: `chorus-core`, `chorus-review`, `chorus-sdlc`,
-`chorus-learn`, and `coryphaeus`, the composition root that holds the schema,
-validator, renderer and provider bindings).
+suite (four skills: `chorus-core`, the substrate that also holds the schema,
+validator, renderer and provider bindings, `chorus-review`, `chorus-sdlc` and
+`chorus-learn`).
 
 ## What's in scope
 
@@ -13,12 +13,15 @@ validator, renderer and provider bindings).
 - **Persona agents** (`agents/*.md`) — sharpening voice, fixing calibration
   notes. A persona speaks to its own remit and names no other lens; the seams
   between lenses live once, in `skill/chorus-core/ROSTER.md` (FC7 checks it).
-- **Schema and tooling** (`skill/coryphaeus/schema/`, `bin/`, `test/`): Node,
-  zero npm dependencies. A rule lives in one file: the canon
-  (`skill/chorus-core/`) owns the ports, the failure policy and the vote-count
-  rule; coryphaeus refers to them and encodes them in the validator. When they
-  disagree, fix coryphaeus; `test/canon-drift.test.mjs` should have caught it.
-  Only coryphaeus names a provider such as problem-brief (FC6).
+- **Schema and tooling** (`skill/chorus-core/schema/`, `bin/`, `test/`): Node,
+  zero npm dependencies. A rule lives in one file. The mechanical rules (seat cap, quorum,
+  retries, ballots, routing, the vote count, the cycle bound) live in
+  `bin/engine.mjs`, and prose that restates one is fixed when they disagree.
+  The ports and the failure policy live in the canon (the markdown in
+  `skill/chorus-core/`), and the validator is fixed when they disagree.
+  `test/canon-drift.test.mjs` should catch either. Only
+  `skill/chorus-core/BINDINGS.md` (and its detector `bin/bindings.mjs`) names a
+  provider such as problem-brief (FC6).
 - **Templates** (`skill/chorus-learn/templates/CHORUS-PROJECT.template.md`, the
   only copy; both install channels ship it with the skill) — better prompts in
   the fillable sections.
@@ -57,12 +60,19 @@ asked to scrub.
 ## Checks
 
 ```sh
-scripts/check-suite-integrity.sh     # FC1–FC6: invariants, sibling isolation,
+scripts/check-suite-integrity.sh     # FC1–FC7: invariants, sibling isolation,
                                      # manifest (incl. claude plugin validate),
-                                     # references, stale content, port boundary
+                                     # references, stale content, port boundary,
+                                     # roster
 scripts/test-install-roundtrip.sh    # install -> verify -> uninstall -> verify
-node --test skill/coryphaeus/test/*.test.mjs   # validator, renderer, canon drift
+node --test skill/chorus-core/test/*.test.mjs  # validator, renderer, bindings, canon drift,
+                                               # conductor scenarios, vocabulary lint
 ```
+
+A new token in a closed set (a status, a vote, a gate result, a persona) goes in
+`skill/chorus-core/schema/vocab.schema.json` first; schemas `$ref` it and code
+imports it from `bin/vocab.mjs`. The vocabulary lint fails on anything spelled by
+hand.
 
 CI (`.github/workflows/integrity.yml`) runs all three, and validates the
 committed review records, on every pull request and on pushes to `main`. The runner has no `claude` CLI, so CI skips

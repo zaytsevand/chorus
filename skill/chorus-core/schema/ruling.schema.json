@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "ruling.schema.json",
   "title": "Ruling",
-  "description": "The shared shape of an operator ruling. Field-for-field the problem-brief ruling, so a ruling moves between a brief and a chorus fallback record without loss. Chorus records normally hold only a ruling_ref to it.",
+  "description": "The shared shape of an operator ruling. Field-for-field a brief's ruling (BINDINGS.md), so a ruling moves between a brief and a chorus fallback record without loss. Chorus records normally hold only a ruling_ref to it.",
   "type": "object",
   "additionalProperties": false,
   "required": ["id", "created", "updated", "about", "said", "source"],
@@ -15,7 +15,7 @@
     "said": { "type": "string", "minLength": 10, "description": "The answer itself, in the operator's own words where given." },
     "source": { "type": "string", "minLength": 3, "description": "Where it was given: 'chat, 2026-09-25', 'comment on Q-4', a commit or a document." },
     "entries": { "type": "array", "items": { "type": "string", "pattern": "^Q-[0-9]+$" }, "description": "Entries (decisions) this ruling bears on." },
-    "status": { "type": "string", "enum": ["active", "replaced"], "default": "active", "description": "active — still holds. replaced — the operator later said otherwise; replacedBy names the successor." },
+    "status": { "$ref": "vocab.schema.json#/$defs/ruling_status", "default": "active", "description": "active — still holds. replaced — the operator later said otherwise; replacedBy names the successor." },
     "replacedBy": { "type": "string", "pattern": "^R-[0-9]+$", "description": "The ruling that took over. Required once status is replaced." },
     "memory": { "type": "string", "description": "A memory file the ruling was also saved to, when it is a general working preference." }
   },

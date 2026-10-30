@@ -179,6 +179,7 @@ rows 5/8/11 declare no auto-default; every 🟡 row names an override — gates 
 | 12 | Reuse / cross-user deferral sign-off | 🔴 | corpus defers cross-user value, shared reuse, or trust promotion **without** a complete § Deferral checklist row (all columns incl. beneficiary) | high-stakes — **no auto-default**; operator confirms beneficiary + falsifiable instrument |
 | 13 | User-value strip (`user-value-strip`) | 🟡 | deferral table or DEFERRED FR present **without** an F-UV strip (§ Deferral checklist) | recorded default: strip requested before sign-off; operator may revise outcome, widen the v1 slice, or record an override |
 | 14 | `NEED_INFO` resolution routing | 🟡 | open `NEED_INFO` on a finding (including every `confidence_on_hand: low`); peer path when another seated persona can supply the gap, else operator path | peer reply or operator context is recorded; author revises or confirms; reversible until tally |
+| 15 | Unresolved conflict (Phase 3) | 🟡 | a framed conflict the arbiter did not rule on (or no arbiter is bound) | recorded default: the counted severity stands; the operator may rule, and a ruling annotates the ranking, never the count |
 
 ## Deferral checklist
 

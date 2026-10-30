@@ -58,6 +58,18 @@ priorities; when tempted to rule on what it does not see, it refuses and
 surfaces. Its voice is the EWD register in `chorus-core/CONDUCTOR.md`:
 procedural, plain, citing the procedure rather than its own judgment.
 
+## Run it with the conductor loop
+
+`bin/conduct.mjs` (`chorus-core/CONDUCTOR.md` § The conductor loop) runs this
+procedure: `conduct init review --target … --context …`, then `conduct next`
+until `done`, doing what each action says, then `conduct record`. The phases
+below say what each step means and which brief to send; the script decides when
+a phase's post-condition holds, who is seated, who votes on what, and the count.
+For those mechanical rules the script is the authority, and this file says
+what each step is for. If the two seem to disagree mid-round, follow the
+script, finish the round, and report the disagreement to the operator; never
+edit the installed script.
+
 ## Rules that hold in every phase
 
 These bind under time pressure and operator instruction alike; an operator who
@@ -119,7 +131,7 @@ Seating still follows the RSVP and the cap (Phase 0.5).
   3 min, exploratory 15 min, Round 1 15 min, Round 2 10 min,
   operator-overridable). A dispatch past its budget is stopped.
 - **One failure rule.** A persona that is silent, past budget, or returns
-  malformed, over-length, or validator-rejected output gets **one automatic
+  malformed (validator-rejected), over-length, or zero-tool-use output gets **one automatic
   retry** with the reason; if that fails too, or the persona is not installed, it
   **counts as ABSTAIN, reason recorded in the roster**. No substitute lens.
   Retries, fallbacks and abstentions go in the record's bindings and are never
@@ -132,8 +144,8 @@ Seating still follows the RSVP and the cap (Phase 0.5).
   the record validator like any other reply.
 - **Output format.** Each persona returns JSON of the kind its phase names —
   `rsvp` (0.5), `finding-report` (1, and Round-2 derives), `vote-report` (2) —
-  checked by the bound record validator (`chorus-core/CONDUCTOR.md` § Ports)
-  before it counts. Field shapes are the bound schema's.
+  checked by chorus-core's record validator (`chorus-core/CONDUCTOR.md` § Ports)
+  before it counts. Field shapes are chorus-core's schema.
 
 ## The procedure
 
@@ -196,7 +208,9 @@ reply and revisit at next cadence. Record joiners and abstainers under
 
 The mechanic is `chorus-core/EXPLORATORY-PHASE.md`. The conductor owns the
 interview in resumable sessions of ≤ 5 questions; advisors never interview
-directly. Persisted memory is an index of locators, never a finding's evidence —
+directly. `conduct.mjs` asks for it as an `interview` step once every seated
+persona has acknowledged exploration, and refuses an answer that leaves a
+`[gate]` question unanswered. Persisted memory is an index of locators, never a finding's evidence —
 findings re-ground in the live source. Abstainers skip this phase.
 
 ### Phase 1 — Round 1 (joiners only)

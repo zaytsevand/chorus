@@ -1,0 +1,3743 @@
+{
+  "kind": "run-log",
+  "schema_version": "1.0",
+  "mode": "review",
+  "header": {
+    "date": "2026-10-29",
+    "target": "PRs #45+#47 (branch worktree-scripted-spine @ be31e5c vs main 7eea2c2): coryphaeus folded into chorus-core; conductor as a program (conduct.mjs/engine.mjs), vocab registry, run-log schema",
+    "dir": "docs/reviews",
+    "stem": "2026-10-29-chorus-review-pr47",
+    "roster": [
+      {
+        "persona": "eric-evans-advisor",
+        "lens": "DDD"
+      },
+      {
+        "persona": "mark-richards-architect",
+        "lens": "architecture"
+      },
+      {
+        "persona": "alan-cooper-advisor",
+        "lens": "adversarial product"
+      },
+      {
+        "persona": "don-norman-advisor",
+        "lens": "human-centred design"
+      },
+      {
+        "persona": "uncle-bob-architect",
+        "lens": "clean code"
+      },
+      {
+        "persona": "kent-beck-persona",
+        "lens": "TDD"
+      },
+      {
+        "persona": "test-strategy-advisor",
+        "lens": "test strategy"
+      },
+      {
+        "persona": "delivery-and-ops-advisor",
+        "lens": "delivery and ops"
+      },
+      {
+        "persona": "security-and-trust-advisor",
+        "lens": "security"
+      },
+      {
+        "persona": "eliyahu-goldratt-advisor",
+        "lens": "constraint and flow"
+      }
+    ],
+    "bindings": {
+      "ports": [
+        {
+          "port": "decision-sink",
+          "provider": "problem-brief"
+        },
+        {
+          "port": "ruling-lookup",
+          "provider": "problem-brief"
+        },
+        {
+          "port": "record-validator",
+          "provider": "chorus-core"
+        },
+        {
+          "port": "record-renderer",
+          "provider": "chorus-core"
+        },
+        {
+          "port": "arbiter",
+          "provider": "default"
+        },
+        {
+          "port": "fixed-viewpoint",
+          "provider": "default"
+        },
+        {
+          "port": "memory-recall",
+          "provider": "default"
+        }
+      ],
+      "recoveries": []
+    },
+    "review_mode": "pr-design",
+    "round_context": "Since the PR32 round (2026-09-27, last record): #45 renames skill/coryphaeus/{schema,bin,test,examples} into skill/chorus-core/, deletes skill/coryphaeus, adds chorus-core/BINDINGS.md + bin/bindings.mjs (problem-brief detection via cwd/.claude/skills, CLAUDE_HOME, CHORUS_SKILL_PATH), rewrites FC6, install.sh RETIRED_SKILLS cleanup (renames edited SKILL.md to SKILL.md.retired), plugin.json down to four skills. #47 adds bin/conduct.mjs (764 lines, append-only <stem>.run.json, next/submit/fail/ack/answer/record, exit codes 0/1/2/3), bin/engine.mjs (pure rule functions citing canon sections), schema/vocab.schema.json + bin/vocab.mjs, schema/run-log.schema.json, test/vocab-lint.test.mjs, test/kit.mjs + scripted e2e; CONDUCTOR.md gains § The conductor loop; chorus-review/sdlc SKILL.md now say run conduct.mjs. 56 files, +2975/-445. Spec specs/018-scripted-spine/spec.md. Observed in dogfood install 2026-10-29: vocab-lint roster test fails inside ~/.claude (reads repo-root .claude-plugin/plugin.json); pre-manifest stale copies of SKILL.md files were skipped by install.sh until --force; docs/reviews/CHORUS-PROJECT.md still names skill/coryphaeus as composition root. Not yet run live with real persona agents before this round. Mode: design review of the PRs' approach, not a line-by-line diff review. Budgets: RSVP 3m, exploratory 15m, R1 15m, R2 10m."
+  },
+  "events": [
+    {
+      "type": "reply",
+      "phase": "rsvp",
+      "persona": "eric-evans-advisor",
+      "data": {
+        "kind": "rsvp",
+        "schema_version": "1",
+        "persona": "eric-evans-advisor",
+        "lens": "ddd",
+        "round": "2026-10-29",
+        "decision": "JOIN",
+        "applies": [
+          "#47 vocab.schema.json + vocab.mjs: one vocabulary registry is the Ubiquitous Language made executable",
+          "#47 run-log.schema.json: agent-script seam is a Published Language",
+          "#45 coryphaeus->chorus-core rename; CHORUS-PROJECT.md still names coryphaeus"
+        ],
+        "expected": {
+          "stakes": "🟡",
+          "hook": "Does the vocab registry own meaning, or do conduct.mjs and canon each mint the same terms privately?"
+        },
+        "reason": "New vocabulary authority and agent-script contract are exactly the language and seam questions my lens owns."
+      }
+    },
+    {
+      "type": "reply",
+      "phase": "rsvp",
+      "persona": "mark-richards-architect",
+      "data": {
+        "kind": "rsvp",
+        "schema_version": "1",
+        "persona": "mark-richards-architect",
+        "lens": "architecture",
+        "round": "2026-10-29",
+        "decision": "JOIN",
+        "applies": [
+          "#47 engine.mjs/conduct.mjs encode rules that CONDUCTOR.md/GATE-PRIMITIVE.md also state: duplicate authority, canon vs script",
+          "#47 run-log.schema.json is the new agent-script seam contract",
+          "#45 vocab-lint and bindings.mjs couple to repo-root layout, which breaks in an install"
+        ],
+        "expected": {
+          "stakes": "🔴",
+          "hook": "Prose canon and the script engine now both own the conductor rules, and no parity check catches drift between them"
+        },
+        "reason": "The ranked qualities come from the context. Seams, contracts and duplicate-authority rulings are this lens's work."
+      }
+    },
+    {
+      "type": "reply",
+      "phase": "rsvp",
+      "persona": "alan-cooper-advisor",
+      "data": {
+        "kind": "rsvp",
+        "schema_version": "1",
+        "persona": "alan-cooper-advisor",
+        "lens": "product",
+        "round": "2026-10-29",
+        "decision": "JOIN",
+        "applies": [
+          "install.sh skips pre-manifest stale SKILL.md copies as 'not ours' until --force: upgrader silently keeps old skills",
+          "conduct.mjs exit codes 0/1/2/3 and fail/ack/answer verbs: a user-facing promise whose legibility is unproven",
+          "vocab-lint roster test fails inside an install"
+        ],
+        "expected": {
+          "stakes": "🔴",
+          "hook": "A stranger who upgrades gets no warning that they are still running the old chorus."
+        },
+        "reason": "Installer silence and the new CLI contract hit the operator first, and the round context says installer findings count at full severity."
+      }
+    },
+    {
+      "type": "reply",
+      "phase": "rsvp",
+      "persona": "don-norman-advisor",
+      "data": {
+        "kind": "rsvp",
+        "schema_version": "1",
+        "persona": "don-norman-advisor",
+        "lens": "hcd",
+        "round": "2026-10-29",
+        "decision": "JOIN",
+        "applies": [
+          "#47 conduct.mjs exit codes 0/1/2/3 + run.json: the agent/operator feedback surface",
+          "install.sh skips stale pre-manifest SKILL.md as 'not ours' unless --force, so upgraders silently keep old skills",
+          "CHORUS-PROJECT.md still names skill/coryphaeus: the docs and the runtime disagree"
+        ],
+        "expected": {
+          "stakes": "🔴",
+          "hook": "A stranger who upgrades keeps the old skills and gets no signal: the gulf of evaluation sits at the installer"
+        },
+        "reason": "New CLI exit-code contract, installer feedback and stale docs are all feedback and mental-model gaps a user hits"
+      }
+    },
+    {
+      "type": "reply",
+      "phase": "rsvp",
+      "persona": "uncle-bob-architect",
+      "data": {
+        "kind": "rsvp",
+        "schema_version": "1",
+        "persona": "uncle-bob-architect",
+        "lens": "clean-code",
+        "round": "2026-10-29",
+        "decision": "JOIN",
+        "applies": [
+          "#47 bin/conduct.mjs: 764 lines carrying seven commands, the run-log I/O and the exit-code policy",
+          "#47 engine.mjs pure rules vs conduct.mjs effects: where the seam sits",
+          "#47 vocab.mjs + vocab-lint: one registry vs magic strings",
+          "#45 bindings.mjs: discovery across three paths"
+        ],
+        "expected": {
+          "stakes": "🟡",
+          "hook": "Is conduct.mjs one module with seven reasons to change, and does engine.mjs really stay pure?"
+        },
+        "reason": "New Node modules with clear SRP, purity and dependency-direction questions"
+      }
+    },
+    {
+      "type": "reply",
+      "phase": "rsvp",
+      "persona": "kent-beck-persona",
+      "data": {
+        "kind": "rsvp",
+        "schema_version": "1",
+        "persona": "kent-beck-persona",
+        "lens": "tdd",
+        "round": "2026-10-29",
+        "decision": "JOIN",
+        "applies": [
+          "#47 vocab.mjs as the one vocabulary registry, plus vocab-lint.test.mjs: can the tests see two copies disagree?",
+          "vocab-lint roster test reads repo-root plugin.json and fails inside an install, so it can't be cornered without the environment",
+          "engine.mjs pure rules vs the 764-line conduct.mjs: which behaviour the e2e kit actually pins"
+        ],
+        "expected": {
+          "stakes": "🟡",
+          "hook": "a registry is only one author if a test can tell when a second author shows up"
+        },
+        "reason": "New Node tooling with tests and a single-authority claim. That's squarely the duplication-the-tests-can't-see lens."
+      }
+    },
+    {
+      "type": "reply",
+      "phase": "rsvp",
+      "persona": "test-strategy-advisor",
+      "data": {
+        "kind": "rsvp",
+        "schema_version": "1",
+        "persona": "test-strategy-advisor",
+        "lens": "test-strategy",
+        "round": "2026-10-29",
+        "decision": "JOIN",
+        "applies": [
+          "#47 test/vocab-lint.test.mjs roster check fails inside an install (reads repo-root plugin.json)",
+          "#47 run-log.schema.json agent-script seam plus test/kit.mjs scripted e2e"
+        ],
+        "expected": {
+          "stakes": "🟡",
+          "hook": "A repo-only check ships into installs, and the agent-to-conduct.mjs seam may be proven only by scripted e2e runs, with no contract test pinning each side."
+        },
+        "reason": "A new seam, a new e2e kit and a check running in the wrong place: all three are placement questions."
+      }
+    },
+    {
+      "type": "reply",
+      "phase": "rsvp",
+      "persona": "delivery-and-ops-advisor",
+      "data": {
+        "kind": "rsvp",
+        "schema_version": "1",
+        "persona": "delivery-and-ops-advisor",
+        "lens": "delivery-ops",
+        "round": "2026-10-29",
+        "decision": "JOIN",
+        "applies": [
+          "install.sh RETIRED_SKILLS + 'not ours' skip: upgrade silently keeps stale skills until --force",
+          "vocab-lint test reads repo-root plugin.json, fails in installed copy",
+          "conduct.mjs exit codes 0/1/2/3 + append-only run.json: first live run"
+        ],
+        "expected": {
+          "stakes": "🔴",
+          "hook": "Upgrade path for strangers is unverified: the stale-skill skip fails silently, and nothing in the gate checks the installed copy"
+        },
+        "reason": "Release/upgrade path and gate realism are core delivery-ops remit"
+      }
+    },
+    {
+      "type": "reply",
+      "phase": "rsvp",
+      "persona": "eliyahu-goldratt-advisor",
+      "data": {
+        "kind": "rsvp",
+        "schema_version": "1",
+        "persona": "eliyahu-goldratt-advisor",
+        "lens": "constraint-flow",
+        "round": "2026-10-29",
+        "decision": "JOIN",
+        "applies": [
+          "#47: 764-line conduct.mjs + engine + vocab registry (56 files, +2975) shipped before its first live run, which is this round",
+          "Dogfood: install.sh silently keeps stale skills on upgrade; vocab-lint fails in an install"
+        ],
+        "expected": {
+          "stakes": "🟡",
+          "hook": "Who is Herbie: the scripted spine, or the stranger's install/upgrade path that drops them before any spine runs?"
+        },
+        "reason": "Batch size and constraint location are mine; nobody else is tasked with the cut list."
+      }
+    },
+    {
+      "type": "reply",
+      "phase": "rsvp",
+      "persona": "security-and-trust-advisor",
+      "data": {
+        "kind": "rsvp",
+        "schema_version": "1",
+        "persona": "security-and-trust-advisor",
+        "lens": "security",
+        "round": "2026-10-29",
+        "decision": "JOIN",
+        "applies": [
+          "bindings.mjs resolves problem-brief first from <cwd>/.claude/skills: the reviewed repo can plant the skill the conductor runs",
+          "install.sh RETIRED_SKILLS rm/mv under $CLAUDE_HOME plus the 'not ours' upgrade skip",
+          "SKILL.md now instructs running conduct.mjs: a canon capability grant"
+        ],
+        "expected": {
+          "stakes": "🟡",
+          "hook": "Who picks the code the chair executes: the reviewed repo's cwd or the install?"
+        },
+        "reason": "Three deltas cross the install/untrusted-repo trust boundary."
+      }
+    },
+    {
+      "type": "ack",
+      "phase": "explore",
+      "persona": "don-norman-advisor"
+    },
+    {
+      "type": "ack",
+      "phase": "explore",
+      "persona": "uncle-bob-architect"
+    },
+    {
+      "type": "ack",
+      "phase": "explore",
+      "persona": "mark-richards-architect"
+    },
+    {
+      "type": "ack",
+      "phase": "explore",
+      "persona": "alan-cooper-advisor"
+    },
+    {
+      "type": "ack",
+      "phase": "explore",
+      "persona": "delivery-and-ops-advisor"
+    },
+    {
+      "type": "reply",
+      "phase": "author",
+      "persona": "delivery-and-ops-advisor",
+      "data": {
+        "kind": "finding-report",
+        "schema_version": "1",
+        "mode": "review",
+        "round": "2026-10-29",
+        "persona": "delivery-and-ops-advisor",
+        "lens": "delivery-ops",
+        "tool_uses": 19,
+        "findings": [
+          {
+            "id": "F1",
+            "lens": "delivery-ops",
+            "locator": "install.sh:150",
+            "claim": "The coryphaeus retire step runs only inside the manifest-prune loop. Reproduced: a tmp CLAUDE_HOME with skills/coryphaeus/SKILL.md and no manifest; install.sh exits 0, leaves it loading next to chorus-core, and prints nothing about it. The round trip seeds coryphaeus only with a manifest. Remedy (about 1h): check RETIRED_SKILLS on disk regardless of the manifest, and test the manifest-less case.",
+            "evidence": [
+              {
+                "kind": "file_line",
+                "ref": "install.sh:150",
+                "note": "prune and retire run only when a manifest exists"
+              },
+              {
+                "kind": "file_line",
+                "ref": "install.sh:166",
+                "note": "retire branch keyed on a manifest line"
+              },
+              {
+                "kind": "file_line",
+                "ref": "scripts/test-install-roundtrip.sh:104",
+                "note": "coryphaeus upgrade test always writes a manifest first"
+              }
+            ],
+            "proposed_severity": "🔴",
+            "pull_quote": "An install from before the manifest existed keeps coryphaeus loading next to chorus-core, and the installer exits 0 without a word.",
+            "confidence_on_hand": "high",
+            "need_info": false
+          },
+          {
+            "id": "F2",
+            "lens": "delivery-ops",
+            "locator": "install.sh:130",
+            "claim": "On a pre-manifest install, a stale chorus-core/SKILL.md is reported as \"skip, not ours\" while the new bin/ and schema/ land around it, leaving a mixed-version skill. The installer exits 0, and the only signal is a prose count. Agents run upgrades and read exit 0 as success. Remedy: when a skipped path sits in a directory this suite ships, exit non-zero and name --force.",
+            "evidence": [
+              {
+                "kind": "file_line",
+                "ref": "install.sh:130",
+                "note": "skip branch: logs a line, does not change the exit status"
+              },
+              {
+                "kind": "file_line",
+                "ref": "install.sh:182",
+                "note": "skip count shown only as prose"
+              },
+              {
+                "kind": "file_line",
+                "ref": "README.md:326",
+                "note": "README calls re-running install.sh the upgrade"
+              }
+            ],
+            "proposed_severity": "🔴",
+            "pull_quote": "A skipped SKILL.md inside our own skill is a silent mixed-version install, and exit 0 tells the upgrading agent it worked.",
+            "confidence_on_hand": "high",
+            "need_info": false
+          },
+          {
+            "id": "F3",
+            "lens": "delivery-ops",
+            "locator": "install.sh:139",
+            "claim": "test/ ships with the install, against the operator decision. In an installed tree 168 tests pass and the roster test fails. CI runs tests on the repo tree only, and the round trip never runs a shipped tool from the installed copy. Remedy: exclude test/ in install.sh, and smoke-run the installed bin/validate.mjs on a committed record.",
+            "evidence": [
+              {
+                "kind": "file_line",
+                "ref": "install.sh:139",
+                "note": "every file under skill/<name> is placed"
+              },
+              {
+                "kind": "file_line",
+                "ref": ".github/workflows/integrity.yml:33",
+                "note": "node --test runs against the repo layout"
+              },
+              {
+                "kind": "file_line",
+                "ref": "skill/chorus-core/test/vocab-lint.test.mjs:168",
+                "note": "reads REPO/.claude-plugin/plugin.json"
+              },
+              {
+                "kind": "file_line",
+                "ref": "CONTRIBUTING.md:101",
+                "note": "no installed-copy drift check"
+              }
+            ],
+            "proposed_severity": "🟡",
+            "pull_quote": "CI proves the repo works; nothing proves the installed copy does.",
+            "confidence_on_hand": "high",
+            "need_info": false
+          },
+          {
+            "id": "F4",
+            "lens": "delivery-ops",
+            "locator": ".claude-plugin/plugin.json:3",
+            "claim": "No version identity: plugin.json stays at 1.0.0 across 56 files, there are no tags, and the manifest records only the source path. Neither a GitHub issue nor an upgrading agent can say what is installed. Remedy: stamp the version and commit into the manifest and the summary, and bump the version at release.",
+            "evidence": [
+              {
+                "kind": "file_line",
+                "ref": ".claude-plugin/plugin.json:3",
+                "note": "static 1.0.0"
+              },
+              {
+                "kind": "file_line",
+                "ref": "install.sh:89",
+                "note": "manifest header: source path only"
+              },
+              {
+                "kind": "file_line",
+                "ref": "CONTRIBUTING.md:89",
+                "note": "release steps have no version bump"
+              }
+            ],
+            "proposed_severity": "🟡",
+            "pull_quote": "An installed copy cannot say which version it is, so neither the bug report nor the upgrading agent can.",
+            "confidence_on_hand": "high",
+            "need_info": false
+          },
+          {
+            "id": "F5",
+            "lens": "delivery-ops",
+            "locator": "CONTRIBUTING.md:89",
+            "claim": "No rollback is defined. The implied one (reinstall an older commit) is untested and has nothing named to roll back to (see F4).",
+            "evidence": [
+              {
+                "kind": "file_line",
+                "ref": "CONTRIBUTING.md:89",
+                "note": "release section, no reversal"
+              },
+              {
+                "kind": "file_line",
+                "ref": "scripts/test-install-roundtrip.sh:104",
+                "note": "only a forward upgrade is tested"
+              }
+            ],
+            "proposed_severity": "🟡",
+            "pull_quote": "A release has no priced way back.",
+            "confidence_on_hand": "low",
+            "need_info": true,
+            "need_info_reason": "The operator deferred the rollback path. Is reinstalling an older commit the supported downgrade, or is downgrading unsupported?"
+          },
+          {
+            "id": "F6",
+            "lens": "delivery-ops",
+            "locator": "skill/chorus-core/bin/conduct.mjs:589",
+            "claim": "appendTo rewrites the whole run log in place. Reproduced with a truncated log: next exits 2, which the exit table defines as caller usage error, so real damage is misreported. The log is untracked until commit, so a damaged log loses the round. A tear is unlikely; the fix is two lines: write a temp file, rename it, and give an unreadable log its own error.",
+            "evidence": [
+              {
+                "kind": "file_line",
+                "ref": "skill/chorus-core/bin/conduct.mjs:589",
+                "note": "writeFileSync over the live file"
+              },
+              {
+                "kind": "file_line",
+                "ref": "skill/chorus-core/bin/conduct.mjs:724",
+                "note": "unreadable log goes through usage(), exit 2"
+              },
+              {
+                "kind": "file_line",
+                "ref": "skill/chorus-core/CONDUCTOR.md:371",
+                "note": "exit 2 means not asked for / usage"
+              }
+            ],
+            "proposed_severity": "🟡",
+            "pull_quote": "A torn run log is reported as the caller's usage error, and the round's replies go with it.",
+            "confidence_on_hand": "high",
+            "need_info": false
+          },
+          {
+            "id": "F7",
+            "lens": "delivery-ops",
+            "locator": "skill/chorus-core/bin/conduct.mjs:667",
+            "claim": "Invalid init input throws an uncaught error: stack trace, exit 1 (\"refused, logged\") before any log exists. Remedy: route it through usage(), exit 2.",
+            "evidence": [
+              {
+                "kind": "file_line",
+                "ref": "skill/chorus-core/bin/conduct.mjs:667",
+                "note": "throw outside any catch"
+              },
+              {
+                "kind": "file_line",
+                "ref": "skill/chorus-core/CONDUCTOR.md:371",
+                "note": "exit-code table"
+              }
+            ],
+            "proposed_severity": "🟢",
+            "pull_quote": "A bad init answers with a stack trace and the wrong exit code.",
+            "confidence_on_hand": "high",
+            "need_info": false
+          },
+          {
+            "id": "F8",
+            "lens": "delivery-ops",
+            "locator": ".github/workflows/integrity.yml:29",
+            "claim": "The README and installer promise Node 18 or later; CI runs only Node 20. Node is now required, so the floor is a contract nobody checks.",
+            "evidence": [
+              {
+                "kind": "file_line",
+                "ref": ".github/workflows/integrity.yml:29",
+                "note": "node-version: 20"
+              },
+              {
+                "kind": "file_line",
+                "ref": "README.md:294",
+                "note": "Node 18 or later"
+              },
+              {
+                "kind": "file_line",
+                "ref": "install.sh:186",
+                "note": "installer prints the 18 floor"
+              }
+            ],
+            "proposed_severity": "🟡",
+            "pull_quote": "The Node 18 floor is a claim no CI run checks.",
+            "confidence_on_hand": "low",
+            "need_info": true,
+            "need_info_reason": "The operator deferred the 18-vs-20 floor. The remedy is either a two-version CI matrix or raising the documented floor to 20."
+          }
+        ]
+      }
+    },
+    {
+      "type": "reply",
+      "phase": "author",
+      "persona": "mark-richards-architect",
+      "data": {
+        "kind": "finding-report",
+        "schema_version": "1",
+        "mode": "review",
+        "round": "2026-10-29",
+        "persona": "mark-richards-architect",
+        "lens": "architecture",
+        "tool_uses": 21,
+        "findings": [
+          {
+            "id": "F1",
+            "lens": "architecture",
+            "locator": "skill/chorus-review/SKILL.md:68",
+            "claim": "The operator ruled that code owns the mechanical rules, yet six places still give authority to the prose: SKILL.md:68 (fix the script), CONDUCTOR.md:310, BINDINGS.md:6, CONTRIBUTING.md:19, canon-drift.test.mjs:6, the addendum, and the residence rule in chorus-core SKILL.md:68-76. engine.mjs's comments cite prose as their source. One rule has two authors and no agreed direction. Ruling: CONSOLIDATE. engine.mjs owns the numbers and routing, the prose states intent and cites engine exports by name, and all six phrases are rewritten in one change.",
+            "evidence": [
+              {
+                "kind": "file_line",
+                "ref": "skill/chorus-review/SKILL.md:68",
+                "note": "'the canon decides and the script is fixed'"
+              },
+              {
+                "kind": "file_line",
+                "ref": "skill/chorus-core/CONDUCTOR.md:310",
+                "note": "'The canon wins: fix the code'"
+              },
+              {
+                "kind": "file_line",
+                "ref": "CONTRIBUTING.md:19",
+                "note": "'When they disagree, fix the code'"
+              },
+              {
+                "kind": "file_line",
+                "ref": "skill/chorus-core/bin/engine.mjs:15",
+                "note": "SEAT_CAP cites DECISION-PRIMITIVE.md § Seating as its source"
+              },
+              {
+                "kind": "principle",
+                "ref": ".specify/memory/constitution.md",
+                "note": "Principle I One Canonical Definition: Cite Never Restate"
+              }
+            ],
+            "proposed_severity": "🟡",
+            "pull_quote": "The suite now has one rule with two authors, and each says the other must yield.",
+            "confidence_on_hand": "high",
+            "need_info": false
+          },
+          {
+            "id": "F2",
+            "lens": "architecture",
+            "locator": "skill/chorus-core/test/canon-drift.test.mjs:80",
+            "claim": "The only drift detector checks the Stage-4 tally, retry wording and severity chain. Nothing ties SEAT_CAP, QUORUM or CYCLE_BOUND to the prose that restates them (DECISION-PRIMITIVE.md:72, chorus-review/SKILL.md:191, chorus-sdlc/SKILL.md:247 and :351), or to the literals in validate.mjs:409 and :480. Change a constant and the docs go stale with CI green. Fitness function: reverse canon-drift so the code is the source. Read the engine exports and fail on any prose or message numeral for these rules that differs, or appears outside an allowlist.",
+            "evidence": [
+              {
+                "kind": "file_line",
+                "ref": "skill/chorus-core/bin/engine.mjs:15",
+                "note": "SEAT_CAP/QUORUM/CYCLE_BOUND/RETRIES at :15-21"
+              },
+              {
+                "kind": "file_line",
+                "ref": "skill/chorus-core/bin/validate.mjs:409",
+                "note": "'the cap is five' literal message"
+              },
+              {
+                "kind": "file_line",
+                "ref": "skill/chorus-core/bin/validate.mjs:480",
+                "note": "'J ≥ 3' literal message"
+              },
+              {
+                "kind": "file_line",
+                "ref": "skill/chorus-sdlc/SKILL.md:247",
+                "note": "N = 3 cycles restated"
+              }
+            ],
+            "proposed_severity": "🟡",
+            "pull_quote": "Prose that restates a number the code owns needs a test that fails when the two disagree.",
+            "confidence_on_hand": "high",
+            "need_info": false
+          },
+          {
+            "id": "F3",
+            "lens": "architecture",
+            "locator": "install.sh:140",
+            "claim": "install.sh ships every file under each skill directory, so test/ and examples/ reach users. vocab-lint fixes REPO as CORE/../.. and reads the repo's .claude-plugin/plugin.json, which couples the test to the repository's layout. I ran it: in a temp CLAUDE_HOME install, 168 tests pass and the roster test fails. That contradicts the operator's ruling that tests stay in the repo. Fix it in the shipping step with a ship list or an exclusion for test/ and examples/, plus a round-trip assertion that an install contains no test/. Patching the test would leave the shipping rule wrong.",
+            "evidence": [
+              {
+                "kind": "file_line",
+                "ref": "install.sh:140",
+                "note": "find \"$name\" -type f ships everything"
+              },
+              {
+                "kind": "file_line",
+                "ref": "skill/chorus-core/test/vocab-lint.test.mjs:13",
+                "note": "REPO = CORE/../.."
+              },
+              {
+                "kind": "file_line",
+                "ref": "skill/chorus-core/test/vocab-lint.test.mjs:168",
+                "note": "reads repo-root plugin.json; fails installed (ran: 168 pass / 1 fail)"
+              }
+            ],
+            "proposed_severity": "🟡",
+            "pull_quote": "A test that only makes sense in the repo is shipping to users and failing there.",
+            "confidence_on_hand": "high",
+            "need_info": false
+          },
+          {
+            "id": "F4",
+            "lens": "architecture",
+            "locator": "skill/chorus-core/schema/run-log.schema.json:89",
+            "claim": "The run log is the seam between agent and script, and records are recomputed from it with whatever engine is installed (conduct.mjs:276). Its header records date, target, directory, stem, roster and bindings, but not which plugin or engine version produced it. The schema version is a hard-coded major.0 (conduct.mjs:47). After an upgrade that changes a rule, replaying an old committed log quietly produces a different record. The fix depends on whether logs must replay across versions. If they must, the header needs the producer version and the engine needs versioned rules. If not, conduct must refuse a log stamped by a different version.",
+            "evidence": [
+              {
+                "kind": "file_line",
+                "ref": "skill/chorus-core/schema/run-log.schema.json:89",
+                "note": "header required fields: no producer/engine version"
+              },
+              {
+                "kind": "file_line",
+                "ref": "skill/chorus-core/bin/conduct.mjs:47",
+                "note": "SCHEMA_VERSION = `${SCHEMA_MAJOR}.0`"
+              },
+              {
+                "kind": "file_line",
+                "ref": "skill/chorus-core/bin/conduct.mjs:276",
+                "note": "derive(log) uses the current engine"
+              }
+            ],
+            "proposed_severity": "🟡",
+            "pull_quote": "A committed run log does not say which rules produced it.",
+            "confidence_on_hand": "low",
+            "need_info": true,
+            "need_info_reason": "The operator deferred whether run logs must replay across plugin versions. That decides between stamping the version and refusing a mismatch, and sets the severity."
+          },
+          {
+            "id": "F5",
+            "lens": "architecture",
+            "locator": "skill/chorus-core/bin/bindings.mjs:26",
+            "claim": "Provider detection checks three places: cwd/.claude/skills, CLAUDE_HOME/skills and CHORUS_SKILL_PATH. That fits the install.sh layout but not the plugin channel's directory, so a problem-brief installed as a plugin falls back to the port default without saying so. The operator said most strangers use install.sh, so this matters little. Still, the detector's output should name the places it searched, so an agent can tell 'not installed' from 'not found here'.",
+            "evidence": [
+              {
+                "kind": "file_line",
+                "ref": "skill/chorus-core/bin/bindings.mjs:26",
+                "note": "probe list"
+              }
+            ],
+            "proposed_severity": "🟢",
+            "pull_quote": "The binding probe knows the install.sh layout and nothing about plugin installs.",
+            "confidence_on_hand": "high",
+            "need_info": false
+          },
+          {
+            "id": "F6",
+            "lens": "architecture",
+            "locator": "docs/reviews/CHORUS-PROJECT.md:106",
+            "claim": "Folding coryphaeus into core left one clean composition root. chorus-core/SKILL.md indexes the canon, BINDINGS, ROSTER and bin/, and the only coryphaeus mentions left are upgrade notes and the round-trip test. The one leftover is the addendum: it still names coryphaeus as the composition root (:14) and still says the canon wins (:106). Fold that line into F1's rewrite.",
+            "evidence": [
+              {
+                "kind": "file_line",
+                "ref": "docs/reviews/CHORUS-PROJECT.md:14",
+                "note": "coryphaeus as composition root"
+              },
+              {
+                "kind": "file_line",
+                "ref": "skill/chorus-core/SKILL.md:62",
+                "note": "core indexes bin/ conduct and engine"
+              }
+            ],
+            "proposed_severity": "🟢",
+            "pull_quote": "The fold produced one root; only the addendum still describes the old one.",
+            "confidence_on_hand": "high",
+            "need_info": false
+          }
+        ]
+      }
+    },
+    {
+      "type": "reply",
+      "phase": "author",
+      "persona": "uncle-bob-architect",
+      "data": {
+        "kind": "finding-report",
+        "schema_version": "1",
+        "mode": "review",
+        "round": "2026-10-29",
+        "persona": "uncle-bob-architect",
+        "lens": "clean-code",
+        "tool_uses": 20,
+        "findings": [
+          {
+            "id": "F1",
+            "lens": "clean-code",
+            "locator": "skill/chorus-review/SKILL.md:67",
+            "claim": "The dependency rule is stated backwards. The operator made code the authority for mechanical rules. Yet SKILL.md:67-68 says the canon decides and the script is fixed, CONDUCTOR.md:310 says 'the canon wins: fix the code', and CONDUCTOR.md:342 says the rules 'stay defined here'. An agent resolving drift will patch the authority to match its description. State the direction once in CONDUCTOR.md and have SKILL.md cite it.",
+            "evidence": [
+              {
+                "kind": "file_line",
+                "ref": "skill/chorus-review/SKILL.md:67",
+                "note": "canon decides and the script is fixed"
+              },
+              {
+                "kind": "file_line",
+                "ref": "skill/chorus-core/CONDUCTOR.md:310",
+                "note": "The canon wins: fix the code"
+              },
+              {
+                "kind": "file_line",
+                "ref": "skill/chorus-core/CONDUCTOR.md:342",
+                "note": "rules stay defined here"
+              }
+            ],
+            "proposed_severity": "🔴",
+            "pull_quote": "The docs tell the agent to fix the authority to match its description.",
+            "confidence_on_hand": "high",
+            "need_info": false
+          },
+          {
+            "id": "F2",
+            "lens": "clean-code",
+            "locator": "skill/chorus-core/bin/conduct.mjs:213",
+            "claim": "board() should only sequence, but it also owns phase rules the canon places in the pure engine. These are S11 peer-then-operator routing and peer eligibility (:213-235), applying a revision to an entry (:245), the S10 gate-answer loop (:173-198) and the post-evidence quorum abort (:201). Those rules change for a different reason than 'what comes next', and today only end-to-end transcripts test them. Extract routeHeld() and reviseEntry() into engine.mjs with § cites.",
+            "evidence": [
+              {
+                "kind": "file_line",
+                "ref": "skill/chorus-core/bin/conduct.mjs:213",
+                "note": "S11 routing inline"
+              },
+              {
+                "kind": "file_line",
+                "ref": "skill/chorus-core/bin/engine.mjs:26",
+                "note": "engine has no S11 routing function"
+              },
+              {
+                "kind": "file_line",
+                "ref": "skill/chorus-core/test/conduct.test.mjs:118",
+                "note": "S11 tested only via transcript"
+              }
+            ],
+            "proposed_severity": "🟡",
+            "pull_quote": "S11 routing is a rule hiding inside the sequencer.",
+            "confidence_on_hand": "high",
+            "need_info": false
+          },
+          {
+            "id": "F3",
+            "lens": "clean-code",
+            "locator": "skill/chorus-core/bin/conduct.mjs:537",
+            "claim": "The registry removed spelled strings and brought in magic indices. selfAudit labels each check as rule[0]..rule[10] of VOCAB.sdlc_rule, and GATE_NAME_OF pairs gate with gate_name by position, where the lint asserts only that the two lists are the same length. Reorder or insert a member and a row is silently mislabelled while the record still validates. Key them by name.",
+            "evidence": [
+              {
+                "kind": "file_line",
+                "ref": "skill/chorus-core/bin/conduct.mjs:537",
+                "note": "rule = VOCAB.sdlc_rule; rule[0..10]"
+              },
+              {
+                "kind": "file_line",
+                "ref": "skill/chorus-core/bin/vocab.mjs:70",
+                "note": "zip by index"
+              },
+              {
+                "kind": "file_line",
+                "ref": "skill/chorus-core/test/vocab-lint.test.mjs:53",
+                "note": "length-only check"
+              }
+            ],
+            "proposed_severity": "🟡",
+            "pull_quote": "Position in a list is a magic number with better manners.",
+            "confidence_on_hand": "high",
+            "need_info": false
+          },
+          {
+            "id": "F4",
+            "lens": "clean-code",
+            "locator": "skill/chorus-core/bin/conduct.mjs:589",
+            "claim": "CONDUCTOR.md promises an append-only run log. appendTo validates (good), then rewrites the whole file in place with writeFileSync, so a crash mid-write truncates the round's only state. Write to a temporary file and renameSync it into place.",
+            "evidence": [
+              {
+                "kind": "file_line",
+                "ref": "skill/chorus-core/bin/conduct.mjs:589",
+                "note": "whole-file writeFileSync"
+              },
+              {
+                "kind": "file_line",
+                "ref": "skill/chorus-core/CONDUCTOR.md:341",
+                "note": "append-only run log"
+              }
+            ],
+            "proposed_severity": "🟡",
+            "pull_quote": "appendTo does not append; it rewrites the only copy in place.",
+            "confidence_on_hand": "high",
+            "need_info": false
+          },
+          {
+            "id": "F5",
+            "lens": "clean-code",
+            "locator": "skill/chorus-core/bin/conduct.mjs:160",
+            "claim": "Seating has two writers. drop() mutates rows returned by engine.seat(): it sets seated to false and deletes seat. The revision step Object.assigns into entries returned by register(). The record's roster is therefore seat() plus patches made by the sequencer. Return new rows from an engine function (unseat) instead. This is about ownership of the row, not the known-limit corner.",
+            "evidence": [
+              {
+                "kind": "file_line",
+                "ref": "skill/chorus-core/bin/conduct.mjs:160",
+                "note": "drop() mutates engine rows"
+              },
+              {
+                "kind": "file_line",
+                "ref": "skill/chorus-core/bin/conduct.mjs:245",
+                "note": "Object.assign(e, …)"
+              }
+            ],
+            "proposed_severity": "🟡",
+            "pull_quote": "The roster in the record is seat() plus edits nobody names.",
+            "confidence_on_hand": "high",
+            "need_info": false
+          },
+          {
+            "id": "F6",
+            "lens": "clean-code",
+            "locator": "install.sh:140",
+            "claim": "The operator ruled that tests are repo-only, but install.sh copies every file under skill/*/, test/ included. vocab-lint.test.mjs:168 depends on the repo-root plugin.json, which does not exist in an install. Exclude test/ from the copy; leave the test as it is.",
+            "evidence": [
+              {
+                "kind": "file_line",
+                "ref": "install.sh:140",
+                "note": "find -type f ships test/"
+              },
+              {
+                "kind": "file_line",
+                "ref": "skill/chorus-core/test/vocab-lint.test.mjs:168",
+                "note": "reads repo-root plugin.json"
+              }
+            ],
+            "proposed_severity": "🟡",
+            "pull_quote": "A repo-only test is shipped to a place without the repo.",
+            "confidence_on_hand": "high",
+            "need_info": false
+          },
+          {
+            "id": "F7",
+            "lens": "clean-code",
+            "locator": "skill/chorus-core/bin/conduct.mjs:687",
+            "claim": "text() reads a file when its argument starts with '@', so I/O hides behind a noun. board() runs a gate's whole pipeline, while the canon's 'board' is the seated panel (DECISION-PRIMITIVE.md:4). Rename it to replayGate.",
+            "evidence": [
+              {
+                "kind": "file_line",
+                "ref": "skill/chorus-core/bin/conduct.mjs:687",
+                "note": "readFileSync on '@'"
+              },
+              {
+                "kind": "file_line",
+                "ref": "skill/chorus-core/DECISION-PRIMITIVE.md:4",
+                "note": "board = seated panel"
+              }
+            ],
+            "proposed_severity": "🟢",
+            "pull_quote": "text() reads files; the name does not admit it.",
+            "confidence_on_hand": "high",
+            "need_info": false
+          },
+          {
+            "id": "F8",
+            "lens": "clean-code",
+            "locator": "skill/chorus-core/bin/conduct.mjs:711",
+            "claim": "Vocabulary values still slip through because the lint flags only comparisons and distinctive tokens. :711 re-spells the RUN_MODE values where `mode` would do, :543 hard-codes 'speckit-' and :422 hard-codes 'incorporate'.",
+            "evidence": [
+              {
+                "kind": "file_line",
+                "ref": "skill/chorus-core/bin/conduct.mjs:711",
+                "note": "\"review\" : \"challenge\""
+              },
+              {
+                "kind": "file_line",
+                "ref": "skill/chorus-core/test/vocab-lint.test.mjs:76",
+                "note": "codeFindings heuristic"
+              }
+            ],
+            "proposed_severity": "🟢",
+            "pull_quote": "The lint guards comparisons; values still slip through as strings.",
+            "confidence_on_hand": "high",
+            "need_info": false
+          }
+        ]
+      }
+    },
+    {
+      "type": "reply",
+      "phase": "author",
+      "persona": "alan-cooper-advisor",
+      "data": {
+        "kind": "finding-report",
+        "schema_version": "1",
+        "mode": "review",
+        "round": "2026-10-29",
+        "persona": "alan-cooper-advisor",
+        "lens": "product",
+        "tool_uses": 13,
+        "findings": [
+          {
+            "id": "F1",
+            "lens": "product",
+            "locator": "install.sh:188",
+            "claim": "Node is required and conduct.mjs is the only supported path (operator, 2026-10-29), yet installer, README and BINDINGS.md still promise a Node-less round runs, and BINDINGS routes to a 'Free-hand form'. A stranger's agent without Node gets exit 0, a failing conduct.mjs, and one written fallback: the unscripted round this PR abolishes. The operator then receives a record no program conducted.",
+            "evidence": [
+              {
+                "kind": "file_line",
+                "ref": "install.sh:188",
+                "note": "Node-not-found message: rounds run unvalidated; exit 0"
+              },
+              {
+                "kind": "file_line",
+                "ref": "README.md:294",
+                "note": "Without Node, rounds run unvalidated"
+              },
+              {
+                "kind": "file_line",
+                "ref": "skill/chorus-core/BINDINGS.md:22",
+                "note": "Node-less defaults, then Free-hand form"
+              },
+              {
+                "kind": "file_line",
+                "ref": "skill/chorus-review/SKILL.md:63",
+                "note": "procedure is conduct.mjs; no Node-absent STOP like :40-44"
+              }
+            ],
+            "proposed_severity": "🔴",
+            "pull_quote": "The only written fallback for a stranger without Node is the free-hand round this PR exists to abolish.",
+            "confidence_on_hand": "high",
+            "need_info": false
+          },
+          {
+            "id": "F2",
+            "lens": "product",
+            "locator": "install.sh:130",
+            "claim": "Reproduced: temp CLAUDE_HOME holding origin/main's chorus-review/SKILL.md, no manifest. ./install.sh exits 0, keeps the old SKILL.md (no conduct loop) beside new bin/conduct.mjs, prints one 'skip' line, then 'Next: say spawn the chorus'. Upgrades are run by agents that need loud machine-actionable errors; exit 0 plus a next step is a success signal. The entry skill runs the old procedure against new tools, and the skip recurs every run since it is never recorded.",
+            "evidence": [
+              {
+                "kind": "file_line",
+                "ref": "install.sh:130",
+                "note": "skip: counted, not failed, not written to manifest"
+              },
+              {
+                "kind": "file_line",
+                "ref": "install.sh:181",
+                "note": "summary then exit 0 regardless"
+              }
+            ],
+            "proposed_severity": "🔴",
+            "pull_quote": "An upgrade that leaves the entry skill stale exits 0 and says 'spawn the chorus'.",
+            "confidence_on_hand": "high",
+            "need_info": false
+          },
+          {
+            "id": "F3",
+            "lens": "product",
+            "locator": "install.sh:151",
+            "claim": "Same run: a pre-manifest skills/coryphaeus/SKILL.md (live trigger on main) was left loading and never mentioned. Retirement walks manifest lines only; RETIRED_SKILLS is never checked on disk. The oldest installs keep a retired skill.",
+            "evidence": [
+              {
+                "kind": "file_line",
+                "ref": "install.sh:151",
+                "note": "retire loop iterates the manifest only"
+              },
+              {
+                "kind": "file_line",
+                "ref": "install.sh:72",
+                "note": "RETIRED_SKILLS known, not probed"
+              }
+            ],
+            "proposed_severity": "🟡",
+            "pull_quote": "The oldest installs keep a retired skill loading, and the installer never mentions it.",
+            "confidence_on_hand": "high",
+            "need_info": false
+          },
+          {
+            "id": "F4",
+            "lens": "product",
+            "locator": "skill/chorus-core/bin/conduct.mjs:355",
+            "claim": "I drove an S7 halt and rendered it; the record is the human's only surface. It reads 'halted-awaiting-operator' and '🔴 goes to the operator' though the operator already answered (their 'open' caused the halt). It names no way forward and does not say whether a new ruling resumes this run; provisional decisions still read 'in-progress'. Consent at question time (:352) is honest; the dead end is the page after.",
+            "evidence": [
+              {
+                "kind": "file_line",
+                "ref": "skill/chorus-core/bin/conduct.mjs:355",
+                "note": "halt on open ruling"
+              },
+              {
+                "kind": "file_line",
+                "ref": "skill/chorus-core/bin/render.mjs:196",
+                "note": "outcome names ids, no next action"
+              },
+              {
+                "kind": "file_line",
+                "ref": "skill/chorus-core/CONDUCTOR.md:365",
+                "note": "promises the record says what awaits the operator"
+              }
+            ],
+            "proposed_severity": "🟡",
+            "pull_quote": "A halted record says it awaits the operator who has already answered, and names no way forward.",
+            "confidence_on_hand": "high",
+            "need_info": false
+          },
+          {
+            "id": "F5",
+            "lens": "product",
+            "locator": "skill/chorus-review/SKILL.md:67",
+            "claim": "SKILL.md tells the running agent that on disagreement 'the canon decides and the script is fixed'. The operator ruled the reverse, and a stranger's agent mid-round in an installed copy cannot fix the script: it either overrides the program or stalls. A maintainer chore is written into the user's runtime instructions.",
+            "evidence": [
+              {
+                "kind": "file_line",
+                "ref": "skill/chorus-review/SKILL.md:67",
+                "note": "canon decides, script is fixed"
+              },
+              {
+                "kind": "principle",
+                "ref": "operator interview 2026-10-29 (r1 brief): code is authority for mechanical rules",
+                "note": "operator-confirmed"
+              }
+            ],
+            "proposed_severity": "🟡",
+            "pull_quote": "'The script is fixed' is a maintainer's chore written into a stranger's runtime instructions.",
+            "confidence_on_hand": "high",
+            "need_info": false
+          },
+          {
+            "id": "F6",
+            "lens": "product",
+            "locator": "install.sh:140",
+            "claim": "install.sh ships every file under skill/, so chorus-core/test/ (8 files in my temp manifest) reaches users, against the operator's repo-only ruling. The vocab-lint roster test is red in every install, so an agent verifying an upgrade meets a false alarm. Packaging mechanics are delivery's; the user cost is mine.",
+            "evidence": [
+              {
+                "kind": "file_line",
+                "ref": "install.sh:140",
+                "note": "find -type f, no test/ exclusion"
+              },
+              {
+                "kind": "file_line",
+                "ref": "skill/chorus-core/test/vocab-lint.test.mjs:1",
+                "note": "reads repo-root plugin.json (round-context dogfood note)"
+              }
+            ],
+            "proposed_severity": "🟡",
+            "pull_quote": "Shipping a test that is red in every install plants a false alarm on the user's disk.",
+            "confidence_on_hand": "high",
+            "need_info": false
+          },
+          {
+            "id": "F7",
+            "lens": "product",
+            "locator": "specs/018-scripted-spine/spec.md:26",
+            "claim": "F-UV. Named outcome: one program computes every mechanical step. v1: scripted rules Full; structural quotes Full; audit log Full; interview Partial; live-persona proof None (fixture-only). Deferrals: persona dispatch (forced by the Agent tool), interview content and old-record migration (team scope, no cost shifted to other users). Ratio ~75%, above 20%: not delivery theater. The headline stays unproven until this round's live run log validates.",
+            "evidence": [
+              {
+                "kind": "file_line",
+                "ref": "specs/018-scripted-spine/spec.md:26",
+                "note": "Stage boundary"
+              },
+              {
+                "kind": "file_line",
+                "ref": "specs/018-scripted-spine/spec.md:22",
+                "note": "proof is fixture replies, no model"
+              }
+            ],
+            "proposed_severity": "🟢",
+            "pull_quote": "The spine delivers about three quarters of its headline; what it lacks is one real persona reply.",
+            "confidence_on_hand": "high",
+            "need_info": false
+          }
+        ]
+      }
+    },
+    {
+      "type": "reply",
+      "phase": "author",
+      "persona": "don-norman-advisor",
+      "data": {
+        "kind": "finding-report",
+        "schema_version": "1",
+        "mode": "review",
+        "round": "2026-10-29",
+        "persona": "don-norman-advisor",
+        "lens": "hcd",
+        "tool_uses": 30,
+        "findings": [
+          {
+            "id": "F1",
+            "lens": "hcd",
+            "locator": "install.sh:130",
+            "claim": "Upgrading over a pre-manifest install leaves a mixed-version skill and exits 0. Reproduced (CLAUDE_HOME=<tmp>, stale chorus-review/SKILL.md): every other file installs new, the old SKILL.md is kept as 'skip ... not installed by this script', exit 0. The only signal is a prose count (:182). The upgrading agent, the user here per the operator, reads success while the pre-conduct entry point keeps loading over the new canon: a gulf of evaluation exactly where the operator asked for loud, machine-actionable errors.",
+            "evidence": [
+              {
+                "kind": "file_line",
+                "ref": "install.sh:130",
+                "note": "skip branch: prints and counts, no failure status"
+              },
+              {
+                "kind": "file_line",
+                "ref": "install.sh:182",
+                "note": "skipped count is prose only; the script ends without a non-z"
+              },
+              {
+                "kind": "file_line",
+                "ref": "docs/reviews/CHORUS-PROJECT.md:97",
+                "note": "installer findings at full severity; operator 2026-10-29: up"
+              }
+            ],
+            "proposed_severity": "🔴",
+            "pull_quote": "An upgrade that keeps the old entry point and exits 0 tells the upgrading agent it succeeded when it did not.",
+            "confidence_on_hand": "high",
+            "need_info": false
+          },
+          {
+            "id": "F2",
+            "lens": "hcd",
+            "locator": "skill/chorus-core/bin/conduct.mjs:596",
+            "claim": "The refusal the agent will hit most names the wrong state and no recovery. (a) Explore asks arrive as 'dispatch' with \"kind\": null; the action table says dispatch replies go through submit (CONDUCTOR.md:361); submit refuses with 'nothing asks X ...; the next action is dispatch (explore)' and never says 'use ack'. (b) A corrected resubmit right after a refusal is refused the same way (reproduced), because the retry surfaces only after every pending ask settles (:106-108). Signifier and feedback describe the batch, not this persona.",
+            "evidence": [
+              {
+                "kind": "file_line",
+                "ref": "skill/chorus-core/bin/conduct.mjs:55",
+                "note": "kindFor returns null for explore; null is the only cue meani"
+              },
+              {
+                "kind": "file_line",
+                "ref": "skill/chorus-core/bin/conduct.mjs:596",
+                "note": "refusal text names the global action, not the persona's stat"
+              },
+              {
+                "kind": "file_line",
+                "ref": "skill/chorus-core/CONDUCTOR.md:361",
+                "note": "dispatch row says replies go through submit; no ack row for "
+              }
+            ],
+            "proposed_severity": "🟡",
+            "pull_quote": "The refusal describes the batch's state, not this persona's, so the agent cannot tell what to do next.",
+            "confidence_on_hand": "high",
+            "need_info": false
+          },
+          {
+            "id": "F3",
+            "lens": "hcd",
+            "locator": "skill/chorus-core/schema/run-log.schema.json:93",
+            "claim": "init accepts what record rejects, and says so only at the end. Header: target minLength 1, round_context 10; review-record: 3 and 20. Reproduced: init --target x ran a full (aborted) round, then record wrote nothing: 'target: is too short'. The header is immutable, so there is no in-protocol recovery; the agent must hand-edit an append-only log, the improvisation the spine exists to remove.",
+            "evidence": [
+              {
+                "kind": "file_line",
+                "ref": "skill/chorus-core/schema/run-log.schema.json:93",
+                "note": "target minLength 1; :97 round_context minLength 10; :90 head"
+              },
+              {
+                "kind": "file_line",
+                "ref": "skill/chorus-core/schema/review-record.schema.json:13",
+                "note": "target minLength 3; :15 round_context minLength 20"
+              },
+              {
+                "kind": "file_line",
+                "ref": "skill/chorus-core/bin/conduct.mjs:749",
+                "note": "record refuses at the very end: 'invalid — not written'"
+              }
+            ],
+            "proposed_severity": "🟡",
+            "pull_quote": "A mistake made at init is reported only when the record is written, after the round's work is spent.",
+            "confidence_on_hand": "high",
+            "need_info": false
+          },
+          {
+            "id": "F4",
+            "lens": "hcd",
+            "locator": "skill/chorus-core/bin/conduct.mjs:746",
+            "claim": "Within conduct, exit 2 means at least four things needing different recoveries: syntax usage (:692), 'not asked for now', a timing mistake (:596, :613, :620), record on an unfinished run (:474, returned 2 at :746), unknown failure kind. An init failing its own schema crashes with a stack trace and exit 1 (:667, reproduced), which the table defines as 'refused, logged'. The sole reader must parse prose to tell slip from mistake. Cross-tool consistency was deferred; I claim only the within-conduct overload.",
+            "evidence": [
+              {
+                "kind": "file_line",
+                "ref": "skill/chorus-core/CONDUCTOR.md:370",
+                "note": "'2 not asked for / usage' fuses two states"
+              },
+              {
+                "kind": "file_line",
+                "ref": "skill/chorus-core/bin/conduct.mjs:667",
+                "note": "uncaught throw: stack trace, exit 1"
+              },
+              {
+                "kind": "file_line",
+                "ref": "skill/chorus-core/bin/conduct.mjs:746",
+                "note": "unfinished-run record returns 2"
+              }
+            ],
+            "proposed_severity": "🟡",
+            "pull_quote": "One exit code carries four meanings, so the agent has to read English to know which recovery applies.",
+            "confidence_on_hand": "high",
+            "need_info": false
+          },
+          {
+            "id": "F5",
+            "lens": "hcd",
+            "locator": "install.sh:188",
+            "claim": "Installer and README still teach the retired model: 'until [Node] is installed, rounds run unvalidated and pages are written by hand'. The operator ruled Node required and the conduct loop the only path, and SKILL.md now instructs conduct.mjs. Three voices, three stories: a stranger's agent may plan a Node-less round the skill cannot run. The closing lines also omit the .run.json the spine says to commit.",
+            "evidence": [
+              {
+                "kind": "file_line",
+                "ref": "install.sh:188",
+                "note": "Node-optional model"
+              },
+              {
+                "kind": "file_line",
+                "ref": "README.md:294",
+                "note": "same Node-optional claim"
+              },
+              {
+                "kind": "file_line",
+                "ref": "skill/chorus-review/SKILL.md:63",
+                "note": "the round runs through conduct.mjs"
+              }
+            ],
+            "proposed_severity": "🟡",
+            "pull_quote": "The installer still says a round can run without Node, which the skill it installs can no longer do.",
+            "confidence_on_hand": "high",
+            "need_info": false
+          },
+          {
+            "id": "F6",
+            "lens": "hcd",
+            "locator": "skill/chorus-core/bin/conduct.mjs:155",
+            "claim": "The abort record is honest about what happened. But quorum collapses to 'aborted' even after a re-ask, and the page says 'Recovered without asking: none' (reproduced). An operator reading only the record cannot tell 'not re-asked' from 'refused twice', and gets no next step beyond waiting.",
+            "evidence": [
+              {
+                "kind": "file_line",
+                "ref": "skill/chorus-core/bin/conduct.mjs:155",
+                "note": "ABORTED overrides the reasked flag"
+              },
+              {
+                "kind": "file_line",
+                "ref": "skill/chorus-core/CONDUCTOR.md:366",
+                "note": "'on halt the record says what awaits the operator'"
+              }
+            ],
+            "proposed_severity": "🟢",
+            "pull_quote": "The abort page cannot show that a re-ask happened, so the operator cannot tell one refusal from two.",
+            "confidence_on_hand": "high",
+            "need_info": false
+          }
+        ]
+      }
+    },
+    {
+      "type": "reply",
+      "phase": "vote",
+      "persona": "delivery-and-ops-advisor",
+      "data": {
+        "kind": "vote-report",
+        "schema_version": "1",
+        "mode": "review",
+        "round": "2026-10-29",
+        "persona": "delivery-and-ops-advisor",
+        "lens": "delivery-ops",
+        "tool_uses": 25,
+        "own_findings": [
+          "F28",
+          "F29",
+          "F30",
+          "F31",
+          "F32",
+          "F33",
+          "F34",
+          "F35"
+        ],
+        "votes": [
+          {
+            "finding": "F1",
+            "confidence_on_hand": "high",
+            "vote": "CONFIRM",
+            "reason": "Six places give authority to the prose; SKILL.md:67-68 is the one an installed agent acts on.",
+            "evidence": [
+              {
+                "kind": "file_line",
+                "ref": "skill/chorus-review/SKILL.md:68"
+              }
+            ]
+          },
+          {
+            "finding": "F2",
+            "confidence_on_hand": "high",
+            "vote": "CONFIRM",
+            "reason": "In CI, only canon-drift ties prose to code, and only for the Stage-4 rules.",
+            "evidence": [
+              {
+                "kind": "file_line",
+                "ref": ".github/workflows/integrity.yml:33"
+              }
+            ]
+          },
+          {
+            "finding": "F3",
+            "confidence_on_hand": "high",
+            "vote": "CONFIRM",
+            "reason": "Reproduced independently: 168 pass, 1 fails in a tmp install.",
+            "evidence": [
+              {
+                "kind": "file_line",
+                "ref": "install.sh:139"
+              }
+            ],
+            "pull_quote": "Excluding test/ is a one-line change, and the prune loop cleans old copies out on the next run."
+          },
+          {
+            "finding": "F4",
+            "confidence_on_hand": "low",
+            "vote": "NEED_INFO",
+            "reason": "Partial fact: plugin.json:3 has never been bumped, so a version field alone would not tell two engines apart. It would need the commit.",
+            "evidence": [
+              {
+                "kind": "file_line",
+                "ref": ".claude-plugin/plugin.json:3"
+              }
+            ]
+          },
+          {
+            "finding": "F5",
+            "confidence_on_hand": "high",
+            "vote": "CONFIRM",
+            "reason": "Plugin channel is the minority per operator; correctly low.",
+            "evidence": [
+              {
+                "kind": "file_line",
+                "ref": "skill/chorus-core/bin/bindings.mjs:26"
+              }
+            ]
+          },
+          {
+            "finding": "F6",
+            "confidence_on_hand": "high",
+            "vote": "CONFIRM",
+            "reason": "The addendum still names coryphaeus.",
+            "evidence": [
+              {
+                "kind": "file_line",
+                "ref": "docs/reviews/CHORUS-PROJECT.md:14"
+              }
+            ]
+          },
+          {
+            "finding": "F7",
+            "confidence_on_hand": "high",
+            "vote": "CONFIRM",
+            "reason": "Without Node the installer prints a soft note and exits 0, even though Node is now required.",
+            "evidence": [
+              {
+                "kind": "file_line",
+                "ref": "install.sh:188"
+              }
+            ],
+            "pull_quote": "A required runtime that is missing should fail the install, not decorate it."
+          },
+          {
+            "finding": "F8",
+            "confidence_on_hand": "high",
+            "vote": "CONFIRM",
+            "reason": "Same mechanism as my own finding, reproduced.",
+            "evidence": [
+              {
+                "kind": "file_line",
+                "ref": "install.sh:130"
+              }
+            ]
+          },
+          {
+            "finding": "F9",
+            "confidence_on_hand": "high",
+            "vote": "PRIORITIZE",
+            "reason": "Reproduced: a retired skill keeps loading alongside its replacement and the exit is 0. For an agent-run upgrade that is a silent double-load.",
+            "evidence": [
+              {
+                "kind": "file_line",
+                "ref": "install.sh:150"
+              },
+              {
+                "kind": "file_line",
+                "ref": "install.sh:166"
+              }
+            ]
+          },
+          {
+            "finding": "F11",
+            "confidence_on_hand": "high",
+            "vote": "PRIORITIZE",
+            "reason": "If an installed agent follows it and edits conduct.mjs, install.sh then keeps that file as 'differs, kept' on every later upgrade (see R2-1).",
+            "evidence": [
+              {
+                "kind": "file_line",
+                "ref": "install.sh:124"
+              }
+            ]
+          },
+          {
+            "finding": "F12",
+            "confidence_on_hand": "high",
+            "vote": "CONFIRM",
+            "reason": "Same packaging fault.",
+            "evidence": [
+              {
+                "kind": "file_line",
+                "ref": "install.sh:139"
+              }
+            ]
+          },
+          {
+            "finding": "F14",
+            "confidence_on_hand": "high",
+            "vote": "CONFIRM",
+            "reason": "Same mechanism, reproduced.",
+            "evidence": [
+              {
+                "kind": "file_line",
+                "ref": "install.sh:130"
+              }
+            ]
+          },
+          {
+            "finding": "F16",
+            "confidence_on_hand": "high",
+            "vote": "CONFIRM",
+            "reason": "Failing late costs a whole round of agent dispatches.",
+            "evidence": [
+              {
+                "kind": "file_line",
+                "ref": "skill/chorus-core/bin/conduct.mjs:667"
+              }
+            ]
+          },
+          {
+            "finding": "F17",
+            "confidence_on_hand": "high",
+            "vote": "CONFIRM",
+            "reason": "A torn log also exits 2 (reproduced).",
+            "evidence": [
+              {
+                "kind": "file_line",
+                "ref": "skill/chorus-core/bin/conduct.mjs:724"
+              }
+            ]
+          },
+          {
+            "finding": "F18",
+            "confidence_on_hand": "high",
+            "vote": "CONFIRM",
+            "reason": "Same contradiction as F7.",
+            "evidence": [
+              {
+                "kind": "file_line",
+                "ref": "install.sh:188"
+              }
+            ]
+          },
+          {
+            "finding": "F20",
+            "confidence_on_hand": "high",
+            "vote": "CONFIRM",
+            "reason": "Correctly rated, and the consequence in the installed copy lasts (R2-1).",
+            "evidence": [
+              {
+                "kind": "file_line",
+                "ref": "skill/chorus-review/SKILL.md:67"
+              }
+            ]
+          },
+          {
+            "finding": "F23",
+            "confidence_on_hand": "high",
+            "vote": "CONFIRM",
+            "reason": "Same write path.",
+            "evidence": [
+              {
+                "kind": "file_line",
+                "ref": "skill/chorus-core/bin/conduct.mjs:589"
+              }
+            ]
+          }
+        ],
+        "derived": [
+          {
+            "id": "R2-1",
+            "lens": "delivery-ops",
+            "locator": "install.sh:124",
+            "claim": "The installed SKILL.md tells the agent to fix the script on disagreement. An agent that patches ~/.claude/skills/chorus-core/bin/conduct.mjs changes its hash, and install.sh then reports it as 'differs, kept' on every later upgrade, still exiting 0. That machine stops getting engine fixes for good, and no signal tells it so.",
+            "evidence": [
+              {
+                "kind": "file_line",
+                "ref": "skill/chorus-review/SKILL.md:67"
+              },
+              {
+                "kind": "file_line",
+                "ref": "install.sh:124"
+              }
+            ],
+            "proposed_severity": "🟡",
+            "pull_quote": "An agent told to fix the installed script freezes that file out of every later upgrade.",
+            "confidence_on_hand": "high",
+            "need_info": false,
+            "derived_from": "F20",
+            "graded": false
+          },
+          {
+            "id": "R2-2",
+            "lens": "delivery-ops",
+            "locator": ".github/workflows/integrity.yml:36",
+            "claim": "CONDUCTOR.md:342 says to commit <stem>.run.json beside the record in docs/reviews. CI validates every docs/reviews/*.json as a review-record. Checked on this round's log: validate.mjs review-record exits 1 (19 errors), while run-log exits 0. The first committed run log turns CI red, and the release steps require green CI with a dogfood round committed. Fix: validate *.run.json as run-log.",
+            "evidence": [
+              {
+                "kind": "file_line",
+                "ref": ".github/workflows/integrity.yml:36"
+              },
+              {
+                "kind": "file_line",
+                "ref": "skill/chorus-core/CONDUCTOR.md:342"
+              },
+              {
+                "kind": "file_line",
+                "ref": "CONTRIBUTING.md:93"
+              }
+            ],
+            "proposed_severity": "🔴",
+            "pull_quote": "The run log this PR tells you to commit fails the CI gate this PR keeps.",
+            "confidence_on_hand": "high",
+            "need_info": false,
+            "derived_from": "F4",
+            "graded": false
+          }
+        ]
+      }
+    },
+    {
+      "type": "reply",
+      "phase": "vote",
+      "persona": "mark-richards-architect",
+      "data": {
+        "kind": "vote-report",
+        "schema_version": "1",
+        "mode": "review",
+        "round": "2026-10-29",
+        "persona": "mark-richards-architect",
+        "lens": "architecture",
+        "tool_uses": 28,
+        "own_findings": [
+          "F1",
+          "F2",
+          "F3",
+          "F4",
+          "F5",
+          "F6"
+        ],
+        "votes": [
+          {
+            "finding": "F7",
+            "confidence_on_hand": "high",
+            "vote": "OVER-RATE",
+            "reason": "The Node line is wrong, but the installed SKILL.md routes every round through conduct.mjs, so a Node-less agent fails at its first command instead of running free-hand. 🟡, same as F18.",
+            "evidence": [
+              {
+                "kind": "file_line",
+                "ref": "install.sh:188"
+              },
+              {
+                "kind": "file_line",
+                "ref": "skill/chorus-review/SKILL.md:62"
+              }
+            ]
+          },
+          {
+            "finding": "F8",
+            "confidence_on_hand": "high",
+            "vote": "CONFIRM",
+            "reason": "The skip branch only counts the file. The summary then prints 'spawn the chorus' and exits 0.",
+            "evidence": [
+              {
+                "kind": "file_line",
+                "ref": "install.sh:130"
+              },
+              {
+                "kind": "file_line",
+                "ref": "install.sh:181"
+              }
+            ]
+          },
+          {
+            "finding": "F9",
+            "confidence_on_hand": "high",
+            "vote": "CONFIRM",
+            "reason": "Pruning only runs when a manifest exists, so pre-manifest coryphaeus files are never visited.",
+            "evidence": [
+              {
+                "kind": "file_line",
+                "ref": "install.sh:150"
+              }
+            ]
+          },
+          {
+            "finding": "F11",
+            "confidence_on_hand": "high",
+            "vote": "CONFIRM",
+            "reason": "The same site as my F1, seen from the user's side.",
+            "evidence": [
+              {
+                "kind": "file_line",
+                "ref": "skill/chorus-review/SKILL.md:68"
+              }
+            ],
+            "pull_quote": "A runtime instruction must not tell the conductor to edit its own counting machine."
+          },
+          {
+            "finding": "F12",
+            "confidence_on_hand": "high",
+            "vote": "CONFIRM",
+            "reason": "I reproduced it: 168 pass and 1 fail in a temp CLAUDE_HOME.",
+            "evidence": [
+              {
+                "kind": "file_line",
+                "ref": "install.sh:140"
+              }
+            ]
+          },
+          {
+            "finding": "F14",
+            "confidence_on_hand": "high",
+            "vote": "CONFIRM",
+            "reason": "Same mechanism as F8. A mixed-version install exits 0.",
+            "evidence": [
+              {
+                "kind": "file_line",
+                "ref": "install.sh:130"
+              }
+            ]
+          },
+          {
+            "finding": "F17",
+            "confidence_on_hand": "high",
+            "vote": "CONFIRM",
+            "reason": "Exit codes are the agent↔script contract. Exit 2 covers usage errors, 'nothing asks you', and assemble failures.",
+            "evidence": [
+              {
+                "kind": "file_line",
+                "ref": "skill/chorus-core/bin/conduct.mjs:597"
+              },
+              {
+                "kind": "file_line",
+                "ref": "skill/chorus-core/bin/conduct.mjs:746"
+              }
+            ]
+          },
+          {
+            "finding": "F18",
+            "confidence_on_hand": "high",
+            "vote": "CONFIRM",
+            "reason": "This contradicts the operator's ruling that Node is required.",
+            "evidence": [
+              {
+                "kind": "file_line",
+                "ref": "install.sh:189"
+              }
+            ]
+          },
+          {
+            "finding": "F20",
+            "confidence_on_hand": "high",
+            "vote": "CONFIRM",
+            "reason": "This is the sharpest of my F1 sites. It instructs the calling agent at runtime to edit the program that seats and counts, which works against Principle II.",
+            "evidence": [
+              {
+                "kind": "file_line",
+                "ref": "skill/chorus-review/SKILL.md:68"
+              }
+            ],
+            "pull_quote": "The one place that tells the agent who wins says the wrong side wins."
+          },
+          {
+            "finding": "F21",
+            "confidence_on_hand": "high",
+            "vote": "CONFIRM",
+            "reason": "Routing sits in deriveReview, not engine.mjs, which contradicts CONDUCTOR.md:343. See R2-1.",
+            "evidence": [
+              {
+                "kind": "file_line",
+                "ref": "skill/chorus-core/bin/conduct.mjs:213"
+              }
+            ]
+          },
+          {
+            "finding": "F23",
+            "confidence_on_hand": "high",
+            "vote": "CONFIRM",
+            "reason": "It pushes the event, validates the whole log, then writeFileSync rewrites the file in place. There is no temp-file-and-rename.",
+            "evidence": [
+              {
+                "kind": "file_line",
+                "ref": "skill/chorus-core/bin/conduct.mjs:589"
+              }
+            ]
+          },
+          {
+            "finding": "F25",
+            "confidence_on_hand": "high",
+            "vote": "CONFIRM",
+            "reason": "Same as my F3.",
+            "evidence": [
+              {
+                "kind": "file_line",
+                "ref": "install.sh:140"
+              }
+            ]
+          },
+          {
+            "finding": "F28",
+            "confidence_on_hand": "high",
+            "vote": "OVER-RATE",
+            "reason": "Real, and the same thing as F9. A stale coryphaeus has no trigger phrase and the siblings cite chorus-core, so the harm is clutter rather than wrong records. 🟡.",
+            "evidence": [
+              {
+                "kind": "file_line",
+                "ref": "install.sh:150"
+              }
+            ]
+          },
+          {
+            "finding": "F29",
+            "confidence_on_hand": "high",
+            "vote": "CONFIRM",
+            "reason": "Old prose combined with a new script is the worst mixed state. See R2-2.",
+            "evidence": [
+              {
+                "kind": "file_line",
+                "ref": "install.sh:130"
+              }
+            ],
+            "pull_quote": "The installer deploys files, but the contract is the whole skill."
+          },
+          {
+            "finding": "F30",
+            "confidence_on_hand": "high",
+            "vote": "CONFIRM",
+            "reason": "CI runs the tests from the repo checkout only.",
+            "evidence": [
+              {
+                "kind": "file_line",
+                "ref": ".github/workflows/integrity.yml:33"
+              }
+            ]
+          },
+          {
+            "finding": "F31",
+            "confidence_on_hand": "high",
+            "vote": "CONFIRM",
+            "reason": "plugin.json holds the version, but install.sh ships only skill/ and agents/.",
+            "evidence": [
+              {
+                "kind": "file_line",
+                "ref": ".claude-plugin/plugin.json:3"
+              },
+              {
+                "kind": "file_line",
+                "ref": "install.sh:135"
+              }
+            ]
+          },
+          {
+            "finding": "F33",
+            "confidence_on_hand": "high",
+            "vote": "CONFIRM",
+            "reason": "A non-atomic full rewrite of the only copy.",
+            "evidence": [
+              {
+                "kind": "file_line",
+                "ref": "skill/chorus-core/bin/conduct.mjs:593"
+              }
+            ]
+          },
+          {
+            "finding": "F35",
+            "confidence_on_hand": "low",
+            "vote": "NEED_INFO",
+            "reason": "The repo shows CI pins Node 20 only. Whether 18 is the intended floor is an operator call and was deferred.",
+            "evidence": [
+              {
+                "kind": "file_line",
+                "ref": ".github/workflows/integrity.yml:29"
+              }
+            ]
+          }
+        ],
+        "derived": [
+          {
+            "id": "R2-1",
+            "lens": "architecture",
+            "locator": "skill/chorus-core/CONDUCTOR.md:343",
+            "claim": "The operator made the code the authority for mechanical rules, but the code keeps them in two places. CONDUCTOR.md:343 says engine.mjs implements the rules as pure functions. S11 routing (peers, then the operator) lives in conduct.mjs:213-222 inside the sequencer. A drift check keyed on engine exports (my F2) would miss S11. CONSOLIDATE: move routing into an engine function, and add a test that each rule named in CONDUCTOR § The conductor loop maps to one engine export.",
+            "evidence": [
+              {
+                "kind": "file_line",
+                "ref": "skill/chorus-core/CONDUCTOR.md:343"
+              },
+              {
+                "kind": "file_line",
+                "ref": "skill/chorus-core/bin/conduct.mjs:213"
+              }
+            ],
+            "proposed_severity": "🟡",
+            "pull_quote": "Code owns the rules now, so the rules need one home inside the code.",
+            "confidence_on_hand": "high",
+            "need_info": false,
+            "derived_from": "F21",
+            "graded": false
+          },
+          {
+            "id": "R2-2",
+            "lens": "architecture",
+            "locator": "install.sh:97",
+            "claim": "F8/F14/F29/F31 share one cause. install.sh treats a file as the unit it deploys (place() per file, :97-133). The real contract unit is the suite: the SKILL.md procedure, conduct.mjs and the schemas change together. Nothing checks they agree, since conduct init stamps only schema 1.0 (conduct.mjs:665) and no suite version ships. Make the suite atomic: exit non-zero when any shipped file is skipped or kept, ship a VERSION file in chorus-core, and have conduct init record it in the header. That stamp also closes F4.",
+            "evidence": [
+              {
+                "kind": "file_line",
+                "ref": "install.sh:97"
+              },
+              {
+                "kind": "file_line",
+                "ref": "install.sh:135"
+              },
+              {
+                "kind": "file_line",
+                "ref": "skill/chorus-core/bin/conduct.mjs:665"
+              }
+            ],
+            "proposed_severity": "🔴",
+            "pull_quote": "Prose and program are one contract, yet they install and fail as separate files.",
+            "confidence_on_hand": "high",
+            "need_info": false,
+            "derived_from": "F29",
+            "graded": false
+          }
+        ]
+      }
+    },
+    {
+      "type": "reply",
+      "phase": "vote",
+      "persona": "alan-cooper-advisor",
+      "data": {
+        "kind": "vote-report",
+        "schema_version": "1",
+        "mode": "review",
+        "round": "2026-10-29",
+        "persona": "alan-cooper-advisor",
+        "lens": "product",
+        "tool_uses": 8,
+        "own_findings": [
+          "F7",
+          "F8",
+          "F9",
+          "F10",
+          "F11",
+          "F12",
+          "F13"
+        ],
+        "votes": [
+          {
+            "finding": "F1",
+            "confidence_on_hand": "high",
+            "vote": "CONFIRM",
+            "reason": "Same split I hit at SKILL.md:67; the agent reading it inherits a contradiction it cannot settle.",
+            "evidence": [
+              {
+                "kind": "file_line",
+                "ref": "skill/chorus-review/SKILL.md:67"
+              }
+            ],
+            "pull_quote": "Two authorities each telling the other to yield leaves the agent to pick one."
+          },
+          {
+            "finding": "F3",
+            "confidence_on_hand": "high",
+            "vote": "CONFIRM",
+            "reason": "Reproduced the shipped test/ in my own temp install.",
+            "evidence": [
+              {
+                "kind": "file_line",
+                "ref": "install.sh:140"
+              }
+            ]
+          },
+          {
+            "finding": "F5",
+            "confidence_on_hand": "high",
+            "vote": "CONFIRM",
+            "reason": "Operator: strangers mostly use install.sh, so plugin-channel miss is correctly minor.",
+            "evidence": [
+              {
+                "kind": "file_line",
+                "ref": "skill/chorus-core/bin/bindings.mjs:26"
+              }
+            ]
+          },
+          {
+            "finding": "F6",
+            "confidence_on_hand": "high",
+            "vote": "CONFIRM",
+            "reason": "Addendum names the old root; readers are advisors, not strangers.",
+            "evidence": [
+              {
+                "kind": "file_line",
+                "ref": "docs/reviews/CHORUS-PROJECT.md:106"
+              }
+            ]
+          },
+          {
+            "finding": "F14",
+            "confidence_on_hand": "high",
+            "vote": "CONFIRM",
+            "reason": "Same reproduction as mine; red is right for an upgrade run by agents reading exit codes.",
+            "evidence": [
+              {
+                "kind": "file_line",
+                "ref": "install.sh:130"
+              }
+            ],
+            "pull_quote": "Exit 0 over a stale entry point is a lie told to the one reader who believes exit codes."
+          },
+          {
+            "finding": "F15",
+            "confidence_on_hand": "high",
+            "vote": "CONFIRM",
+            "reason": "The agent is the user of conduct stdout (operator ruling); a refusal without the next verb strands it.",
+            "evidence": [
+              {
+                "kind": "file_line",
+                "ref": "skill/chorus-core/bin/conduct.mjs:596"
+              }
+            ]
+          },
+          {
+            "finding": "F16",
+            "confidence_on_hand": "high",
+            "vote": "CONFIRM",
+            "reason": "A whole round of persona work spent before the header is rejected; low likelihood keeps it yellow.",
+            "evidence": [
+              {
+                "kind": "file_line",
+                "ref": "skill/chorus-core/schema/run-log.schema.json:93"
+              }
+            ]
+          },
+          {
+            "finding": "F17",
+            "confidence_on_hand": "high",
+            "vote": "CONFIRM",
+            "reason": "Exit codes are the agent's only machine-readable promise; four meanings in one breaks it.",
+            "evidence": [
+              {
+                "kind": "file_line",
+                "ref": "skill/chorus-core/bin/conduct.mjs:746"
+              }
+            ]
+          },
+          {
+            "finding": "F18",
+            "confidence_on_hand": "high",
+            "vote": "PRIORITIZE",
+            "reason": "BINDINGS.md:22 routes the Node-less agent to the free-hand form, so the false promise produces an unscripted round, not just confusion.",
+            "evidence": [
+              {
+                "kind": "file_line",
+                "ref": "skill/chorus-core/BINDINGS.md:22"
+              }
+            ],
+            "pull_quote": "The stale Node note does not just mislead; it hands the agent a way to skip the program."
+          },
+          {
+            "finding": "F19",
+            "confidence_on_hand": "high",
+            "vote": "CONFIRM",
+            "reason": "Record is the human's only surface; ambiguity there is real but cheap.",
+            "evidence": [
+              {
+                "kind": "file_line",
+                "ref": "skill/chorus-core/bin/conduct.mjs:155"
+              }
+            ]
+          },
+          {
+            "finding": "F20",
+            "confidence_on_hand": "high",
+            "vote": "CONFIRM",
+            "reason": "Red holds: an agent obeying it edits the installed program, which the installer then keeps forever (my R2-1).",
+            "evidence": [
+              {
+                "kind": "file_line",
+                "ref": "install.sh:125"
+              }
+            ]
+          },
+          {
+            "finding": "F23",
+            "confidence_on_hand": "high",
+            "vote": "CONFIRM",
+            "reason": "User cost: the round's only state can be truncated; name aside, the promise 'append-only' is false.",
+            "evidence": [
+              {
+                "kind": "file_line",
+                "ref": "skill/chorus-core/bin/conduct.mjs:589"
+              }
+            ]
+          },
+          {
+            "finding": "F25",
+            "confidence_on_hand": "high",
+            "vote": "CONFIRM",
+            "reason": "Same as F3/F12.",
+            "evidence": [
+              {
+                "kind": "file_line",
+                "ref": "install.sh:140"
+              }
+            ]
+          },
+          {
+            "finding": "F28",
+            "confidence_on_hand": "high",
+            "vote": "OVER-RATE",
+            "reason": "Cohort is near-empty: coryphaeus/SKILL.md and the install manifest arrived in the same commit (#32, 8d16107), so no install.sh user ever had coryphaeus without a manifest. Same applies to my F9.",
+            "evidence": [
+              {
+                "kind": "file_line",
+                "ref": "install.sh:72"
+              }
+            ]
+          },
+          {
+            "finding": "F29",
+            "confidence_on_hand": "high",
+            "vote": "CONFIRM",
+            "reason": "Pre-#32 installs are a real cohort for chorus-review/core SKILL.md; reproduced.",
+            "evidence": [
+              {
+                "kind": "file_line",
+                "ref": "install.sh:130"
+              }
+            ]
+          },
+          {
+            "finding": "F30",
+            "confidence_on_hand": "high",
+            "vote": "CONFIRM",
+            "reason": "Root cause of F8/F12/F14 all reaching users unseen.",
+            "evidence": [
+              {
+                "kind": "file_line",
+                "ref": "install.sh:139"
+              }
+            ]
+          },
+          {
+            "finding": "F31",
+            "confidence_on_hand": "high",
+            "vote": "CONFIRM",
+            "reason": "GitHub issues are the operator's only upgrade feedback channel; an unversioned report is half a report.",
+            "evidence": [
+              {
+                "kind": "file_line",
+                "ref": ".claude-plugin/plugin.json:3"
+              }
+            ]
+          },
+          {
+            "finding": "F33",
+            "confidence_on_hand": "high",
+            "vote": "CONFIRM",
+            "reason": "Misreporting damage as usage error tells the agent the fault is its own.",
+            "evidence": [
+              {
+                "kind": "file_line",
+                "ref": "skill/chorus-core/bin/conduct.mjs:589"
+              }
+            ]
+          },
+          {
+            "finding": "F34",
+            "confidence_on_hand": "high",
+            "vote": "CONFIRM",
+            "reason": "Small and real.",
+            "evidence": [
+              {
+                "kind": "file_line",
+                "ref": "skill/chorus-core/bin/conduct.mjs:667"
+              }
+            ]
+          }
+        ],
+        "derived": [
+          {
+            "id": "R2-1",
+            "lens": "product",
+            "locator": "install.sh:125",
+            "claim": "F20 compounds with F29. An agent obeying 'the script is fixed' edits the installed conduct.mjs in ~/.claude. Every later upgrade then reports it 'differs, kept (edited since install)' and exits 0, so the user's install is frozen on a hand-patched program with no error.",
+            "evidence": [
+              {
+                "kind": "file_line",
+                "ref": "skill/chorus-review/SKILL.md:67"
+              },
+              {
+                "kind": "file_line",
+                "ref": "install.sh:125"
+              }
+            ],
+            "proposed_severity": "🔴",
+            "pull_quote": "Obey the doc once, and every later upgrade silently keeps your patched copy of the program.",
+            "confidence_on_hand": "high",
+            "need_info": false,
+            "derived_from": "F20",
+            "graded": false
+          },
+          {
+            "id": "R2-2",
+            "lens": "product",
+            "locator": "README.md:1",
+            "claim": "The operator learns of broken upgrades from GitHub issues, yet README names no place to report one, there is no issue template, and the installer prints no version (F31). The one feedback loop has no door marked for strangers.",
+            "evidence": [
+              {
+                "kind": "file_line",
+                "ref": "CONTRIBUTING.md:83"
+              },
+              {
+                "kind": "file_line",
+                "ref": ".claude-plugin/plugin.json:3"
+              }
+            ],
+            "proposed_severity": "🟡",
+            "pull_quote": "The only feedback channel has no door marked for the stranger who needs it.",
+            "confidence_on_hand": "high",
+            "need_info": false,
+            "derived_from": "F31",
+            "graded": false
+          },
+          {
+            "id": "R2-3",
+            "lens": "product",
+            "locator": "install.sh:72",
+            "claim": "Self-correction for F9: coryphaeus and the manifest shipped together in #32 (8d16107), so the pre-manifest coryphaeus cohort is near-empty; F9 should drop to 🟢. The stale chorus-review/core SKILL.md cohort (F8) is real: pre-#32 installs.",
+            "evidence": [
+              {
+                "kind": "file_line",
+                "ref": "install.sh:72"
+              }
+            ],
+            "proposed_severity": "🟢",
+            "pull_quote": "The retired-skill cohort I named barely exists; the stale-entry-skill cohort does.",
+            "confidence_on_hand": "high",
+            "need_info": false,
+            "derived_from": "F28",
+            "graded": false
+          }
+        ]
+      }
+    },
+    {
+      "type": "reply",
+      "phase": "vote",
+      "persona": "don-norman-advisor",
+      "data": {
+        "kind": "vote-report",
+        "schema_version": "1",
+        "mode": "review",
+        "round": "2026-10-29",
+        "persona": "don-norman-advisor",
+        "lens": "hcd",
+        "tool_uses": 8,
+        "own_findings": [
+          "F14",
+          "F15",
+          "F16",
+          "F17",
+          "F18",
+          "F19"
+        ],
+        "votes": [
+          {
+            "finding": "F1",
+            "confidence_on_hand": "high",
+            "vote": "CONFIRM",
+            "reason": "Two stated authorities give the agent two contradictory conceptual models of the system.",
+            "evidence": [
+              {
+                "kind": "file_line",
+                "ref": "skill/chorus-review/SKILL.md:67"
+              }
+            ],
+            "pull_quote": "An agent cannot form one model from a rule that names two owners."
+          },
+          {
+            "finding": "F2",
+            "confidence_on_hand": "high",
+            "vote": "CONFIRM",
+            "reason": "Prose that restates code constants is a system image with no discipline keeping it true.",
+            "evidence": [
+              {
+                "kind": "file_line",
+                "ref": "skill/chorus-core/test/canon-drift.test.mjs:80"
+              }
+            ]
+          },
+          {
+            "finding": "F3",
+            "confidence_on_hand": "high",
+            "vote": "CONFIRM",
+            "reason": "A red test in the install is false feedback; same root as F12/F25.",
+            "evidence": [
+              {
+                "kind": "file_line",
+                "ref": "install.sh:140"
+              }
+            ]
+          },
+          {
+            "finding": "F5",
+            "confidence_on_hand": "high",
+            "vote": "CONFIRM",
+            "reason": "A silent fallback with no list of the places searched leaves a gulf of evaluation.",
+            "evidence": [
+              {
+                "kind": "file_line",
+                "ref": "skill/chorus-core/bin/bindings.mjs:26"
+              }
+            ],
+            "pull_quote": "A probe should say where it looked, so its silence can be read."
+          },
+          {
+            "finding": "F6",
+            "confidence_on_hand": "high",
+            "vote": "CONFIRM",
+            "reason": "Stale addendum line contradicts the tree; small and correctly rated.",
+            "evidence": [
+              {
+                "kind": "file_line",
+                "ref": "docs/reviews/CHORUS-PROJECT.md:14"
+              }
+            ]
+          },
+          {
+            "finding": "F7",
+            "confidence_on_hand": "high",
+            "vote": "CONFIRM",
+            "reason": "My F18 found the same Node-optional story; BINDINGS' free-hand route makes it a working path to the abolished procedure, which earns 🔴.",
+            "evidence": [
+              {
+                "kind": "file_line",
+                "ref": "skill/chorus-core/BINDINGS.md:20"
+              }
+            ],
+            "pull_quote": "The only fallback the docs offer leads back to the round the spine replaced."
+          },
+          {
+            "finding": "F8",
+            "confidence_on_hand": "high",
+            "vote": "CONFIRM",
+            "reason": "Reproduced independently (my F14).",
+            "evidence": [
+              {
+                "kind": "file_line",
+                "ref": "install.sh:130"
+              }
+            ],
+            "pull_quote": "Exit 0 after keeping the stale entry point is a false success signal."
+          },
+          {
+            "finding": "F9",
+            "confidence_on_hand": "high",
+            "vote": "PRIORITIZE",
+            "reason": "Main's coryphaeus SKILL.md describes itself as the validator and renderer, so two loaded skills claim one role and the agent may route to the stale one.",
+            "evidence": [
+              {
+                "kind": "file_line",
+                "ref": "skill/chorus-core/SKILL.md:1"
+              }
+            ]
+          },
+          {
+            "finding": "F10",
+            "confidence_on_hand": "high",
+            "vote": "CONFIRM",
+            "reason": "Read the code: halt is terminal (answer() refuses any topic once the action is halt) while the page says 'awaiting'. See my R2-1.",
+            "evidence": [
+              {
+                "kind": "file_line",
+                "ref": "skill/chorus-core/bin/conduct.mjs:358"
+              }
+            ],
+            "pull_quote": "'Awaiting' promises a wait the run cannot resume from."
+          },
+          {
+            "finding": "F11",
+            "confidence_on_hand": "high",
+            "vote": "CONFIRM",
+            "reason": "An instruction the runtime user cannot carry out is a dead affordance.",
+            "evidence": [
+              {
+                "kind": "file_line",
+                "ref": "skill/chorus-review/SKILL.md:67"
+              }
+            ]
+          },
+          {
+            "finding": "F12",
+            "confidence_on_hand": "high",
+            "vote": "CONFIRM",
+            "reason": "Same as F3, priced at the user.",
+            "evidence": [
+              {
+                "kind": "file_line",
+                "ref": "install.sh:140"
+              }
+            ]
+          },
+          {
+            "finding": "F13",
+            "confidence_on_hand": "high",
+            "vote": "CONFIRM",
+            "reason": "The 75% estimate is honest, and this round is the missing live proof.",
+            "evidence": [
+              {
+                "kind": "file_line",
+                "ref": "specs/018-scripted-spine/spec.md:26"
+              }
+            ]
+          },
+          {
+            "finding": "F20",
+            "confidence_on_hand": "high",
+            "vote": "OVER-RATE",
+            "reason": "The harm only fires when an agent detects a disagreement mid-round; F1 and F11 price the same root at 🟡.",
+            "evidence": [
+              {
+                "kind": "file_line",
+                "ref": "skill/chorus-review/SKILL.md:67"
+              }
+            ]
+          },
+          {
+            "finding": "F23",
+            "confidence_on_hand": "high",
+            "vote": "CONFIRM",
+            "reason": "A torn log loses the round; the fix is a temp-file-and-rename write.",
+            "evidence": [
+              {
+                "kind": "file_line",
+                "ref": "skill/chorus-core/bin/conduct.mjs:589"
+              }
+            ]
+          },
+          {
+            "finding": "F25",
+            "confidence_on_hand": "high",
+            "vote": "CONFIRM",
+            "reason": "Same root as F3.",
+            "evidence": [
+              {
+                "kind": "file_line",
+                "ref": "install.sh:140"
+              }
+            ]
+          },
+          {
+            "finding": "F28",
+            "confidence_on_hand": "high",
+            "vote": "CONFIRM",
+            "reason": "Reproduced by the author; a retired validator skill still loading risks silently stale validation (see my F9 vote).",
+            "evidence": [
+              {
+                "kind": "file_line",
+                "ref": "install.sh:150"
+              }
+            ]
+          },
+          {
+            "finding": "F29",
+            "confidence_on_hand": "high",
+            "vote": "CONFIRM",
+            "reason": "Converges with my F14.",
+            "evidence": [
+              {
+                "kind": "file_line",
+                "ref": "install.sh:130"
+              }
+            ],
+            "pull_quote": "A mixed-version skill that reports success is the worst kind of feedback."
+          },
+          {
+            "finding": "F30",
+            "confidence_on_hand": "high",
+            "vote": "CONFIRM",
+            "reason": "Only the repo tree is ever exercised; the user's copy never is.",
+            "evidence": [
+              {
+                "kind": "file_line",
+                "ref": "install.sh:139"
+              }
+            ]
+          },
+          {
+            "finding": "F31",
+            "confidence_on_hand": "high",
+            "vote": "CONFIRM",
+            "reason": "Without version identity neither agent nor human can read what state the install is in.",
+            "evidence": [
+              {
+                "kind": "file_line",
+                "ref": ".claude-plugin/plugin.json:3"
+              }
+            ],
+            "pull_quote": "You cannot evaluate an upgrade you cannot name."
+          },
+          {
+            "finding": "F33",
+            "confidence_on_hand": "high",
+            "vote": "CONFIRM",
+            "reason": "Converges with my F17: damage reported as usage misleads the only reader.",
+            "evidence": [
+              {
+                "kind": "file_line",
+                "ref": "skill/chorus-core/bin/conduct.mjs:724"
+              }
+            ],
+            "pull_quote": "Calling damage a usage error sends the agent to fix the wrong thing."
+          },
+          {
+            "finding": "F34",
+            "confidence_on_hand": "high",
+            "vote": "CONFIRM",
+            "reason": "Reproduced in my F17.",
+            "evidence": [
+              {
+                "kind": "file_line",
+                "ref": "skill/chorus-core/bin/conduct.mjs:667"
+              }
+            ]
+          }
+        ],
+        "derived": [
+          {
+            "id": "R2-1",
+            "lens": "hcd",
+            "locator": "skill/chorus-core/bin/conduct.mjs:358",
+            "claim": "Halt is terminal in code but presented as a wait. The halt action carries only {action, reason}. answer() refuses any topic unless the current action asks for it (:630), so after a halt no new operator ruling is accepted. Yet the action table says 'the record says what awaits the operator' (CONDUCTOR.md:366) and the page renders 'halt → awaiting operator on …' (render.mjs:195). An operator who changes their mind has no way in, and nobody tells them a new run is the only way forward.",
+            "evidence": [
+              {
+                "kind": "file_line",
+                "ref": "skill/chorus-core/bin/conduct.mjs:358"
+              },
+              {
+                "kind": "file_line",
+                "ref": "skill/chorus-core/bin/conduct.mjs:630"
+              },
+              {
+                "kind": "file_line",
+                "ref": "skill/chorus-core/bin/render.mjs:195"
+              }
+            ],
+            "proposed_severity": "🟡",
+            "pull_quote": "The page says the run awaits the operator; the code has already closed the door.",
+            "confidence_on_hand": "high",
+            "need_info": false,
+            "derived_from": "F10",
+            "graded": false
+          },
+          {
+            "id": "R2-2",
+            "lens": "hcd",
+            "locator": "skill/chorus-core/CONDUCTOR.md:290",
+            "claim": "The agent is told where the tools live: '.claude/skills/chorus-core in the project, else ~/.claude/skills/chorus-core'. install.sh honours CLAUDE_HOME and the bindings probe searches CLAUDE_HOME/skills and CHORUS_SKILL_PATH, but <root> names neither, nor the plugin channel. An agent on any of those layouts is handed a path that does not exist: a gulf of execution at the first command.",
+            "evidence": [
+              {
+                "kind": "file_line",
+                "ref": "skill/chorus-core/CONDUCTOR.md:290"
+              },
+              {
+                "kind": "file_line",
+                "ref": "skill/chorus-core/bin/bindings.mjs:26"
+              }
+            ],
+            "proposed_severity": "🟢",
+            "pull_quote": "Three files tell the agent three different places the tools might be.",
+            "confidence_on_hand": "high",
+            "need_info": false,
+            "derived_from": "F5",
+            "graded": false
+          }
+        ]
+      }
+    },
+    {
+      "type": "reply",
+      "phase": "vote",
+      "persona": "uncle-bob-architect",
+      "data": {
+        "kind": "vote-report",
+        "schema_version": "1",
+        "mode": "review",
+        "round": "2026-10-29",
+        "persona": "uncle-bob-architect",
+        "lens": "clean-code",
+        "tool_uses": 26,
+        "own_findings": [
+          "F20",
+          "F21",
+          "F22",
+          "F23",
+          "F24",
+          "F25",
+          "F26",
+          "F27"
+        ],
+        "votes": [
+          {
+            "finding": "F1",
+            "confidence_on_hand": "high",
+            "vote": "PRIORITIZE",
+            "reason": "The authority direction is inverted in the canon itself, so every drift fix goes the wrong way. Conformance is ranked first, which makes this red.",
+            "evidence": [
+              {
+                "kind": "file_line",
+                "ref": "skill/chorus-review/SKILL.md:67"
+              },
+              {
+                "kind": "file_line",
+                "ref": "skill/chorus-core/CONDUCTOR.md:310"
+              }
+            ],
+            "pull_quote": "Two documents name opposite authorities for the same rules."
+          },
+          {
+            "finding": "F11",
+            "confidence_on_hand": "high",
+            "vote": "CONFIRM",
+            "reason": "This is the same line seen from the runtime reader's side. It is correctly yellow as its own finding.",
+            "evidence": [
+              {
+                "kind": "file_line",
+                "ref": "skill/chorus-review/SKILL.md:67"
+              }
+            ]
+          },
+          {
+            "finding": "F2",
+            "confidence_on_hand": "high",
+            "vote": "CONFIRM",
+            "reason": "validate.mjs:409 compares against SEAT_CAP and then prints 'the cap is five', a second copy of the constant.",
+            "evidence": [
+              {
+                "kind": "file_line",
+                "ref": "skill/chorus-core/bin/validate.mjs:409"
+              }
+            ]
+          },
+          {
+            "finding": "F3",
+            "confidence_on_hand": "high",
+            "vote": "CONFIRM",
+            "reason": "Verified: place() is fed by a find over every file, so test/ ships.",
+            "evidence": [
+              {
+                "kind": "file_line",
+                "ref": "install.sh:140"
+              }
+            ],
+            "pull_quote": "Excluding test/ fixes it without touching the test."
+          },
+          {
+            "finding": "F12",
+            "confidence_on_hand": "high",
+            "vote": "CONFIRM",
+            "reason": "This is the user cost of the same packaging defect.",
+            "evidence": [
+              {
+                "kind": "file_line",
+                "ref": "skill/chorus-core/test/vocab-lint.test.mjs:168"
+              }
+            ]
+          },
+          {
+            "finding": "F6",
+            "confidence_on_hand": "high",
+            "vote": "CONFIRM",
+            "reason": "The addendum is the only stale root, and every lens anchors on it.",
+            "evidence": [
+              {
+                "kind": "file_line",
+                "ref": "docs/reviews/CHORUS-PROJECT.md:106"
+              }
+            ]
+          },
+          {
+            "finding": "F7",
+            "confidence_on_hand": "high",
+            "vote": "CONFIRM",
+            "reason": "The installer's Node-missing message still speaks of a validator/renderer-only round. The operator made Node mandatory.",
+            "evidence": [
+              {
+                "kind": "file_line",
+                "ref": "install.sh:188"
+              }
+            ]
+          },
+          {
+            "finding": "F18",
+            "confidence_on_hand": "high",
+            "vote": "CONFIRM",
+            "reason": "Same text as F7. Yellow is the right rating for the second view of it.",
+            "evidence": [
+              {
+                "kind": "file_line",
+                "ref": "install.sh:186"
+              }
+            ]
+          },
+          {
+            "finding": "F8",
+            "confidence_on_hand": "high",
+            "vote": "CONFIRM",
+            "reason": "In place(), a file with no manifest record whose content differs is skipped without --force, and the exit code stays 0.",
+            "evidence": [
+              {
+                "kind": "file_line",
+                "ref": "install.sh:130"
+              }
+            ],
+            "pull_quote": "A skipped file inside our own skill directory is a mixed install, not a courtesy."
+          },
+          {
+            "finding": "F14",
+            "confidence_on_hand": "high",
+            "vote": "CONFIRM",
+            "reason": "Same defect as F8, framed around feedback to the agent.",
+            "evidence": [
+              {
+                "kind": "file_line",
+                "ref": "install.sh:130"
+              }
+            ]
+          },
+          {
+            "finding": "F29",
+            "confidence_on_hand": "high",
+            "vote": "CONFIRM",
+            "reason": "Same defect. Its remedy, failing when a skip lands in a suite-owned directory, is the right one.",
+            "evidence": [
+              {
+                "kind": "file_line",
+                "ref": "install.sh:130"
+              }
+            ]
+          },
+          {
+            "finding": "F9",
+            "confidence_on_hand": "high",
+            "vote": "CONFIRM",
+            "reason": "Retirement is only reachable through the manifest-prune loop.",
+            "evidence": [
+              {
+                "kind": "file_line",
+                "ref": "install.sh:151"
+              }
+            ]
+          },
+          {
+            "finding": "F28",
+            "confidence_on_hand": "high",
+            "vote": "CONFIRM",
+            "reason": "Same path as F9. A live trigger for a skill whose bin/ is gone is a broken upgrade.",
+            "evidence": [
+              {
+                "kind": "file_line",
+                "ref": "install.sh:150"
+              }
+            ]
+          },
+          {
+            "finding": "F15",
+            "confidence_on_hand": "high",
+            "vote": "PRIORITIZE",
+            "reason": "One action name carries two reply protocols. submit refuses when ask.kind is null and ack refuses when it is set, yet both arrive as dispatch.",
+            "evidence": [
+              {
+                "kind": "file_line",
+                "ref": "skill/chorus-core/bin/conduct.mjs:597"
+              },
+              {
+                "kind": "file_line",
+                "ref": "skill/chorus-core/bin/conduct.mjs:622"
+              }
+            ],
+            "pull_quote": "dispatch means 'reply' or 'ack' and only a null says which."
+          },
+          {
+            "finding": "F16",
+            "confidence_on_hand": "high",
+            "vote": "CONFIRM",
+            "reason": "Verified: the header allows target length 1 and round_context length 10, while the record requires 3 and 20.",
+            "evidence": [
+              {
+                "kind": "file_line",
+                "ref": "skill/chorus-core/schema/run-log.schema.json:93"
+              },
+              {
+                "kind": "file_line",
+                "ref": "skill/chorus-core/schema/review-record.schema.json:13"
+              }
+            ]
+          },
+          {
+            "finding": "F17",
+            "confidence_on_hand": "high",
+            "vote": "CONFIRM",
+            "reason": "Verified: exit 2 is returned at :597, :613, :614, :622, :629 and :746 for different conditions.",
+            "evidence": [
+              {
+                "kind": "file_line",
+                "ref": "skill/chorus-core/bin/conduct.mjs:746"
+              }
+            ]
+          },
+          {
+            "finding": "F33",
+            "confidence_on_hand": "high",
+            "vote": "CONFIRM",
+            "reason": "This converges with my F23, and adds the misreported exit code.",
+            "evidence": [
+              {
+                "kind": "file_line",
+                "ref": "skill/chorus-core/bin/conduct.mjs:589"
+              }
+            ],
+            "pull_quote": "Temp file plus rename makes the name honest."
+          },
+          {
+            "finding": "F34",
+            "confidence_on_hand": "high",
+            "vote": "CONFIRM",
+            "reason": "initLog throws on an invalid header instead of returning the {exit, message} shape its siblings use.",
+            "evidence": [
+              {
+                "kind": "file_line",
+                "ref": "skill/chorus-core/bin/conduct.mjs:667"
+              }
+            ]
+          }
+        ],
+        "derived": [
+          {
+            "id": "R2-1",
+            "lens": "clean-code",
+            "locator": "skill/chorus-core/bin/conduct.mjs:597",
+            "claim": "F17's overload is a symptom. Exit codes are bare numbers in about twenty places across conduct.mjs, and the registry this PR built has no exit vocabulary, so nothing names the meanings that F17 asks to split. Add an exit vocabulary (OK, REFUSED, NOT_NOW, USAGE, VERSION, UNFINISHED), then separate the meanings.",
+            "evidence": [
+              {
+                "kind": "file_line",
+                "ref": "skill/chorus-core/bin/conduct.mjs:597"
+              },
+              {
+                "kind": "file_line",
+                "ref": "skill/chorus-core/bin/conduct.mjs:746"
+              },
+              {
+                "kind": "file_line",
+                "ref": "skill/chorus-core/bin/conduct.mjs:21"
+              }
+            ],
+            "proposed_severity": "🟡",
+            "pull_quote": "The one vocabulary left out of the registry is the one the agent branches on.",
+            "confidence_on_hand": "high",
+            "need_info": false,
+            "derived_from": "F17",
+            "graded": false
+          },
+          {
+            "id": "R2-2",
+            "lens": "clean-code",
+            "locator": "skill/chorus-core/schema/run-log.schema.json:93",
+            "claim": "F16's root cause is that 'target' and 'round_context' are defined twice, with different bounds. conduct.mjs already points answer contracts into review-record.schema.json by $ref (:62). The header should $ref the record's properties the same way, so init and record cannot disagree.",
+            "evidence": [
+              {
+                "kind": "file_line",
+                "ref": "skill/chorus-core/schema/run-log.schema.json:97"
+              },
+              {
+                "kind": "file_line",
+                "ref": "skill/chorus-core/bin/conduct.mjs:62"
+              }
+            ],
+            "proposed_severity": "🟡",
+            "pull_quote": "One field, two schemas, two minimums: a duplicated authority.",
+            "confidence_on_hand": "high",
+            "need_info": false,
+            "derived_from": "F16",
+            "graded": false
+          }
+        ]
+      }
+    },
+    {
+      "type": "answer",
+      "phase": "need-info",
+      "topic": "provision",
+      "data": {
+        "finding": "F4",
+        "route": "peer",
+        "supplied": false,
+        "note": "No peer supplied it: alan-cooper-advisor, don-norman-advisor and uncle-bob-architect skipped F4 as held in their Round 2 reports; the gap is operator intent (replay across plugin versions), deferred in the interview."
+      }
+    },
+    {
+      "type": "answer",
+      "phase": "need-info",
+      "topic": "provision",
+      "data": {
+        "finding": "F4",
+        "route": "operator",
+        "supplied": true,
+        "note": "Operator (2026-10-29): No: refuse mismatches. Stamp the engine version/commit in the header and refuse (loudly) to replay a log from another version."
+      }
+    },
+    {
+      "type": "reply",
+      "phase": "need-info",
+      "finding": "F4",
+      "persona": "mark-richards-architect",
+      "data": {
+        "kind": "finding-report",
+        "schema_version": "1",
+        "mode": "review",
+        "round": "2026-10-29",
+        "persona": "mark-richards-architect",
+        "lens": "architecture",
+        "tool_uses": 2,
+        "findings": [
+          {
+            "id": "F4",
+            "lens": "architecture",
+            "locator": "skill/chorus-core/schema/run-log.schema.json:89",
+            "claim": "Operator ruling: replaying a log across versions is refused, not supported. The contract cannot enforce that today. The run-log header (required fields at :89) has no slot for the engine version or commit. conduct.mjs:665 stamps only schema_version 1.0, and derive() at conduct.mjs:276 replays any log through whatever engine is installed. So a log from an older version silently yields a different record. Fix: add a required header field holding the engine version and commit, set by conduct init. On every command that loads a log, conduct compares that stamp with its own and refuses loudly on a mismatch. The refusal gets a distinct exit code and names both versions, so the upgrading agent knows to finish or restart the round on one version. Add a conduct.test case where a log stamped with another version is refused. The version needs one source: ship a chorus-core VERSION file, or read plugin.json, which install.sh does not ship today.",
+            "evidence": [
+              {
+                "kind": "file_line",
+                "ref": "skill/chorus-core/schema/run-log.schema.json:89",
+                "note": "header required fields: no engine version/commit"
+              },
+              {
+                "kind": "file_line",
+                "ref": "skill/chorus-core/bin/conduct.mjs:665",
+                "note": "init stamps only schema_version"
+              },
+              {
+                "kind": "file_line",
+                "ref": "skill/chorus-core/bin/conduct.mjs:276",
+                "note": "derive(log) replays with the current engine"
+              },
+              {
+                "kind": "file_line",
+                "ref": "install.sh:135",
+                "note": "plugin.json version not shipped; no version source in an install"
+              }
+            ],
+            "proposed_severity": "🟡",
+            "pull_quote": "Refusing a log from another version needs the log to say which version wrote it.",
+            "confidence_on_hand": "high",
+            "need_info": false
+          }
+        ]
+      }
+    },
+    {
+      "type": "reply",
+      "phase": "need-info",
+      "round": 2,
+      "finding": "F4",
+      "persona": "delivery-and-ops-advisor",
+      "data": {
+        "kind": "vote-report",
+        "schema_version": "1",
+        "mode": "review",
+        "round": "2026-10-29",
+        "persona": "delivery-and-ops-advisor",
+        "lens": "delivery-ops",
+        "tool_uses": 2,
+        "own_findings": [
+          "F28",
+          "F29",
+          "F30",
+          "F31",
+          "F32",
+          "F33",
+          "F34",
+          "F35"
+        ],
+        "votes": [
+          {
+            "finding": "F4",
+            "confidence_on_hand": "high",
+            "vote": "CONFIRM",
+            "reason": "The operator's refuse-on-mismatch rule needs a stamp, and an installed copy has no .git. plugin.json:3 is never bumped and install.sh:89 records only the source path, so the stamp has to come from a bumped version or from install.sh writing the commit.",
+            "evidence": [
+              {
+                "kind": "file_line",
+                "ref": ".claude-plugin/plugin.json:3"
+              },
+              {
+                "kind": "file_line",
+                "ref": "install.sh:89"
+              }
+            ],
+            "pull_quote": "In an install with no git, the version stamp has to be written at release or install time, or there is nothing to refuse against."
+          }
+        ],
+        "derived": []
+      }
+    },
+    {
+      "type": "reply",
+      "phase": "need-info",
+      "round": 2,
+      "finding": "F4",
+      "persona": "don-norman-advisor",
+      "data": {
+        "kind": "vote-report",
+        "schema_version": "1",
+        "mode": "review",
+        "round": "2026-10-29",
+        "persona": "don-norman-advisor",
+        "lens": "hcd",
+        "tool_uses": 2,
+        "own_findings": [
+          "F14",
+          "F15",
+          "F16",
+          "F17",
+          "F18",
+          "F19"
+        ],
+        "votes": [
+          {
+            "finding": "F4",
+            "confidence_on_hand": "high",
+            "vote": "CONFIRM",
+            "reason": "The operator ruled that a log from another version is refused. The log stamps only schema_version (conduct.mjs:665), so today the agent gets a silently different record with no feedback at all. The revised remedy (a distinct exit code that names both versions) closes that gulf of evaluation, and 🟡 fits.",
+            "evidence": [
+              {
+                "kind": "file_line",
+                "ref": "skill/chorus-core/bin/conduct.mjs:665"
+              },
+              {
+                "kind": "file_line",
+                "ref": "skill/chorus-core/schema/run-log.schema.json:89"
+              }
+            ],
+            "pull_quote": "A refusal the agent can act on needs both versions named, and today neither one is recorded."
+          }
+        ],
+        "derived": []
+      }
+    },
+    {
+      "type": "reply",
+      "phase": "need-info",
+      "round": 2,
+      "finding": "F4",
+      "persona": "alan-cooper-advisor",
+      "data": {
+        "kind": "vote-report",
+        "schema_version": "1",
+        "mode": "review",
+        "round": "2026-10-29",
+        "persona": "alan-cooper-advisor",
+        "lens": "product",
+        "tool_uses": 3,
+        "own_findings": [
+          "F7",
+          "F8",
+          "F9",
+          "F10",
+          "F11",
+          "F12",
+          "F13"
+        ],
+        "votes": [
+          {
+            "finding": "F4",
+            "confidence_on_hand": "high",
+            "vote": "CONFIRM",
+            "reason": "Verified: the header's required fields carry no engine version or commit (run-log.schema.json:89), and SCHEMA_VERSION is a fixed major.0 (conduct.mjs:47). The operator's refuse-on-mismatch ruling cannot be honoured without the stamp. Agents run upgrades, so a mid-round upgrade would otherwise replay silently under new rules. Yellow is right.",
+            "evidence": [
+              {
+                "kind": "file_line",
+                "ref": "skill/chorus-core/schema/run-log.schema.json:89"
+              },
+              {
+                "kind": "file_line",
+                "ref": "skill/chorus-core/bin/conduct.mjs:47"
+              }
+            ],
+            "pull_quote": "A loud refusal needs a stamp to refuse on; today the log carries none."
+          }
+        ],
+        "derived": []
+      }
+    },
+    {
+      "type": "reply",
+      "phase": "need-info",
+      "round": 2,
+      "finding": "F4",
+      "persona": "uncle-bob-architect",
+      "data": {
+        "kind": "vote-report",
+        "schema_version": "1",
+        "mode": "review",
+        "round": "2026-10-29",
+        "persona": "uncle-bob-architect",
+        "lens": "clean-code",
+        "tool_uses": 3,
+        "own_findings": [
+          "F20",
+          "F21",
+          "F22",
+          "F23",
+          "F24",
+          "F25",
+          "F26",
+          "F27"
+        ],
+        "votes": [
+          {
+            "finding": "F4",
+            "confidence_on_hand": "high",
+            "vote": "CONFIRM",
+            "reason": "Verified: derive() replays every log through whatever engine is installed (conduct.mjs:276-277), and the only stamp is SCHEMA_MAJOR.0 (conduct.mjs:47), so the operator's refuse rule cannot be enforced. The remedy needs a single version source and a named exit code; R2-1's exit vocabulary is where that code belongs. Yellow is right because a hard refusal is cheap to add.",
+            "evidence": [
+              {
+                "kind": "file_line",
+                "ref": "skill/chorus-core/bin/conduct.mjs:276"
+              },
+              {
+                "kind": "file_line",
+                "ref": "skill/chorus-core/bin/conduct.mjs:47"
+              },
+              {
+                "kind": "file_line",
+                "ref": "skill/chorus-core/schema/run-log.schema.json:89"
+              }
+            ],
+            "pull_quote": "A replay that cannot tell who wrote the log cannot refuse it."
+          }
+        ],
+        "derived": []
+      }
+    },
+    {
+      "type": "answer",
+      "phase": "need-info",
+      "topic": "provision",
+      "data": {
+        "finding": "F32",
+        "route": "peer",
+        "supplied": false,
+        "note": "No peer supplied it: mark-richards-architect, alan-cooper-advisor, don-norman-advisor and uncle-bob-architect skipped F32 as held in Round 2; the gap is operator intent (supported downgrade), deferred in the interview."
+      }
+    },
+    {
+      "type": "answer",
+      "phase": "need-info",
+      "topic": "provision",
+      "data": {
+        "finding": "F32",
+        "route": "operator",
+        "supplied": true,
+        "note": "Operator (2026-10-29): Older commit + install.sh. Checking out an older commit and re-running install.sh is the supported downgrade."
+      }
+    },
+    {
+      "type": "reply",
+      "phase": "need-info",
+      "finding": "F32",
+      "persona": "delivery-and-ops-advisor",
+      "data": {
+        "kind": "finding-report",
+        "schema_version": "1",
+        "mode": "review",
+        "round": "2026-10-29",
+        "persona": "delivery-and-ops-advisor",
+        "lens": "delivery-ops",
+        "tool_uses": 2,
+        "findings": [
+          {
+            "id": "F32",
+            "lens": "delivery-ops",
+            "locator": "CONTRIBUTING.md:89",
+            "claim": "The operator has named the supported downgrade: an older commit plus install.sh. It works. Reproduced: install HEAD into a tmp CLAUDE_HOME, then run origin/main's install.sh over it. Exit 0, 41 files pruned, 5 updated, and the result is byte-identical to origin/main's skill tree. The gap is that this is not written down or tested. CONTRIBUTING's release section and the README never mention it, and the round trip only tests forward upgrades, so a later change to prune could break downgrades silently. Remedy (under 1h, no keep-on cost): one README line, and a downgrade leg in the round trip (install HEAD, then git archive a prior commit and run its install.sh). It still depends on F31 to name the commit to go back to.",
+            "evidence": [
+              {
+                "kind": "file_line",
+                "ref": "CONTRIBUTING.md:89",
+                "note": "release steps name no downgrade"
+              },
+              {
+                "kind": "file_line",
+                "ref": "scripts/test-install-roundtrip.sh:104",
+                "note": "only forward upgrade tested"
+              },
+              {
+                "kind": "file_line",
+                "ref": "install.sh:150",
+                "note": "prune loop is what makes the downgrade clean"
+              }
+            ],
+            "proposed_severity": "🟢",
+            "pull_quote": "The way back works today, but nothing writes it down or keeps it working.",
+            "confidence_on_hand": "high",
+            "need_info": false
+          }
+        ]
+      }
+    },
+    {
+      "type": "reply",
+      "phase": "need-info",
+      "round": 2,
+      "finding": "F32",
+      "persona": "alan-cooper-advisor",
+      "data": {
+        "kind": "vote-report",
+        "schema_version": "1",
+        "mode": "review",
+        "round": "2026-10-29",
+        "persona": "alan-cooper-advisor",
+        "lens": "product",
+        "tool_uses": 2,
+        "own_findings": [
+          "F7",
+          "F8",
+          "F9",
+          "F10",
+          "F11",
+          "F12",
+          "F13"
+        ],
+        "votes": [
+          {
+            "finding": "F32",
+            "confidence_on_hand": "high",
+            "vote": "CONFIRM",
+            "reason": "The author reproduced a working downgrade, and the release steps at CONTRIBUTING.md:89 never mention it. 🟢 fits: the path works, so the cost is discoverability. An agent can only use a rollback it can find written down, and it still needs a version to roll back to (F31).",
+            "evidence": [
+              {
+                "kind": "file_line",
+                "ref": "CONTRIBUTING.md:89"
+              }
+            ],
+            "pull_quote": "A rollback that works but is written nowhere is one only the maintainer can use."
+          }
+        ],
+        "derived": []
+      }
+    },
+    {
+      "type": "reply",
+      "phase": "need-info",
+      "round": 2,
+      "finding": "F32",
+      "persona": "don-norman-advisor",
+      "data": {
+        "kind": "vote-report",
+        "schema_version": "1",
+        "mode": "review",
+        "round": "2026-10-29",
+        "persona": "don-norman-advisor",
+        "lens": "hcd",
+        "tool_uses": 2,
+        "own_findings": [
+          "F14",
+          "F15",
+          "F16",
+          "F17",
+          "F18",
+          "F19"
+        ],
+        "votes": [
+          {
+            "finding": "F32",
+            "confidence_on_hand": "high",
+            "vote": "CONFIRM",
+            "reason": "The author reproduced a working downgrade (install HEAD, then origin/main's install.sh, giving a byte-identical tree). What is left is an undocumented recovery path that an agent cannot discover from CONTRIBUTING.md:89 or the README. That is a small gulf of execution, and 🟢 fits.",
+            "evidence": [
+              {
+                "kind": "file_line",
+                "ref": "CONTRIBUTING.md:89"
+              }
+            ],
+            "pull_quote": "A recovery path that works but is written nowhere is one the agent will not find."
+          }
+        ],
+        "derived": []
+      }
+    },
+    {
+      "type": "reply",
+      "phase": "need-info",
+      "round": 2,
+      "finding": "F32",
+      "persona": "mark-richards-architect",
+      "data": {
+        "kind": "vote-report",
+        "schema_version": "1",
+        "mode": "review",
+        "round": "2026-10-29",
+        "persona": "mark-richards-architect",
+        "lens": "architecture",
+        "tool_uses": 3,
+        "own_findings": [
+          "F1",
+          "F2",
+          "F3",
+          "F4",
+          "F5",
+          "F6"
+        ],
+        "votes": [
+          {
+            "finding": "F32",
+            "confidence_on_hand": "high",
+            "vote": "CONFIRM",
+            "reason": "🟢 is right. The manifest prune loop makes the downgrade path clean (install.sh:150), and the round trip only tests upgrades (scripts/test-install-roundtrip.sh:104), so a downgrade leg is a cheap fitness function. When it is written down, the line should say that a run log from the newer version will be refused after a downgrade (revised F4), so an in-flight round has to be finished or restarted.",
+            "evidence": [
+              {
+                "kind": "file_line",
+                "ref": "install.sh:150"
+              },
+              {
+                "kind": "file_line",
+                "ref": "scripts/test-install-roundtrip.sh:104"
+              }
+            ],
+            "pull_quote": "Downgrade works, so one test leg is enough to keep it honest."
+          }
+        ],
+        "derived": []
+      }
+    },
+    {
+      "type": "reply",
+      "phase": "need-info",
+      "round": 2,
+      "finding": "F32",
+      "persona": "uncle-bob-architect",
+      "data": {
+        "kind": "vote-report",
+        "schema_version": "1",
+        "mode": "review",
+        "round": "2026-10-29",
+        "persona": "uncle-bob-architect",
+        "lens": "clean-code",
+        "tool_uses": 3,
+        "own_findings": [
+          "F20",
+          "F21",
+          "F22",
+          "F23",
+          "F24",
+          "F25",
+          "F26",
+          "F27"
+        ],
+        "votes": [
+          {
+            "finding": "F32",
+            "confidence_on_hand": "high",
+            "vote": "CONFIRM",
+            "reason": "Verified that the downgrade is undocumented: CONTRIBUTING.md § Releasing (:89) and README.md never mention downgrade or rollback (README.md:221 is a lens-table cell, not a procedure). The path works, so green is the right rating; the cheap fix is one line of documentation plus a round-trip leg.",
+            "evidence": [
+              {
+                "kind": "file_line",
+                "ref": "CONTRIBUTING.md:89"
+              },
+              {
+                "kind": "file_line",
+                "ref": "README.md:221"
+              }
+            ],
+            "pull_quote": "A working path nobody wrote down is one refactor from not working."
+          }
+        ],
+        "derived": []
+      }
+    },
+    {
+      "type": "answer",
+      "phase": "need-info",
+      "topic": "provision",
+      "data": {
+        "finding": "F35",
+        "route": "peer",
+        "supplied": false,
+        "note": "No peer supplied it: mark-richards-architect voted NEED_INFO (operator call, deferred); alan-cooper-advisor, don-norman-advisor and uncle-bob-architect skipped F35 as held. The gap is operator intent (Node floor), deferred in the interview."
+      }
+    },
+    {
+      "type": "answer",
+      "phase": "need-info",
+      "topic": "provision",
+      "data": {
+        "finding": "F35",
+        "route": "operator",
+        "supplied": true,
+        "note": "Operator (2026-10-29): Raise floor to 20. Document Node 20+ and keep CI on 20."
+      }
+    },
+    {
+      "type": "reply",
+      "phase": "need-info",
+      "finding": "F35",
+      "persona": "delivery-and-ops-advisor",
+      "data": {
+        "kind": "finding-report",
+        "schema_version": "1",
+        "mode": "review",
+        "round": "2026-10-29",
+        "persona": "delivery-and-ops-advisor",
+        "lens": "delivery-ops",
+        "tool_uses": 3,
+        "findings": [
+          {
+            "id": "F35",
+            "lens": "delivery-ops",
+            "locator": "README.md:294",
+            "claim": "The operator set the floor at Node 20 and CI already runs 20, so CI matches. Ten places still promise 18: README.md:294, install.sh:186 and :188, chorus-core/SKILL.md:64, and the headers of all six bin/*.mjs (git grep). The installer prints the Node version but never checks it, so Node 16 or 18 passes with exit 0 and the first sign of trouble is conduct.mjs failing mid-round. Remedy (under 1h, no keep-on cost): change 18 to 20 in those ten places, and have install.sh exit non-zero when node's major is below 20, matching the missing-Node fix in F7.",
+            "evidence": [
+              {
+                "kind": "file_line",
+                "ref": "README.md:294",
+                "note": "Node 18 or later"
+              },
+              {
+                "kind": "file_line",
+                "ref": "install.sh:186",
+                "note": "prints the version, never compares it"
+              },
+              {
+                "kind": "file_line",
+                "ref": "skill/chorus-core/bin/conduct.mjs:27",
+                "note": "Node 18+ header, same in the other five bin files"
+              },
+              {
+                "kind": "file_line",
+                "ref": ".github/workflows/integrity.yml:29",
+                "note": "CI on 20 matches the ruling"
+              }
+            ],
+            "proposed_severity": "🟡",
+            "pull_quote": "The floor is 20 now, but ten places still say 18 and the installer checks neither.",
+            "confidence_on_hand": "high",
+            "need_info": false
+          }
+        ]
+      }
+    },
+    {
+      "type": "reply",
+      "phase": "need-info",
+      "round": 2,
+      "finding": "F35",
+      "persona": "alan-cooper-advisor",
+      "data": {
+        "kind": "vote-report",
+        "schema_version": "1",
+        "mode": "review",
+        "round": "2026-10-29",
+        "persona": "alan-cooper-advisor",
+        "lens": "product",
+        "tool_uses": 2,
+        "own_findings": [
+          "F7",
+          "F8",
+          "F9",
+          "F10",
+          "F11",
+          "F12",
+          "F13"
+        ],
+        "votes": [
+          {
+            "finding": "F35",
+            "confidence_on_hand": "high",
+            "vote": "CONFIRM",
+            "reason": "I saw install.sh:186 myself: it prints the Node version and exits 0, with no comparison. Under-floor Node is therefore found mid-round, after personas have spent their work, not at install. The same promise-versus-check gap as my F7. The fix is cheap, so 🟡 holds.",
+            "evidence": [
+              {
+                "kind": "file_line",
+                "ref": "install.sh:186"
+              },
+              {
+                "kind": "file_line",
+                "ref": "README.md:294"
+              }
+            ],
+            "pull_quote": "A floor the installer never checks gets found mid-round, after the work is spent."
+          }
+        ],
+        "derived": []
+      }
+    },
+    {
+      "type": "reply",
+      "phase": "need-info",
+      "round": 2,
+      "finding": "F35",
+      "persona": "uncle-bob-architect",
+      "data": {
+        "kind": "vote-report",
+        "schema_version": "1",
+        "mode": "review",
+        "round": "2026-10-29",
+        "persona": "uncle-bob-architect",
+        "lens": "clean-code",
+        "tool_uses": 2,
+        "own_findings": [
+          "F20",
+          "F21",
+          "F22",
+          "F23",
+          "F24",
+          "F25",
+          "F26",
+          "F27"
+        ],
+        "votes": [
+          {
+            "finding": "F35",
+            "confidence_on_hand": "high",
+            "vote": "CONFIRM",
+            "reason": "Verified: CI pins node-version 20 (integrity.yml:29), while install.sh:186 and :188 and README.md:294 still say 18, and install.sh only prints the version without checking it. One floor is restated in ten places with no check, which is duplicated authority. A single check in install.sh that exits non-zero would make the number enforced, not just stated. Yellow is right.",
+            "evidence": [
+              {
+                "kind": "file_line",
+                "ref": "install.sh:186"
+              },
+              {
+                "kind": "file_line",
+                "ref": "README.md:294"
+              },
+              {
+                "kind": "file_line",
+                "ref": ".github/workflows/integrity.yml:29"
+              }
+            ],
+            "pull_quote": "A floor stated ten times and checked nowhere is ten chances to be wrong."
+          }
+        ],
+        "derived": []
+      }
+    },
+    {
+      "type": "reply",
+      "phase": "need-info",
+      "round": 2,
+      "finding": "F35",
+      "persona": "don-norman-advisor",
+      "data": {
+        "kind": "vote-report",
+        "schema_version": "1",
+        "mode": "review",
+        "round": "2026-10-29",
+        "persona": "don-norman-advisor",
+        "lens": "hcd",
+        "tool_uses": 2,
+        "own_findings": [
+          "F14",
+          "F15",
+          "F16",
+          "F17",
+          "F18",
+          "F19"
+        ],
+        "votes": [
+          {
+            "finding": "F35",
+            "confidence_on_hand": "high",
+            "vote": "CONFIRM",
+            "reason": "install.sh:186 prints the Node version and the stale '18 or later' but never checks it. An agent installing on Node 18 gets exit 0 and meets the failure mid-round, far from its cause. That is the same false-success pattern as my F14 and the same multi-voice drift as my F18. 🟡 fits.",
+            "evidence": [
+              {
+                "kind": "file_line",
+                "ref": "install.sh:186"
+              },
+              {
+                "kind": "file_line",
+                "ref": "README.md:294"
+              }
+            ],
+            "pull_quote": "An installer that prints the requirement but does not check it moves the failure to the middle of the round."
+          }
+        ],
+        "derived": []
+      }
+    },
+    {
+      "type": "reply",
+      "phase": "need-info",
+      "round": 2,
+      "finding": "F35",
+      "persona": "mark-richards-architect",
+      "data": {
+        "kind": "vote-report",
+        "schema_version": "1",
+        "mode": "review",
+        "round": "2026-10-29",
+        "persona": "mark-richards-architect",
+        "lens": "architecture",
+        "tool_uses": 3,
+        "own_findings": [
+          "F1",
+          "F2",
+          "F3",
+          "F4",
+          "F5",
+          "F6"
+        ],
+        "votes": [
+          {
+            "finding": "F35",
+            "confidence_on_hand": "high",
+            "vote": "CONFIRM",
+            "reason": "🟡 is right. git grep finds 10 sites stating the 18 floor, and the installer only prints the version (install.sh:186). The floor is a duplicated value with no single owner. Keep one source: install.sh enforces the floor and the prose points to that check. Add a lint that fails on any other stated Node floor, so the next bump is a one-line change.",
+            "evidence": [
+              {
+                "kind": "file_line",
+                "ref": "install.sh:186"
+              },
+              {
+                "kind": "file_line",
+                "ref": "README.md:294"
+              }
+            ],
+            "pull_quote": "A version floor written in ten places is ten floors."
+          }
+        ],
+        "derived": []
+      }
+    },
+    {
+      "type": "answer",
+      "phase": "conflicts",
+      "topic": "conflicts",
+      "data": [
+        {
+          "id": "C1",
+          "advisors": [
+            "alan-cooper-advisor",
+            "mark-richards-architect",
+            "don-norman-advisor",
+            "delivery-and-ops-advisor"
+          ],
+          "disputed": "Whether any install.sh user has a retired coryphaeus skill without a manifest. Cooper (OVER-RATE F28): coryphaeus/SKILL.md and the install manifest arrived in the same commit (#32, 8d16107), so the cohort is near-empty; Richards: the harm is clutter, not wrong records. Norman and Delivery-and-Ops (PRIORITIZE F9): a pre-manifest copy keeps a second skill claiming the validator/renderer role. Outcome differs: install.sh must or need not retire coryphaeus without the manifest. Same defect counted twice: F9 escalated to 🔴, F28 demoted to 🟡.",
+          "outcome": "unresolved",
+          "findings": [
+            "F9",
+            "F28"
+          ]
+        },
+        {
+          "id": "C2",
+          "advisors": [
+            "don-norman-advisor",
+            "uncle-bob-architect",
+            "mark-richards-architect",
+            "delivery-and-ops-advisor",
+            "alan-cooper-advisor"
+          ],
+          "disputed": "How much harm 'the script is fixed' (chorus-review/SKILL.md:67) does in a stranger's install. Norman (OVER-RATE F20): it fires only when an agent detects a disagreement mid-round; F1 and F11 price the same root at 🟡. Others hold 🔴: Delivery-and-Ops and Cooper derive (R2-) that a patched installed conduct.mjs is then kept as 'differs, kept' on every upgrade with exit 0. Outcome differs: fix before merge (gating) or as follow-up.",
+          "outcome": "unresolved",
+          "findings": [
+            "F20",
+            "F1",
+            "F11"
+          ]
+        },
+        {
+          "id": "C3",
+          "advisors": [
+            "mark-richards-architect",
+            "alan-cooper-advisor",
+            "don-norman-advisor"
+          ],
+          "disputed": "What a Node-less agent actually does. Richards (OVER-RATE F7): the installed SKILL.md routes every round through conduct.mjs, so it fails at the first command — 🟡, same as F18. Cooper and Norman: BINDINGS.md:20-22 sends the agent to the 'Free-hand form', so it runs an unscripted round. Outcome differs: a loud failure vs a silent unscripted round.",
+          "outcome": "unresolved",
+          "findings": [
+            "F7",
+            "F18"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "answer",
+      "phase": "rank",
+      "topic": "ranking",
+      "data": [
+        {
+          "finding": "F29",
+          "cost": "medium",
+          "value": "Every upgrader from before #32 ends with a mixed-version skill and exit 0; the operator ruled upgrades are agent-run, so exit 0 is read as success. Same locator as F8 and F14 (install.sh:130); Richards' R2-2 names the shared cause (file-by-file install of one contract). Fix: exit non-zero and name each skipped shipped file; recognise known shipped versions.",
+          "constitutional_roi": "VII Block on 🔴, Never Silently — the installer passes silently over a broken install."
+        },
+        {
+          "finding": "F20",
+          "cost": "low",
+          "value": "Six or seven sentences say the canon wins and the script is fixed, against the operator's ruling that code is the authority (F1, F11 same root). Unblocks the drift test of F2 and removes the instruction whose consequence R2-3/R2-10 show: a patched installed conduct.mjs is frozen out of every later upgrade.",
+          "constitutional_roi": "I One Canonical Definition: Cite, Never Restate — the authority must be named once, the right way round.",
+          "arbiter_note": "C2 unresolved (Norman OVER-RATE vs four 🔴 holders); counted severity stands."
+        },
+        {
+          "finding": "R2-11",
+          "cost": "low",
+          "value": "[ungraded] Committing this round's own run.json, as CONDUCTOR.md:342 directs, turns CI red (integrity.yml:36 validates every docs/reviews/*.json as a review-record). One-line fix; blocks committing any scripted round and the dogfood-before-release step.",
+          "constitutional_roi": "X Validate the Procedure, Not the Artifact — the procedure's own trail must pass its gate."
+        },
+        {
+          "finding": "F7",
+          "cost": "low",
+          "value": "Node is now required (operator ruling) but install.sh:188, README.md:294 and BINDINGS.md:20-22 still offer a Node-less path; F18 same root, F35 adds the missing version check. Fix the three texts and make install.sh fail below Node 20.",
+          "arbiter_note": "C3 unresolved (Richards: fails at first command vs Cooper/Norman: free-hand fallback); counted severity stands."
+        },
+        {
+          "finding": "F15",
+          "cost": "low",
+          "value": "The calling agent is the only reader of conduct output (operator ruling); the most common refusal names the batch's state, not the persona's, and never says 'use ack', costing a round trip per misstep. Observed live in this round's explore step (asks carry kind: null)."
+        }
+      ]
+    },
+    {
+      "type": "answer",
+      "phase": "signoff",
+      "topic": "signoff",
+      "data": {
+        "tldr": [
+          "Five seated lenses (architecture, product, HCD, clean code, delivery-ops) found the scripted spine and the coryphaeus fold sound in the code but leaky at the edges: 35 findings and 11 derived, clustered on the upgrade path, the canon-vs-code authority wording, and the Node requirement.",
+          "The top five are the silent mixed-version upgrade (F29), the inverted authority wording that tells agents to patch the installed script (F20), the committed run log failing CI (R2-11, ungraded), the stale Node-less fallback (F7), and conduct refusals that give the agent no recovery step (F15).",
+          "The 🔴 findings F29, F8, F14, F9, F20, F7 and F15 gate merging #45/#47 for strangers; C1 (F9 vs F28 cohort), C2 (F20 harm) and C3 (F7 behaviour) are unresolved and await the operator."
+        ],
+        "baseline": {
+          "assume_closed": [
+            "Operator rulings 2026-10-29: code is the authority for mechanical rules; operator sees questions and the record only; one maintainer, install.sh channel; ranking unchanged; tests repo-only; upgrades agent-run with loud errors; Node 20+ required; run logs refuse cross-version replay; downgrade = older commit + install.sh; program size alone is not a cost"
+          ],
+          "in_progress": [
+            "#45/#47 fixes for the top five and their duplicates (F8/F14/F29, F1/F11/F20, F7/F18/F35, F3/F12/F25)",
+            "Addendum CHORUS-PROJECT.md still names skill/coryphaeus (F6)"
+          ],
+          "re_evaluate": [
+            "C1 cohort of pre-manifest coryphaeus installs",
+            "Unvoted F22, F24, F26, F27 and minority F10, F13, F19, F21",
+            "Conductor gaps seen live: no batched interview step, duplicates not grouped by locator, unresolved conflicts carry no decision"
+          ]
+        },
+        "baseline_ref": "docs/reviews/2026-09-27-chorus-review-pr32.json",
+        "secret_filter": {
+          "ran": false,
+          "note": "The canonical pre-filter did not run; the conductor grepped the five new memory files and the run log for home paths, names, emails, tokens and secrets and found none."
+        }
+      }
+    }
+  ]
+}
