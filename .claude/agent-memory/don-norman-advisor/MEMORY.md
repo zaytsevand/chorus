@@ -10,3 +10,4 @@
 - understanding-chorus-review-007.md — Norman-lens exploratory understanding of chorus-review repo + feature 007, Gate A
 - understanding-2026-10-29-pr47.md — Norman-lens exploratory record, 2026-10-29 review of PR #45+#47 (scripted spine, conduct.mjs)
 - understanding-2026-11-06-process-constants.md — Norman-lens exploratory record, 2026-11-06 round on docs/process-constants.md (C1-C9, home, citation)
+- understanding-2026-11-06-process-constants-2.md — Norman-lens record, round 2026-11-06-2 (post R-1..R-9: principle ref not rendered, R-5 no record field)

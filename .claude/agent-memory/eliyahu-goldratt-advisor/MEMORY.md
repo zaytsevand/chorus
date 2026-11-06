@@ -7,3 +7,4 @@
 - project-015-fitness-harness.md — feature 015 Gate A cycle-2: G4 CLEARED (TS runtime on-constraint, amortizes bash-framework tax); GC5 tautology fixed by truth-labeling; NEW 🟡 = FC7 seam-ceiling has no gauge
 - project-chorus-exploratory-phase.md — feature 004 (exploratory phase) infra-only; constraint = chorus verdict-quality/cycle-time; phase built ahead of proof
 - understanding-chorus-review-007.md — exploratory-phase understanding record, chorus-review repo + feature 007, Gate A run 2 clean-slate
+- 2026-11-06-process-constants-2.md — round 2 on process-constants note; constraint = maintainer attention + unlanded WIP (5 unmerged commits, round-1 fixes unapplied)

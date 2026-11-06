@@ -1,0 +1,1 @@
+- [Round 2026-11-06-2 process-constants](2026-11-06-process-constants-2.md) — CI check layers, I9 oracle locators, C-id/conflict-id collision, open gaps

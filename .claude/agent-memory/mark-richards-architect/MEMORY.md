@@ -22,3 +22,4 @@
 - project-feature015-gateB-cycle2.md — feature 015 Gate B cycle-2; all RB cleared, Phase-2a/2b split clean, Gate B clears (no open 🔴)
 - [Understanding PR45+47 (2026-10-29)](understanding-2026-10-29-pr47.md) — gates referenced from addendum; engine↔canon duplicate authority; run-log contract
 - [Understanding process-constants (2026-11-06)](2026-11-06-process-constants.md) — C1-C9 note: docs/ not shipped, C-token residence, canon-rule restatement
+- [Understanding process-constants re-run (2026-11-06-2)](2026-11-06-process-constants-2.md) — R-7 rule in two files; FC1 regex misses table-form C-defs

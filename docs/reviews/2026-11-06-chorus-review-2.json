@@ -1,0 +1,1854 @@
+{
+  "kind": "review-record",
+  "schema_version": "1.0",
+  "date": "2026-11-06",
+  "target": "docs/process-constants.md (branch worktree-process-constants): re-run with Goldratt, Test-Strategy and Evans seated by operator ruling; review the note's content and its home skill-wise",
+  "mode": "project-state",
+  "round_context": "Since the first round today (docs/reviews/2026-11-06-chorus-review.md): I9 amended so the chorus signs its advice, not the result (539ca94); BRIEFS.md item 8 and the note allow a constant as a finding's principle unless code contradicts it (2608fbf); chorus-core 2.1.0 adds an operator seat override (57feef5). The operator ruled Goldratt, Test-Strategy and Evans into seats (brief ruling R-8). Prior rulings: lenses read the note and it ships; advisory; chorus bullets are rationale; known errors are advice for now; validation status shows in the record. Budgets: RSVP 3m, exploratory 15m, R1 15m, R2 10m.",
+  "bindings": {
+    "ports": [
+      {
+        "port": "decision-sink",
+        "provider": "problem-brief"
+      },
+      {
+        "port": "ruling-lookup",
+        "provider": "problem-brief"
+      },
+      {
+        "port": "record-validator",
+        "provider": "chorus-core"
+      },
+      {
+        "port": "record-renderer",
+        "provider": "chorus-core"
+      },
+      {
+        "port": "arbiter",
+        "provider": "default"
+      },
+      {
+        "port": "fixed-viewpoint",
+        "provider": "default"
+      },
+      {
+        "port": "memory-recall",
+        "provider": "default"
+      }
+    ],
+    "recoveries": []
+  },
+  "secret_filter": {
+    "ran": false,
+    "note": "No memory writes went through the conductor this round."
+  },
+  "baseline_ref": "docs/reviews/2026-11-06-chorus-review.json",
+  "tldr": [
+    "The re-seated board (Evans, Test-Strategy, Goldratt by operator override, with Richards and Norman) raised 23 findings and 10 derives that the first round missed: 'principle' now has three meanings, borrowed words (incident, derivative, validation) collide with canon terms, the rule from R-7 lives in two files, and seven derivatives rows have no reader.",
+    "The top five shape the one shipping change (R-10): a shared field for whether the result reached its goal (F9), oracles that state what they do not cover (F17), a PC-number check that scans agents/ and is shown to fail (F18), R-7 kept only in BRIEFS.md citing the moved note by path (F6), and cutting the unread rows before rewording (F20).",
+    "F9, F17 and F18 are red and gate the shipping change; this record signs the chorus's advice, not the result, and two conflicts (C1 citation tooling now or later, C2 the field's name) remain for the operator."
+  ],
+  "roster": [
+    {
+      "persona": "eric-evans-advisor",
+      "lens": "DDD",
+      "decision": "JOIN",
+      "reason": "The new ruling stretches one canon term across two sources of authority, which is a language seam my lens owns.",
+      "applies": [
+        "2608fbf: 'principle' now means a C-id as well as a governance-named principle (CONDUCTOR.md:176,246)",
+        "C1-C9 and ITIL terms entering lens vocabulary from the chorus-core home"
+      ],
+      "expected": "🟡",
+      "hook": "CONDUCTOR.md:176 defines principle as named in governance; process-constants.md:97 lets a constant be one",
+      "seated": true,
+      "seat": "ordinary"
+    },
+    {
+      "persona": "mark-richards-architect",
+      "lens": "architecture",
+      "decision": "JOIN",
+      "reason": "The first round's predicted duplicate authority has now landed in canon, and ruling on it is my standing assignment.",
+      "applies": [
+        "2608fbf writes the constant-as-principle rule twice: BRIEFS.md item 8 (shipped) and the note (docs/, unshipped)",
+        "shipped BRIEFS.md:40 names 'a process constant' that no shipped file defines",
+        "baseline PROCESS-CONSTANTS.md home: C-id residence fitness function"
+      ],
+      "expected": "🟡",
+      "hook": "BRIEFS.md:40 and docs/process-constants.md chorus section: one rule, two authors, no parity check",
+      "seated": true,
+      "seat": "ordinary"
+    },
+    {
+      "persona": "alan-cooper-advisor",
+      "lens": "adversarial product",
+      "decision": "JOIN",
+      "reason": "Both new rulings move cost and judgement onto the operator, the person my seat speaks for.",
+      "applies": [
+        "2608fbf: each code-vs-constant clash becomes an operator NEED_INFO question, a new per-round cost",
+        "539ca94 I9: the operator owns whether the result reached its goal; does the record ever ask them?",
+        "note still cited nowhere in skill/ or agents/"
+      ],
+      "expected": "🟡",
+      "hook": "BRIEFS.md item 8 sends contradictions to the operator; CONDUCTOR I9 leaves validation open with no record slot",
+      "seated": false,
+      "capped": true
+    },
+    {
+      "persona": "don-norman-advisor",
+      "lens": "human-centred design",
+      "decision": "JOIN",
+      "reason": "The rulings legitimise findings the operator cannot evaluate, a gulf of evaluation my lens owns.",
+      "applies": [
+        "2608fbf: constant-alone principle findings now legal; render.mjs:36 still shows bare '[principle]' (R2-4)",
+        "'no code contradicts it': operator cannot see whether that was checked",
+        "539ca94 I9 vs sign-off wording the operator reads (F10)",
+        "C2 ~4 slots stated as bedrock"
+      ],
+      "expected": "🟡",
+      "hook": "BRIEFS.md:40 allows constant-only evidence; render.mjs:36 gives the operator nothing to follow",
+      "seated": true,
+      "seat": "ordinary"
+    },
+    {
+      "persona": "uncle-bob-architect",
+      "lens": "clean code",
+      "decision": "JOIN",
+      "reason": "The duplicate authority I flagged last round as a risk has now landed in shipped canon, which is my remit.",
+      "applies": [
+        "2608fbf authors one rule twice: BRIEFS.md item 8 and note l.99-102, worded differently",
+        "shipped BRIEFS.md uses 'process constant' with no anchor while the note sits in unshipped docs/"
+      ],
+      "expected": "🟡",
+      "hook": "skill/chorus-review/BRIEFS.md:40 'only when'/NEED_INFO vs docs/process-constants.md:99 'can be'/operator question",
+      "seated": false,
+      "capped": true
+    },
+    {
+      "persona": "kent-beck-persona",
+      "lens": "TDD / simple design",
+      "decision": "JOIN",
+      "reason": "Today's rulings did what I warned about last round: they gave canon rules a second author, so whether tests can see the copies drift is my question.",
+      "applies": [
+        "2608fbf wrote one rule twice: BRIEFS.md:40 and the note's constant-as-principle bullet, nothing checks they agree",
+        "I9's new oracle clause (539ca94) vs C8's 'every check needs an oracle': two authors, one meaning",
+        "what a move to chorus-core must test"
+      ],
+      "expected": "🟡",
+      "hook": "skill/chorus-review/BRIEFS.md:40 and docs/process-constants.md give the constant-as-principle rule twice, and neither copy is tested",
+      "seated": false,
+      "capped": true
+    },
+    {
+      "persona": "test-strategy-advisor",
+      "lens": "test strategy",
+      "decision": "JOIN",
+      "reason": "The note recasts my lens's core heuristic as a derivative, and the new I9 oracle clause is a check-placement question.",
+      "applies": [
+        "l.83 pyramid row: 'what survives' omits diagnosis and C7 latency",
+        "amended I9: which check is the oracle that makes a result signable",
+        "2608fbf 'unless code contradicts': what check detects the contradiction"
+      ],
+      "expected": "🟡",
+      "hook": "docs/process-constants.md:83 prices tests by authoring/run cost only; diagnostic precision and feedback latency (C7) do not fall with cheap code",
+      "seated": true,
+      "seat": "ordinary"
+    },
+    {
+      "persona": "delivery-and-ops-advisor",
+      "lens": "delivery and ops",
+      "decision": "JOIN",
+      "reason": "A shipped rule now depends on an unshipped file, which is a release-path gap.",
+      "applies": [
+        "shipped BRIEFS.md item 8 now admits 'process constant' as principle while the note still sits in unshipped docs/",
+        "note line 85 DORA claim and line 63/105 KEDB advice unchanged since baseline F18/F20",
+        "home move: install/uninstall/FC4 coverage"
+      ],
+      "expected": "🟡",
+      "hook": "skill/chorus-review/BRIEFS.md:40 ships a rule naming constants; install.sh copies no docs/, so installed lenses cite nothing",
+      "seated": false,
+      "capped": true
+    },
+    {
+      "persona": "security-and-trust-advisor",
+      "lens": "security",
+      "decision": "JOIN",
+      "reason": "Known-error memory replayed into agents crosses a trust boundary nobody has drawn, and the note now ships to other projects.",
+      "applies": [
+        "KEDB bullet still sends recurring findings 'where the next round reads it' with no named store, filter or owner, unchanged since round 1",
+        "item 8 lets an uncontradicted constant stand as evidence, a laundering path"
+      ],
+      "expected": "🟡",
+      "hook": "process-constants.md:103-105 unchanged; BRIEFS.md item 8 (2608fbf)",
+      "seated": false,
+      "capped": true
+    },
+    {
+      "persona": "eliyahu-goldratt-advisor",
+      "lens": "constraint and flow",
+      "decision": "JOIN",
+      "reason": "The baseline decides where the note lives but not what to cut or when to polish, and those calls are my remit.",
+      "applies": [
+        "Sequencing: move plus twelve wording fixes queued while the note still has zero inbound citations",
+        "The cut: which constants, tables and history rows a lens actually cites",
+        "C1/C7/C8 overlap with my lens's cheap-generation clause"
+      ],
+      "expected": "🟡",
+      "hook": "grep finds no reference to process-constants in skill/ or agents/; the baseline queues 12 wording fixes before any lens cites it",
+      "seated": true,
+      "seat": "ordinary"
+    }
+  ],
+  "quorum": {
+    "joiners": 10,
+    "branch": "proceed"
+  },
+  "seating_decision": "seating-1",
+  "register": [
+    {
+      "id": "F1",
+      "author": "eric-evans-advisor",
+      "lens": "DDD",
+      "authored_severity": "🟡",
+      "locator": "skill/chorus-core/CONDUCTOR.md:176",
+      "pull_quote": "One word now ends a chain with authority and without it, and the record can't tell which.",
+      "evidence": [
+        {
+          "kind": "file_line",
+          "ref": "skill/chorus-core/CONDUCTOR.md:176",
+          "note": "terminus: 'principle (named in governance)'; :178 'refusal to descend further than authority permits'"
+        },
+        {
+          "kind": "file_line",
+          "ref": "skill/chorus-review/BRIEFS.md:40",
+          "note": "a process constant may stand as that principle"
+        },
+        {
+          "kind": "file_line",
+          "ref": "skill/chorus-core/schema/vocab.schema.json:15",
+          "note": "one 'principle' kind for both sources"
+        },
+        {
+          "kind": "file_line",
+          "ref": "docs/process-constants.md:73",
+          "note": "third sense: 'Their principles came from the constants'"
+        },
+        {
+          "kind": "file_line",
+          "ref": "docs/reviews/CHORUS-PROJECT.md:128",
+          "note": "Core = conductor procedure and invariants"
+        }
+      ],
+      "confidence_on_hand": "high",
+      "need_info": false,
+      "graded": true
+    },
+    {
+      "id": "F2",
+      "author": "eric-evans-advisor",
+      "lens": "DDD",
+      "authored_severity": "🟡",
+      "locator": "docs/process-constants.md:52",
+      "pull_quote": "Shipped into chorus-core, 'the brief' both means the wrong brief and names a provider the canon promises never to name.",
+      "evidence": [
+        {
+          "kind": "file_line",
+          "ref": "docs/process-constants.md:52",
+          "note": "'ADR, a ruling in the brief'"
+        },
+        {
+          "kind": "file_line",
+          "ref": "docs/reviews/CHORUS-PROJECT.md:136",
+          "note": "chorus never names the brief; skills and personas name no provider"
+        },
+        {
+          "kind": "file_line",
+          "ref": "skill/chorus-review/BRIEFS.md:40",
+          "note": "'brief' in canon = the lens brief"
+        }
+      ],
+      "confidence_on_hand": "high",
+      "need_info": false,
+      "graded": true
+    },
+    {
+      "id": "F3",
+      "author": "eric-evans-advisor",
+      "lens": "DDD",
+      "authored_severity": "🟡",
+      "locator": "docs/process-constants.md:103",
+      "pull_quote": "Borrow ITIL's ideas, not its nouns: the canon already spends 'incident', 'derive' and 'validate' on other things.",
+      "evidence": [
+        {
+          "kind": "file_line",
+          "ref": "skill/chorus-review/SKILL.md:170",
+          "note": "incidents = production events"
+        },
+        {
+          "kind": "file_line",
+          "ref": "skill/chorus-review/SKILL.md:241",
+          "note": "derive R2- findings"
+        },
+        {
+          "kind": "file_line",
+          "ref": "docs/process-constants.md:38",
+          "note": "C8 'Validation'"
+        },
+        {
+          "kind": "file_line",
+          "ref": ".specify/memory/constitution.md:279",
+          "note": "Principle X 'Validate the Procedure'"
+        }
+      ],
+      "confidence_on_hand": "high",
+      "need_info": false,
+      "graded": true
+    },
+    {
+      "id": "F4",
+      "author": "eric-evans-advisor",
+      "lens": "DDD",
+      "authored_severity": "🟢",
+      "locator": "docs/process-constants.md:29",
+      "pull_quote": "Call them PC1-PC9, so the id says 'process constant' and borrows nobody else's word.",
+      "evidence": [
+        {
+          "kind": "file_line",
+          "ref": "skill/chorus-core/CONDUCTOR.md:200",
+          "note": "Cn = conflict ids"
+        },
+        {
+          "kind": "file_line",
+          "ref": "skill/chorus-core/ROSTER.md:28",
+          "note": "'constraint' is Goldratt's term"
+        },
+        {
+          "kind": "file_line",
+          "ref": "skill/chorus-core/CONDUCTOR.md:268",
+          "note": "'verification constraint'"
+        }
+      ],
+      "confidence_on_hand": "high",
+      "need_info": false,
+      "graded": true
+    },
+    {
+      "id": "F5",
+      "author": "eric-evans-advisor",
+      "lens": "DDD",
+      "authored_severity": "🟢",
+      "locator": "docs/process-constants.md:87",
+      "pull_quote": "A derivative that can't name the practice it degrades from leaves the lens a chain with a missing link.",
+      "evidence": [
+        {
+          "kind": "file_line",
+          "ref": "docs/process-constants.md:73",
+          "note": "definition: tuned to one cost structure"
+        },
+        {
+          "kind": "file_line",
+          "ref": "docs/process-constants.md:83",
+          "note": "survivor not in practice table"
+        },
+        {
+          "kind": "file_line",
+          "ref": "docs/process-constants.md:87",
+          "note": "tuned to '—'"
+        }
+      ],
+      "confidence_on_hand": "high",
+      "need_info": false,
+      "graded": true
+    },
+    {
+      "id": "F6",
+      "author": "mark-richards-architect",
+      "lens": "architecture",
+      "authored_severity": "🟡",
+      "locator": "skill/chorus-review/BRIEFS.md:40",
+      "pull_quote": "Once the note sits in core it may not point at BRIEFS.md, so the second copy has to go, not just link back.",
+      "evidence": [
+        {
+          "kind": "file_line",
+          "ref": "skill/chorus-review/BRIEFS.md:40",
+          "note": "R-7 rule as shipped canon; 'a process constant' has no path"
+        },
+        {
+          "kind": "file_line",
+          "ref": "docs/process-constants.md:97",
+          "note": "same rule restated as an operational sentence"
+        },
+        {
+          "kind": "file_line",
+          "ref": "scripts/check-suite-integrity.sh:281",
+          "note": "FC4b: chorus-core may not cite chorus-review/… files"
+        },
+        {
+          "kind": "file_line",
+          "ref": "skill/chorus-core/CONDUCTOR.md:264",
+          "note": "I9 already owns 'validation is the operator's'"
+        }
+      ],
+      "confidence_on_hand": "high",
+      "need_info": false,
+      "graded": true
+    },
+    {
+      "id": "F7",
+      "author": "mark-richards-architect",
+      "lens": "architecture",
+      "authored_severity": "🟡",
+      "locator": "scripts/check-suite-integrity.sh:41",
+      "pull_quote": "A residence check that only reads list-form lines will pass green over a table it never saw.",
+      "evidence": [
+        {
+          "kind": "file_line",
+          "ref": "scripts/check-suite-integrity.sh:41",
+          "note": "def_regex_I/S/D are list-form only"
+        },
+        {
+          "kind": "file_line",
+          "ref": "docs/process-constants.md:31",
+          "note": "constants defined as table rows"
+        },
+        {
+          "kind": "file_line",
+          "ref": "skill/chorus-core/schema/review-record.schema.json:49",
+          "note": "conflict id pattern ^C[0-9]+$"
+        },
+        {
+          "kind": "file_line",
+          "ref": "skill/chorus-core/SKILL.md:68",
+          "note": "residence section lists I/D/S families only"
+        }
+      ],
+      "confidence_on_hand": "high",
+      "need_info": false,
+      "graded": true
+    },
+    {
+      "id": "F8",
+      "author": "mark-richards-architect",
+      "lens": "architecture",
+      "authored_severity": "🟡",
+      "locator": "skill/chorus-core/CONDUCTOR.md:471",
+      "pull_quote": "The oracle is I9's word, so it lives where I9 lives, and the review item list just points to it.",
+      "evidence": [
+        {
+          "kind": "file_line",
+          "ref": "skill/chorus-core/CONDUCTOR.md:267",
+          "note": "I9 depends on 'oracle', which nothing defines"
+        },
+        {
+          "kind": "file_line",
+          "ref": "skill/chorus-core/CONDUCTOR.md:471",
+          "note": "core already owns the addendum's section shapes"
+        },
+        {
+          "kind": "file_line",
+          "ref": "skill/chorus-review/ADDENDUM-AND-SCOPE.md:9",
+          "note": "review-only item list; sdlc cannot cite it"
+        }
+      ],
+      "confidence_on_hand": "high",
+      "need_info": false,
+      "graded": true
+    },
+    {
+      "id": "F9",
+      "author": "mark-richards-architect",
+      "lens": "architecture",
+      "authored_severity": "🟡",
+      "locator": "skill/chorus-core/schema/common.schema.json:1",
+      "pull_quote": "One shared shape for both record kinds is the parity test; two copies would need one.",
+      "evidence": [
+        {
+          "kind": "file_line",
+          "ref": "skill/chorus-core/schema/review-record.schema.json:17",
+          "note": "precedent: shared $def via common.schema.json"
+        },
+        {
+          "kind": "file_line",
+          "ref": "skill/chorus-core/schema/sdlc-log.schema.json:154",
+          "note": "the lifecycle sign-off already references the same shared $def"
+        },
+        {
+          "kind": "file_line",
+          "ref": "skill/chorus-core/schema/review-record.schema.json:8",
+          "note": "required list; the new field has to be listed here"
+        }
+      ],
+      "confidence_on_hand": "high",
+      "need_info": false,
+      "graded": true
+    },
+    {
+      "id": "F10",
+      "author": "mark-richards-architect",
+      "lens": "architecture",
+      "authored_severity": "🟢",
+      "locator": "skill/chorus-core/SKILL.md:60",
+      "pull_quote": "Index before you cite, and land the check with its first caller, and every step stays green.",
+      "evidence": [
+        {
+          "kind": "file_line",
+          "ref": "scripts/check-suite-integrity.sh:288",
+          "note": "4c: SKILL.md must index every core file"
+        },
+        {
+          "kind": "file_line",
+          "ref": "skill/chorus-core/VERSION:1",
+          "note": "57feef5 bumped it with the run-log schema change"
+        }
+      ],
+      "confidence_on_hand": "high",
+      "need_info": false,
+      "graded": true
+    },
+    {
+      "id": "F11",
+      "author": "don-norman-advisor",
+      "lens": "human-centred design",
+      "authored_severity": "🟡",
+      "locator": "skill/chorus-core/bin/render.mjs:116",
+      "pull_quote": "An 'open' with no observation that would close it tells the operator what is missing, not what to look for.",
+      "evidence": [
+        {
+          "kind": "file_line",
+          "ref": "skill/chorus-core/bin/render.mjs:116",
+          "note": "TL;DR first, no validation status"
+        },
+        {
+          "kind": "file_line",
+          "ref": "skill/chorus-core/schema/review-record.schema.json:106",
+          "note": "'Assume closed'"
+        },
+        {
+          "kind": "file_line",
+          "ref": "skill/chorus-core/CONDUCTOR.md:264-268",
+          "note": "amended I9"
+        },
+        {
+          "kind": "file_line",
+          "ref": "docs/process-constants.md:52",
+          "note": "goal as observation"
+        }
+      ],
+      "confidence_on_hand": "high",
+      "need_info": false,
+      "graded": true
+    },
+    {
+      "id": "F12",
+      "author": "don-norman-advisor",
+      "lens": "human-centred design",
+      "authored_severity": "🟡",
+      "locator": "skill/chorus-core/bin/render.mjs:33-38",
+      "pull_quote": "The record already knows which constant a finding rests on and throws that away just before the operator reads it.",
+      "evidence": [
+        {
+          "kind": "file_line",
+          "ref": "skill/chorus-core/bin/render.mjs:33-38",
+          "note": "bare tag, ref dropped"
+        },
+        {
+          "kind": "file_line",
+          "ref": "skill/chorus-core/schema/common.schema.json:89",
+          "note": "principle ref = where established"
+        },
+        {
+          "kind": "file_line",
+          "ref": "skill/chorus-review/BRIEFS.md:40-43",
+          "note": "R-7"
+        }
+      ],
+      "confidence_on_hand": "high",
+      "need_info": false,
+      "graded": true
+    },
+    {
+      "id": "F13",
+      "author": "don-norman-advisor",
+      "lens": "human-centred design",
+      "authored_severity": "🟡",
+      "locator": "skill/chorus-review/BRIEFS.md:40-43",
+      "pull_quote": "A condition nobody records having checked looks to the operator exactly like a condition nobody checked.",
+      "evidence": [
+        {
+          "kind": "file_line",
+          "ref": "skill/chorus-review/BRIEFS.md:40-43",
+          "note": "condition, no recording duty"
+        },
+        {
+          "kind": "file_line",
+          "ref": "skill/chorus-core/schema/common.schema.json:84-89",
+          "note": "evidence note available"
+        },
+        {
+          "kind": "file_line",
+          "ref": "docs/process-constants.md:31-32",
+          "note": "C1/C2 are cognition claims"
+        }
+      ],
+      "confidence_on_hand": "high",
+      "need_info": false,
+      "graded": true
+    },
+    {
+      "id": "F14",
+      "author": "don-norman-advisor",
+      "lens": "human-centred design",
+      "authored_severity": "🟡",
+      "locator": "skill/chorus-learn/SKILL.md:164-191",
+      "pull_quote": "The tutorial still teaches the model the canon has just retired.",
+      "evidence": [
+        {
+          "kind": "file_line",
+          "ref": "skill/chorus-learn/SKILL.md:164-176",
+          "note": "Step 3"
+        },
+        {
+          "kind": "file_line",
+          "ref": "skill/chorus-learn/SKILL.md:186-191",
+          "note": "Step 4"
+        },
+        {
+          "kind": "file_line",
+          "ref": "skill/chorus-core/CONDUCTOR.md:264-268",
+          "note": "amended I9"
+        }
+      ],
+      "confidence_on_hand": "high",
+      "need_info": false,
+      "graded": true
+    },
+    {
+      "id": "F15",
+      "author": "don-norman-advisor",
+      "lens": "human-centred design",
+      "authored_severity": "🟢",
+      "locator": "docs/process-constants.md:3-10",
+      "pull_quote": "The note tells a lens what it is not, and never says what it is at the place the lens actually lands.",
+      "evidence": [
+        {
+          "kind": "file_line",
+          "ref": "docs/process-constants.md:8-10",
+          "note": "negative definition only"
+        },
+        {
+          "kind": "file_line",
+          "ref": "docs/process-constants.md:96-98",
+          "note": "rule-shaped wording"
+        }
+      ],
+      "confidence_on_hand": "high",
+      "need_info": false,
+      "graded": true
+    },
+    {
+      "id": "F16",
+      "author": "test-strategy-advisor",
+      "lens": "test strategy",
+      "authored_severity": "🟡",
+      "locator": "docs/process-constants.md:83",
+      "pull_quote": "Cheap code makes tests cheap to write, not quick to answer or precise when red, so the pyramid's reasons outlive its ratios.",
+      "evidence": [
+        {
+          "kind": "file_line",
+          "ref": "docs/process-constants.md:83",
+          "note": "'What each test type cost to write and run' leaves out diagnostic precision"
+        },
+        {
+          "kind": "file_line",
+          "ref": "docs/process-constants.md:38",
+          "note": "C8: verification gets cheaper, and every check needs an oracle. No practice row names tests as that oracle"
+        },
+        {
+          "kind": "file_line",
+          "ref": "docs/process-constants.md:59",
+          "note": "the only test-related practice row is goal-level acceptance (C8), not verification checks"
+        }
+      ],
+      "confidence_on_hand": "high",
+      "need_info": false,
+      "graded": true
+    },
+    {
+      "id": "F17",
+      "author": "test-strategy-advisor",
+      "lens": "test strategy",
+      "authored_severity": "🟡",
+      "locator": "skill/chorus-core/CONDUCTOR.md:266",
+      "pull_quote": "Green CI verifies the records, the structure and a Linux install; it says nothing about whether a prose rule is right.",
+      "evidence": [
+        {
+          "kind": "file_line",
+          "ref": "skill/chorus-core/CONDUCTOR.md:266",
+          "note": "the result is signable only when members can call an oracle that verifies it"
+        },
+        {
+          "kind": "file_line",
+          "ref": ".github/workflows/integrity.yml:14",
+          "note": "all three jobs run on ubuntu-latest only"
+        },
+        {
+          "kind": "file_line",
+          "ref": "skill/chorus-core/test/canon-drift.test.mjs:57",
+          "note": "canon-drift checks an enumerated set of rules (tests at 57-202), not prose in general"
+        },
+        {
+          "kind": "file_line",
+          "ref": "docs/reviews/CHORUS-PROJECT.md:94",
+          "note": "the addendum's project-understanding section has no oracle entries yet"
+        }
+      ],
+      "confidence_on_hand": "high",
+      "need_info": false,
+      "graded": true
+    },
+    {
+      "id": "F18",
+      "author": "test-strategy-advisor",
+      "lens": "test strategy",
+      "authored_severity": "🟡",
+      "locator": "scripts/check-suite-integrity.sh:96",
+      "pull_quote": "Add the prefix to FC1, scan agents/ too, and show once that the check can go red.",
+      "evidence": [
+        {
+          "kind": "file_line",
+          "ref": "scripts/check-suite-integrity.sh:96",
+          "note": "1d resolution loop scans $SKILL_DIR only"
+        },
+        {
+          "kind": "file_line",
+          "ref": "scripts/check-suite-integrity.sh:118",
+          "note": "1e catalog completeness, the pattern to reuse"
+        },
+        {
+          "kind": "file_line",
+          "ref": "scripts/check-suite-integrity.sh:41",
+          "note": "the definition regexes expect bold list items, so a table-row definition needs its own regex"
+        }
+      ],
+      "confidence_on_hand": "high",
+      "need_info": false,
+      "graded": true
+    },
+    {
+      "id": "F19",
+      "author": "test-strategy-advisor",
+      "lens": "test strategy",
+      "authored_severity": "🟡",
+      "locator": "skill/chorus-core/test/conduct.test.mjs:25",
+      "pull_quote": "Test who fills the validation field at the engine, where a red names the culprit; the move itself is already covered.",
+      "evidence": [
+        {
+          "kind": "file_line",
+          "ref": "skill/chorus-core/test/conduct.test.mjs:25",
+          "note": "pins provide:signoff in the step order but not who supplies the value"
+        },
+        {
+          "kind": "file_line",
+          "ref": "scripts/check-suite-integrity.sh:288",
+          "note": "4c: the core index check covers the new file"
+        },
+        {
+          "kind": "file_line",
+          "ref": "scripts/test-install-roundtrip.sh:69",
+          "note": "every skill file installed, compared and recorded in the manifest"
+        },
+        {
+          "kind": "file_line",
+          "ref": "skill/chorus-core/CONDUCTOR.md:267",
+          "note": "I9: otherwise it stays open and is the operator's"
+        }
+      ],
+      "confidence_on_hand": "high",
+      "need_info": false,
+      "graded": true
+    },
+    {
+      "id": "F20",
+      "author": "eliyahu-goldratt-advisor",
+      "lens": "constraint and flow",
+      "authored_severity": "🟡",
+      "locator": "docs/process-constants.md:77-87",
+      "pull_quote": "The change gets reviewed by one person in one sitting, so cut the rows no lens reads before you polish them.",
+      "evidence": [
+        {
+          "kind": "file_line",
+          "ref": "docs/process-constants.md:79-87",
+          "note": "seven rows with no lens owner; grep over agents/ and skill/ finds no story points, pair programming, ITIL, Amara or Braudel"
+        },
+        {
+          "kind": "file_line",
+          "ref": "docs/process-constants.md:14-18",
+          "note": "history frame; nothing in the suite cites it, while the 10x test at :19 is the operative part"
+        },
+        {
+          "kind": "file_line",
+          "ref": "docs/reviews/2026-11-06-chorus-review.md:148",
+          "note": "round-1 in-progress pile: move plus 12 wording findings, none applied yet"
+        }
+      ],
+      "confidence_on_hand": "high",
+      "need_info": false,
+      "graded": true
+    },
+    {
+      "id": "F21",
+      "author": "eliyahu-goldratt-advisor",
+      "lens": "constraint and flow",
+      "authored_severity": "🟡",
+      "locator": "docs/process-constants.md:31",
+      "pull_quote": "A trend says where to look first; only evidence says where the constraint is.",
+      "evidence": [
+        {
+          "kind": "file_line",
+          "ref": "docs/process-constants.md:31",
+          "note": "'When generation gets cheap, the bottleneck becomes what to read'"
+        },
+        {
+          "kind": "file_line",
+          "ref": "docs/process-constants.md:41-42",
+          "note": "asymmetry stated as a universal trend"
+        },
+        {
+          "kind": "file_line",
+          "ref": "docs/reviews/CHORUS-PROJECT.md:103",
+          "note": "one maintainer: here the constraint is that person's attention"
+        }
+      ],
+      "confidence_on_hand": "high",
+      "need_info": false,
+      "graded": true
+    },
+    {
+      "id": "F22",
+      "author": "eliyahu-goldratt-advisor",
+      "lens": "constraint and flow",
+      "authored_severity": "🟡",
+      "locator": "docs/process-constants.md:96-98",
+      "pull_quote": "Two rounds of counting tell us whether citing constants earns its keep; until then, build no check.",
+      "evidence": [
+        {
+          "kind": "file_line",
+          "ref": "docs/process-constants.md:96-98",
+          "note": "asks lenses to name a constant; no measure of whether that helps"
+        },
+        {
+          "kind": "principle_proposed",
+          "ref": "C1 attention (docs/process-constants.md:31)",
+          "note": "an unmeasured citation duty spends operator attention without a verdict on its value"
+        }
+      ],
+      "confidence_on_hand": "high",
+      "need_info": false,
+      "graded": true
+    },
+    {
+      "id": "F23",
+      "author": "eliyahu-goldratt-advisor",
+      "lens": "constraint and flow",
+      "authored_severity": "🟢",
+      "locator": "docs/process-constants.md:61",
+      "pull_quote": "Don't teach the lenses to want a store the operator declined.",
+      "evidence": [
+        {
+          "kind": "file_line",
+          "ref": "docs/process-constants.md:61",
+          "note": "ITIL row: KEDB, problem ownership, trend analysis"
+        },
+        {
+          "kind": "file_line",
+          "ref": "docs/process-constants.md:63-66",
+          "note": "KEDB paragraph"
+        }
+      ],
+      "confidence_on_hand": "high",
+      "need_info": false,
+      "graded": true
+    },
+    {
+      "id": "R2-1",
+      "author": "eric-evans-advisor",
+      "lens": "DDD",
+      "authored_severity": "🟡",
+      "locator": "skill/chorus-core/schema/common.schema.json:1",
+      "pull_quote": "A field called 'validation' that closes on 'verified' teaches the confusion the note was written to prevent.",
+      "evidence": [
+        {
+          "kind": "file_line",
+          "ref": "skill/chorus-core/CONDUCTOR.md:266"
+        },
+        {
+          "kind": "file_line",
+          "ref": "docs/process-constants.md:38"
+        }
+      ],
+      "confidence_on_hand": "high",
+      "need_info": false,
+      "graded": false,
+      "derived_from": "F9"
+    },
+    {
+      "id": "R2-2",
+      "author": "eric-evans-advisor",
+      "lens": "DDD",
+      "authored_severity": "🟢",
+      "locator": "skill/chorus-core/schema/run-log.schema.json:45",
+      "pull_quote": "One 'sign-off' now signs advice in review and the result in lifecycle; name the two apart.",
+      "evidence": [
+        {
+          "kind": "file_line",
+          "ref": "skill/chorus-core/schema/run-log.schema.json:45"
+        },
+        {
+          "kind": "file_line",
+          "ref": "skill/chorus-core/CONDUCTOR.md:264"
+        }
+      ],
+      "confidence_on_hand": "high",
+      "need_info": false,
+      "graded": false,
+      "derived_from": "F19"
+    },
+    {
+      "id": "R2-3",
+      "author": "mark-richards-architect",
+      "lens": "architecture",
+      "authored_severity": "🟡",
+      "locator": "skill/chorus-core/schema/vocab.schema.json:5",
+      "pull_quote": "Put the constant ids in a schema enum and advice becomes a contract the validator enforces.",
+      "evidence": [
+        {
+          "kind": "file_line",
+          "ref": "skill/chorus-core/schema/vocab.schema.json:5"
+        },
+        {
+          "kind": "file_line",
+          "ref": "skill/chorus-core/schema/common.schema.json:89"
+        }
+      ],
+      "confidence_on_hand": "high",
+      "need_info": false,
+      "graded": false,
+      "derived_from": "F1"
+    },
+    {
+      "id": "R2-4",
+      "author": "don-norman-advisor",
+      "lens": "human-centred design",
+      "authored_severity": "🟡",
+      "locator": "skill/chorus-core/schema/common.schema.json:1",
+      "pull_quote": "A status that can only ever say 'open' soon stops being read.",
+      "evidence": [
+        {
+          "kind": "file_line",
+          "ref": "skill/chorus-core/schema/sdlc-log.schema.json:152"
+        },
+        {
+          "kind": "file_line",
+          "ref": "skill/chorus-core/CONDUCTOR.md:264-268"
+        }
+      ],
+      "confidence_on_hand": "high",
+      "need_info": false,
+      "graded": false,
+      "derived_from": "F9"
+    },
+    {
+      "id": "R2-5",
+      "author": "don-norman-advisor",
+      "lens": "human-centred design",
+      "authored_severity": "🟡",
+      "locator": "skill/chorus-core/bin/render.mjs:217",
+      "pull_quote": "The ledger labels a memory write 'sign-off', and the operator reads it as the result being signed.",
+      "evidence": [
+        {
+          "kind": "file_line",
+          "ref": "skill/chorus-core/bin/render.mjs:217"
+        },
+        {
+          "kind": "file_line",
+          "ref": "skill/chorus-sdlc/SKILL.md:283"
+        },
+        {
+          "kind": "file_line",
+          "ref": "skill/chorus-core/CONDUCTOR.md:255"
+        }
+      ],
+      "confidence_on_hand": "high",
+      "need_info": false,
+      "graded": false,
+      "derived_from": "F1"
+    },
+    {
+      "id": "R2-6",
+      "author": "don-norman-advisor",
+      "lens": "human-centred design",
+      "authored_severity": "🟢",
+      "locator": "skill/chorus-core/CONDUCTOR.md:266-267",
+      "pull_quote": "Show what the oracle can't see at the moment the operator trusts it.",
+      "evidence": [
+        {
+          "kind": "file_line",
+          "ref": "skill/chorus-core/CONDUCTOR.md:266-267"
+        }
+      ],
+      "confidence_on_hand": "high",
+      "need_info": false,
+      "graded": false,
+      "derived_from": "F17"
+    },
+    {
+      "id": "R2-7",
+      "author": "test-strategy-advisor",
+      "lens": "test strategy",
+      "authored_severity": "🟡",
+      "locator": "skill/chorus-core/CONDUCTOR.md:336",
+      "pull_quote": "A 'verified' that names an oracle nobody declared should fail validation, the same way a missing ruling does.",
+      "evidence": [
+        {
+          "kind": "file_line",
+          "ref": "skill/chorus-core/CONDUCTOR.md:336"
+        },
+        {
+          "kind": "file_line",
+          "ref": "skill/chorus-core/test/validate.test.mjs:24"
+        }
+      ],
+      "confidence_on_hand": "high",
+      "need_info": false,
+      "graded": false,
+      "derived_from": "F9"
+    },
+    {
+      "id": "R2-8",
+      "author": "test-strategy-advisor",
+      "lens": "test strategy",
+      "authored_severity": "🟢",
+      "locator": "scripts/check-suite-integrity.sh:339",
+      "pull_quote": "The boundary check guards the provider's name, not its nicknames; fix the word, don't widen the regex.",
+      "evidence": [
+        {
+          "kind": "file_line",
+          "ref": "scripts/check-suite-integrity.sh:339"
+        },
+        {
+          "kind": "file_line",
+          "ref": "docs/process-constants.md:52"
+        }
+      ],
+      "confidence_on_hand": "high",
+      "need_info": false,
+      "graded": false,
+      "derived_from": "F2"
+    },
+    {
+      "id": "R2-9",
+      "author": "eliyahu-goldratt-advisor",
+      "lens": "constraint and flow",
+      "authored_severity": "🟡",
+      "locator": "skill/chorus-review/BRIEFS.md:40-43",
+      "pull_quote": "Build the citation machinery for the first citation, not ahead of it.",
+      "evidence": [
+        {
+          "kind": "file_line",
+          "ref": "skill/chorus-review/BRIEFS.md:40-43"
+        },
+        {
+          "kind": "file_line",
+          "ref": "skill/chorus-core/bin/render.mjs:33-38"
+        }
+      ],
+      "confidence_on_hand": "high",
+      "need_info": false,
+      "graded": false,
+      "derived_from": "F13"
+    },
+    {
+      "id": "R2-10",
+      "author": "eliyahu-goldratt-advisor",
+      "lens": "constraint and flow",
+      "authored_severity": "🟢",
+      "locator": "docs/process-constants.md:96-98",
+      "pull_quote": "The note's own value is the first open validation the new field should carry.",
+      "evidence": [
+        {
+          "kind": "file_line",
+          "ref": "docs/process-constants.md:96-98"
+        },
+        {
+          "kind": "file_line",
+          "ref": "skill/chorus-core/bin/render.mjs:116"
+        }
+      ],
+      "confidence_on_hand": "high",
+      "need_info": false,
+      "graded": false,
+      "derived_from": "F11"
+    }
+  ],
+  "tally": [
+    {
+      "finding": "F1",
+      "authored_severity": "🟡",
+      "n": 4,
+      "p": 1,
+      "c": 2,
+      "o": 1,
+      "net": 0,
+      "threshold": 2,
+      "final_severity": "🟡",
+      "movement": "agreed",
+      "convergence": 3,
+      "gating": false,
+      "status": "graded"
+    },
+    {
+      "finding": "F2",
+      "authored_severity": "🟡",
+      "n": 4,
+      "p": 0,
+      "c": 4,
+      "o": 0,
+      "net": 0,
+      "threshold": 2,
+      "final_severity": "🟡",
+      "movement": "agreed",
+      "convergence": 4,
+      "gating": false,
+      "status": "graded"
+    },
+    {
+      "finding": "F3",
+      "authored_severity": "🟡",
+      "n": 3,
+      "p": 0,
+      "c": 3,
+      "o": 0,
+      "net": 0,
+      "threshold": 1,
+      "final_severity": "🟡",
+      "movement": "agreed",
+      "convergence": 3,
+      "gating": false,
+      "status": "graded"
+    },
+    {
+      "finding": "F4",
+      "authored_severity": "🟢",
+      "n": 4,
+      "p": 0,
+      "c": 4,
+      "o": 0,
+      "net": 0,
+      "threshold": 2,
+      "final_severity": "🟢",
+      "movement": "agreed",
+      "convergence": 4,
+      "gating": false,
+      "status": "graded"
+    },
+    {
+      "finding": "F5",
+      "authored_severity": "🟢",
+      "n": 3,
+      "p": 0,
+      "c": 2,
+      "o": 1,
+      "net": -1,
+      "threshold": 1,
+      "final_severity": "dropped",
+      "movement": "demote",
+      "convergence": 2,
+      "gating": false,
+      "status": "graded"
+    },
+    {
+      "finding": "F6",
+      "authored_severity": "🟡",
+      "n": 4,
+      "p": 0,
+      "c": 4,
+      "o": 0,
+      "net": 0,
+      "threshold": 2,
+      "final_severity": "🟡",
+      "movement": "agreed",
+      "convergence": 4,
+      "gating": false,
+      "status": "graded"
+    },
+    {
+      "finding": "F7",
+      "authored_severity": "🟡",
+      "n": 3,
+      "p": 0,
+      "c": 3,
+      "o": 0,
+      "net": 0,
+      "threshold": 1,
+      "final_severity": "🟡",
+      "movement": "agreed",
+      "convergence": 3,
+      "gating": false,
+      "status": "graded"
+    },
+    {
+      "finding": "F8",
+      "authored_severity": "🟡",
+      "n": 4,
+      "p": 0,
+      "c": 4,
+      "o": 0,
+      "net": 0,
+      "threshold": 2,
+      "final_severity": "🟡",
+      "movement": "agreed",
+      "convergence": 4,
+      "gating": false,
+      "status": "graded"
+    },
+    {
+      "finding": "F9",
+      "authored_severity": "🟡",
+      "n": 4,
+      "p": 2,
+      "c": 2,
+      "o": 0,
+      "net": 2,
+      "threshold": 2,
+      "final_severity": "🔴",
+      "movement": "escalate",
+      "convergence": 4,
+      "gating": true,
+      "status": "graded"
+    },
+    {
+      "finding": "F10",
+      "authored_severity": "🟢",
+      "n": 3,
+      "p": 0,
+      "c": 3,
+      "o": 0,
+      "net": 0,
+      "threshold": 1,
+      "final_severity": "🟢",
+      "movement": "agreed",
+      "convergence": 3,
+      "gating": false,
+      "status": "graded"
+    },
+    {
+      "finding": "F11",
+      "authored_severity": "🟡",
+      "n": 4,
+      "p": 0,
+      "c": 4,
+      "o": 0,
+      "net": 0,
+      "threshold": 2,
+      "final_severity": "🟡",
+      "movement": "agreed",
+      "convergence": 4,
+      "gating": false,
+      "status": "graded"
+    },
+    {
+      "finding": "F12",
+      "authored_severity": "🟡",
+      "n": 4,
+      "p": 1,
+      "c": 3,
+      "o": 0,
+      "net": 1,
+      "threshold": 2,
+      "final_severity": "🟡",
+      "movement": "agreed",
+      "convergence": 4,
+      "gating": false,
+      "status": "graded"
+    },
+    {
+      "finding": "F13",
+      "authored_severity": "🟡",
+      "n": 4,
+      "p": 1,
+      "c": 2,
+      "o": 1,
+      "net": 0,
+      "threshold": 2,
+      "final_severity": "🟡",
+      "movement": "agreed",
+      "convergence": 3,
+      "gating": false,
+      "status": "graded"
+    },
+    {
+      "finding": "F14",
+      "authored_severity": "🟡",
+      "n": 4,
+      "p": 0,
+      "c": 4,
+      "o": 0,
+      "net": 0,
+      "threshold": 2,
+      "final_severity": "🟡",
+      "movement": "agreed",
+      "convergence": 4,
+      "gating": false,
+      "status": "graded"
+    },
+    {
+      "finding": "F15",
+      "authored_severity": "🟢",
+      "n": 4,
+      "p": 0,
+      "c": 4,
+      "o": 0,
+      "net": 0,
+      "threshold": 2,
+      "final_severity": "🟢",
+      "movement": "agreed",
+      "convergence": 4,
+      "gating": false,
+      "status": "graded"
+    },
+    {
+      "finding": "F16",
+      "authored_severity": "🟡",
+      "n": 3,
+      "p": 0,
+      "c": 3,
+      "o": 0,
+      "net": 0,
+      "threshold": 1,
+      "final_severity": "🟡",
+      "movement": "agreed",
+      "convergence": 3,
+      "gating": false,
+      "status": "graded"
+    },
+    {
+      "finding": "F17",
+      "authored_severity": "🟡",
+      "n": 4,
+      "p": 2,
+      "c": 2,
+      "o": 0,
+      "net": 2,
+      "threshold": 2,
+      "final_severity": "🔴",
+      "movement": "escalate",
+      "convergence": 4,
+      "gating": true,
+      "status": "graded"
+    },
+    {
+      "finding": "F18",
+      "authored_severity": "🟡",
+      "n": 3,
+      "p": 1,
+      "c": 2,
+      "o": 0,
+      "net": 1,
+      "threshold": 1,
+      "final_severity": "🔴",
+      "movement": "escalate",
+      "convergence": 3,
+      "gating": true,
+      "status": "graded"
+    },
+    {
+      "finding": "F19",
+      "authored_severity": "🟡",
+      "n": 4,
+      "p": 0,
+      "c": 3,
+      "o": 1,
+      "net": -1,
+      "threshold": 2,
+      "final_severity": "🟡",
+      "movement": "agreed",
+      "convergence": 3,
+      "gating": false,
+      "status": "graded"
+    },
+    {
+      "finding": "F20",
+      "authored_severity": "🟡",
+      "n": 4,
+      "p": 0,
+      "c": 4,
+      "o": 0,
+      "net": 0,
+      "threshold": 2,
+      "final_severity": "🟡",
+      "movement": "agreed",
+      "convergence": 4,
+      "gating": false,
+      "status": "graded"
+    },
+    {
+      "finding": "F21",
+      "authored_severity": "🟡",
+      "n": 2,
+      "p": 0,
+      "c": 2,
+      "o": 0,
+      "net": 0,
+      "threshold": 1,
+      "final_severity": "🟡",
+      "movement": "agreed",
+      "convergence": 2,
+      "gating": false,
+      "status": "graded"
+    },
+    {
+      "finding": "F22",
+      "authored_severity": "🟡",
+      "n": 4,
+      "p": 0,
+      "c": 0,
+      "o": 4,
+      "net": -4,
+      "threshold": 2,
+      "final_severity": "🟢",
+      "movement": "demote",
+      "convergence": 0,
+      "gating": false,
+      "status": "graded"
+    },
+    {
+      "finding": "F23",
+      "authored_severity": "🟢",
+      "n": 4,
+      "p": 0,
+      "c": 4,
+      "o": 0,
+      "net": 0,
+      "threshold": 2,
+      "final_severity": "🟢",
+      "movement": "agreed",
+      "convergence": 4,
+      "gating": false,
+      "status": "graded"
+    },
+    {
+      "finding": "R2-1",
+      "authored_severity": "🟡",
+      "status": "ungraded",
+      "final_severity": "🟡"
+    },
+    {
+      "finding": "R2-2",
+      "authored_severity": "🟢",
+      "status": "ungraded",
+      "final_severity": "🟢"
+    },
+    {
+      "finding": "R2-3",
+      "authored_severity": "🟡",
+      "status": "ungraded",
+      "final_severity": "🟡"
+    },
+    {
+      "finding": "R2-4",
+      "authored_severity": "🟡",
+      "status": "ungraded",
+      "final_severity": "🟡"
+    },
+    {
+      "finding": "R2-5",
+      "authored_severity": "🟡",
+      "status": "ungraded",
+      "final_severity": "🟡"
+    },
+    {
+      "finding": "R2-6",
+      "authored_severity": "🟢",
+      "status": "ungraded",
+      "final_severity": "🟢"
+    },
+    {
+      "finding": "R2-7",
+      "authored_severity": "🟡",
+      "status": "ungraded",
+      "final_severity": "🟡"
+    },
+    {
+      "finding": "R2-8",
+      "authored_severity": "🟢",
+      "status": "ungraded",
+      "final_severity": "🟢"
+    },
+    {
+      "finding": "R2-9",
+      "authored_severity": "🟡",
+      "status": "ungraded",
+      "final_severity": "🟡"
+    },
+    {
+      "finding": "R2-10",
+      "authored_severity": "🟢",
+      "status": "ungraded",
+      "final_severity": "🟢"
+    }
+  ],
+  "interview": {
+    "sessions": 1,
+    "questions": [
+      {
+        "persona": "eliyahu-goldratt-advisor",
+        "scope": "project-wide",
+        "gate": true,
+        "question": "Should this round's findings go into the same change as the queued move to skill/chorus-core/PROCESS-CONSTANTS.md and the round-1 wording fixes, or into a separate pass after it?",
+        "answer": "Same change"
+      },
+      {
+        "persona": "test-strategy-advisor",
+        "scope": "project-wide",
+        "gate": true,
+        "question": "Amended I9 says the chorus can sign a result only with an oracle its lenses 'can call'. In review mode, what counts as such an oracle?",
+        "answer": "project's addendum can define such oracles, with explicitly stated area each covers. Lenses decide on per-case basis if verification can be performed & sufficient. Only high confidence allows a sign-off of the result."
+      },
+      {
+        "persona": "don-norman-advisor",
+        "scope": "project-wide",
+        "gate": false,
+        "question": "Ruling R-5: should 'validation still open, and who closes it' be a record field (schema and renderer) or a sentence in the summary?",
+        "answer": "Record field"
+      },
+      {
+        "persona": "test-strategy-advisor",
+        "scope": "project-wide",
+        "gate": false,
+        "question": "When the C-number check lands (R-9), rename the constants to avoid the conflict ids C1, C2, and should the check also enforce that constants are defined only in PROCESS-CONSTANTS.md?",
+        "answer": "Rename + residence"
+      },
+      {
+        "persona": "eliyahu-goldratt-advisor",
+        "scope": "project-wide",
+        "gate": false,
+        "question": "Which merges first: PRs #45/#47 or this branch?",
+        "deferred": true
+      },
+      {
+        "persona": "don-norman-advisor",
+        "scope": "lens-specific",
+        "gate": false,
+        "question": "Under R-7, who checks that no code contradicts a constant cited as a principle, and what counts as contradicting a cognition constant?",
+        "deferred": true
+      },
+      {
+        "persona": "test-strategy-advisor",
+        "scope": "lens-specific",
+        "gate": false,
+        "question": "Is there any history of flaky or escaped defects for the three integrity.yml jobs?",
+        "deferred": true
+      }
+    ],
+    "degradation": "Merge order unknown: findings that touch chorus-core may need a rebase onto #45/#47. Who checks R-7's 'no contradicting code' is left to the lenses' own findings. CI trust history is inferred from the workflow files only."
+  },
+  "conflicts": [
+    {
+      "id": "C1",
+      "advisors": [
+        "eliyahu-goldratt-advisor",
+        "eric-evans-advisor"
+      ],
+      "disputed": "Build the citation tooling now or with the first real citation? Goldratt (R2-9; OVER-RATE on F1, F13): the principle split and the recording duty wait for a lens to cite a constant. Evans (F1, PRIORITIZE F12), Norman and Richards: land them in this change. Outcome: a smaller change now, or citation rules ready before anyone cites. R-10 says one change. No arbiter port.",
+      "outcome": "unresolved",
+      "findings": [
+        "F1",
+        "F13",
+        "R2-9"
+      ],
+      "decision_ref": "conflict-1"
+    },
+    {
+      "id": "C2",
+      "advisors": [
+        "eric-evans-advisor",
+        "mark-richards-architect"
+      ],
+      "disputed": "What to call the R-12 field. Richards (F9) and Norman (F11): a shared 'validation' definition with a 'verified' status. Evans (R2-1): that name repeats the confusion the note warns against; name it for I9 (whether the result reached its goal) with statuses open, oracle_verified, operator_ruled. Outcome: which word the operator reads on every record. No arbiter port.",
+      "outcome": "unresolved",
+      "findings": [
+        "F9",
+        "R2-1"
+      ],
+      "decision_ref": "conflict-2"
+    }
+  ],
+  "top_five": [
+    {
+      "rank": 1,
+      "finding": "F9",
+      "pull_quote": "One shared shape for both record kinds is the parity test; two copies would need one.",
+      "locator": "skill/chorus-core/schema/common.schema.json:1",
+      "final_severity": "🔴",
+      "cost": "medium",
+      "value": "Carries R-5/R-12: one shared field definition keeps review and lifecycle records in step without a parity test, and lets the validator require it (C2 settles its name).",
+      "constitutional_roi": "I. One Canonical Definition — one schema definition, two consumers.",
+      "convergence": 4
+    },
+    {
+      "rank": 2,
+      "finding": "F17",
+      "pull_quote": "Green CI verifies the records, the structure and a Linux install; it says nothing about whether a prose rule is right.",
+      "locator": "skill/chorus-core/CONDUCTOR.md:266",
+      "final_severity": "🔴",
+      "cost": "low",
+      "value": "Carries R-11: each declared oracle states what it does not cover, so green CI is not read as 'the canon change is right'; prevents the over-trust the I9 amendment is meant to stop.",
+      "convergence": 4
+    },
+    {
+      "rank": 3,
+      "finding": "F18",
+      "pull_quote": "Add the prefix to FC1, scan agents/ too, and show once that the check can go red.",
+      "locator": "scripts/check-suite-integrity.sh:96",
+      "final_severity": "🔴",
+      "cost": "low",
+      "value": "Carries R-9/R-13: the PC-number check must scan agents/ (where lenses cite) and be shown once to fail, or it passes green while blind.",
+      "convergence": 3
+    },
+    {
+      "rank": 4,
+      "finding": "F6",
+      "pull_quote": "Once the note sits in core it may not point at BRIEFS.md, so the second copy has to go, not just link back.",
+      "locator": "skill/chorus-review/BRIEFS.md:40",
+      "final_severity": "🟡",
+      "cost": "low",
+      "value": "R-7 gets one home (BRIEFS.md item 8) citing chorus-core/PROCESS-CONSTANTS.md by path; that path citation is the first constant citation, which brings the R-9 check into this same change.",
+      "constitutional_roi": "I. One Canonical Definition — the rule stops living in two files.",
+      "convergence": 4
+    },
+    {
+      "rank": 5,
+      "finding": "F20",
+      "pull_quote": "The change gets reviewed by one person in one sitting, so cut the rows no lens reads before you polish them.",
+      "locator": "docs/process-constants.md:77-87",
+      "final_severity": "🟡",
+      "cost": "low",
+      "value": "Shrinks the single change R-10 asks for by deleting seven derivatives rows and the history frame no lens reads, which also retires two round-1 wording fixes (F8, F20 of round 1).",
+      "convergence": 4
+    }
+  ],
+  "held": [],
+  "baseline": {
+    "assume_closed": [
+      "Home: skill/chorus-core/PROCESS-CONSTANTS.md (round 1, R-1).",
+      "One shipping change carries the move, round-1 wording and this round's findings (R-10).",
+      "Constants renamed to PC1–PC9; the check enforces residence and resolution (R-13; F4 of this round names the prefix).",
+      "Oracles are defined by the addendum per area; sign-off of a result needs high confidence (R-11)."
+    ],
+    "in_progress": [
+      "The shipping change, in Richards's order (F10): move and rename; index and roster pointer; check run red then green; BRIEFS.md path citation; oracle section; shared field with schema, renderer and tests; version bump.",
+      "W-7 of the brief: this re-run itself, closed by this record."
+    ],
+    "re_evaluate": [
+      "C1: citation tooling (F1 principle split, F13 recorded search) now or with the first lens citation.",
+      "C2: name of the R-12 field — 'validation' or a name tied to I9 with statuses open, oracle_verified, operator_ruled.",
+      "R2-10: whether lenses citing constants improves a round is itself unconfirmed; count it over the next two rounds (F22's experiment, demoted but not dropped)."
+    ]
+  },
+  "appendix": [
+    {
+      "persona": "eric-evans-advisor",
+      "reports": [
+        "docs/reviews/2026-11-06-chorus-review-2.run.json"
+      ]
+    },
+    {
+      "persona": "mark-richards-architect",
+      "reports": [
+        "docs/reviews/2026-11-06-chorus-review-2.run.json"
+      ]
+    },
+    {
+      "persona": "don-norman-advisor",
+      "reports": [
+        "docs/reviews/2026-11-06-chorus-review-2.run.json"
+      ]
+    },
+    {
+      "persona": "test-strategy-advisor",
+      "reports": [
+        "docs/reviews/2026-11-06-chorus-review-2.run.json"
+      ]
+    },
+    {
+      "persona": "eliyahu-goldratt-advisor",
+      "reports": [
+        "docs/reviews/2026-11-06-chorus-review-2.run.json"
+      ]
+    }
+  ],
+  "decisions": [
+    {
+      "id": "seating-1",
+      "point": "RSVP seating — tie at the cap",
+      "catalog_row": 2,
+      "band": "🟡",
+      "title": "Seating tie at seat 5: default panel seated",
+      "problem": "10 personas joined for 5 ordinary seats; the two-axis signal (cited deltas, then expected stakes) ties across seat 5.",
+      "sensor": {
+        "signal": "strict order at the cap boundary (DECISION-PRIMITIVE.md § Seating)",
+        "evidence": [
+          "eric-evans-advisor",
+          "mark-richards-architect",
+          "don-norman-advisor",
+          "test-strategy-advisor",
+          "eliyahu-goldratt-advisor"
+        ],
+        "reading": "tie"
+      },
+      "evidence": [
+        {
+          "kind": "run",
+          "ref": "conduct.mjs seat()"
+        }
+      ],
+      "solutions": [
+        {
+          "id": "sorted-panel",
+          "label": "Seat the sorted panel",
+          "recommended": true,
+          "summary": "Seat eric-evans-advisor, mark-richards-architect, don-norman-advisor, test-strategy-advisor, eliyahu-goldratt-advisor.",
+          "cost": {
+            "work": "none"
+          }
+        },
+        {
+          "id": "swap-seat",
+          "label": "Swap a tied seat",
+          "summary": "Operator's seat override (run header seat_override): eliyahu-goldratt-advisor in for kent-beck-persona; eric-evans-advisor in for alan-cooper-advisor.",
+          "cost": {
+            "work": "re-run the board"
+          }
+        }
+      ],
+      "resolution": "default-applied",
+      "override": {
+        "how": "Name the tied persona to seat instead; the board re-runs.",
+        "cost": "one board re-run"
+      },
+      "status": "complete",
+      "decision": {
+        "chose": "swap-seat",
+        "date": "2026-11-06"
+      }
+    },
+    {
+      "id": "conflict-1",
+      "point": "Unresolved conflict (Phase 3)",
+      "catalog_row": 15,
+      "band": "🟡",
+      "title": "C1: eliyahu-goldratt-advisor, eric-evans-advisor disagree on F1, F13, R2-9",
+      "problem": "Build the citation tooling now or with the first real citation? Goldratt (R2-9; OVER-RATE on F1, F13): the principle split and the recording duty wait for a lens to cite a constant. Evans (F1, PRIORITIZE F12), Norman and Richards: land them in this change. Outcome: a smaller change now, or citation rules ready before anyone cites. R-10 says one change. No arbiter port.",
+      "evidence": [
+        {
+          "kind": "finding",
+          "ref": "F1"
+        },
+        {
+          "kind": "finding",
+          "ref": "F13"
+        },
+        {
+          "kind": "finding",
+          "ref": "R2-9"
+        }
+      ],
+      "solutions": [
+        {
+          "id": "counted-stands",
+          "label": "Let the counted severity stand",
+          "recommended": true,
+          "summary": "The vote's arithmetic stands; nothing changes in the ranking.",
+          "cost": {
+            "work": "none"
+          }
+        },
+        {
+          "id": "operator-rules",
+          "label": "Rule on the disagreement",
+          "summary": "The operator decides which reading holds; the ruling annotates the ranking.",
+          "cost": {
+            "work": "one operator ruling"
+          }
+        }
+      ],
+      "resolution": "default-applied",
+      "override": {
+        "how": "Rule on the conflict; the ruling annotates the ranking and never changes counted severity.",
+        "cost": "one operator ruling"
+      },
+      "status": "open"
+    },
+    {
+      "id": "conflict-2",
+      "point": "Unresolved conflict (Phase 3)",
+      "catalog_row": 15,
+      "band": "🟡",
+      "title": "C2: eric-evans-advisor, mark-richards-architect disagree on F9, R2-1",
+      "problem": "What to call the R-12 field. Richards (F9) and Norman (F11): a shared 'validation' definition with a 'verified' status. Evans (R2-1): that name repeats the confusion the note warns against; name it for I9 (whether the result reached its goal) with statuses open, oracle_verified, operator_ruled. Outcome: which word the operator reads on every record. No arbiter port.",
+      "evidence": [
+        {
+          "kind": "finding",
+          "ref": "F9"
+        },
+        {
+          "kind": "finding",
+          "ref": "R2-1"
+        }
+      ],
+      "solutions": [
+        {
+          "id": "counted-stands",
+          "label": "Let the counted severity stand",
+          "recommended": true,
+          "summary": "The vote's arithmetic stands; nothing changes in the ranking.",
+          "cost": {
+            "work": "none"
+          }
+        },
+        {
+          "id": "operator-rules",
+          "label": "Rule on the disagreement",
+          "summary": "The operator decides which reading holds; the ruling annotates the ranking.",
+          "cost": {
+            "work": "one operator ruling"
+          }
+        }
+      ],
+      "resolution": "default-applied",
+      "override": {
+        "how": "Rule on the conflict; the ruling annotates the ranking and never changes counted severity.",
+        "cost": "one operator ruling"
+      },
+      "status": "open"
+    }
+  ],
+  "side_notes": [
+    {
+      "regime": "threshold-boundary",
+      "note": "Moved at exactly the threshold: |net| == T.",
+      "findings": [
+        "F5",
+        "F9",
+        "F17",
+        "F18"
+      ]
+    },
+    {
+      "regime": "unanimous-same-brief",
+      "note": "Unanimous among voters who read the same brief: one datum, not several.",
+      "findings": [
+        "F22"
+      ]
+    }
+  ]
+}
