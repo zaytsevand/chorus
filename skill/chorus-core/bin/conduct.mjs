@@ -32,7 +32,7 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import {
   ACTION, CONFIDENCE, CONFLICT_OUTCOME, SDLC_RULE, DECISION_EVIDENCE, EXIT, DECISION_RESOLUTION, DECISION_STATUS, EVENT, FAILURE, GATE, GATE_NAME_OF,
-  GATE_QUORUM, GATE_RESULT, HELD_ROUTE, LENS_OF, OPTIONAL_LENSES, PHASE, RECORD_KIND, RECOVERY, RED_DISPOSITION,
+  GATE_QUORUM, GATE_RESULT, GOAL_STATUS, HELD_ROUTE, LENS_OF, OPTIONAL_LENSES, PHASE, RECORD_KIND, RECOVERY, RED_DISPOSITION,
   REVIEW_MODE, REVIEW_QUORUM, RSVP, RUN_MODE, SCOPE, SDLC_MODE, SDLC_STATUS, SEAT, SEATING_BAND, SEVERITY, TALLY_STATUS,
   TOPIC, VOCAB, VOTE,
 } from "./vocab.mjs";
@@ -406,19 +406,27 @@ function seatingDecision(id, B, date) {
   const seated = B.rows.filter((r) => r.seated).map((r) => r.persona);
   const swaps = B.seating.swaps ?? [];
   const swapped = swaps.map((w) => `${w.in} in for ${w.out}`).join("; ");
+  const sorted = seated.map((p) => swaps.find((w) => w.in === p)?.out ?? p); // the panel before the override
   return {
     id, point: tie ? "RSVP seating — tie at the cap" : "RSVP seating — clean two-axis sort", catalog_row: tie ? 2 : 1, band: tie ? SEVERITY.YELLOW : SEVERITY.GREEN,
-    title: tie ? `Seating tie at seat ${SEAT_CAP}: default panel seated` : `More than ${SEAT_CAP} joined: seated by the two-axis sort`,
+    title: swaps.length ? `Operator seat override: ${swaps.length} seat(s) swapped` : tie ? `Seating tie at seat ${SEAT_CAP}: default panel seated` : `More than ${SEAT_CAP} joined: seated by the two-axis sort`,
     problem: `${B.seating.joiners} personas joined for ${SEAT_CAP} ordinary seats; the two-axis signal (cited deltas, then expected stakes) ${tie ? `ties across seat ${SEAT_CAP}` : "orders them strictly"}.`,
     sensor: { signal: "strict order at the cap boundary (DECISION-PRIMITIVE.md § Seating)", evidence: seated, reading: tie ? "tie" : "strict" },
     evidence: [{ kind: DECISION_EVIDENCE.RUN, ref: "conduct.mjs seat()" }],
-    solutions: [{ id: "sorted-panel", label: "Seat the sorted panel", recommended: true, summary: `Seat ${seated.join(", ")}.`, cost: { work: "none" } },
-      ...(tie || swaps.length ? [{ id: "swap-seat", label: "Swap a tied seat", summary: swaps.length ? `Operator's seat override (run header seat_override): ${swapped}.` : "Re-seat one tied persona in place of another and re-run the board.", cost: { work: "re-run the board" } }] : [])],
+    solutions: (() => { // the applied option is the default and comes first
+      const sortedPanel = { id: "sorted-panel", label: "Seat the sorted panel", ...(swaps.length ? {} : { recommended: true }), summary: `Seat ${sorted.join(", ")}.`, cost: { work: "none" } };
+      const swap = { id: "swap-seat", label: "Swap a tied seat", ...(swaps.length ? { recommended: true } : {}), summary: swaps.length ? `Operator's seat override (run header seat_override): ${swapped}.` : "Re-seat one tied persona in place of another and re-run the board.", cost: { work: "re-run the board" } };
+      return swaps.length ? [swap, sortedPanel] : tie ? [sortedPanel, swap] : [sortedPanel];
+    })(),
     resolution: tie ? DECISION_RESOLUTION.DEFAULT_APPLIED : DECISION_RESOLUTION.AUTO_RESOLVED,
     ...(tie ? { override: { how: "Name the tied persona to seat instead; the board re-runs.", cost: "one board re-run" } } : {}),
     status: DECISION_STATUS.COMPLETE, decision: { chose: swaps.length ? "swap-seat" : "sorted-panel", date },
   };
 }
+
+/** I9: the chorus signs its advice, never the result, so the conductor only ever writes "open" — the operator's.
+ *  The sign-off may state the observation that would close it; the status is not the conductor's to set. */
+const goalOpen = (signoff) => ({ status: GOAL_STATUS.OPEN, owner: "operator", ...(signoff?.closes_when ? { closes_when: signoff.closes_when } : {}) });
 
 /** An unresolved conflict, carried to the decision sink: counted severity stands unless the operator rules. */
 function conflictDecision(c) {
@@ -473,6 +481,7 @@ function assembleReview(log) {
     secret_filter: d.signoff?.secret_filter ?? { ran: false, note: "No memory writes went through the conductor this round." },
     ...(d.signoff?.baseline_ref ? { baseline_ref: d.signoff.baseline_ref } : {}),
     tldr: d.signoff?.tldr ?? abortedTldr(B),
+    goal_reached: goalOpen(d.signoff),
     roster: B.rows,
     quorum,
     ...(B.seating.joiners > SEAT_CAP ? { seating_decision: decisions[0].id } : {}),
@@ -542,7 +551,7 @@ function assembleLifecycle(log) {
   });
   const complete = d.action.action === ACTION.DONE;
   const rec = {
-    kind: RECORD_KIND.SDLC_LOG, schema_version: SCHEMA_VERSION, feature: h.feature ?? h.target, feature_dir: h.dir, run_started: h.date,
+    kind: RECORD_KIND.SDLC_LOG, schema_version: SCHEMA_VERSION, feature: h.feature ?? h.target, goal_reached: goalOpen(d.signoff), feature_dir: h.dir, run_started: h.date,
     mode: log.mode === RUN_MODE.CHALLENGE ? SDLC_MODE.CHALLENGE : SDLC_MODE.AGENT_SDLC,
     status: complete ? SDLC_STATUS.COMPLETE : SDLC_STATUS.HALTED_AWAITING_OPERATOR,
     gates, decisions,
@@ -690,6 +699,14 @@ export function answer(file, log, topic, data) {
   if (topic === TOPIC.OPERATOR_RULING && !errors.length) {
     if (data.local_ruling && data.ruling_ref && data.ruling_ref.record !== "#") errors.push({ path: "ruling_ref", message: "a local ruling is cited as record \"#\"" });
     if (data.findings.some((x) => x.disposition === RED_DISPOSITION.WAIVED) && !data.ruling_ref && !data.local_ruling) errors.push({ path: "ruling_ref", message: "a waiver cites the operator's ruling (S4, D2): give ruling_ref, or local_ruling when no decision sink is bound" });
+  }
+  if (topic === TOPIC.CONFLICTS && !errors.length) {
+    // An unresolved conflict becomes a decision in the record: refuse now what record would refuse later.
+    data.forEach((c, i) => {
+      if (c.outcome !== CONFLICT_OUTCOME.UNRESOLVED) return;
+      for (const e of validate(RECORD_KIND.DECISION, { kind: RECORD_KIND.DECISION, ...conflictDecision(c) }).errors)
+        errors.push({ path: `[${i}] as decision → ${e.path}`, message: e.message });
+    });
   }
   if (topic === TOPIC.RANKING && !errors.length) {
     const ok = new Set(action.eligible.map((e) => e.id));

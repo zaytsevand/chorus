@@ -37,10 +37,12 @@ Brief sections per joiner (continued via `SendMessage`):
    of findings; do not pad or trim to a count.
 8. **Evidence rule and pull-quote** — every finding cites `file:line`, or carries
    `[principle]` (existing; cite where established) or `[principle:proposed]`
-   (newly named). A process constant may stand as that principle only when no
-   code in the project contradicts it; where such code exists, the finding does
-   not rest on the constant: it raises which of the two overrules the other as
-   its own question (`NEED_INFO`). **Before you write a finding, you MUST have either followed the
+   (newly named). A process constant (`chorus-core/PROCESS-CONSTANTS.md`, cited by
+   its id and name, e.g. "PC1 attention") may stand as that principle only when no
+   code in the project contradicts it. Its evidence `ref` is the PC id, and its
+   `note` says where you looked for contradicting code. Where such code exists,
+   the finding does not rest on the constant: it raises which of the two
+   overrules the other as its own question (`NEED_INFO`). **Before you write a finding, you MUST have either followed the
    artefact chain to an invariant or run out of pointers, OR tagged it.** For each
    finding, mark **one short sentence in your own words** as its pull-quote, on a
    line beginning `PULL-QUOTE:` with its locator. The conductor relays that span

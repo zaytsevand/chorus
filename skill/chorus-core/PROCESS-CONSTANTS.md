@@ -1,105 +1,92 @@
 # Process constants
 
-What stays fixed in software development while the tools change, and which
-practices those fixed points keep relevant. A reference for lenses, the
-conductor and the operator when a finding or a recommendation says "this
-practice matters" or "this practice is obsolete".
+**Advisory.** Nothing here binds a lens or the conductor. A lens may cite a
+constant as the reason a practice matters or will fade; it never has to. The
+rules the suite enforces on itself are the I1–I9 invariants in `CONDUCTOR.md`;
+these are something else: properties of the people and the world a project works
+in, which no rule changes.
 
-Not to be confused with the I1–I9 invariants in `skill/chorus-core/CONDUCTOR.md`.
-Those are rules the suite enforces on itself. These are properties of the
-people and the world the suite works in, which no rule can change.
+Cite a constant by its id and name, e.g. "PC1 attention". Ids are never reused or
+renumbered; a retired constant keeps its number. `scripts/check-suite-integrity.sh`
+FC8 checks that each id is defined once, here, and that every citation resolves.
 
-## The frame
+## Two tests
 
-- **Amara's law.** We overestimate the effect of a technology in the short run
-  and underestimate it in the long run.
-- **Braudel's three speeds.** Events (fast), cycles (decades), structures
-  (barely move). A practice worth investing in lives at the second speed: it
-  has already outlived several tool generations and will outlive this one.
-- **The test.** If producing code got 10× cheaper tomorrow, would the practice
-  still make sense? If it exists because code is expensive to write, it is a
-  derivative and will be rewritten. If it exists because of a constant below,
-  it stays, and usually matters more.
-- **The second test.** Can a tool remove this cost, or only move it? A cost a
-  tool removes (recall, typing, boilerplate) is a temporary bottleneck. A cost
-  a tool only moves is a constant.
+- **What cost does the practice pay down?** Name it, then ask whether that cost
+  falls as writing code gets cheaper. If it does, the practice is a cost-tuned
+  form (below) and its shape will change. If the cost is one of the constants,
+  the practice stays, and usually matters more.
+- **Can a tool remove this cost, or only move it?** A cost a tool removes
+  (recall, typing, boilerplate) is a temporary bottleneck. A cost a tool only
+  moves is a constant.
+
+Both say where to look first, not where a project's constraint is. Find that in
+the project's own evidence before a finding leans on a constant.
 
 ## The constants
 
-| # | Constant | Why tools don't remove it |
+| Id | Constant | Why tools don't remove it |
 |---|---|---|
-| C1 | **Attention** for decisions that can't be delegated | Tools cut how many things need it, not how much there is in a day. When generation gets cheap, the bottleneck becomes what to read. |
-| C2 | **Working-memory slots** (about 4) | Training grows what fits in a slot (chunk size), never the slot count. A system that doesn't fit in one head can't be validated, however fast it was written. |
-| C3 | **Accountability** | Someone answers for the outcome; a tool cannot. What you are accountable for is what you can't stop paying attention to. |
-| C4 | **Communication bandwidth between people** | Unchanged since speech. Coordination cost grows with n², and the system copies the organisation (Conway). Agents make nodes faster, not edges. |
-| C5 | **Essential complexity** | Tools strip accidental complexity; the domain's own complexity remains and becomes a larger share of the work (Brooks). |
-| C6 | **Not knowing what you want** | Requirements are hypotheses. Generating options got cheap; learning which one was right did not. |
-| C7 | **Feedback latency from reality** | Users, markets and incidents respond on their own schedule. That sets the pace of the learning loop. |
-| C8 | **Validation** (did we reach the goal) | Verification against a spec keeps getting cheaper. Validation closes only against reality and ends with a person (C3) spending attention (C1). Every check needs an oracle, and a spec is just another hypothesis about the goal. |
-| C9 | **Software in use must change** (Lehman) | The environment moves, so the software moves or decays. Maintenance never reaches zero. |
+| PC1 | **Attention** for decisions that can't be delegated | Tools cut how many things need it, not how much there is in a day. When writing gets cheap, the bottleneck becomes what to read. |
+| PC2 | **Working-memory slots** (about four) | Training grows what fits in a slot (chunk size), never the slot count. A system that doesn't fit in one head can't be checked by one person, however fast it was written. |
+| PC3 | **Accountability** | Someone answers for the outcome; a tool cannot. What you are accountable for is what you can't stop paying attention to. |
+| PC4 | **Communication bandwidth between people** | Unchanged since speech. Coordination cost grows with the square of the team, and the system copies the organisation (Conway). Agents make each person faster, not the links between people. |
+| PC5 | **Essential complexity** | Tools strip accidental complexity; the domain's own complexity remains and becomes a larger share of the work (Brooks). |
+| PC6 | **Not knowing what you want** | Requirements are hypotheses. Generating options got cheap; learning which one was right did not. |
+| PC7 | **Feedback latency from reality** | Users, markets and production failures respond on their own schedule. That sets the pace of the learning loop. |
+| PC8 | **Goal confirmation** (did the result reach its goal) | Checking against a spec keeps getting cheaper. Confirming the goal closes only against reality, or an oracle the project declares, and ends with a person (PC3) spending attention (PC1). A spec is itself a hypothesis about the goal. |
+| PC9 | **Software in use must change** (Lehman) | The environment moves, so the software moves or decays. Maintenance never reaches zero. |
 
-One asymmetry follows from C8: generation gets cheaper faster than validation,
-so the share of effort spent defining and confirming the goal keeps rising.
+One asymmetry follows from PC8: writing gets cheaper faster than confirming the
+goal, so the share of effort spent stating and confirming the goal keeps rising.
+That is a direction of travel, not a measurement of any one project.
 
 ## Practices that rest on the constants
 
-| Practice | Constants | Age |
+| Practice | Constants |
+|---|---|
+| Information hiding and modularity: a module fits in one head | PC2, PC5 |
+| Naming and domain language: one chunk instead of five | PC2, PC4 |
+| Limits on work in progress, small batches | PC1, PC7 |
+| Explicit ranking: one item on top, not a list of equals | PC1 |
+| Decisions written down so nobody pays for the same question twice (an ADR, a recorded operator ruling) | PC1, PC3 |
+| A named owner for each decision and each result | PC3 |
+| Blameless postmortems | PC3, PC7 |
+| Team boundaries matching system boundaries, explicit contracts between them | PC4 |
+| Domain modelling: separate essential from accidental | PC5 |
+| Iteration: build, show, learn | PC6, PC7 |
+| Small, reversible delivery; observability in production | PC7, PC9 |
+| The goal stated as an observation before work starts ("we'll know it worked when we see X") | PC8 |
+| Automated checks as the fast oracle for verification: a failure arrives quickly and names its cause; they never confirm the goal | PC7, PC2, PC8 |
+| Refactoring: keep the cost of change low | PC9, PC2 |
+| Recurring findings get an owner and a permanent fix (what ITIL calls a problem, as distinct from an incident) | PC3 |
+
+As code gets cheaper, modularity and naming matter more: an agent writes any
+volume, and the person accepting it still has four slots.
+
+## Cost-tuned forms
+
+A form tuned to one cost structure. Its purpose came from a constant and
+survives; its shape came from a cost that is falling, and changes.
+
+| Form | What it was tuned to | What survives |
 |---|---|---|
-| Information hiding and modularity: a module fits in one head | C2, C5 | Parnas 1972 |
-| Naming and domain language: one chunk instead of five | C2, C4 | DDD 2003, older in spirit |
-| Limits on work in progress, small batches | C1, C7 | Toyota 1950s; Reinertsen |
-| Explicit ranking: one item on top, not a list of equals | C1 | Pareto, Drucker |
-| Decisions written down so nobody pays for the same question twice (ADR, a ruling in the brief) | C1, C3 | decades |
-| A named owner for each decision and each result | C3 | older than software |
-| Blameless postmortems | C3, C7 | aviation, medicine |
-| Team boundaries matching system boundaries, explicit contracts between them | C4 | Conway 1968 |
-| Domain modelling: separate essential from accidental | C5 | Brooks 1986 |
-| Iteration: build, show, learn | C6, C7 | Deming's PDSA, 1950s |
-| Small, reversible delivery; observability in production | C7, C9 | continuous delivery, PDSA again |
-| The goal stated as an observation before work starts ("we'll know it worked when we see X") | C8 | acceptance criteria, test-first at the goal level |
-| Refactoring: keep the cost of change low | C9, C2 | Opdyke 1992, Fowler 1999 |
-| Problem management: restore service (incident) apart from removing the cause (problem); a known-error database; problem ownership; proactive trend analysis | C1, C3, C7, C9 | ITIL; incident vs problem is Braudel's first and second speed |
-
-The known-error database matters more with agents, not less. An agent with no
-memory hits the same known error on every run. A list of known errors with
-their workarounds and permanent fixes is the operational memory both people
-and agents read.
-
-As code gets cheaper, modularity and naming become more important: an agent
-writes any volume, and the person accepting it still has four slots.
-
-## Derivatives
-
-Packages of rituals tuned to one cost structure. Their principles came from the
-constants and survive; their forms came from the cost ratios and change when the
-ratios flip.
-
-| Derivative | What it was tuned to | What survives |
-|---|---|---|
-| Agile rituals | Expensive code change, small co-located team | Iteration, small batches, working software as the measure |
-| Story points, estimates in hours | The cost of producing code, which is the cost that is falling | Estimating the cost of validation and of the decision |
-| Sprint cadence | Team bandwidth | A cadence set by how often a decision is made |
-| Line-by-line code review | Code small enough for a person to read all of it | Review of intent and risk |
-| Test-pyramid proportions | What each test type cost to write and run | "Which risk does this catch that nothing cheaper would?" |
-| Pair programming between two people | Two heads only available as two people | A second head on the hard part |
-| ITIL bureaucracy: tickets for their own sake, change advisory boards, sign-offs | Ops apart from dev, rare and expensive changes (DORA found CAB approval doesn't improve stability) | The incident/problem split and the KEDB |
+| Line-by-line code review | Code small enough for a person to read all of it | Review of intent and risk (PC1, PC2) |
+| Test-pyramid proportions | Partly what each kind of test cost to write, which is falling | How fast a failure arrives (PC7) and how precisely it names the cause (PC2): "which risk does this catch that nothing cheaper would?" |
 | "Root cause" in the singular | A linear model of failure | Contributing factors and conditions (Cook, Allspaw) |
-| Process maturity as a goal | — | Goodhart applies: count incidents that didn't come back, not problem tickets closed |
 
-## What this means for chorus
+## Why chorus works the way it does
 
-- **A review's output is measured in the operator's attention (C1), not in the
-  number of findings.** Ranking, one recommended way out per question, and
-  rulings recorded so nothing is asked twice all follow from that.
-- **A gate can confirm verification; closing validation is the operator's
-  ruling (C3, C8).** Keep the person who closes it named in the record.
-- **When a lens calls a practice obsolete or essential, it names the constant
-  it rests on, or applies the 10× test.** A recommendation that rests on a
-  derivative says so, and its expected lifetime is a few years.
-- **A constant can be a finding's principle while no code contradicts it.**
-  When code in the project contradicts the constant, the finding does not rest
-  on the constant; which of the two overrules the other is a separate question
-  for the operator.
-- **Findings that recur across rounds are problems, not incidents.** They want
-  an owner and a permanent fix, and their known workaround belongs where the
-  next round reads it.
+Rationale for rules that live elsewhere; each points at its rule.
+
+- **A review's output is measured in the operator's attention (PC1).** This is
+  why rounds rank, offer one recommended way out per question and record rulings
+  so nothing is asked twice (`CONDUCTOR.md`, the EWD-340 methodology).
+- **The chorus signs its advice, never the result (PC8, PC3).** I9 in
+  `CONDUCTOR.md` holds the rule; the record's `goal_reached` field shows whether
+  the goal is still open, confirmed by a declared oracle, or ruled by the operator.
+- **A constant can serve as a finding's principle** because it states a reason
+  that holds across projects. The rule for when it may (no project code
+  contradicts it) is in the chorus-review round brief, item 8.
+- **Recurring findings want an owner (PC3).** The next round reads them in the
+  record's baseline.

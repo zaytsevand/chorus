@@ -1,5 +1,29 @@
 # Changelog
 
+## 2.2.0 — 2026-11-06
+
+- **Process constants ship.** `chorus-core/PROCESS-CONSTANTS.md` (advisory): what
+  stays fixed as tools change (`PC1–PC9`), the practices that rest on it, and the
+  forms tuned to a falling cost. Indexed in chorus-core SKILL.md; ROSTER.md says
+  every lens may cite it. Cut and reworded per both chorus rounds of 2026-11-06.
+- **FC8** checks that each PC id is defined once, in its home, and that every
+  citation in `skill/` or `agents/` resolves.
+- **Citing a constant.** The round brief (chorus-review BRIEFS.md item 8) and I8
+  mark a cited constant as advisory, resolved by its PC id, with a note of where
+  the lens looked for contradicting code. A principle tag now renders its refs.
+- **`goal_reached`** on every review record (required) and lifecycle ledger:
+  open, oracle_verified or operator_ruled. The conductor only ever writes open;
+  the round signs its advice, not the result (I9). Rendered under the TL;DR.
+- **Declared oracles.** The project addendum may declare oracles, each with what
+  it covers and does not cover (CONDUCTOR.md § Contract: declared oracles;
+  addendum item 8).
+- **Conductor fixes.** A conflict the record could not carry as a decision is
+  refused when answered, not at record. A seat override is labelled as one. The
+  ledger's memory heading no longer says "sign-off".
+
+Run logs started by 2.1.0 replay only under 2.1.0. Review records written before
+2.2.0 have no `goal_reached` and no longer validate; they are never rewritten.
+
 ## 2.1.0 — 2026-11-06
 
 - **Operator seat override.** `conduct init review --seat a,b` rules lenses into a

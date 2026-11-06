@@ -173,7 +173,8 @@ implements this as a single chain of discipline:
     code · spec · test · config · dashboard · runbook
        │  termination
        ▼
-    invariant (executable assertion) or principle (named in governance)
+    invariant (executable assertion), principle (named in governance)
+    or process constant (advisory, cited by its PC id)
 
 Each arrow is a refusal to descend further than authority permits.
 The integration layer does not descend into lens content. The persona does
@@ -244,9 +245,10 @@ repaired. Siblings reference these tokens; they never redefine them.
 - **I8.** The integration layer never accepts a Round-1 or Round-2 report
   whose project-specific findings lack `file:line` evidence. Tagged
   `[principle]` (existing — MUST cite where the principle is established:
-  constitution clause, prior chorus finding, project doc) and
-  `[principle:proposed]` (genuinely new, named for the first time) are
-  acceptable; tagged `[unsupported]` is excluded from the matrix and
+  constitution clause, prior chorus finding, project doc, or a process
+  constant's PC id in `PROCESS-CONSTANTS.md`, which marks it advisory rather
+  than governance) and `[principle:proposed]` (genuinely new, named for the
+  first time) are acceptable; tagged `[unsupported]` is excluded from the matrix and
   convergence counts. Re-dispatch policy: zero-tool-use reports get one
   re-dispatch with explicit artefact-list amendment; second zero round
   marks the lens substituted-without-evidence. The gate is enforced after
@@ -264,8 +266,9 @@ repaired. Siblings reference these tokens; they never redefine them.
   lends advice and signs that advice, never the final result: a review
   round's sign-off (its summary and baseline) is the chorus signing what it
   advises. The result is signable by the chorus only when its members can
-  call an oracle that verifies it; otherwise whether it reached its goal
-  stays open and is the operator's (verification constraint).
+  call an oracle that verifies it (§ Contract: declared oracles); otherwise
+  whether it reached its goal stays open and is the operator's (verification
+  constraint). Every record carries this as `goal_reached`.
 
 The gate-primitive `S8–S11` (`GATE-PRIMITIVE.md`), the decision-primitive `D1–D5`
 (`DECISION-PRIMITIVE.md`), and the lifecycle `S1–S7` (the chorus-sdlc skill) **extend**
@@ -475,6 +478,22 @@ change. **Persisted memory is an index of locators, never a finding's
 evidentiary endpoint** — findings re-ground in the live material. This two-tier
 model is the contract a future memory-update skill honors. The model is defined
 in `EXPLORATORY-PHASE.md`; this names it as a contract.
+
+### Contract: declared oracles
+
+An oracle is a check the lenses can run to confirm a result, not just to verify
+it against a spec (I9). The project addendum may declare oracles in an
+"Oracles" section, one entry each, with:
+
+- an **id** (`oracle-<name>`), which a record's `goal_reached.oracle` cites;
+- **what it covers**: the area and the kind of claim a pass confirms;
+- **what it does not cover**: shown next to the oracle wherever a record cites
+  it, so a pass is never read as confirming more than it checks.
+
+A lens decides case by case whether a declared oracle can confirm the result in
+front of it and whether that is enough. Only at `high` confidence may a result be
+recorded `oracle_verified`; otherwise `goal_reached` stays `open` and is the
+operator's. With no "Oracles" section, nothing the chorus runs counts as one.
 
 ## Findings → memory contract (designed seam; impl deferred — FR-010/010a/010b)
 

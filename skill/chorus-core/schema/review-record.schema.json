@@ -5,7 +5,7 @@
   "description": "The durable record of one chorus-review round: the data the review page is rendered from (chorus-review § Artifact). Vote arithmetic lives here and only here; operator rulings appear only as ruling_ref.",
   "type": "object",
   "additionalProperties": false,
-  "required": ["kind", "schema_version", "date", "target", "mode", "round_context", "bindings", "secret_filter", "tldr", "roster", "quorum", "register", "tally", "conflicts", "top_five", "held", "baseline", "appendix"],
+  "required": ["kind", "schema_version", "date", "target", "mode", "round_context", "bindings", "secret_filter", "tldr", "goal_reached", "roster", "quorum", "register", "tally", "conflicts", "top_five", "held", "baseline", "appendix"],
   "properties": {
     "kind": { "const": "review-record", "description": "Record kind." },
     "schema_version": { "$ref": "common.schema.json#/$defs/schema_version", "description": "Schema version; the major must be 1." },
@@ -15,6 +15,7 @@
     "round_context": { "type": "string", "minLength": 20, "description": "The paragraph of concrete since-last-chorus deltas every brief carried." },
     "bindings": { "$ref": "common.schema.json#/$defs/bindings", "description": "Port providers and recovered failures for this round." },
     "secret_filter": { "$ref": "common.schema.json#/$defs/secret_filter", "description": "Whether the secret pre-filter ran over the memory the round's personas wrote." },
+    "goal_reached": { "$ref": "common.schema.json#/$defs/goal_reached", "description": "Whether the reviewed result reached its goal. The round signs its advice, not the result (I9)." },
     "baseline_ref": { "type": "string", "description": "The prior review record this round baselines against, if any." },
     "tldr": {
       "type": "array",

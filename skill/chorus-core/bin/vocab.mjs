@@ -30,6 +30,7 @@ export const SEATING_BAND = named("seating_band");
 export const CONFIDENCE = named("confidence");
 export const VOTE = named("vote");
 export const RSVP = named("rsvp_decision");
+export const GOAL_STATUS = named("goal_status");
 export const FAILURE = named("failure");
 export const SEAT = named("seat");
 export const EVIDENCE_KIND = named("evidence_kind");

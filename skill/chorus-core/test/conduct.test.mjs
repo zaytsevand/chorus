@@ -28,6 +28,27 @@ test("review: the default round runs the phases in order and its record validate
   assert.equal(rec.top_five[0].pull_quote, rec.register.find((e) => e.id === rec.top_five[0].finding).pull_quote, "the script copies the quote (I6)");
 });
 
+test("review: the conductor records the goal as open and the operator's, never confirmed (I9)", () => {
+  const run = newRun(RUN_MODE.REVIEW);
+  drive(run);
+  const rec = valid(assemble(run.log));
+  assert.deepEqual(rec.goal_reached, { status: "open", owner: "operator" });
+  const signoff = run.log.events.findLast((e) => e.topic === "signoff");
+  signoff.data.closes_when = "A week of exports with no duplicate rows.";
+  assert.deepEqual(valid(assemble(run.log)).goal_reached, { status: "open", owner: "operator", closes_when: "A week of exports with no duplicate rows." });
+});
+
+test("review: a seat override is labelled as one, and the sorted panel is listed before the swap", () => {
+  const run = newRun(RUN_MODE.REVIEW, { seat: [ROSTER6[5]] });
+  drive(run);
+  const rec = valid(assemble(run.log));
+  const d = rec.decisions.find((x) => x.id === "seating-1");
+  assert.match(d.title, /Operator seat override: 1 seat\(s\) swapped/);
+  assert.equal(d.decision.chose, "swap-seat");
+  assert.match(d.solutions[0].summary, new RegExp(`${ROSTER6[5]} in for`), "the applied override is the default, listed first");
+  assert.ok(!d.solutions[1].summary.includes(ROSTER6[5]), "the sorted panel is the one before the override");
+});
+
 test("review: replaying the same log yields the same record byte for byte", () => {
   const run = newRun(RUN_MODE.REVIEW);
   drive(run);
@@ -352,6 +373,12 @@ test("review: held findings are revised in one dispatch and re-voted on one ball
   assert.equal(revote.length, 1, "one re-vote dispatch");
   const rec = valid(assemble(run.log));
   assert.deepEqual(rec.held, []);
+});
+
+test("review: a conflict the record could not carry as a decision is refused when answered, not at record", () => {
+  const run = newRun(RUN_MODE.REVIEW, { roster: ROSTER6.slice(0, 3) });
+  const long = { id: "C1", advisors: [ROSTER6[0], ROSTER6[1]], disputed: "x".repeat(450), outcome: "unresolved", findings: ["F1"] };
+  assert.throws(() => drive(run, { answers: { [TOPIC.CONFLICTS]: () => [long] } }), /answer conflicts refused: .*as decision → problem/);
 });
 
 test("review: an unresolved conflict is carried to the decision sink", () => {

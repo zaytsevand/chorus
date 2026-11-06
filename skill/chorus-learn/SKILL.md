@@ -171,7 +171,9 @@ comes from the vote arithmetic, not from any one advisor — unless a persona de
 `confidence_on_hand: low` or raises `NEED_INFO` (formulation, remediation, or
 confidence gap), in which case tally waits for peer or operator resolution (`chorus-core/GATE-PRIMITIVE.md`, S11). See
 `chorus-core/GATE-PRIMITIVE.md` for the mechanic; this tutorial summarizes, it
-does not restate it.
+does not restate it. The record signs the chorus's advice, not your result: its
+"Goal reached?" line stays open, and yours, until an oracle your project declares
+or you confirm it (I9 in `chorus-core/CONDUCTOR.md`).
 
 Cites: the `chorus-review` skill, `chorus-core/GATE-PRIMITIVE.md`.
 
@@ -190,7 +192,9 @@ self-heals across a few bounded cycles or asks you — it never passes a 🔴
 silently, and operator decisions are *banded* (some auto-resolve, some proceed
 with a recorded default you can override, some hard-block for your call). The
 pipeline and the block-on-🔴 rule live in the `chorus-sdlc` skill; the decision
-banding lives in `chorus-core/DECISION-PRIMITIVE.md`.
+banding lives in `chorus-core/DECISION-PRIMITIVE.md`. Gates clearing means the
+work was checked, not that the feature reached its goal; the ledger's "Goal
+reached?" line says which.
 
 Cites: the `chorus-sdlc` skill, `chorus-core/DECISION-PRIMITIVE.md`.
 

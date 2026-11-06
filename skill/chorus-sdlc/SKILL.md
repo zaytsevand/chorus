@@ -323,7 +323,7 @@ It reuses the exploratory phase's write-back contract and invents **no new write
   the phase records a no-op **naming which test produced it** (no locator / does-not-generalize / no
   memory dir) — it never fabricates a record or surfaces an empty proposal.
 
-The phase records its outcome in the ledger under `## Memory update (sign-off)` (below), and the
+The phase records its outcome in the ledger under `## Memory update` (below), and the
 end-of-run self-audit gains the check "orchestrator authored no record / synthesized no learning."
 
 ## Invariants (lifecycle level)

@@ -2,6 +2,7 @@
   "kind": "sdlc-log",
   "schema_version": "1",
   "feature": "checkout-retry",
+  "goal_reached": { "status": "operator_ruled", "owner": "operator", "ruling_ref": { "record": "specs/014-checkout-retry/brief/brief.json", "id": "R-2" } },
   "feature_dir": "specs/014-checkout-retry/",
   "run_started": "2026-09-20",
   "mode": "agent-sdlc",

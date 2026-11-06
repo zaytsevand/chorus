@@ -52,6 +52,11 @@ Alongside the four: `ROSTER.md` — the roster, each lens's remit, and every sea
 between two lenses, stated once. Personas and briefs point to it; read it when
 seating a panel or routing a handoff.
 
+`PROCESS-CONSTANTS.md` — advisory: what stays fixed in software development as
+tools change (`PC1–PC9`), the practices that rest on it, and the forms tuned to a
+falling cost. A lens may cite a constant as a finding's reason; read it when a
+finding calls a practice essential or obsolete.
+
 `BINDINGS.md` — what serves each port when a brief provider is registered, the
 free-hand form when none is, and how a decision crosses to a brief and back. The
 only suite file that names a provider. Read it when a round or gate starts
@@ -73,7 +78,9 @@ zero-dependency `conduct.mjs` conductor loop and `engine.mjs` rules,
 **reference** them via composition. The sole tokens permitted to live outside
 core are the lifecycle `S1–S7` (defined in the chorus-sdlc skill), and only as
 references that extend core's `I1–I9`. `scripts/check-suite-integrity.sh` FC1
-enforces this residence rule.
+enforces this residence rule. The advisory process constants `PC1–PC9` live only
+in `PROCESS-CONSTANTS.md`; FC8 checks their residence and that every citation in
+`skill/` or `agents/` resolves.
 
 ## Composition contract (what a sibling does)
 

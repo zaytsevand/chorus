@@ -10,6 +10,7 @@
     "confidence": { "type": "string", "enum": ["high", "low"], "description": "Declared confidence_on_hand: epistemic sufficiency of the evidence on hand. low requires need_info (S11). Declared by the persona, never inferred." },
     "vote": { "type": "string", "enum": ["PRIORITIZE", "CONFIRM", "OVER-RATE", "NEED_INFO"], "description": "A declared Stage-3 vote (GATE-PRIMITIVE.md § Stage 3)." },
     "rsvp_decision": { "type": "string", "enum": ["JOIN", "ABSTAIN", "EXCEPTIONAL"], "description": "The persona's own RSVP reply (I2). EXCEPTIONAL is exceptional entry beyond the cap." },
+    "goal_status": { "type": "string", "enum": ["open", "oracle_verified", "operator_ruled"], "description": "Whether the result reached its goal (I9): open (the operator's to confirm), oracle_verified (a declared oracle confirmed it at high confidence), operator_ruled (the operator ruled on it)." },
     "failure": { "type": "string", "enum": ["not-installed", "silent", "past-budget", "malformed", "over-length", "no-evidence"], "description": "Why a persona counts as ABSTAIN under the one failure rule." },
     "seat": { "type": "string", "enum": ["ordinary", "exceptional"], "description": "Seat kind, when seated." },
     "evidence_kind": { "type": "string", "enum": ["file_line", "principle", "principle_proposed"], "description": "file_line: a real anchor in the corpus. principle: an existing principle. principle_proposed: a principle named here for the first time." },

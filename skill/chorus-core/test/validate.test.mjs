@@ -18,6 +18,24 @@ const expectError = (kind, data, re) => {
 };
 const cli = (...args) => spawnSync(process.execPath, [join(ROOT, "bin", "validate.mjs"), ...args], { encoding: "utf8" });
 
+/* ── goal_reached (I9): the result is confirmed only by a declared oracle or the operator ── */
+
+test("goal_reached: confirmed by an oracle needs the oracle's id, ruled needs the ruling", () => {
+  const d = clone(load("review-record.valid.json"));
+  d.goal_reached = { status: "oracle_verified", owner: "operator" };
+  expectError("review-record", d, /goal_reached/);
+  d.goal_reached = { status: "operator_ruled", owner: "operator" };
+  expectError("review-record", d, /goal_reached/);
+  d.goal_reached = { status: "oracle_verified", owner: "operator", oracle: "oracle-ci" };
+  assert.equal(validate("review-record", d).valid, true, messages(validate("review-record", d)));
+});
+
+test("goal_reached: a review record without it is refused", () => {
+  const d = clone(load("review-record.valid.json"));
+  delete d.goal_reached;
+  expectError("review-record", d, /goal_reached/);
+});
+
 /* ── every kind: one valid, one invalid example ─────────────────────────── */
 
 for (const kind of KINDS) {

@@ -8,6 +8,9 @@ adding, renaming, narrowing a lens — is an edit to this file and to the one
 persona it concerns, nothing else. `scripts/check-suite-integrity.sh` FC7 holds
 that line.
 
+Every lens may cite the advisory process constants in `PROCESS-CONSTANTS.md`
+(`PC1–PC9`) as the reason a practice matters or will fade; no lens owns them.
+
 ## Roster
 
 `seat`: **core** lenses RSVP every round; an **optional** lens RSVPs only when

@@ -10,6 +10,7 @@
     "kind": { "const": "sdlc-log", "description": "Record kind." },
     "schema_version": { "$ref": "common.schema.json#/$defs/schema_version", "description": "Schema version; the major must be 1." },
     "feature": { "type": "string", "minLength": 2, "description": "Feature name." },
+    "goal_reached": { "$ref": "common.schema.json#/$defs/goal_reached", "description": "Whether the feature reached its goal. Gates clearing verify; they do not confirm the goal (I9)." },
     "feature_dir": { "type": "string", "minLength": 2, "description": "specs/<feature>/." },
     "run_started": { "$ref": "common.schema.json#/$defs/date", "description": "When the run started." },
     "mode": { "$ref": "vocab.schema.json#/$defs/sdlc_mode", "description": "agent-sdlc: the lifecycle. challenge: chorus challenge (premise pass standalone)." },
@@ -131,7 +132,7 @@
       "type": "object",
       "additionalProperties": false,
       "required": ["personas", "operator", "secret_filter"],
-      "description": "Memory update (sign-off): once per lifecycle, after Gate C clears.",
+      "description": "Memory update: once per lifecycle, after Gate C clears.",
       "properties": {
         "personas": {
           "type": "array",

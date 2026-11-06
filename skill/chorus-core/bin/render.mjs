@@ -18,7 +18,7 @@ import { readFileSync, writeFileSync, realpathSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { validate } from "./validate.mjs";
 import {
-  CONFLICT_OUTCOME, EVIDENCE_KIND, GATE, GATE_RESULT, RECORD_KIND, REVIEW_MODE, RSVP, SDLC_MODE,
+  CONFLICT_OUTCOME, EVIDENCE_KIND, GATE, GATE_RESULT, GOAL_STATUS, RECORD_KIND, REVIEW_MODE, RSVP, SDLC_MODE,
   SEATING_BAND, SCOPE, SEVERITY, TALLY_STATUS, VOTE,
 } from "./vocab.mjs";
 import { CYCLE_BOUND } from "./engine.mjs";
@@ -34,9 +34,17 @@ const tagOf = (e) => {
   if (e.unsupported) return "[unsupported]";
   const kinds = new Set((e.evidence ?? []).map((x) => x.kind));
   if (kinds.has(EVIDENCE_KIND.FILE_LINE)) return "";
-  if (kinds.has(EVIDENCE_KIND.PRINCIPLE)) return "[principle]";
+  if (kinds.has(EVIDENCE_KIND.PRINCIPLE)) return `[principle: ${e.evidence.filter((x) => x.kind === EVIDENCE_KIND.PRINCIPLE).map((x) => x.ref).join("; ")}]`;
   if (kinds.has(EVIDENCE_KIND.PRINCIPLE_PROPOSED)) return "[principle:proposed]";
   return "";
+};
+/** I9: whether the result reached its goal, never implied by a cleared gate or a signed round. */
+const goalLine = (g) => {
+  if (!g) return "not recorded";
+  const how = g.status === GOAL_STATUS.ORACLE_VERIFIED ? `confirmed by declared oracle \`${g.oracle}\` (see its "does not cover" in the project addendum)`
+    : g.status === GOAL_STATUS.OPERATOR_RULED ? `ruled by the operator (${ref(g.ruling_ref)})`
+    : `open — the ${g.owner}'s to confirm; this record signs the chorus's advice, not the result`;
+  return `${how}${g.closes_when ? `. Closes when: ${g.closes_when}` : ""}`;
 };
 const needInfo = (e) => (e.need_info ? `open · ${(e.need_info_reasons ?? []).map((r) => `${r.raiser}: ${r.reason}`).join("; ")}` : "—");
 
@@ -113,7 +121,7 @@ export function renderReviewRecord(d) {
   L.push(`# Chorus review — ${d.date}`, "", `- **Target**: ${d.target}`, `- **Mode**: ${d.mode === REVIEW_MODE.PR_DESIGN ? "design review of the PR's approach, not a line-by-line diff review" : "project-state review"}`);
   if (d.baseline_ref) L.push(`- **Baseline**: ${d.baseline_ref}`);
   L.push("", `**Round context.** ${d.round_context}`, "", bindingsBlock(d.bindings), "", `**Secret filter.** ${secretFilter(d.secret_filter)}`, "");
-  L.push("## 1. TL;DR", "", d.tldr.join(" "), "");
+  L.push("## 1. TL;DR", "", d.tldr.join(" "), "", `**Goal reached?** ${goalLine(d.goal_reached)}`, "");
   L.push("## 2. Roster (this round)", "", rsvpTable(d.roster), "",
     `Joiners: ${d.quorum.joiners}. Quorum: ${d.quorum.branch}.${d.seating_decision ? ` Seating decision: ${d.seating_decision}.` : ""}`, "");
   if (d.interview) {
@@ -166,7 +174,7 @@ const GATE_TITLE = { [GATE.A]: "Gate A — design", [GATE.B]: "Gate B — plan/t
 export function renderSdlcLog(d) {
   const L = [];
   L.push(`# Agent-SDLC Ledger: ${d.feature}`, "", `- **Feature**: ${d.feature_dir}`, `- **Run started**: ${d.run_started}`,
-    `- **Mode**: ${d.mode === SDLC_MODE.CHALLENGE ? "chorus challenge" : "agent-SDLC (lifecycle)"}`, `- **Status**: ${d.status}`, "");
+    `- **Mode**: ${d.mode === SDLC_MODE.CHALLENGE ? "chorus challenge" : "agent-SDLC (lifecycle)"}`, `- **Status**: ${d.status}`, `- **Goal reached?** ${goalLine(d.goal_reached)}`, "");
   for (const g of d.gates) {
     L.push(`## ${GATE_TITLE[g.gate]} — cycle ${g.cycle}`, "", `**Corpus**: ${g.corpus.join(", ")}`, "");
     if (g.premise_pass) {
@@ -214,7 +222,7 @@ export function renderSdlcLog(d) {
   if (other.length) L.push("## Other decisions", "", ...other.flatMap((x) => [decisionBlock(x), ""]));
   if (d.memory_update) {
     const m = d.memory_update;
-    L.push("## Memory update (sign-off)", "", table(["Persona", "Written", "No-op test"], m.personas.map((p) => [p.persona, p.written, p.noop])), "",
+    L.push("## Memory update", "", table(["Persona", "Written", "No-op test"], m.personas.map((p) => [p.persona, p.written, p.noop])), "",
       `Project-wide proposal: ${m.project_wide_diff ?? "none"} — operator: ${m.operator}${m.operator_ref ? ` (${ref(m.operator_ref)})` : ""}.`,
       `Pending proposals: ${m.pending?.length ? m.pending.join("; ") : "none"}. Secret filter: ${secretFilter(m.secret_filter)}`, "");
   }

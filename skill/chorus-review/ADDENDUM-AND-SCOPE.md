@@ -23,6 +23,9 @@ Each project may provide `docs/reviews/CHORUS-PROJECT.md`, read before Phase 0:
    (`head -n 20 specs/<NNN-slug>/spec.md`), memory recall, spec-slug grep
    (`rg "specs/0[0-9]+"`) followed code → spec → invariant. Item 3 is the static
    fallback when discovery yields nothing.
+8. **Oracles** (optional) — checks the lenses can run to confirm a result, each
+   with an id, what it covers and what it does not cover. The shape and how a
+   lens may use one: `chorus-core/CONDUCTOR.md` § Contract: declared oracles.
 
 **Scope confirmation follows catalog rows 9–10 only.** Addendum present → 🟢:
 use its exclusions and anchors, no ask. Addendum absent → 🟡: infer defaults

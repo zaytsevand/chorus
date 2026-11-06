@@ -383,10 +383,37 @@ if [[ $fc7 -eq 0 ]]; then note "PASS — roster matches agents/; no persona name
 [[ $fc7 -ne 0 ]] && fail=1
 
 # ---------------------------------------------------------------------------
+# FC8 — process constants: one home, every citation resolves
+# ---------------------------------------------------------------------------
+section "FC8 — process constants: residence, completeness, resolution"
+fc8=0
+PCDOC="$CORE/PROCESS-CONSTANTS.md"
+PC_MAX=9
+pc_def='^\| PC[0-9]+ \|'   # a definition is a table row whose first cell is the id
+if [[ ! -f "$PCDOC" ]]; then
+  note "MISSING: $PCDOC"; fc8=1
+else
+  # Residence: PC definitions live only in PROCESS-CONSTANTS.md.
+  stray="$(grep -rnE "$pc_def" "$SKILL_DIR" "$AGENTS_DIR" 2>/dev/null | grep -v "^$PCDOC:" || true)"
+  [[ -n "$stray" ]] && { note "RESIDENCE VIOLATION: PC id defined outside $PCDOC:"; printf '%s\n' "$stray" | sed 's/^/    /'; fc8=1; }
+  # Completeness: PC1..PC_MAX each defined exactly once (ids are never reused).
+  for n in $(seq 1 "$PC_MAX"); do
+    c="$(grep -cE "^\| PC$n \|" "$PCDOC" || true)"
+    [[ "$c" -ne 1 ]] && { note "CATALOG: PC$n is defined $c times in $PCDOC (expected 1)"; fc8=1; }
+  done
+  # Resolution: every PCn cited in skill/ or agents/ has a definition.
+  for t in $(grep -rhoE '\bPC[0-9]+\b' "$SKILL_DIR" "$AGENTS_DIR" 2>/dev/null | sort -u); do
+    grep -qE "^\| $t \|" "$PCDOC" || { note "DANGLING: $t is cited but not defined in $PCDOC"; fc8=1; }
+  done
+fi
+if [[ $fc8 -eq 0 ]]; then note "PASS — PC1–PC$PC_MAX defined once in $PCDOC; every citation resolves."; fi
+[[ $fc8 -ne 0 ]] && fail=1
+
+# ---------------------------------------------------------------------------
 section "RESULT"
 if [[ $fail -ne 0 ]]; then
   echo "FAIL — one or more fitness checks reported violations (see locators above)."
   exit 1
 fi
-echo "OK — FC1 to FC7 all pass."
+echo "OK — FC1 to FC8 all pass."
 exit 0

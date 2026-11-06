@@ -27,6 +27,7 @@
     "The top five puts the aggregate root first, then the retry contract and the streaming writer's backpressure.",
     "One 🔴 finding (F1, the missing aggregate root) blocks public rollout."
   ],
+  "goal_reached": { "status": "open", "owner": "operator", "closes_when": "A week of exports with no duplicate order rows." },
   "roster": [
     {
       "persona": "eric-evans-advisor",

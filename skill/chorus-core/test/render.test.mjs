@@ -23,10 +23,17 @@ test("review record renders the skeleton in canon order", () => {
   assert.match(md, /\[unsupported\]/);
 });
 
+test("review record says whether the goal was reached, and names a cited constant", () => {
+  const d = load("review-record.valid.json");
+  assert.match(render("review-record", d), /\*\*Goal reached\?\*\* open — the operator's to confirm; this record signs the chorus's advice, not the result\. Closes when: A week of exports/);
+  d.register[0].evidence = [{ kind: "principle", ref: "PC1 attention", note: "searched src/ for a contradicting rule; none" }];
+  assert.match(render("review-record", d), /\[principle: PC1 attention\]/);
+});
+
 test("sdlc log renders gates, tally and self-audit", () => {
   const md = render("sdlc-log", load("sdlc-log.valid.json"));
   for (const h of ["# Agent-SDLC Ledger: checkout-retry", "## Gate A — design — cycle 1", "### Premise pass", "## Gate B — plan/tasks — cycle 2",
-    "### 🔴 resolution log", "## Provisional decisions (review & override)", "## Memory update (sign-off)", "## Self-audit (S1–S11)"]) {
+    "### 🔴 resolution log", "## Provisional decisions (review & override)", "## Memory update", "## Self-audit (S1–S11)"]) {
     assert.ok(md.includes(h), `${h} missing`);
   }
   assert.match(md, /B-self-heal-1/);

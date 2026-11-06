@@ -23,6 +23,23 @@
         { "if": { "properties": { "ran": { "const": true } } }, "then": { "required": ["drops"] } }
       ]
     },
+    "goal_reached": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "owner"],
+      "description": "Whether the result reached its goal (I9). The chorus signs its advice, never the result: this stays open, and the operator's, unless a declared oracle confirmed it or the operator ruled (CONDUCTOR.md § Contract: declared oracles).",
+      "properties": {
+        "status": { "$ref": "vocab.schema.json#/$defs/goal_status", "description": "open, oracle_verified or operator_ruled." },
+        "owner": { "type": "string", "minLength": 3, "description": "Who closes it while it is open: the operator." },
+        "closes_when": { "type": "string", "minLength": 5, "description": "The observation that would close it, stated before anyone looks." },
+        "oracle": { "type": "string", "pattern": "^oracle-[a-z0-9-]+$", "description": "oracle_verified: the id of the oracle the project addendum declares." },
+        "ruling_ref": { "$ref": "#/$defs/ruling_ref", "description": "operator_ruled: the operator's ruling." }
+      },
+      "allOf": [
+        { "if": { "properties": { "status": { "const": "oracle_verified" } }, "required": ["status"] }, "then": { "required": ["oracle"] } },
+        { "if": { "properties": { "status": { "const": "operator_ruled" } }, "required": ["status"] }, "then": { "required": ["ruling_ref"] } }
+      ]
+    },
     "timestamp": {
       "type": "string",
       "format": "date-time",

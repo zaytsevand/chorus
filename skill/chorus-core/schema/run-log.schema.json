@@ -47,6 +47,7 @@
         "tldr": { "$ref": "review-record.schema.json#/properties/tldr", "description": "Three sentences." },
         "baseline": { "$ref": "review-record.schema.json#/properties/baseline", "description": "What the next round assumes." },
         "baseline_ref": { "type": "string", "minLength": 1, "description": "The prior record this round baselines against." },
+        "closes_when": { "$ref": "common.schema.json#/$defs/goal_reached/properties/closes_when", "description": "The observation that would confirm the result reached its goal; copied into goal_reached. Only the text: the status stays open." },
         "secret_filter": { "$ref": "common.schema.json#/$defs/secret_filter", "description": "Whether the filter ran over this run's memory writes; default not run." },
         "ruling_ref": { "$ref": "common.schema.json#/$defs/ruling_ref", "description": "Lifecycle: the operator's sign-off ruling." }
       }
