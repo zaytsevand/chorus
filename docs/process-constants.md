@@ -96,6 +96,10 @@ ratios flip.
 - **When a lens calls a practice obsolete or essential, it names the constant
   it rests on, or applies the 10× test.** A recommendation that rests on a
   derivative says so, and its expected lifetime is a few years.
+- **A constant can be a finding's principle while no code contradicts it.**
+  When code in the project contradicts the constant, the finding does not rest
+  on the constant; which of the two overrules the other is a separate question
+  for the operator.
 - **Findings that recur across rounds are problems, not incidents.** They want
   an owner and a permanent fix, and their known workaround belongs where the
   next round reads it.
