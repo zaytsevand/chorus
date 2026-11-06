@@ -5,3 +5,4 @@
 - understanding-record-007-chorus-learn.md — D&O lens understanding record for feature 007 (chorus learn), Gate A (all 4 D&O seeds healed)
 - project-chorus-015-first-ci-gate.md — feature 015 first CI/merge gate; Gate A D&O findings (lockfile + branch-protection are the 🔴 pair); first-CI checklist
 - [Understanding 2026-10-29 PR47](understanding-2026-10-29-pr47.md) — release/upgrade path, CI gate scope, run-log write, scale gate open
+- [Process constants 2026-11-06](2026-11-06-process-constants.md) — docs/ does not ship; docs/ citations unchecked by CI; KEDB upkeep unowned

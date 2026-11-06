@@ -7,3 +7,4 @@
 - project-014-gateC-parity.md — feature 014 suite-decomposition Gate C; parity proofs re-run check-suite-integrity.sh; tier-2 is file-presence not observable behavior
 - project-015-gateA-cycle2.md — feature 015 Gate A cycle 2 (Beck): B4 + ADR-001 cleared (TS earns keep on DevEx); B1/B2 overclaim still 🟡 in narrative prose only
 - project-015-gateB-tasks.md — feature 015 Gate B tasks (Beck): JOIN 🟡; four RED-realness tightenings (T014 quickstart-escape, T019 false-green, T013 smear, T022 untested abort)
+- 2026-11-06-process-constants.md — round on docs/process-constants.md: docs/ unchecked by FC4/FC5; implications overlap CONDUCTOR.md rules
