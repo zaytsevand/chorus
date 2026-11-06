@@ -252,14 +252,20 @@ repaired. Siblings reference these tokens; they never redefine them.
   marks the lens substituted-without-evidence. The gate is enforced after
   every authoring stage and every cross-evaluation stage, in both modes.
 - **I9.** The chair decides nothing. Every decision in a round has a named
-  owner — the operator (scope, sign-off, ties, deferrals), a persona (its
+  owner — the operator (scope, lifecycle sign-off, ties, deferrals, whether
+  the result reached its goal), a persona (its
   findings, its RSVP, its gates, merge of its findings), the tally
   (severity, gating), `advisor()` (framed conflicts) — and the integration
   layer's whole authority is routing each decision to its owner and
   recording the outcome. A decision the conductor cannot attribute to an
   owner is a decision it must not make; the disguises this slippage wears
   are catalogued in "The chair decides nothing" above. Permitted
-  first-person verbs: *halt, route, refuse, record, count.*
+  first-person verbs: *halt, route, refuse, record, count.* The chorus
+  lends advice and signs that advice, never the final result: a review
+  round's sign-off (its summary and baseline) is the chorus signing what it
+  advises. The result is signable by the chorus only when its members can
+  call an oracle that verifies it; otherwise whether it reached its goal
+  stays open and is the operator's (verification constraint).
 
 The gate-primitive `S8–S11` (`GATE-PRIMITIVE.md`), the decision-primitive `D1–D5`
 (`DECISION-PRIMITIVE.md`), and the lifecycle `S1–S7` (the chorus-sdlc skill) **extend**
