@@ -1,5 +1,20 @@
 # Changelog
 
+## 2.1.0 — 2026-11-06
+
+- **Operator seat override.** `conduct init review --seat a,b` rules lenses into a
+  seat; each named lens that joined takes the place of the lowest-sorted seated lens
+  not itself named, and the seating decision records each swap
+  (DECISION-PRIMITIVE.md § Seating, `seat_override` in the run header).
+- **The chorus signs its advice, not the result** (I9). A review round's sign-off is
+  the chorus signing what it advises; the result is signable only with an oracle the
+  lenses can call.
+- **A process constant may be a finding's principle** while no project code
+  contradicts it; where code does, which overrules the other is its own question
+  (chorus-review BRIEFS.md item 8).
+
+Run logs started by 2.0.0 replay only under 2.0.0.
+
 ## 2.0.0 — 2026-10-29
 
 Breaking: `conduct.mjs` exit codes changed, the `coryphaeus` skill is folded into

@@ -97,6 +97,7 @@
         "review_mode": { "$ref": "vocab.schema.json#/$defs/review_mode", "description": "Review runs only." },
         "round_context": { "$ref": "review-record.schema.json#/properties/round_context", "description": "Review runs: the concrete since-last-chorus deltas. The record's limits." },
         "feature": { "type": "string", "minLength": 1, "description": "Lifecycle runs: the feature id, e.g. 018-scripted-spine." },
+        "seat_override": { "type": "array", "minItems": 1, "items": { "$ref": "common.schema.json#/$defs/persona" }, "description": "Personas the operator ruled into a seat (conduct init --seat). Each that joined but was capped takes the place of the lowest-sorted seated persona not itself named (DECISION-PRIMITIVE.md § Seating)." },
         "corpus": { "type": "array", "items": { "type": "string", "minLength": 1 }, "description": "Lifecycle and challenge runs: the artefacts each gate reviews." },
         "roster": {
           "type": "array",

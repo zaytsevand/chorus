@@ -48,8 +48,11 @@ const cmp = (a, b) => b[0] - a[0] || b[1] - a[1];
  * Returns { rows (each with seated/seat), band, joiners, tie }. Roster order breaks
  * nothing: a tie spanning the fifth seat is band 🟡 and seats the roster-order
  * default, recorded for async override (catalog row 2).
+ * named: personas the operator ruled into a seat (run header seat_override). Each one
+ * that joined but was capped takes the place of the lowest-sorted seated persona not
+ * itself named, so the sort, not an actor, decides who leaves. Returns swaps [{in, out}].
  */
-export function seat(replies) {
+export function seat(replies, named = []) {
   const rows = replies.map((r) => ({ ...r, seated: false }));
   const joins = rows.filter((r) => r.decision === RSVP.JOIN);
   let band = SEATING_BAND.GREEN, tie = false;
@@ -59,6 +62,15 @@ export function seat(replies) {
     tie = cmp(signal(sorted[SEAT_CAP - 1]), signal(sorted[SEAT_CAP])) === 0;
     if (tie) band = SEATING_BAND.YELLOW;
     seatedJoins = sorted.slice(0, SEAT_CAP);
+  }
+  const swaps = [];
+  for (const p of named) {
+    const r = joins.find((j) => j.persona === p);
+    if (!r || seatedJoins.includes(r)) continue;
+    const out = [...seatedJoins].reverse().find((s) => !named.includes(s.persona));
+    if (!out) break;
+    seatedJoins = seatedJoins.filter((s) => s !== out).concat(r);
+    swaps.push({ in: p, out: out.persona });
   }
   const ordinary = new Set(seatedJoins.map((r) => r.persona));
   for (const r of rows) if (r.decision === RSVP.JOIN && !ordinary.has(r.persona)) r.capped = true;
@@ -70,7 +82,7 @@ export function seat(replies) {
       if (!deltas.has(d)) { deltas.add(d); Object.assign(r, { seated: true, seat: SEAT.EXCEPTIONAL }); }
     }
   }
-  return { rows, band, tie, joiners: joins.length };
+  return { rows, band, tie, joiners: joins.length, swaps };
 }
 
 /** Whether a board may proceed (I3): J ≥ 3. */

@@ -7,7 +7,7 @@
  * NEED_INFO hold and routing, the Stage-4 count, gate cycles and the bound,
  * the record itself — is computed here from the run log, never by the agent.
  *
- *   conduct init review    --target <t> --context <text|@file> [--pr <n>] [--roster a,b] [--python] [--date YYYY-MM-DD] [--dir docs/reviews]
+ *   conduct init review    --target <t> --context <text|@file> [--pr <n>] [--roster a,b] [--seat a,b] [--python] [--date YYYY-MM-DD] [--dir docs/reviews]
  *   conduct init sdlc      --feature <0NN-name> [--corpus a,b] [--roster a,b] [--date …]
  *   conduct init challenge --target <t> [--corpus a,b] [--roster a,b] [--date …] [--dir docs/reviews]
  *   conduct next   <run.json>                         # the next action, as JSON
@@ -142,7 +142,7 @@ function replayGate(log, ctx) {
   if (a) return { action: a };
   const replies = new Map(g1.replies), abst = new Map(g1.abstained);
   const rowsNow = () => roster.map((r) => rsvpRow(r, replies.get(r.persona), abst.get(r.persona)));
-  let seating = seat(rowsNow());
+  let seating = seat(rowsNow(), log.header.seat_override ?? []);
   let reasked = false;
   if (!quorate(seating.joiners)) {
     reasked = true;
@@ -152,7 +152,7 @@ function replayGate(log, ctx) {
     if (a) return { action: a };
     for (const [p, r] of g2.replies) replies.set(p, r);
     for (const [p, s] of g2.abstained) abst.set(p, s);
-    seating = seat(rowsNow());
+    seating = seat(rowsNow(), log.header.seat_override ?? []);
   }
   let rows = seating.rows;
   const quorum = !quorate(seating.joiners) ? REVIEW_QUORUM.ABORTED : reasked ? REVIEW_QUORUM.RE_ASKED_PROCEED : REVIEW_QUORUM.PROCEED;
@@ -404,6 +404,8 @@ function recoveriesOf(evs, rows) {
 function seatingDecision(id, B, date) {
   const tie = B.seating.band === SEATING_BAND.YELLOW;
   const seated = B.rows.filter((r) => r.seated).map((r) => r.persona);
+  const swaps = B.seating.swaps ?? [];
+  const swapped = swaps.map((w) => `${w.in} in for ${w.out}`).join("; ");
   return {
     id, point: tie ? "RSVP seating — tie at the cap" : "RSVP seating — clean two-axis sort", catalog_row: tie ? 2 : 1, band: tie ? SEVERITY.YELLOW : SEVERITY.GREEN,
     title: tie ? `Seating tie at seat ${SEAT_CAP}: default panel seated` : `More than ${SEAT_CAP} joined: seated by the two-axis sort`,
@@ -411,10 +413,10 @@ function seatingDecision(id, B, date) {
     sensor: { signal: "strict order at the cap boundary (DECISION-PRIMITIVE.md § Seating)", evidence: seated, reading: tie ? "tie" : "strict" },
     evidence: [{ kind: DECISION_EVIDENCE.RUN, ref: "conduct.mjs seat()" }],
     solutions: [{ id: "sorted-panel", label: "Seat the sorted panel", recommended: true, summary: `Seat ${seated.join(", ")}.`, cost: { work: "none" } },
-      ...(tie ? [{ id: "swap-seat", label: "Swap a tied seat", summary: "Re-seat one tied persona in place of another and re-run the board.", cost: { work: "re-run the board" } }] : [])],
+      ...(tie || swaps.length ? [{ id: "swap-seat", label: "Swap a tied seat", summary: swaps.length ? `Operator's seat override (run header seat_override): ${swapped}.` : "Re-seat one tied persona in place of another and re-run the board.", cost: { work: "re-run the board" } }] : [])],
     resolution: tie ? DECISION_RESOLUTION.DEFAULT_APPLIED : DECISION_RESOLUTION.AUTO_RESOLVED,
     ...(tie ? { override: { how: "Name the tied persona to seat instead; the board re-runs.", cost: "one board re-run" } } : {}),
-    status: DECISION_STATUS.COMPLETE, decision: { chose: "sorted-panel", date },
+    status: DECISION_STATUS.COMPLETE, decision: { chose: swaps.length ? "swap-seat" : "sorted-panel", date },
   };
 }
 
@@ -713,7 +715,12 @@ export function initLog(mode, opts) {
   if (mode === RUN_MODE.REVIEW) Object.assign(header, { review_mode: opts.pr ? REVIEW_MODE.PR_DESIGN : REVIEW_MODE.PROJECT_STATE, round_context: opts.context });
   if (mode !== RUN_MODE.REVIEW) Object.assign(header, { corpus: opts.corpus ?? [opts.target ?? opts.feature] });
   if (mode === RUN_MODE.SDLC) header.feature = opts.feature;
-  const log = { kind: RECORD_KIND.RUN_LOG, schema_version: SCHEMA_VERSION, mode, header, events: [] };
+  if (opts.seat?.length) {
+    const unknown = opts.seat.filter((p) => !roster.some((r) => r.persona === p));
+    if (unknown.length) throw new Error(`--seat names personas not on the roster: ${unknown.join(", ")}`);
+    header.seat_override = opts.seat;
+  }
+  const log ={ kind: RECORD_KIND.RUN_LOG, schema_version: SCHEMA_VERSION, mode, header, events: [] };
   const r = validate(RECORD_KIND.RUN_LOG, log);
   if (!r.valid) throw new Error(r.errors.map((e) => `${e.path}: ${e.message}${e.hint ? ` (${e.hint})` : ""}`).join("\n"));
   return log;
@@ -751,7 +758,7 @@ function main(argv) {
     if (!VOCAB.run_mode.includes(mode)) usage(`init needs a mode: ${VOCAB.run_mode.join(", ")}`);
     const date = f.date ?? today();
     const opts = { date, target: f.target, feature: f.feature, pr: f.pr, python: f.python, context: argOrFile(f.context),
-      roster: f.roster?.split(",").filter(Boolean), corpus: f.corpus?.split(",").filter(Boolean), bindings: bindings().block };
+      roster: f.roster?.split(",").filter(Boolean), seat: f.seat?.split(",").filter(Boolean), corpus: f.corpus?.split(",").filter(Boolean), bindings: bindings().block };
     if (mode === RUN_MODE.SDLC) {
       if (!f.feature) usage("init sdlc needs --feature");
       Object.assign(opts, { dir: f.dir ?? `specs/${f.feature}`, stem: "agent-sdlc-log" });

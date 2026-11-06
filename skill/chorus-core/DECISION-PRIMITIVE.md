@@ -85,11 +85,15 @@ gate alike. It is a *decision* banded by catalog rows 1–2; the persona's RSVP 
   arithmetic, `GATE-PRIMITIVE.md` Stage 4). Seated board size =
   `min(roster, min(5, |ordinary JOIN|) + |exceptional|)`. Exceptional entries (with cited
   deltas) and the ordinary/exceptional split are recorded in the ledger.
-- **No mandate.** No actor pins, approves, or compels a seat — not the orchestrator, not
-  the operator, not a catalog row. A lens that cannot articulate an uncovered delta is not
-  seated; that is the bar working, not exclusion. Where a lens's absence carries risk, the
-  conductor files a **flag-only side-note** (`CONDUCTOR.md` § Side-notes) — never an
-  auto-seat.
+- **No mandate.** No actor pins, approves, or compels a seat — not the orchestrator, not a
+  catalog row. A lens that cannot articulate an uncovered delta is not seated; that is the
+  bar working, not exclusion. Where a lens's absence carries risk, the conductor files a
+  **flag-only side-note** (`CONDUCTOR.md` § Side-notes) — never an auto-seat.
+- **Operator seat override.** The one exception: the operator may rule lenses into a seat
+  for a run (`conduct init --seat a,b`, recorded as `seat_override` in the run header).
+  A named lens is seated only if it joined; each takes the place of the lowest-sorted
+  seated lens not itself named, so the sort, not an actor, decides who leaves. The seating
+  decision records each swap.
 - **Role guardrail.** When the cap forces an ordinary out-seat, "covered by a seated
   lens" is judged by the lens's **role, not by overlapping findings** — one shared finding
   does not transfer a lens's role.

@@ -28,6 +28,14 @@ test("six joiners tied across the fifth seat: band 🟡, five still seated (reco
   assert.equal(s.rows.filter((r) => r.seated).length, 5);
 });
 
+test("operator seat override: each named joiner takes the lowest-sorted unnamed seat", () => {
+  const rows = [join("a", 5), join("b", 4), join("c", 3), join("d", 2), join("e", 1), join("f", 1), join("g", 1), { persona: "h", decision: RSVP.ABSTAIN }];
+  const s = seat(rows, ["f", "g", "h", "a"]);
+  assert.deepEqual(s.rows.filter((r) => r.seated).map((r) => r.persona).sort(), ["a", "b", "c", "f", "g"]);
+  assert.deepEqual(s.swaps, [{ in: "f", out: "e" }, { in: "g", out: "d" }]);
+  assert.deepEqual(seat(rows).swaps, []);
+});
+
 test("exceptional entries seat beyond the cap, one per distinct uncovered delta", () => {
   const ex = (persona, delta) => ({ persona, decision: RSVP.EXCEPTIONAL, applies: [delta], uncovered_delta: delta });
   const s = seat([...["a", "b", "c"].map((p) => join(p)), ex("x", "files leave the boundary"), ex("y", "Files leave the boundary ")]);
