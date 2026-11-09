@@ -64,9 +64,17 @@ scripts/check-suite-integrity.sh     # FC1–FC7: invariants, sibling isolation,
                                      # manifest (incl. claude plugin validate),
                                      # references, stale content, port boundary,
                                      # roster
+scripts/check-records.sh             # every docs/reviews/*.json validates
+                                     # (review records and .run.json logs)
 scripts/test-install-roundtrip.sh    # install -> verify -> uninstall -> verify
 node --test skill/chorus-core/test/*.test.mjs  # validator, renderer, bindings, canon drift,
                                                # conductor scenarios, vocabulary lint
+```
+
+Once per clone, turn on the pre-commit hook, which runs the first two:
+
+```sh
+git config core.hooksPath .githooks
 ```
 
 A new token in a closed set (a status, a vote, a gate result, a persona) goes in
