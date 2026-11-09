@@ -27,7 +27,7 @@
  * Zero dependencies; Node 20+.
  */
 
-import { existsSync, readFileSync, readdirSync, realpathSync, renameSync, writeFileSync, mkdirSync } from "node:fs";
+import { closeSync, existsSync, mkdirSync, openSync, readFileSync, readdirSync, realpathSync, renameSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import {
@@ -737,6 +737,26 @@ const readJson = (f) => JSON.parse(readFileSync(f, "utf8"));
 const today = () => new Date().toISOString().slice(0, 10);
 const argOrFile = (v) => (v?.startsWith("@") ? readFileSync(v.slice(1), "utf8").trim() : v);
 
+const LOCK_STALE_MS = 10_000;
+
+/**
+ * Holds `<file>.lock` from read to exit. Each command reads the log, checks the reply
+ * against the state it derives, then rewrites the whole file; without the lock, parallel
+ * submits each rewrite their own copy and all but one reply are lost while every one exits 0.
+ * Waiters poll; a lock older than LOCK_STALE_MS is a crashed writer's and is broken.
+ */
+function lockRun(file) {
+  const lock = `${file}.lock`;
+  for (;;) {
+    try { closeSync(openSync(lock, "wx")); break; } catch (e) {
+      if (e.code !== "EEXIST") throw e;
+      try { if (Date.now() - statSync(lock).mtimeMs > LOCK_STALE_MS) rmSync(lock, { force: true }); } catch {}
+      Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 20);
+    }
+  }
+  process.on("exit", () => rmSync(lock, { force: true }));
+}
+
 function usage(msg) {
   if (msg) process.stderr.write(`${msg}\n`);
   process.stderr.write("usage: conduct init <review|sdlc|challenge> … | next|status|record <run.json> | submit <run.json> <persona> <reply.json> | fail <run.json> <persona> <failure> <reason> | ack <run.json> <persona> | answer <run.json> <topic> <data.json>\n");
@@ -775,6 +795,7 @@ function main(argv) {
   let log;
   const unreadable = (why) => { process.stderr.write(`${why}. Restore it from git (git checkout -- ${file}) or start a new run with conduct init.\n`); return EXIT.UNREADABLE_LOG; };
   if (!existsSync(file)) usage(`no run log at ${file}; start one with conduct init, or check the path`);
+  lockRun(file);
   try { log = readJson(file); } catch (e) { return unreadable(`cannot read the run log ${file}: ${e.message}`); }
   const shape = validate(RECORD_KIND.RUN_LOG, log);
   if (!shape.valid) return unreadable(`${file} is not a valid run log: ${shape.errors.map((e) => `${e.path}: ${e.message}`).join("; ")}`);

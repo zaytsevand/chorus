@@ -1,7 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
-import { spawnSync } from "node:child_process";
+import { spawn, spawnSync } from "node:child_process";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { ack, answer, assemble, derive, freeStem, submit } from "../bin/conduct.mjs";
@@ -279,6 +279,20 @@ test("cli: next prints the action; record writes JSON and page once the run is d
   const r = cli("record", run.file);
   assert.equal(r.status, 0, r.stderr);
   assert.ok(existsSync(join(run.dir, "2026-10-28-chorus-review.md")));
+});
+
+test("cli: replies submitted at the same time are all kept", async () => {
+  const run = newRun(RUN_MODE.REVIEW);
+  const action = derive(run.log).action;
+  const submits = ROSTER6.map((p) => {
+    const reply = join(run.dir, `${p}.rsvp.json`);
+    writeFileSync(reply, JSON.stringify(rsvp(p, action)));
+    return new Promise((done) => spawn(process.execPath, [join(ROOT, "bin", "conduct.mjs"), "submit", run.file, p, reply]).on("exit", done));
+  });
+  assert.deepEqual(await Promise.all(submits), ROSTER6.map(() => 0));
+  const kept = JSON.parse(readFileSync(run.file, "utf8")).events.map((e) => e.persona).sort();
+  assert.deepEqual(kept, [...ROSTER6].sort(), "a reply that exits 0 is in the log");
+  assert.ok(!existsSync(`${run.file}.lock`), "the lock is released");
 });
 
 test("cli: each failure has its own exit code", () => {

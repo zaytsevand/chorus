@@ -1,5 +1,13 @@
 # Changelog
 
+## Unreleased
+
+- **Parallel submits no longer lose replies.** Every `conduct.mjs` command now
+  holds `<run>.json.lock` from reading the log until it exits. Before this, six
+  `conduct submit` calls run at once kept as few as one reply, and every call
+  still exited 0. A lock older than 10 s is taken to be a crashed writer's and
+  is broken.
+
 ## 2.0.0 — 2026-10-29
 
 Breaking: `conduct.mjs` exit codes changed, the `coryphaeus` skill is folded into
