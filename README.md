@@ -2,7 +2,7 @@
 
 A Claude Code skill suite that runs a structured multi-advisor review of **whatever
 you point it at** — most often a spec or a feature's design, occasionally a
-full-codebase sweep. Nine persona advisors, each reviewing the target through
+full-codebase sweep. Ten persona advisors, each reviewing the target through
 their lens:
 
 - **Eric Evans** — DDD / domain model
@@ -14,17 +14,18 @@ their lens:
 - **Delivery-and-Ops** — synthesized (Farley · Hightower · Majors)
 - **Security-and-Trust** — synthesized (Schneier · Shostack · Nather)
 - **Goldratt** — Eliyahu M. Goldratt (Theory of Constraints; deferral / opportunity cost), modernized by Reinertsen flow economics
+- **Test-Strategy** — synthesized (Cohn · Fowler & Vocke · Dodds · Rainsberger · Crispin & Gregory); where each risk is checked, at what price, with the test pyramid as one tool among several
 
 An optional **Guido** (Python) language lens joins only on rounds with Python in
 scope. Conflicts go to `advisor()`. Output is a durable markdown artifact you
 commit; the most recent artifact is the next round's baseline.
 
-## The suite — five skills over one substrate
+## The suite — four skills over one substrate
 
-The chorus is packaged as a **composable suite** of five skills. The shared
-mechanics live once in a substrate skill; the two review modes compose it by
-name and never depend on each other, a tutorial skill teaches both, and a
-composition root binds them to the outside world:
+The chorus is packaged as a **composable suite** of four skills. The shared
+mechanics, the record tools and the bindings to the outside world live once in
+a substrate skill; the two review modes compose it by name and never depend on
+each other, and a tutorial skill teaches both:
 
 - **`chorus-core`** — substrate (not invoked directly). The four-stage gate
   primitive (`skill/chorus-core/GATE-PRIMITIVE.md`: extract → uncapped author →
@@ -33,7 +34,11 @@ composition root binds them to the outside world:
   the conductor discipline + the single `I1–I9` invariant catalog
   (`CONDUCTOR.md`). It also documents the **reserved seams** (extract-stage
   record, agent-memory layout, two-tier memory model) and the **findings→memory
-  contract** future skills compose.
+  contract** future skills compose. It holds the **record tools**: the JSON
+  schema for every chorus record, the zero-dependency validator and renderer
+  every round uses (`skill/chorus-core/bin/`), with a drift test that fails when
+  they stop matching the canon, and the **bindings** (`BINDINGS.md`): what
+  serves each port when a provider is installed.
 - **`chorus-review`** — the **project-state round**: a multi-lens review of a
   scope you choose (most often a spec or a feature's design; occasionally the
   whole codebase). Trigger: **"spawn the chorus."** Output:
@@ -55,12 +60,6 @@ composition root binds them to the outside world:
   addendum, which it can scaffold on request from the template it ships at
   `skill/chorus-learn/templates/CHORUS-PROJECT.template.md`) and both review
   modes. Trigger: **"chorus learn."**
-- **`coryphaeus`**, the **composition root**: the JSON schema for every
-  chorus record, the zero-dependency validator and renderer every round uses
-  (`skill/coryphaeus/bin/`), and the bindings of the chorus's ports to
-  providers, problem-brief by default. It enforces the canon's rules and
-  restates none of them; where the two disagree the canon wins, and a drift
-  test in its `test/` catches it. It is the only skill that names a provider.
 
 Both modes run the **same** gate primitive from `chorus-core`, so they cannot
 drift. Each sibling declares `REQUIRED: chorus-core` and carries a sibling-side
@@ -71,13 +70,19 @@ describes the project-state round (`chorus-review`).
 
 The chorus skills name no outside skill. They declare **ports** — decision sink, ruling
 lookup, record validator, record renderer, arbiter, fixed viewpoint, memory recall
-(`skill/chorus-core/CONDUCTOR.md` § Ports) — and a composition root binds them.
-Without one, each port's default applies (ask in chat, `advisor()`, hand-written
-pages marked unrendered, and so on) and the round record says which ran unbound.
-`coryphaeus` binds them: its validator and renderer serve the record ports, and
-with [problem-brief](https://github.com/zaytsevand/problem-brief) installed, the
-decision sink, ruling lookup and publishing go to a brief (`skill/coryphaeus/SKILL.md`
-§ Bindings).
+(`skill/chorus-core/CONDUCTOR.md` § Ports). chorus-core's own validator and
+renderer serve the record ports. At the start of each round or gate the conductor
+runs `bin/bindings.mjs`, which looks for an installed
+[problem-brief](https://github.com/zaytsevand/problem-brief): if one is there,
+the decision sink, ruling lookup and publishing go to a brief
+(`skill/chorus-core/BINDINGS.md`); if not, each port's default applies (ask in
+chat, rulings kept in the record, `advisor()`, and so on). The records are the
+same either way, so installing problem-brief later loses nothing. The round
+record says which provider served each port. `BINDINGS.md` is the only file that
+names a provider.
+
+Earlier releases shipped this layer as a separate `coryphaeus` skill. It is now
+part of chorus-core; re-running `install.sh` removes the old copy.
 
 ## Why
 
@@ -211,11 +216,11 @@ cross-cutting concerns recur across every lens — they aren't a separate
 doctrine layered on top of the personas, they're how each persona
 *already* reads code through their own vocabulary:
 
-| Concern | Cooper / Norman read it as | Evans reads it as | Richards reads it as | Beck reads it as | Uncle Bob reads it as | Delivery-and-Ops reads it as | Security-and-Trust reads it as | Goldratt reads it as |
-|---|---|---|---|---|---|---|---|---|
-| **Interface contracts** | a promise the user can read | Published Language at a bounded-context boundary | the coupling-type decision at the seam | making the change easy before making the easy change | Dependency Inversion at the architectural seam | the surface a smoke test, canary, or rollback gate can assert against | the trust boundary — what crosses it, who's authoritative, what's enforced | the hypothesis the work is betting on — the boundary past which a non-constraint may be subordinated |
-| **Local purity / explicit effects** | hidden cost shifted onto the user | a Domain Event the model refuses to acknowledge | undocumented temporal or content coupling | a function that can't be cornered by a unit test | SRP and the principle of least astonishment, from two angles | three failure modes presented as one — blast radius compounds silently | a hidden grant of capability the threat model never accounted for | a deferral whose downstream cost is hidden — opportunity cost that must be priced, not buried |
-| **Behavioural assertions** | a promise nobody is keeping | an aggregate invariant nobody enforces | the cheapest fitness function | the red of red-green-refactor | a blocker, not a nit | the cheapest signal — the CI gate you can afford | a threat-model claim with no test = security theatre | a defer/cut claim with no settling experiment — an opinion, not a finding |
+| Concern | Cooper / Norman read it as | Evans reads it as | Richards reads it as | Beck reads it as | Uncle Bob reads it as | Delivery-and-Ops reads it as | Security-and-Trust reads it as | Goldratt reads it as | Test-Strategy reads it as |
+|---|---|---|---|---|---|---|---|---|---|
+| **Interface contracts** | a promise the user can read | Published Language at a bounded-context boundary | the coupling-type decision at the seam | making the change easy before making the easy change | Dependency Inversion at the architectural seam | the surface a smoke test, canary, or rollback gate can assert against | the trust boundary — what crosses it, who's authoritative, what's enforced | the hypothesis the work is betting on — the boundary past which a non-constraint may be subordinated | the seam a contract test pins from both sides, so the pair is proven without booting the pair |
+| **Local purity / explicit effects** | hidden cost shifted onto the user | a Domain Event the model refuses to acknowledge | undocumented temporal or content coupling | a function that can't be cornered by a unit test | SRP and the principle of least astonishment, from two angles | three failure modes presented as one — blast radius compounds silently | a hidden grant of capability the threat model never accounted for | a deferral whose downstream cost is hidden — opportunity cost that must be priced, not buried | a check forced up the stack — what a unit test can't corner gets bought with a slow, vague end-to-end one |
+| **Behavioural assertions** | a promise nobody is keeping | an aggregate invariant nobody enforces | the cheapest fitness function | the red of red-green-refactor | a blocker, not a nit | the cheapest signal — the CI gate you can afford | a threat-model claim with no test = security theatre | a defer/cut claim with no settling experiment — an opinion, not a finding | a risk placed at the cheapest check that can honestly catch it |
 
 Each persona carries these as their own concerns in their own voice — see
 the agent files under [`agents/`](agents/). Optional language lenses carry the
@@ -225,7 +230,7 @@ can pin (`agents/guido-python-reviewer.md`). When two lenses independently judge
 finding **under-rated** (the `PRIORITIZE` vote) in a chorus round, it escalates one
 severity level. Mere agreement at the proposed severity (the `CONFIRM` vote) counts as
 convergence for *ranking* but does not escalate — so popular polish stays polish.
-(Vote vocabulary `PRIORITIZE` / `CONFIRM` / `OVER-RATE`; see `skill/chorus-core/GATE-PRIMITIVE.md`.)
+(Vote vocabulary `PRIORITIZE` / `CONFIRM` / `OVER-RATE` / `NEED_INFO`; see `skill/chorus-core/GATE-PRIMITIVE.md`.)
 
 Projects with stronger or more-specific principles (layer rules, language
 mandates, infrastructure constraints) declare them in section 4 of
@@ -240,7 +245,9 @@ neither — see [`skill/chorus-core/CONDUCTOR.md`](skill/chorus-core/CONDUCTOR.m
 
 ## Lens coverage
 
-Which agent owns which axis. Score per cell: **3** primary remit · **2**
+Which agent owns which axis. Each lens's remit and the seams between lenses are
+stated once, in [`skill/chorus-core/ROSTER.md`](skill/chorus-core/ROSTER.md); this
+matrix scores them. Score per cell: **3** primary remit · **2**
 secondary strength · **1** incidental · `·` none. A column with no `3` is an
 axis no single lens owns — structurally under-represented.
 
@@ -255,7 +262,8 @@ axis no single lens owns — structurally under-represented.
 | **Delivery-and-Ops** — Farley/Hightower/Majors | · | 1 | · | 2 | · | · | 2 | **3** | **3** | · | 1 | · |
 | **Security-and-Trust** — Schneier/Shostack/Nather | · | 1 | · | 1 | · | · | 2 | 1 | 1 | **3** | · | 2 |
 | **Goldratt** — ToC/Reinertsen | · | 1 | 1 | 1 | · | 2 | **3** | 2 | 1 | · | 1 | · |
-| **Breadth (Σ)** | 7 | 11 | 10 | 12 | 5 | 9 | 12 | 8 | 6 | 4 | 4 | 5 |
+| **Test-Strategy** — Cohn/Fowler/Dodds/Rainsberger | · | 2 | 1 | **3** | · | · | 2 | 2 | 1 | · | 1 | · |
+| **Breadth (Σ)** | 7 | 13 | 11 | 15 | 5 | 9 | 14 | 10 | 7 | 4 | 5 | 5 |
 | **Champion? (any 3)** | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | — | — |
 
 **Axis key:** **Dom** Domain modeling · **Arch** Architecture & evolvability ·
@@ -283,8 +291,9 @@ version of this matrix — heatmap, radar, and per-axis breakdown — is at
 - **The `advisor()` tool** — conflict reconciliation (Phase 3) routes disputes
   to it. Without it the chorus records each conflict, unresolved, for you to
   rule on.
-- **Node 18 or later**: coryphaeus's validator and renderer. No npm
-  dependencies. Without Node, rounds run unvalidated and pages are hand-written.
+- **Node 20 or later**: every round runs through chorus-core's conductor loop
+  (`bin/conduct.mjs`), validator and renderer. No npm dependencies. There is no
+  round without Node; `install.sh` refuses to install below Node 20.
 
 **Optional:**
 
@@ -293,16 +302,16 @@ version of this matrix — heatmap, radar, and per-axis breakdown — is at
 - **memsearch** — recall of past-session context when the round context is
   drafted; the project's own memory surface works too.
 - **problem-brief**: the decision sink, ruling store and lookup, and publisher
-  coryphaeus binds to. Without it each port falls back to its default
+  chorus-core routes to when it is installed. Without it each port falls back to its default
   (questions in chat, answers kept in the record). Install:
   `git clone https://github.com/zaytsevand/problem-brief && cd problem-brief && ./install.sh`.
 
 ## Install
 
 The suite is named **chorus**. Both channels below
-deliver the same five skills (`chorus-core`, `chorus-review`, `chorus-sdlc`,
-`chorus-learn`, `coryphaeus`, including their subfolders such as the addendum
-template) and the ten persona agents. One install covers the whole suite.
+deliver the same four skills (`chorus-core`, `chorus-review`, `chorus-sdlc`,
+`chorus-learn`, including their subfolders such as the addendum
+template) and the eleven persona agents. One install covers the whole suite.
 
 ### Clone + script
 
@@ -318,12 +327,32 @@ Every file it writes is recorded, with a hash of what it wrote, in
 `~/.claude/.chorus-install-manifest`. Re-running it is safe and is how you
 upgrade: a file still as installed is updated, a file you edited is reported as
 "differs, kept" and left alone, and files an earlier version shipped but this
-one does not are pruned unless you edited them. Files it did not write are left
-alone. `--force` overwrites every shipped file.
+one does not are pruned unless you edited them. A copy installed before the
+manifest existed is recognised as ours when its content matches a version this
+repository once shipped, and is updated. Files it did not write are left alone.
+`--force` overwrites every shipped file. Tests and fixtures (`test/`,
+`examples/`) stay in the repository and are not installed.
 
-Its closing message reports whether Node is present and whether problem-brief
-is installed, with the command to install it if not. It never installs
-problem-brief itself.
+**Exit status.** `install.sh` refuses Node older than 20 before writing anything.
+If any shipped file is left as it was (yours, or unrecognised), it lists each
+path with the fix and exits 1, because the install then mixes two versions.
+Exit 0 means every shipped file is current.
+
+Its closing message reports the version it installed (also in
+`~/.claude/skills/chorus-core/VERSION`), the Node version, and whether
+problem-brief is installed, with the command to install it if not. It never
+installs problem-brief itself.
+At review time chorus-core looks for problem-brief in the project's
+`.claude/skills`, then `${CLAUDE_HOME:-~/.claude}/skills`; if you keep skills
+elsewhere, add those directories to `CHORUS_SKILL_PATH` (colon-separated).
+
+Upgrading from a release with the separate `coryphaeus` skill: the installer
+never removes it. It warns that the retired skill is still installed and still
+loads, and prints the command to remove it; whether to run it is your choice.
+
+**Downgrade** by checking out an older commit and re-running `./install.sh`. A
+run log (`<stem>.run.json`) is replayed only by the version that started it;
+another version refuses it with exit 8 and says which version to use.
 
 **Per-project install** — install into one project's `.claude/` instead of your
 global config, by pointing `CLAUDE_HOME` at it (run from the project root):
@@ -408,6 +437,13 @@ A markdown artifact structured as:
 The chorus is usually pointed at a spec or a feature's design; a full-codebase
 sweep is the occasional periodic case, not the default. For the full sweep,
 cadence is typically quarterly or after a major release.
+
+## Reporting a problem
+
+Open an issue at https://github.com/zaytsevand/chorus/issues. Include the
+installed version (`cat ~/.claude/skills/chorus-core/VERSION`), the full output
+and exit code of `./install.sh` or of the failing `conduct` command, and, for a
+round, the run log (`docs/reviews/<stem>.run.json`) if you can share it.
 
 ## License
 

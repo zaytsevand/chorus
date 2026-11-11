@@ -21,3 +21,4 @@
 - project-feature015-gateB-vote.md — feature 015 Gate B (plan/tasks) arch vote; sequencing sound, seam tasked right, RB1 🔴 FC4 baseline ordering gap
 - project-feature015-gateB-cycle2.md — feature 015 Gate B cycle-2; all RB cleared, Phase-2a/2b split clean, Gate B clears (no open 🔴)
 - project-pr32-exploratory.md — PR #32 + coryphaeus exploratory 2026-09-27; gate open, Stage-4 duplicate authority, schema pinning gap
+- [Understanding PR45+47 (2026-10-29)](understanding-2026-10-29-pr47.md) — gates referenced from addendum; engine↔canon duplicate authority; run-log contract

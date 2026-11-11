@@ -1,0 +1,129 @@
+{
+  "kind": "run-log",
+  "schema_version": "1.0",
+  "mode": "review",
+  "header": {
+    "date": "2026-10-28",
+    "target": "specs/099-example/spec.md",
+    "dir": "docs/reviews",
+    "stem": "2026-10-28-chorus-review",
+    "roster": [
+      {
+        "persona": "eric-evans-advisor",
+        "lens": "DDD"
+      },
+      {
+        "persona": "mark-richards-architect",
+        "lens": "architecture"
+      },
+      {
+        "persona": "alan-cooper-advisor",
+        "lens": "adversarial product"
+      },
+      {
+        "persona": "don-norman-advisor",
+        "lens": "human-centred design"
+      }
+    ],
+    "bindings": {
+      "ports": [
+        {
+          "port": "decision-sink",
+          "provider": "default"
+        },
+        {
+          "port": "ruling-lookup",
+          "provider": "default"
+        },
+        {
+          "port": "record-validator",
+          "provider": "default"
+        },
+        {
+          "port": "record-renderer",
+          "provider": "default"
+        },
+        {
+          "port": "arbiter",
+          "provider": "default"
+        },
+        {
+          "port": "fixed-viewpoint",
+          "provider": "default"
+        },
+        {
+          "port": "memory-recall",
+          "provider": "default"
+        }
+      ],
+      "recoveries": []
+    },
+    "review_mode": "project-state",
+    "round_context": "Commit abc123 added the export path; spec 099 landed."
+  },
+  "events": [
+    {
+      "type": "reply",
+      "phase": "rsvp",
+      "persona": "eric-evans-advisor",
+      "data": {
+        "kind": "rsvp",
+        "schema_version": "1",
+        "persona": "eric-evans-advisor",
+        "lens": "lens",
+        "round": "2026-10-28",
+        "decision": "JOIN",
+        "applies": [
+          "the export path"
+        ],
+        "expected": {
+          "stakes": "🟡",
+          "hook": "the export path is new"
+        },
+        "reason": "The export path is in my territory."
+      }
+    },
+    {
+      "type": "reply",
+      "phase": "rsvp",
+      "persona": "mark-richards-architect",
+      "data": {
+        "kind": "rsvp",
+        "schema_version": "1",
+        "persona": "mark-richards-architect",
+        "lens": "lens",
+        "round": "2026-10-28",
+        "decision": "JOIN",
+        "applies": [
+          "the export path"
+        ],
+        "expected": {
+          "stakes": "🟡",
+          "hook": "the export path is new"
+        },
+        "reason": "The export path is in my territory."
+      }
+    },
+    {
+      "type": "reply",
+      "phase": "rsvp",
+      "persona": "alan-cooper-advisor",
+      "data": {
+        "kind": "rsvp",
+        "schema_version": "1",
+        "persona": "alan-cooper-advisor",
+        "lens": "lens",
+        "round": "2026-10-28",
+        "decision": "ABSTAIN",
+        "reason": "Nothing in the deltas touches my lens."
+      }
+    },
+    {
+      "type": "failure",
+      "phase": "rsvp",
+      "persona": "don-norman-advisor",
+      "failure": "silent",
+      "reason": "no reply within the 3-minute RSVP budget"
+    }
+  ]
+}

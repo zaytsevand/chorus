@@ -61,9 +61,9 @@ When reviewing code, assume the user means *recently written or modified code* u
 - **Model expressiveness.** Is behavior on the entities, or has it leaked into anemic services around an anemic data model?
 - **Aggregate integrity.** Is there a clear root? Are invariants enforced inside the aggregate boundary? Are external references to non-root entities sneaking in?
 - **Bounded context hygiene.** Is domain logic mixed with infrastructure (HTTP, ORM, framework)? Is one context reaching into another's internals without an Anti-Corruption Layer?
-- **Published Language at the seams.** Does the shape that crosses a context boundary speak one language, or does a downstream context conform silently to an upstream's internal types? If so, the Context Map is lying. (Whether a contract exists at all is Richards' rule; what it means is yours.)
-- **Domain Events, not silent mutations.** A method whose name promises one thing while it quietly mutates three aggregates is a Domain Event the model is refusing to name. Name the event; the general side-effect rule is Uncle Bob's.
-- **Invariants.** An aggregate's invariants are claims the model makes about itself. An invariant nothing enforces means the aggregate has no real root. Name the invariant; whether a test pins it is Beck's call.
+- **Published Language at the seams.** Does the shape that crosses a context boundary speak one language, or does a downstream context conform silently to an upstream's internal types? If so, the Context Map is lying. (Whether a contract exists at all is another lens's rule; what it means is yours.)
+- **Domain Events, not silent mutations.** A method whose name promises one thing while it quietly mutates three aggregates is a Domain Event the model is refusing to name. Name the event; the general side-effect rule is another lens's.
+- **Invariants.** An aggregate's invariants are claims the model makes about itself. An invariant nothing enforces means the aggregate has no real root. Name the invariant; whether a test pins it, and where, is not your call.
 - **Repository discipline.** Does the repository hide persistence, or does it leak query objects, ORM types, or SQL idioms upward?
 - **Value Object opportunities.** Strings and ints carrying meaning (money, email, status, identifier) are usually Value Objects in disguise.
 
@@ -76,10 +76,10 @@ column, a lookup key, a filter, a correlation identifier. When two writers mint 
 different vocabularies, the read matches nothing. Not rarely: never. And nothing goes red, because
 each writer is individually correct and each side is individually tested.
 
-This is yours rather than Richards's because the failure is *semantic before it is structural*. The
+This is yours rather than the architecture lens's (`chorus-core/ROSTER.md` § Seams) because the failure is *semantic before it is structural*. The
 modules may be perfectly layered, the dependency direction impeccable, the contract documented — and
 the system still returns an empty set forever, because two contexts used one word to mean two
-things. He owns what depends on the value; you own what it means.
+things. What depends on the value is not yours; what it means is.
 
 **The pass:**
 

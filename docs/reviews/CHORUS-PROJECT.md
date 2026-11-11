@@ -7,13 +7,15 @@ repo.
 
 ## 1. Project summary
 
-`chorus` is a Claude Code plugin: a suite of five skills and ten persona agents
+`chorus` is a Claude Code plugin: a suite of four skills and ten persona agents
 that run structured multi-lens reviews. `skill/chorus-core/` is the canon (the
 conductor's procedure, the gate, decision and exploratory primitives, the
 I1 to I9 catalog, the ports); `chorus-review`, `chorus-sdlc` and `chorus-learn`
-compose it; `skill/coryphaeus/` is the composition root (JSON schema, validator,
-renderer, provider bindings). Canon and personas are markdown; tooling is Node
-with zero npm dependencies (`skill/coryphaeus/bin/`) plus bash scripts.
+compose it. `skill/chorus-core/` is also the composition root: the conductor
+loop and its rules (`bin/conduct.mjs`, `bin/engine.mjs`), the vocabulary
+registry, the JSON schema, validator and renderer, and the provider bindings
+(`BINDINGS.md`). Canon and personas are markdown; tooling is Node 20+ with zero
+npm dependencies (`skill/chorus-core/bin/`) plus bash scripts.
 Governance doc: `.specify/memory/constitution.md`.
 
 ## 2. Default scope exclusions
@@ -22,7 +24,7 @@ Governance doc: `.specify/memory/constitution.md`.
   came to be, not a target; a finding belongs on the canon file the spec
   produced.
 - `tests/parity/`: older parity notes from the suite decomposition. The
-  current checks are `scripts/` and `skill/coryphaeus/test/`.
+  current checks are `scripts/` and `skill/chorus-core/test/`.
 - `docs/reviews/` past rounds (`2026-06-06-chorus-review.md`,
   `2026-09-27-chorus-review-pr32.*`, `pr32/`): baseline, not target. They
   record what was said at the time and are never rewritten.
@@ -31,7 +33,7 @@ Governance doc: `.specify/memory/constitution.md`.
 - `.claude/agent-memory/`: persona memory. Tracked and published, but written by
   the personas; review the memory contract in `CONDUCTOR.md`, not the entries.
 - `.specify/` templates and scripts: speckit tooling, vendored.
-- `skill/coryphaeus/examples/`: fixtures for the validator tests, including
+- `skill/chorus-core/examples/`: fixtures for the validator tests, including
   deliberately invalid ones.
 
 ## 3. Default anchor surface
@@ -40,8 +42,9 @@ Governance doc: `.specify/memory/constitution.md`.
   `DECISION-PRIMITIVE.md`, `EXPLORATORY-PHASE.md`, `SKILL.md`)
 - `skill/chorus-review/SKILL.md`, `skill/chorus-sdlc/SKILL.md`,
   `skill/chorus-learn/` (with `templates/`)
-- `skill/coryphaeus/`: `SKILL.md`, `schema/`, `bin/validate.mjs`,
-  `bin/render.mjs`, `test/` (including `canon-drift.test.mjs`)
+- `skill/chorus-core/BINDINGS.md`, `schema/`, `bin/` (`conduct.mjs`,
+  `engine.mjs`, `vocab.mjs`, `validate.mjs`, `render.mjs`, `bindings.mjs`),
+  `test/` (including `canon-drift.test.mjs` and `vocab-lint.test.mjs`)
 - `agents/`: the ten persona definitions
 - `install.sh`, `uninstall.sh`, `.claude-plugin/plugin.json`: packaging and
   onboarding
@@ -78,7 +81,7 @@ On top of the Security-and-Trust defaults:
   ruling kept in a private brief outside the repo. Only the reference is
   committed, never the brief or its content.
 - **Supply chain**: zero npm dependencies is a rule, not a habit; any `import`
-  outside `node:` in `skill/coryphaeus/bin/` is a finding.
+  outside `node:` in `skill/chorus-core/bin/` is a finding.
 - **Prompt surface**: persona and skill prose is executed by a model with the
   user's tools; an instruction in canon is a capability grant.
 
@@ -97,13 +100,29 @@ On top of the Security-and-Trust defaults:
 - Who it is for: a published plugin installed by people the operator does not
   know. Installer and onboarding findings count at full severity.
   [operator-confirmed 2026-09-27]
+- Scale and channel: one maintainer; strangers mostly install with `install.sh`;
+  broken upgrades are reported as GitHub issues. [operator-confirmed 2026-10-29]
+- Upgrades count at full severity and are run by operators' agents: errors must
+  be loud and machine-actionable; human UX matters less. The installer warns
+  about stale skills and never removes them; removal is the operator's choice.
+  Downgrade is an older commit plus `./install.sh`. [operator-confirmed 2026-10-29]
+- Who reads what in a round: the calling agent is the only reader of
+  `conduct`'s output, exit codes and run log; the operator sees the questions
+  and the final record. [operator-confirmed 2026-10-29]
 
 ### Architecture
 - Ranked qualities: 1 conformance and reliability, 2 portability, 3 ease of
   change, 4 simplicity. [operator-confirmed 2026-09-27]
 - Shape: one repository, several skills. Each rule lives in one file and others
-  refer to it by path; the chorus canon owns the rules and coryphaeus binds and
-  checks them, the canon winning on disagreement. [operator-confirmed 2026-09-28]
+  refer to it by path. [operator-confirmed 2026-09-28]
+- Authority: for the conductor's mechanical rules (seat cap, quorum, retries,
+  ballots, routing, the vote count, the cycle bound) the code (`bin/engine.mjs`,
+  `bin/conduct.mjs`) is the authority and the prose says what each rule is for;
+  the ports and the failure policy stay in the canon. Supersedes the
+  2026-09-28 "canon wins" line. [operator-confirmed 2026-10-29]
+- A program's size is not by itself a cost against simplicity ("a 700-line
+  program is not a burden to work with in the agentic era").
+  [operator-confirmed 2026-10-29]
 
 ### Domain
 - Core: the conductor's procedure and invariants (phase gates, I1 to I9,
@@ -115,9 +134,16 @@ On top of the Security-and-Trust defaults:
   [operator-confirmed 2026-09-27]
 - Claude Code only. [operator-confirmed 2026-09-27]
 - The chorus never names the brief: it composes with problem-brief only through
-  coryphaeus. The chorus skills and personas name no provider.
+  `skill/chorus-core/BINDINGS.md` and its detector. The chorus skills and
+  personas name no provider.
   [operator-confirmed 2026-09-27]
 - No hosted or long-running services. [operator-confirmed 2026-09-27]
+- Node 20 or later is required: every round runs through `bin/conduct.mjs`, and
+  there is no round without Node. [operator-confirmed 2026-10-29]
+- `skill/chorus-core/test/` and `examples/` stay in the repo; only the canon,
+  `bin/` and `schema/` reach users. [operator-confirmed 2026-10-29]
+- A committed run log is replayed only by the engine version that wrote it;
+  another version refuses it loudly. [operator-confirmed 2026-10-29]
 - Persona memory is hand-written or pluggable into any store (memsearch or
   another) and exists to keep personas distinct. [operator-confirmed 2026-09-28]
 
