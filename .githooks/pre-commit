@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+# Enabled once per clone with: git config core.hooksPath .githooks
+# Runs the two fast local checks before every commit; bypass with --no-verify.
+set -euo pipefail
+root="$(git rev-parse --show-toplevel)"
+bash "$root/scripts/check-suite-integrity.sh"
+bash "$root/scripts/check-records.sh"
