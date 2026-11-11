@@ -74,6 +74,15 @@ Run 1: cycles 1→2→3 all BLOCKED (38→14→6 🔴, monotonic), S7 bound reac
 - **Cluster D resolved**: channel-resolvable cites — data-model.md:34 S2 annotation (install.sh cite = file-path channel only; plugin-channel resolves to packaged template+SKILL.md), C3 channel-awareness note.
 - Lesson re-confirmed: when a suite declares a uniform contract ("every stanza emits FAIL:"), verify EVERY stanza against it — the team fixed the stanzas that were named in findings and missed the one that wasn't.
 
+### Spec 017 exploratory (2026-10-12, round 2026-10-12-spec017)
+- Gate #1 (user + count): REFERENCED docs/reviews/CHORUS-PROJECT.md section 7 "Who it is for" (published plugin, external installers, operator-confirmed 2026-09-27). Count/skill of the operator who forks a reviewer file is not stated in spec 017: gap-question.
+
 ### Sequencing / environment facts (unchanged)
 
 - Branch SKILL.md is pre-006 ("Two modes"); R8 corrected at cycle 2: 006 does NOT deliver a three-mode SKILL.md — **007 itself performs the reframe** (research.md R8). 007 lands after 006 (PR #5 open). Installed skill at ~/.claude carries 006-era canon.
+
+## PR #32 suite-review round (exploratory 2026-09-27)
+
+- **Gate (who/how many) standing answer: STILL OPEN.** No ruling in docs/reviews/pr32/standing-rulings.md (R-1..R-10, Q-1..Q-17) settles audience count. Signals point both ways: R-7/Q-8 "release = dogfooding" (operator is the primary user); plugin.json 1.0.0 + README "you" (implies external installers). Carried over from 007 run-2 open gate. Re-ask; do not grade channel findings until answered.
+- Seam to chase: chorus install.sh/README never mention coryphaeus or Node; coryphaeus/install.sh only warns on missing node. CONDUCTOR.md:274 validator port unbound → round runs, record says "unvalidated" (graceful, but is the operator told up front?).
+- Failure rule (chorus-review SKILL.md:159-172; coryphaeus SKILL.md:43): invalid reply → one retry → ABSTAIN, reason in roster. Check whether the operator learns mid-round or only in the record.
