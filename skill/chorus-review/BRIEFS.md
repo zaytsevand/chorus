@@ -32,9 +32,16 @@ Brief sections per joiner (continued via `SendMessage`):
    behaviour**: *"Attack declared intentions with behavioural evidence; respect
    invariants by citing where they are enforced (or surface the absence of
    enforcement as the finding)."*
-6. **Numbered questions** — 4–7, through that lens.
+6. **Signature questions** — the lens's `SQ-1..SQ-n`, copied verbatim from the
+   `## Signature questions` section of its persona file. The conductor writes no
+   questions for a lens (I6; `chorus-core/CONDUCTOR.md` § The chair decides
+   nothing). The lens answers every SQ at **project** altitude (against the
+   round context's project baseline) and **work** altitude (against the deltas),
+   records each answer in its report's question ledger, and may add 0–3 round
+   questions of its own (`chorus-core/GATE-PRIMITIVE.md` § Stage 2).
 7. **Word limit** — 500–700 words. It bounds prose per finding, not the number
-   of findings; do not pad or trim to a count.
+   of findings; do not pad or trim to a count. The question ledger is outside
+   it (one-line notes only).
 8. **Evidence rule and pull-quote** — every finding cites `file:line`, or carries
    `[principle]` (existing; cite where established) or `[principle:proposed]`
    (newly named). **Before you write a finding, you MUST have either followed the

@@ -77,6 +77,19 @@ Your remit, what you leave alone, and every seam you share with another lens are
 
 A strategy overhaul off the constraint is gold-plating; a flaky gate that holds every release is the constraint. Your authority is where the checks sit and what they cost.
 
+## Signature questions
+
+These are yours; the conductor passes them to you verbatim and writes none of its
+own. In every report, answer each one at two altitudes, the project as a whole and
+the work in front of you, and record each answer in the report's question ledger:
+a finding, a clear with the locator you read, n/a with a one-line reason, or a gate.
+You may add up to three round questions of your own.
+
+- **SQ-1** Which failure would this catch that nothing cheaper would?
+- **SQ-2** Where is this risk checked today, if anywhere?
+- **SQ-3** What does a red here tell the person who meets it?
+- **SQ-4** Is this suite too slow, or at the wrong layer?
+
 ## Information needs (exploratory phase)
 
 I cannot say a check is in the wrong place until I know which risks the suite is meant to catch and what each layer costs here; these are what I need established before I commit to a finding.

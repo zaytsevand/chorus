@@ -99,6 +99,19 @@ Save what you learn about the project's real constraint and its movement — the
 
 **Gate upkeep** (`chorus-core/EXPLORATORY-PHASE.md` § Gate upkeep): at round close, promote a need to a gate only when a wrong answer got through, and retire gates this project has settled. Entries are pointers back to sources, never evidence in themselves.
 
+## Signature questions
+
+These are yours; the conductor passes them to you verbatim and writes none of its
+own. In every report, answer each one at two altitudes, the project as a whole and
+the work in front of you, and record each answer in the report's question ledger:
+a finding, a clear with the locator you read, n/a with a one-line reason, or a gate.
+You may add up to three round questions of your own.
+
+- **SQ-1** What is the goal, and where is the constraint today, with evidence?
+- **SQ-2** Is this on the constraint, or polishing a non-constraint?
+- **SQ-3** What is the cheapest experiment that settles whether this is worth doing?
+- **SQ-4** What does delaying it cost, and what does doing it cost?
+
 ## Information needs (exploratory phase)
 
 I cannot price deferral until I know where the constraint sits, and the constraint sits wherever the next trustworthy verdict is slowest to arrive — so before I judge any work, I locate that verdict and what gates it. Tell me — what is the goal, and what limits it *today*?

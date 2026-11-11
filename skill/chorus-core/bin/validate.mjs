@@ -23,7 +23,8 @@
  *   2. Rules a schema cannot express: the Stage-4 tally arithmetic
  *      (GATE-PRIMITIVE.md), unique ids, R2- findings ungraded, held findings out
  *      of the top five, word limits, cross-references, ruling_ref shape, and
- *      each ruling_ref followed into the local record it names.
+ *      each ruling_ref followed into the local record it names, and the
+ *      question ledger's coverage (every SQ at both altitudes) and refs.
  *
  * A program, never a model reading the JSON. Zero dependencies; Node 20+.
  * Only the JSON Schema keywords the bundled schemas use are implemented; any
@@ -36,7 +37,7 @@ import { fileURLToPath } from "node:url";
 import {
   DECISION_RESOLUTION, DECISION_STATUS, GATE, GATE_NAME_OF, GATE_RESULT, HELD_ROUTE,
   RECOVERY, RED_DISPOSITION, REPORT_MODE, REVIEW_QUORUM, RSVP, SDLC_MODE, SDLC_STATUS, SEAT, SEVERITY,
-  SEATING_BAND, TALLY_STATUS, VOCAB, CONFLICT_OUTCOME, RECORD_KIND, RULING_STATUS,
+  SEATING_BAND, TALLY_STATUS, VOCAB, CONFLICT_OUTCOME, RECORD_KIND, RULING_STATUS, LEDGER_OUTCOME,
 } from "./vocab.mjs";
 import { QUORUM, SEAT_CAP, CYCLE_BOUND, tally } from "./engine.mjs";
 
@@ -449,6 +450,41 @@ function checkFindingReport(d, s) {
     if (f.conditional_on && !(d.gate_questions ?? []).length) s.err(`findings[${i}]`, "a conditional finding needs the gate question it is conditional on", "add it to gate_questions (S10)");
     if ((f.scope || f.attack_form) && d.mode === REPORT_MODE.REVIEW) s.warn(`findings[${i}]`, "scope and attack_form belong to the premise pass (sdlc Gate A or challenge)");
   });
+  s.unique(d.gate_questions, "id", "gate_questions", "gate-question id");
+  if (d.ledger) checkLedger(d, s);
+  else s.warn("", "no question ledger", "a report written now declares schema 1.1 and answers every signature question at project and work altitude (GATE-PRIMITIVE.md § Stage 2)");
+}
+
+/**
+ * The question ledger (GATE-PRIMITIVE.md Stage 2). Which SQ ids a persona owns
+ * lives in agents/, which this validator does not read: here the ids must run
+ * SQ-1..SQ-n with n in 3–5; matching n to the persona file is the suite's FC8.
+ */
+function checkLedger(d, s) {
+  const findings = new Set((d.findings ?? []).map((f) => f.id));
+  const gates = new Set((d.gate_questions ?? []).map((g) => g.id).filter(Boolean));
+  const seen = new Map();
+  d.ledger.forEach((e, i) => {
+    const p = `ledger[${i}]`;
+    const key = `${e.sq} at ${e.altitude}`;
+    if (seen.has(key)) s.err(p, `${key} is answered twice`, `already at ledger[${seen.get(key)}]; one entry per question per altitude`);
+    else seen.set(key, i);
+    for (const r of e.refs ?? []) {
+      if (e.outcome === LEDGER_OUTCOME.FINDING && !findings.has(r)) s.err(join2(p, "refs"), `"${r}" is not a finding in this report`, "a finding outcome cites the Fn it produced");
+      if (e.outcome === LEDGER_OUTCOME.GATE && !gates.has(r)) s.err(join2(p, "refs"), `"${r}" is not a gate question in this report`, "give the gate question an id (G1, …) and cite it");
+    }
+    if ((e.outcome === LEDGER_OUTCOME.CLEAR || e.outcome === LEDGER_OUTCOME.N_A) && e.refs?.length) s.err(join2(p, "refs"), `a ${e.outcome} answer cites nothing`, "refs belong to finding and gate answers");
+    const n = words(e.note);
+    if (n > 20) s.err(join2(p, "note"), `${n} words; the limit is 20`);
+    if (words(e.question) > 25) s.err(join2(p, "question"), `${words(e.question)} words; the limit is 25`);
+  });
+  const sq = [...new Set(d.ledger.map((e) => e.sq).filter((x) => x?.startsWith("SQ-")))].map((x) => Number(x.slice(3))).sort((a, b) => a - b);
+  if (sq.length < 3 || sq.length > 5 || sq.some((n, i) => n !== i + 1)) s.err("ledger", `signature questions ${sq.map((n) => `SQ-${n}`).join(", ") || "none"}; expected SQ-1..SQ-n with n from 3 to 5`, "answer every signature question in the persona file, numbered as there");
+  for (const n of sq) for (const alt of VOCAB.ledger_altitude) {
+    if (!seen.has(`SQ-${n} at ${alt}`)) s.err("ledger", `SQ-${n} has no ${alt}-altitude answer`, "every signature question is answered at project and work altitude; n/a with a note when it does not apply");
+  }
+  const rq = new Set(d.ledger.map((e) => e.sq).filter((x) => x?.startsWith("RQ-")));
+  if (rq.size > 3) s.err("ledger", `${rq.size} round questions; at most 3`);
 }
 
 function checkVoteReport(d, s) {

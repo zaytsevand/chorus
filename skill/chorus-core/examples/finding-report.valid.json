@@ -1,13 +1,13 @@
 {
   "kind": "finding-report",
-  "schema_version": "1",
+  "schema_version": "1.1",
   "mode": "review",
   "round": "2026-09-27",
   "persona": "kent-beck-persona",
   "lens": "TDD / simple design",
   "tool_uses": 14,
   "gate_questions": [
-    { "need": "the grading bar", "question": "Is the export job an internal tool or a customer-facing service?", "assumption": "customer-facing" }
+    { "id": "G1", "need": "the grading bar", "question": "Is the export job an internal tool or a customer-facing service?", "assumption": "customer-facing" }
   ],
   "findings": [
     {
@@ -34,5 +34,16 @@
       "need_info": true,
       "need_info_reason": "The spec does not say how many rows an export may hold."
     }
+  ],
+  "ledger": [
+    { "sq": "SQ-1", "altitude": "project", "outcome": "clear", "evidence": ["tests/export/test_batch.py:1-80"], "note": "Batch export is test-first; red-for-the-right-reason tests exist." },
+    { "sq": "SQ-1", "altitude": "work", "outcome": "finding", "refs": ["F1"] },
+    { "sq": "SQ-2", "altitude": "project", "outcome": "clear", "evidence": ["src/export/batch.py:1-40"] },
+    { "sq": "SQ-2", "altitude": "work", "outcome": "gate", "refs": ["G1"], "note": "Whether to make it fast depends on who uses it." },
+    { "sq": "SQ-3", "altitude": "project", "outcome": "n/a", "note": "No structural change is pending outside the export package." },
+    { "sq": "SQ-3", "altitude": "work", "outcome": "clear", "evidence": ["src/export/csv.py:1-60"] },
+    { "sq": "SQ-4", "altitude": "project", "outcome": "clear", "evidence": ["docs/roadmap.md:12"] },
+    { "sq": "SQ-4", "altitude": "work", "outcome": "finding", "refs": ["F1", "F2"] },
+    { "sq": "RQ-1", "question": "Does anything exercise the streaming writer under load?", "altitude": "work", "outcome": "finding", "refs": ["F2"] }
   ]
 }
